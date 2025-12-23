@@ -1,26 +1,28 @@
-import { Menu, ChevronDown, Zap, Gift, BookOpen, Phone, Info } from "lucide-react";
+import { Menu, ChevronDown, Zap, Package, Grid3X3, BookOpen, Phone, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import { translations } from "@/lib/i18n";
 
 const categories = [
-  "Electronics",
-  "Fashion & Clothing",
-  "Home & Garden",
-  "Sports & Outdoors",
-  "Health & Beauty",
-  "Toys & Games",
-  "Automotive",
-  "Books & Media",
+  translations.categories.electronics,
+  translations.categories.fashion,
+  translations.categories.homeGarden,
+  translations.categories.sports,
+  translations.categories.healthBeauty,
+  translations.categories.toysGames,
+  translations.categories.automotive,
+  translations.categories.booksMedia,
 ];
 
 const navLinks = [
-  { label: "New Arrivals", icon: Zap, badge: "NEW" },
-  { label: "Promotions", icon: Gift },
-  { label: "Specials", icon: null },
-  { label: "Blog", icon: BookOpen },
-  { label: "Contact Us", icon: Phone },
-  { label: "About Us", icon: Info },
+  { label: translations.nav.products, icon: Package, href: "/products" },
+  { label: translations.nav.categories, icon: Grid3X3, href: "/categories" },
+  { label: translations.nav.newArrivals, icon: Zap, href: "/products?filter=new", badge: "جدید" },
+  { label: translations.nav.blog, icon: BookOpen, href: "/blog" },
+  { label: translations.nav.contactUs, icon: Phone, href: "/contact" },
+  { label: translations.nav.aboutUs, icon: Info, href: "/about" },
 ];
 
 const Navigation = () => {
@@ -38,7 +40,7 @@ const Navigation = () => {
               onClick={() => setIsCategoryOpen(!isCategoryOpen)}
             >
               <Menu className="h-5 w-5" />
-              <span className="hidden sm:inline">CATEGORY</span>
+              <span className="hidden sm:inline">{translations.nav.category}</span>
               <ChevronDown className={`h-4 w-4 transition-transform ${isCategoryOpen ? 'rotate-180' : ''}`} />
             </Button>
 
@@ -46,14 +48,14 @@ const Navigation = () => {
             {isCategoryOpen && (
               <div className="absolute top-full left-0 w-64 bg-card border border-border shadow-xl rounded-b-lg z-50 animate-fade-in">
                 {categories.map((category, index) => (
-                  <a
+                  <Link
                     key={category}
-                    href="#"
+                    to={`/categories/${encodeURIComponent(category)}`}
                     className="flex items-center px-4 py-3 hover:bg-orange/10 hover:text-orange transition-colors border-b border-border last:border-b-0"
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
                     {category}
-                  </a>
+                  </Link>
                 ))}
               </div>
             )}
@@ -62,30 +64,30 @@ const Navigation = () => {
           {/* Navigation Links */}
           <div className="hidden lg:flex items-center flex-1">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.label}
-                href="#"
+                to={link.href}
                 className="flex items-center gap-1 px-4 py-3 h-12 text-sm font-medium text-foreground hover:text-cyan transition-colors relative group"
               >
-                {link.icon && <link.icon className="h-4 w-4" />}
+                <link.icon className="h-4 w-4" />
                 {link.label}
                 {link.badge && (
-                  <Badge variant="sale" className="ml-1 text-[10px] px-1.5 py-0">
+                  <Badge variant="sale" className="mr-1 text-[10px] px-1.5 py-0">
                     {link.badge}
                   </Badge>
                 )}
-                <span className="absolute bottom-0 left-0 w-full h-0.5 bg-cyan scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
-              </a>
+                <span className="absolute bottom-0 right-0 w-full h-0.5 bg-cyan scale-x-0 group-hover:scale-x-100 transition-transform origin-right" />
+              </Link>
             ))}
           </div>
 
           {/* Special Offers */}
-          <div className="hidden md:flex items-center gap-4 ml-auto">
-            <a href="#" className="text-sm text-muted-foreground hover:text-orange transition-colors">
-              Special Offer!
-            </a>
+          <div className="hidden md:flex items-center gap-4 mr-auto">
+            <Link to="/products?filter=sale" className="text-sm text-muted-foreground hover:text-orange transition-colors">
+              {translations.nav.specialOffer}
+            </Link>
             <Badge variant="hot" className="animate-pulse">
-              Black Friday
+              {translations.nav.blackFriday}
             </Badge>
           </div>
         </div>
