@@ -1,10 +1,11 @@
-import { ArrowRight, ChevronLeft, ChevronRight, Clock } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ProductCard from "./ProductCard";
+import { translations } from "@/lib/i18n";
 
 const products = [
   {
-    name: "New Style Blender Pro",
+    name: "مخلوط‌کن حرفه‌ای جدید",
     price: 160.0,
     originalPrice: 200.0,
     rating: 4,
@@ -14,14 +15,14 @@ const products = [
     countdown: { hours: 90, minutes: 48, seconds: 53 },
   },
   {
-    name: "Apple iPhone 6 128GB",
+    name: "اپل آیفون ۶ ۱۲۸ گیگابایت",
     price: 255.0,
     rating: 5,
     reviews: 0,
     countdown: { hours: 90, minutes: 48, seconds: 53 },
   },
   {
-    name: "New Style Blender Mini",
+    name: "مخلوط‌کن مینی جدید",
     price: 140.0,
     originalPrice: 200.0,
     rating: 4,
@@ -31,7 +32,7 @@ const products = [
     countdown: { hours: 90, minutes: 48, seconds: 53 },
   },
   {
-    name: "Portable Earbuds Set",
+    name: "هندزفری بی‌سیم قابل حمل",
     price: 95.0,
     originalPrice: 105.0,
     rating: 3,
@@ -41,7 +42,7 @@ const products = [
     countdown: { hours: 90, minutes: 48, seconds: 53 },
   },
   {
-    name: "Pro Laptop 15 inch",
+    name: "لپ‌تاپ حرفه‌ای ۱۵ اینچ",
     price: 195.0,
     rating: 4,
     reviews: 0,
@@ -59,19 +60,19 @@ const TodayDeals = () => {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 bg-orange px-4 py-2 rounded-lg">
               <Clock className="h-5 w-5 text-accent-foreground" />
-              <h2 className="font-display font-bold text-lg text-accent-foreground">TODAY DEAL</h2>
+              <h2 className="font-display font-bold text-lg text-accent-foreground">{translations.deals.todayDeal}</h2>
             </div>
             <Button variant="link" className="text-muted-foreground hover:text-cyan gap-1">
-              See All <ArrowRight className="h-4 w-4" />
+              {translations.deals.seeAll} <ArrowLeft className="h-4 w-4" />
             </Button>
           </div>
 
           <div className="flex items-center gap-2">
             <Button variant="outline" size="icon" className="rounded-full">
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronRight className="h-4 w-4" />
             </Button>
             <Button variant="outline" size="icon" className="rounded-full">
-              <ChevronRight className="h-4 w-4" />
+              <ChevronLeft className="h-4 w-4" />
             </Button>
           </div>
         </div>
