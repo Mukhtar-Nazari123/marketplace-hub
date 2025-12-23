@@ -1,12 +1,45 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import TopBar from "@/components/layout/TopBar";
+import Header from "@/components/layout/Header";
+import Navigation from "@/components/layout/Navigation";
+import Footer from "@/components/layout/Footer";
+import HeroSection from "@/components/home/HeroSection";
+import TodayDeals from "@/components/home/TodayDeals";
+import PromoBanner from "@/components/home/PromoBanner";
+import BestSellers from "@/components/home/BestSellers";
+import CategoryBanners from "@/components/home/CategoryBanners";
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen flex flex-col bg-background">
+      {/* Top Bar */}
+      <TopBar />
+
+      {/* Header */}
+      <Header />
+
+      {/* Navigation */}
+      <Navigation />
+
+      {/* Main Content */}
+      <main className="flex-1">
+        {/* Hero Section */}
+        <HeroSection />
+
+        {/* Today's Deals */}
+        <TodayDeals />
+
+        {/* Promo Banner */}
+        <PromoBanner />
+
+        {/* Best Sellers */}
+        <BestSellers />
+
+        {/* Category Banners */}
+        <CategoryBanners />
+      </main>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };
