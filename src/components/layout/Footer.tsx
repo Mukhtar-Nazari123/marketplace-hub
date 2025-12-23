@@ -2,25 +2,27 @@ import { Facebook, Twitter, Instagram, Youtube, Mail, Phone, MapPin, CreditCard,
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { translations } from "@/lib/i18n";
+import { useLanguage } from "@/lib/i18n";
 
 const Footer = () => {
+  const { t, isRTL } = useLanguage();
+  
   const quickLinks = [
-    { label: translations.footer.aboutUs, href: "/about" },
-    { label: translations.footer.contactUs, href: "/contact" },
-    { label: translations.footer.privacyPolicy, href: "/privacy" },
-    { label: translations.footer.termsConditions, href: "/terms" },
-    { label: translations.footer.faq, href: "/faq" },
-    { label: translations.footer.sitemap, href: "/sitemap" },
+    { label: t.footer.aboutUs, href: "/about" },
+    { label: t.footer.contactUs, href: "/contact" },
+    { label: t.footer.privacyPolicy, href: "/privacy" },
+    { label: t.footer.termsConditions, href: "/terms" },
+    { label: t.footer.faq, href: "/faq" },
+    { label: t.footer.sitemap, href: "/sitemap" },
   ];
 
   const customerLinks = [
-    { label: translations.footer.myAccount, href: "/account" },
-    { label: translations.footer.orderTracking, href: "/orders" },
-    { label: translations.footer.wishlist, href: "/wishlist" },
-    { label: translations.footer.returns, href: "/returns" },
-    { label: translations.footer.shippingInfo, href: "/shipping" },
-    { label: translations.footer.giftCards, href: "/gift-cards" },
+    { label: t.footer.myAccount, href: "/account" },
+    { label: t.footer.orderTracking, href: "/orders" },
+    { label: t.footer.wishlist, href: "/wishlist" },
+    { label: t.footer.returns, href: "/returns" },
+    { label: t.footer.shippingInfo, href: "/shipping" },
+    { label: t.footer.giftCards, href: "/gift-cards" },
   ];
 
   return (
@@ -34,8 +36,8 @@ const Footer = () => {
                 <Truck className="h-6 w-6 text-cyan" />
               </div>
               <div>
-                <h4 className="font-semibold">{translations.footer.freeShipping}</h4>
-                <p className="text-sm text-muted-foreground">{translations.footer.ordersOver}</p>
+                <h4 className="font-semibold">{t.footer.freeShipping}</h4>
+                <p className="text-sm text-muted-foreground">{t.footer.ordersOver}</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
@@ -43,8 +45,8 @@ const Footer = () => {
                 <Shield className="h-6 w-6 text-orange" />
               </div>
               <div>
-                <h4 className="font-semibold">{translations.footer.securePayment}</h4>
-                <p className="text-sm text-muted-foreground">{translations.footer.protected}</p>
+                <h4 className="font-semibold">{t.footer.securePayment}</h4>
+                <p className="text-sm text-muted-foreground">{t.footer.protected}</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
@@ -52,8 +54,8 @@ const Footer = () => {
                 <Headphones className="h-6 w-6 text-cyan" />
               </div>
               <div>
-                <h4 className="font-semibold">{translations.footer.support}</h4>
-                <p className="text-sm text-muted-foreground">{translations.footer.dedicatedHelp}</p>
+                <h4 className="font-semibold">{t.footer.support}</h4>
+                <p className="text-sm text-muted-foreground">{t.footer.dedicatedHelp}</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
@@ -61,8 +63,8 @@ const Footer = () => {
                 <CreditCard className="h-6 w-6 text-orange" />
               </div>
               <div>
-                <h4 className="font-semibold">{translations.footer.easyReturns}</h4>
-                <p className="text-sm text-muted-foreground">{translations.footer.daysReturn}</p>
+                <h4 className="font-semibold">{t.footer.easyReturns}</h4>
+                <p className="text-sm text-muted-foreground">{t.footer.daysReturn}</p>
               </div>
             </div>
           </div>
@@ -79,12 +81,12 @@ const Footer = () => {
                 <span className="text-accent-foreground font-bold text-xl">M</span>
               </div>
               <div>
-                <h3 className="font-display text-xl font-bold">مارکت</h3>
-                <p className="text-xs text-muted-foreground -mt-1">{translations.footer.onlineStore}</p>
+                <h3 className="font-display text-xl font-bold">{isRTL ? 'مارکت' : 'Market'}</h3>
+                <p className="text-xs text-muted-foreground -mt-1">{t.footer.onlineStore}</p>
               </div>
             </Link>
             <p className="text-muted-foreground text-sm mb-4">
-              {translations.footer.description}
+              {t.footer.description}
             </p>
             <div className="flex gap-3">
               <a href="#" className="w-10 h-10 rounded-full bg-background/10 flex items-center justify-center hover:bg-cyan transition-colors">
@@ -104,7 +106,7 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-display font-bold text-lg mb-4">{translations.footer.quickLinks}</h4>
+            <h4 className="font-display font-bold text-lg mb-4">{t.footer.quickLinks}</h4>
             <ul className="space-y-2">
               {quickLinks.map((link) => (
                 <li key={link.label}>
@@ -118,7 +120,7 @@ const Footer = () => {
 
           {/* Customer Service */}
           <div>
-            <h4 className="font-display font-bold text-lg mb-4">{translations.footer.customerService}</h4>
+            <h4 className="font-display font-bold text-lg mb-4">{t.footer.customerService}</h4>
             <ul className="space-y-2">
               {customerLinks.map((link) => (
                 <li key={link.label}>
@@ -132,16 +134,16 @@ const Footer = () => {
 
           {/* Newsletter */}
           <div>
-            <h4 className="font-display font-bold text-lg mb-4">{translations.footer.newsletter}</h4>
+            <h4 className="font-display font-bold text-lg mb-4">{t.footer.newsletter}</h4>
             <p className="text-muted-foreground text-sm mb-4">
-              {translations.footer.subscribeText}
+              {t.footer.subscribeText}
             </p>
             <div className="flex gap-2">
               <Input
                 type="email"
-                placeholder={translations.footer.enterEmail}
+                placeholder={t.footer.enterEmail}
                 className="bg-background/10 border-background/20 text-background placeholder:text-muted-foreground"
-                dir="rtl"
+                dir={isRTL ? 'rtl' : 'ltr'}
               />
               <Button variant="orange" size="icon">
                 <Mail className="h-4 w-4" />
@@ -150,7 +152,7 @@ const Footer = () => {
             <div className="mt-6 space-y-2">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Phone className="h-4 w-4 text-cyan" />
-                <span>+۹۳ ۱۲۳-۴۵۶-۷۸۹</span>
+                <span>{isRTL ? '+۹۳ ۱۲۳-۴۵۶-۷۸۹' : '+93 123-456-789'}</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Mail className="h-4 w-4 text-cyan" />
@@ -158,7 +160,7 @@ const Footer = () => {
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <MapPin className="h-4 w-4 text-cyan" />
-                <span>کابل، افغانستان</span>
+                <span>{t.contact.addressText}</span>
               </div>
             </div>
           </div>
@@ -170,7 +172,7 @@ const Footer = () => {
         <div className="container py-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">
-              © ۱۴۰۳ مارکت. {translations.footer.allRightsReserved}
+              © {isRTL ? '۱۴۰۳' : '2024'} {isRTL ? 'مارکت' : 'Market'}. {t.footer.allRightsReserved}
             </p>
             <div className="flex items-center gap-4">
               <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-6 opacity-70 hover:opacity-100 transition-opacity" />

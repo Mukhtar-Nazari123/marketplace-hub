@@ -3,35 +3,36 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { translations } from "@/lib/i18n";
+import { useLanguage } from "@/lib/i18n";
 
 interface MobileMenuProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const categories = [
-  translations.categories.electronics,
-  translations.categories.fashion,
-  translations.categories.homeGarden,
-  translations.categories.sports,
-  translations.categories.healthBeauty,
-  translations.categories.toysGames,
-  translations.categories.automotive,
-  translations.categories.booksMedia,
-];
-
-const navLinks = [
-  { label: translations.nav.products, icon: Package, href: "/products" },
-  { label: translations.nav.categories, icon: Grid3X3, href: "/categories" },
-  { label: translations.nav.newArrivals, icon: Zap, href: "/products?filter=new", badge: "جدید" },
-  { label: translations.nav.blog, icon: BookOpen, href: "/blog" },
-  { label: translations.nav.contactUs, icon: Phone, href: "/contact" },
-  { label: translations.nav.aboutUs, icon: Info, href: "/about" },
-];
-
 const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+  const { t, isRTL } = useLanguage();
+
+  const categories = [
+    t.categories.electronics,
+    t.categories.fashion,
+    t.categories.homeGarden,
+    t.categories.sports,
+    t.categories.healthBeauty,
+    t.categories.toysGames,
+    t.categories.automotive,
+    t.categories.booksMedia,
+  ];
+
+  const navLinks = [
+    { label: t.nav.products, icon: Package, href: "/products" },
+    { label: t.nav.categories, icon: Grid3X3, href: "/categories" },
+    { label: t.nav.newArrivals, icon: Zap, href: "/products?filter=new", badge: isRTL ? "جدید" : "New" },
+    { label: t.nav.blog, icon: BookOpen, href: "/blog" },
+    { label: t.nav.contactUs, icon: Phone, href: "/contact" },
+    { label: t.nav.aboutUs, icon: Info, href: "/about" },
+  ];
 
   if (!isOpen) return null;
 
@@ -44,14 +45,14 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
       />
       
       {/* Menu Panel */}
-      <div className="fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-card z-50 lg:hidden animate-slide-in-right shadow-xl overflow-y-auto">
+      <div className={`fixed top-0 h-full w-80 max-w-[85vw] bg-card z-50 lg:hidden shadow-xl overflow-y-auto ${isRTL ? 'right-0 animate-slide-in-right' : 'left-0 animate-slide-in-left'}`}>
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-orange flex items-center justify-center">
               <span className="text-accent-foreground font-bold">M</span>
             </div>
-            <span className="font-display font-bold text-foreground">مارکت</span>
+            <span className="font-display font-bold text-foreground">{isRTL ? 'مارکت' : 'Market'}</span>
           </div>
           <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-5 w-5" />
@@ -68,7 +69,7 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
             >
               <span className="flex items-center gap-2">
                 <Grid3X3 className="h-5 w-5" />
-                {translations.nav.category}
+                {t.nav.category}
               </span>
               <ChevronDown className={`h-4 w-4 transition-transform ${isCategoryOpen ? 'rotate-180' : ''}`} />
             </button>
@@ -101,7 +102,7 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
                 <link.icon className="h-5 w-5" />
                 <span>{link.label}</span>
                 {link.badge && (
-                  <Badge variant="sale" className="mr-auto text-[10px] px-1.5 py-0">
+                  <Badge variant="sale" className={`text-[10px] px-1.5 py-0 ${isRTL ? 'mr-auto' : 'ml-auto'}`}>
                     {link.badge}
                   </Badge>
                 )}
@@ -112,10 +113,10 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
           {/* Special Offers */}
           <div className="mt-6 p-4 bg-gradient-to-r from-orange/10 to-cyan/10 rounded-lg">
             <Badge variant="hot" className="animate-pulse mb-2">
-              {translations.nav.blackFriday}
+              {t.nav.blackFriday}
             </Badge>
             <p className="text-sm text-muted-foreground">
-              {translations.nav.specialOffer}
+              {t.nav.specialOffer}
             </p>
           </div>
         </nav>

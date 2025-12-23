@@ -1,7 +1,7 @@
-import { ArrowLeft, ChevronLeft, ChevronRight, Clock } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ProductCard from "./ProductCard";
-import { translations } from "@/lib/i18n";
+import { useLanguage } from "@/lib/i18n";
 
 const products = [
   {
@@ -52,6 +52,8 @@ const products = [
 ];
 
 const TodayDeals = () => {
+  const { t, isRTL } = useLanguage();
+  
   return (
     <section className="py-12 bg-background">
       <div className="container">
@@ -60,10 +62,11 @@ const TodayDeals = () => {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 bg-orange px-4 py-2 rounded-lg">
               <Clock className="h-5 w-5 text-accent-foreground" />
-              <h2 className="font-display font-bold text-lg text-accent-foreground">{translations.deals.todayDeal}</h2>
+              <h2 className="font-display font-bold text-lg text-accent-foreground">{t.deals.todayDeal}</h2>
             </div>
             <Button variant="link" className="text-muted-foreground hover:text-cyan gap-1">
-              {translations.deals.seeAll} <ArrowLeft className="h-4 w-4" />
+              {t.deals.seeAll}
+              {isRTL ? <ArrowLeft className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
             </Button>
           </div>
 

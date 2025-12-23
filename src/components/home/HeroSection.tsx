@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Headphones } from "lucide-react";
-import { translations } from "@/lib/i18n";
+import { useLanguage } from "@/lib/i18n";
 
 const HeroSection = () => {
+  const { t, isRTL } = useLanguage();
+  
   return (
     <section className="relative overflow-hidden">
       <div className="container py-8">
@@ -16,29 +18,29 @@ const HeroSection = () => {
             <div className="absolute top-10 left-10 w-64 h-64 bg-cyan/20 rounded-full blur-3xl" />
             <div className="absolute bottom-10 left-20 w-48 h-48 bg-orange/20 rounded-full blur-3xl" />
             
-            <div className="relative z-10 p-8 lg:p-12 h-full flex flex-col justify-center max-w-lg mr-auto">
+            <div className={`relative z-10 p-8 lg:p-12 h-full flex flex-col justify-center max-w-lg ${isRTL ? 'mr-auto' : 'ml-auto'}`}>
               <Badge variant="sale" className="w-fit mb-4 text-sm px-4 py-1">
-                {translations.hero.sale}
+                {t.hero.sale}
               </Badge>
               
               <h2 className="font-display text-4xl lg:text-5xl font-bold text-background mb-4 leading-tight">
-                {translations.hero.modernStyle}
-                <span className="block text-cyan">{translations.hero.headphones}</span>
-                {translations.hero.model}
+                {t.hero.modernStyle}
+                <span className="block text-cyan">{t.hero.headphones}</span>
+                {t.hero.model}
               </h2>
               
               <p className="text-background/70 mb-6 text-lg">
-                {translations.hero.quickSale}
+                {t.hero.quickSale}
               </p>
               
               <Button variant="orange" size="xl" className="w-fit group">
-                {translations.hero.shopNow}
-                <ArrowLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
+                {t.hero.shopNow}
+                <ArrowLeft className={`h-5 w-5 transition-transform ${isRTL ? 'group-hover:-translate-x-1' : 'group-hover:translate-x-1 rotate-180'}`} />
               </Button>
             </div>
 
             {/* Floating Product Image Placeholder */}
-            <div className="absolute left-8 bottom-8 lg:left-16 lg:bottom-16 opacity-80">
+            <div className={`absolute bottom-8 lg:bottom-16 opacity-80 ${isRTL ? 'left-8 lg:left-16' : 'right-8 lg:right-16'}`}>
               <div className="w-48 h-48 lg:w-64 lg:h-64 rounded-full bg-gradient-to-br from-cyan/30 to-orange/30 flex items-center justify-center animate-float">
                 <Headphones className="w-24 h-24 lg:w-32 lg:h-32 text-background/50" />
               </div>
@@ -50,39 +52,39 @@ const HeroSection = () => {
             {/* Banner 1 */}
             <div className="relative rounded-xl overflow-hidden bg-gradient-to-br from-cyan/10 to-cyan/5 p-6 flex-1 hover-lift animate-slide-in-left stagger-1">
               <div className="absolute top-0 left-0 w-20 h-20 bg-cyan/20 rounded-full blur-2xl" />
-              <Badge variant="new" className="mb-2">{translations.hero.nowAvailable}</Badge>
+              <Badge variant="new" className="mb-2">{t.hero.nowAvailable}</Badge>
               <h3 className="font-display font-bold text-lg text-foreground mb-1">
-                {translations.hero.topSelling} <span className="text-cyan">iMAC</span>
+                {t.hero.topSelling} <span className="text-cyan">iMAC</span>
               </h3>
-              <p className="text-muted-foreground text-sm mb-2">{translations.hero.latestGeneration}</p>
+              <p className="text-muted-foreground text-sm mb-2">{t.hero.latestGeneration}</p>
               <p className="text-2xl font-bold text-cyan">
-                {translations.hero.startingFrom} <span className="text-foreground">$۳۹۹</span>
+                {t.hero.startingFrom} <span className="text-foreground">$399</span>
               </p>
             </div>
 
             {/* Banner 2 */}
             <div className="relative rounded-xl overflow-hidden bg-gradient-to-br from-orange/10 to-orange/5 p-6 flex-1 hover-lift animate-slide-in-left stagger-2">
               <div className="absolute top-0 left-0 w-20 h-20 bg-orange/20 rounded-full blur-2xl" />
-              <Badge variant="sale" className="mb-2">{translations.hero.nowAvailable}</Badge>
+              <Badge variant="sale" className="mb-2">{t.hero.nowAvailable}</Badge>
               <h3 className="font-display font-bold text-lg text-foreground mb-1">
-                {translations.hero.topSelling} <span className="text-orange">لوازم خانگی</span>
+                {t.hero.topSelling} <span className="text-orange">{t.hero.kitchenEssentials}</span>
               </h3>
-              <p className="text-muted-foreground text-sm mb-2">{translations.hero.kitchenEssentials}</p>
+              <p className="text-muted-foreground text-sm mb-2">{t.hero.kitchenEssentials}</p>
               <p className="text-2xl font-bold text-orange">
-                {translations.hero.startingFrom} <span className="text-foreground">$۱۹۹</span>
+                {t.hero.startingFrom} <span className="text-foreground">$199</span>
               </p>
             </div>
 
             {/* Banner 3 */}
             <div className="relative rounded-xl overflow-hidden bg-gradient-to-br from-cyan/10 to-cyan/5 p-6 flex-1 hover-lift animate-slide-in-left stagger-3">
               <div className="absolute top-0 left-0 w-20 h-20 bg-cyan/20 rounded-full blur-2xl" />
-              <Badge variant="new" className="mb-2">{translations.hero.nowAvailable}</Badge>
+              <Badge variant="new" className="mb-2">{t.hero.nowAvailable}</Badge>
               <h3 className="font-display font-bold text-lg text-foreground mb-1">
-                {translations.hero.topSelling} <span className="text-cyan">لوازم جانبی</span>
+                {t.hero.topSelling} <span className="text-cyan">{t.hero.mustHaveGadgets}</span>
               </h3>
-              <p className="text-muted-foreground text-sm mb-2">{translations.hero.mustHaveGadgets}</p>
+              <p className="text-muted-foreground text-sm mb-2">{t.hero.mustHaveGadgets}</p>
               <p className="text-2xl font-bold text-cyan">
-                {translations.hero.startingFrom} <span className="text-foreground">$۹۹</span>
+                {t.hero.startingFrom} <span className="text-foreground">$99</span>
               </p>
             </div>
           </div>

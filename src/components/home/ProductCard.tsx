@@ -2,7 +2,7 @@ import { Star, Heart, ShoppingCart, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { translations } from "@/lib/i18n";
+import { useLanguage } from "@/lib/i18n";
 
 interface ProductCardProps {
   name: string;
@@ -32,9 +32,13 @@ const ProductCard = ({
   countdown,
 }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
+  const { t, isRTL } = useLanguage();
 
   const formatPrice = (num: number) => {
-    return num.toFixed(2).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]);
+    if (isRTL) {
+      return num.toFixed(2).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]);
+    }
+    return num.toFixed(2);
   };
 
   return (
@@ -44,26 +48,26 @@ const ProductCard = ({
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Badges */}
-      <div className="absolute top-3 right-3 z-10 flex flex-col gap-1">
+      <div className={`absolute top-3 z-10 flex flex-col gap-1 ${isRTL ? 'right-3' : 'left-3'}`}>
         {badge === "sale" && (
           <Badge variant="sale" className="text-xs">
-            -{discount}٪
+            -{discount}{isRTL ? '٪' : '%'}
           </Badge>
         )}
         {badge === "new" && (
           <Badge variant="new" className="text-xs">
-            {translations.product.new}
+            {t.product.new}
           </Badge>
         )}
         {badge === "hot" && (
           <Badge variant="hot" className="text-xs">
-            {translations.product.hot}
+            {t.product.hot}
           </Badge>
         )}
       </div>
 
       {/* Wishlist Button */}
-      <button className="absolute top-3 left-3 z-10 w-8 h-8 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-orange hover:text-accent-foreground transition-colors">
+      <button className={`absolute top-3 z-10 w-8 h-8 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center hover:bg-orange hover:text-accent-foreground transition-colors ${isRTL ? 'left-3' : 'right-3'}`}>
         <Heart className="h-4 w-4" />
       </button>
 
@@ -106,7 +110,7 @@ const ProductCard = ({
               />
             ))}
           </div>
-          <span className="text-xs text-muted-foreground">({reviews} {translations.product.reviews})</span>
+          <span className="text-xs text-muted-foreground">({reviews} {t.product.reviews})</span>
         </div>
 
         {/* Name */}
@@ -128,18 +132,18 @@ const ProductCard = ({
         {countdown && (
           <div className="mt-3 flex items-center justify-center gap-1 bg-foreground text-background rounded-lg p-2">
             <div className="text-center">
-              <span className="font-bold text-lg">{countdown.hours.toString().padStart(2, "0").replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)])}</span>
-              <p className="text-[10px] uppercase opacity-70">{translations.product.hours}</p>
+              <span className="font-bold text-lg">{isRTL ? countdown.hours.toString().padStart(2, "0").replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]) : countdown.hours.toString().padStart(2, "0")}</span>
+              <p className="text-[10px] uppercase opacity-70">{t.product.hours}</p>
             </div>
             <span className="font-bold">:</span>
             <div className="text-center">
-              <span className="font-bold text-lg">{countdown.minutes.toString().padStart(2, "0").replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)])}</span>
-              <p className="text-[10px] uppercase opacity-70">{translations.product.minutes}</p>
+              <span className="font-bold text-lg">{isRTL ? countdown.minutes.toString().padStart(2, "0").replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]) : countdown.minutes.toString().padStart(2, "0")}</span>
+              <p className="text-[10px] uppercase opacity-70">{t.product.minutes}</p>
             </div>
             <span className="font-bold">:</span>
             <div className="text-center">
-              <span className="font-bold text-lg">{countdown.seconds.toString().padStart(2, "0").replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)])}</span>
-              <p className="text-[10px] uppercase opacity-70">{translations.product.seconds}</p>
+              <span className="font-bold text-lg">{isRTL ? countdown.seconds.toString().padStart(2, "0").replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]) : countdown.seconds.toString().padStart(2, "0")}</span>
+              <p className="text-[10px] uppercase opacity-70">{t.product.seconds}</p>
             </div>
           </div>
         )}

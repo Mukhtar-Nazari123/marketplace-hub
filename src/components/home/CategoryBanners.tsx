@@ -1,32 +1,31 @@
 import { ArrowLeft, Tablet, Tv, Smartphone } from "lucide-react";
 import { Link } from "react-router-dom";
-import { translations } from "@/lib/i18n";
-
-const categories = [
-  {
-    title: "تبلت و",
-    subtitle: "لوازم جانبی",
-    icon: Tablet,
-    color: "from-cyan to-cyan-dark",
-    href: "/categories/tablets",
-  },
-  {
-    title: "تلویزیون و",
-    subtitle: "صوتی/تصویری",
-    icon: Tv,
-    color: "from-orange to-orange-dark",
-    href: "/categories/tv",
-  },
-  {
-    title: "گوشی هوشمند و",
-    subtitle: "لوازم جانبی",
-    icon: Smartphone,
-    color: "from-cyan to-cyan-dark",
-    href: "/categories/smartphones",
-  },
-];
+import { useLanguage } from "@/lib/i18n";
 
 const CategoryBanners = () => {
+  const { t, isRTL } = useLanguage();
+  
+  const categories = [
+    {
+      title: t.categoryBanners.tabletAccessories,
+      icon: Tablet,
+      color: "from-cyan to-cyan-dark",
+      href: "/categories/tablets",
+    },
+    {
+      title: t.categoryBanners.tvAudioVideo,
+      icon: Tv,
+      color: "from-orange to-orange-dark",
+      href: "/categories/tv",
+    },
+    {
+      title: t.categoryBanners.smartphoneAccessories,
+      icon: Smartphone,
+      color: "from-cyan to-cyan-dark",
+      href: "/categories/smartphones",
+    },
+  ];
+
   return (
     <section className="py-12">
       <div className="container">
@@ -44,21 +43,18 @@ const CategoryBanners = () => {
               </div>
 
               {/* Icon */}
-              <div className="absolute left-6 bottom-6 opacity-20">
+              <div className={`absolute bottom-6 opacity-20 ${isRTL ? 'left-6' : 'right-6'}`}>
                 <category.icon className="h-24 w-24 text-primary-foreground" />
               </div>
 
               {/* Content */}
               <div className="relative z-10">
-                <h3 className="font-display text-xl font-bold text-primary-foreground mb-1">
+                <h3 className="font-display text-xl font-bold text-primary-foreground mb-4">
                   {category.title}
                 </h3>
-                <p className="text-2xl font-bold text-primary-foreground/90 mb-4">
-                  {category.subtitle}
-                </p>
                 <div className="flex items-center gap-2 text-primary-foreground/80 group-hover:text-primary-foreground transition-colors">
-                  <span className="font-medium">{translations.hero.shopNow}</span>
-                  <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+                  <span className="font-medium">{t.hero.shopNow}</span>
+                  <ArrowLeft className={`h-4 w-4 transition-transform ${isRTL ? 'group-hover:-translate-x-1' : 'group-hover:translate-x-1 rotate-180'}`} />
                 </div>
               </div>
             </Link>

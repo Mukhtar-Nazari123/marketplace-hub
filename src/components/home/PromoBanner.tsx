@@ -1,8 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Tablet } from "lucide-react";
-import { translations } from "@/lib/i18n";
+import { ArrowLeft, ArrowRight, Tablet } from "lucide-react";
+import { useLanguage } from "@/lib/i18n";
 
 const PromoBanner = () => {
+  const { t, isRTL } = useLanguage();
+  
   return (
     <section className="py-8">
       <div className="container">
@@ -20,24 +22,28 @@ const PromoBanner = () => {
                 <Tablet className="h-12 w-12 text-primary-foreground" />
               </div>
 
-              <div className="text-center md:text-right">
+              <div className={`text-center ${isRTL ? 'md:text-right' : 'md:text-left'}`}>
                 <h3 className="font-display text-2xl md:text-3xl font-bold text-primary-foreground mb-2">
-                  {translations.promo.savingOff}
+                  {t.promo.savingOff}
                 </h3>
                 <p className="text-primary-foreground/80">
-                  {translations.promo.limitedOffer}
+                  {t.promo.limitedOffer}
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-6">
               <Button variant="orange" size="xl" className="group">
-                {translations.hero.shopNow}
-                <ArrowLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
+                {t.hero.shopNow}
+                {isRTL ? (
+                  <ArrowLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
+                ) : (
+                  <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                )}
               </Button>
-              <div className="text-left hidden sm:block">
-                <p className="text-primary-foreground/60 text-sm">{translations.hero.startingFrom}</p>
-                <p className="font-display text-3xl font-bold text-primary-foreground">$۱۴۰</p>
+              <div className={`hidden sm:block ${isRTL ? 'text-left' : 'text-right'}`}>
+                <p className="text-primary-foreground/60 text-sm">{t.hero.startingFrom}</p>
+                <p className="font-display text-3xl font-bold text-primary-foreground">$140</p>
               </div>
             </div>
           </div>
