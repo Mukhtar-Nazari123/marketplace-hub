@@ -2,15 +2,7 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ProductCard from "./ProductCard";
 import { useState } from "react";
-import { translations } from "@/lib/i18n";
-
-const categories = [
-  translations.categories.electronics,
-  translations.bestSellers.television,
-  translations.bestSellers.airConditional,
-  translations.bestSellers.laptopsAccessories,
-  translations.bestSellers.smartphoneTablets,
-];
+import { useLanguage } from "@/lib/i18n";
 
 const products = [
   { name: "مخلوط‌کن جدید", price: 95.0, rating: 4, reviews: 0 },
@@ -21,7 +13,17 @@ const products = [
 ];
 
 const BestSellers = () => {
-  const [activeCategory, setActiveCategory] = useState(translations.categories.electronics);
+  const { t } = useLanguage();
+  
+  const categories = [
+    t.categories.electronics,
+    t.bestSellers.television,
+    t.bestSellers.airConditional,
+    t.bestSellers.laptopsAccessories,
+    t.bestSellers.smartphoneTablets,
+  ];
+  
+  const [activeCategory, setActiveCategory] = useState(categories[0]);
 
   return (
     <section className="py-12 bg-secondary/30">
@@ -29,10 +31,10 @@ const BestSellers = () => {
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 bg-orange px-4 py-2 rounded-lg">
-              <h2 className="font-display font-bold text-lg text-accent-foreground">{translations.bestSellers.weeklyBestSellers}</h2>
+              <h2 className="font-display font-bold text-lg text-accent-foreground">{t.bestSellers.weeklyBestSellers}</h2>
             </div>
             <Button variant="link" className="text-muted-foreground hover:text-cyan gap-1">
-              {translations.deals.seeAll} <ArrowLeft className="h-4 w-4" />
+              {t.deals.seeAll} <ArrowLeft className="h-4 w-4" />
             </Button>
           </div>
           <div className="flex items-center gap-2 overflow-x-auto pb-2 lg:pb-0">
