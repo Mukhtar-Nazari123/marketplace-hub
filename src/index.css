@@ -44,7 +44,9 @@
     --orange-light: 33 100% 60%;
     --orange-dark: 33 100% 45%;
     --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
     --info: 199 89% 48%;
 
     /* Gradients */
