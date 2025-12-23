@@ -18,7 +18,7 @@ const HeroSection = () => {
             <div className="absolute top-10 left-10 w-64 h-64 bg-cyan/20 rounded-full blur-3xl" />
             <div className="absolute bottom-10 left-20 w-48 h-48 bg-orange/20 rounded-full blur-3xl" />
             
-            <div className={`relative z-10 p-8 lg:p-12 h-full flex flex-col justify-center max-w-lg ${isRTL ? 'mr-auto' : 'ml-auto'}`}>
+            <div className={`relative z-10 p-8 lg:p-12 lg:pr-4 h-full flex flex-col justify-center max-w-lg ${isRTL ? 'mr-auto' : 'ml-auto'}`}>
               <Badge variant="sale" className="w-fit mb-4 text-sm px-4 py-1">
                 {t.hero.sale}
               </Badge>

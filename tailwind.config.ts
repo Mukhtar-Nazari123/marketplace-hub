@@ -75,8 +75,14 @@ export default {
           light: "hsl(var(--orange-light))",
           dark: "hsl(var(--orange-dark))",
         },
-        success: "hsl(var(--success))",
-        warning: "hsl(var(--warning))",
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+        },
         info: "hsl(var(--info))",
       },
       borderRadius: {
