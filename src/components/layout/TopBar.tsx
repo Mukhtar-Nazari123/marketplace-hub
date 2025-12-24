@@ -26,10 +26,6 @@ const TopBar = () => {
               <span>{language === 'fa' ? 'English' : 'دری'}</span>
               <ChevronDown className="h-3 w-3" />
             </button>
-            <button className="flex items-center gap-1 hover:text-cyan transition-colors">
-              <span>{t.topBar.currency}</span>
-              <ChevronDown className="h-3 w-3" />
-            </button>
           </div>
         </div>
         <div className="flex items-center gap-4">
