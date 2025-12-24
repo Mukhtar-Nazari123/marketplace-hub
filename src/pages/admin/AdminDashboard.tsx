@@ -5,6 +5,7 @@ import { RecentActivityCard } from '@/components/admin/RecentActivityCard';
 import { QuickActionsCard } from '@/components/admin/QuickActionsCard';
 import { RevenueChart } from '@/components/admin/RevenueChart';
 import { supabase } from '@/integrations/supabase/client';
+import { useLanguage } from '@/lib/i18n';
 import {
   Users,
   Package,
@@ -36,17 +37,20 @@ interface Activity {
   timestamp: Date;
 }
 
-const mockChartData = [
-  { name: 'يناير', revenue: 4000, orders: 24 },
-  { name: 'فبراير', revenue: 3000, orders: 13 },
-  { name: 'مارس', revenue: 5000, orders: 28 },
-  { name: 'أبريل', revenue: 2780, orders: 19 },
-  { name: 'مايو', revenue: 1890, orders: 12 },
-  { name: 'يونيو', revenue: 2390, orders: 15 },
-  { name: 'يوليو', revenue: 3490, orders: 21 },
-];
-
 const AdminDashboard = () => {
+  const { t, language } = useLanguage();
+  
+  // Chart data with proper Dari month names
+  const mockChartData = [
+    { name: t.admin.months.january, revenue: 4000, orders: 24 },
+    { name: t.admin.months.february, revenue: 3000, orders: 13 },
+    { name: t.admin.months.march, revenue: 5000, orders: 28 },
+    { name: t.admin.months.april, revenue: 2780, orders: 19 },
+    { name: t.admin.months.may, revenue: 1890, orders: 12 },
+    { name: t.admin.months.june, revenue: 2390, orders: 15 },
+    { name: t.admin.months.july, revenue: 3490, orders: 21 },
+  ];
+
   const [stats, setStats] = useState<DashboardStats>({
     totalUsers: 0,
     newRegistrations: 0,
@@ -122,34 +126,34 @@ const AdminDashboard = () => {
           pendingSellers: pendingSellers || 0,
         });
 
-        // Generate mock activities for now
+        // Generate activities with translated text
         setActivities([
           {
             id: '1',
             type: 'user',
-            action: 'تسجيل مستخدم جديد',
-            description: 'انضم مستخدم جديد كمشتري',
+            action: t.admin.newUserRegistration,
+            description: t.admin.newUserJoined,
             timestamp: new Date(Date.now() - 1000 * 60 * 30),
           },
           {
             id: '2',
             type: 'order',
-            action: 'طلب جديد',
-            description: 'تم إنشاء طلب جديد بقيمة $150',
+            action: t.admin.newOrder,
+            description: t.admin.newOrderCreated,
             timestamp: new Date(Date.now() - 1000 * 60 * 60),
           },
           {
             id: '3',
             type: 'product',
-            action: 'منتج جديد في الانتظار',
-            description: 'تم إضافة منتج جديد يحتاج مراجعة',
+            action: t.admin.newProductPending,
+            description: t.admin.newProductNeedsReview,
             timestamp: new Date(Date.now() - 1000 * 60 * 90),
           },
           {
             id: '4',
             type: 'seller',
-            action: 'طلب تحقق جديد',
-            description: 'بائع جديد يطلب التحقق',
+            action: t.admin.newVerificationRequest,
+            description: t.admin.newSellerVerification,
             timestamp: new Date(Date.now() - 1000 * 60 * 120),
           },
         ]);
@@ -162,82 +166,90 @@ const AdminDashboard = () => {
     };
 
     fetchDashboardData();
-  }, []);
+  }, [t]);
 
   return (
-    <AdminLayout title="لوحة التحكم" description="نظرة عامة على النظام">
+    <AdminLayout title={t.admin.dashboard} description={t.admin.dashboardDescription}>
       <div className="space-y-6">
         {/* Stats Grid */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <StatsCard
-            title="إجمالي المستخدمين"
+            title={t.admin.totalUsers}
             value={stats.totalUsers}
-            description="من الشهر الماضي"
+            description={t.admin.fromLastMonth}
             icon={Users}
             trend={{ value: 12, isPositive: true }}
+            delay={0}
           />
           <StatsCard
-            title="المنتجات النشطة"
+            title={t.admin.activeProducts}
             value={stats.totalProducts}
-            description={`${stats.pendingProducts} في الانتظار`}
+            description={`${stats.pendingProducts} ${t.admin.pending}`}
             icon={Package}
             iconClassName="bg-accent/10 text-accent"
+            delay={1}
           />
           <StatsCard
-            title="إجمالي الطلبات"
+            title={t.admin.totalOrders}
             value={stats.totalOrders}
-            description={`${stats.pendingOrders} قيد المعالجة`}
+            description={`${stats.pendingOrders} ${t.admin.inProgress}`}
             icon={ShoppingCart}
-            iconClassName="bg-success/10 text-success"
+            iconClassName="bg-emerald-500/10 text-emerald-500"
+            delay={2}
           />
           <StatsCard
-            title="إجمالي الإيرادات"
+            title={t.admin.totalRevenue}
             value={`$${stats.totalRevenue.toLocaleString()}`}
-            description="من الشهر الماضي"
+            description={t.admin.fromLastMonth}
             icon={DollarSign}
             trend={{ value: 8, isPositive: true }}
-            iconClassName="bg-warning/10 text-warning"
+            iconClassName="bg-amber-500/10 text-amber-500"
+            delay={3}
           />
         </div>
 
         {/* Secondary Stats */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <StatsCard
-            title="التسجيلات الجديدة"
+            title={t.admin.newRegistrations}
             value={stats.newRegistrations}
-            description="هذا الأسبوع"
+            description={t.admin.thisWeek}
             icon={TrendingUp}
-            iconClassName="bg-cyan/10 text-cyan"
+            iconClassName="bg-cyan-500/10 text-cyan-500"
+            delay={4}
           />
           <StatsCard
-            title="البائعين النشطين"
+            title={t.admin.activeSellers}
             value={stats.activeSellers}
-            description={`${stats.pendingSellers} في انتظار التحقق`}
+            description={`${stats.pendingSellers} ${t.admin.awaitingVerification}`}
             icon={Store}
-            iconClassName="bg-orange/10 text-orange"
+            iconClassName="bg-orange-500/10 text-orange-500"
+            delay={5}
           />
           <StatsCard
-            title="المنتجات المعلقة"
+            title={t.admin.pendingProducts}
             value={stats.pendingProducts}
-            description="تحتاج مراجعة"
+            description={t.admin.pendingReview}
             icon={Clock}
             iconClassName="bg-muted text-muted-foreground"
+            delay={6}
           />
           <StatsCard
-            title="التنبيهات"
+            title={t.admin.alerts}
             value={stats.pendingProducts + stats.pendingSellers}
-            description="تحتاج انتباه"
+            description={t.admin.needsAttention}
             icon={AlertCircle}
             iconClassName="bg-destructive/10 text-destructive"
+            delay={7}
           />
         </div>
 
         {/* Charts and Activity */}
         <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 animate-fade-in" style={{ animationDelay: '0.4s' }}>
             <RevenueChart data={mockChartData} isLoading={isLoading} />
           </div>
-          <div>
+          <div className="animate-fade-in" style={{ animationDelay: '0.5s' }}>
             <QuickActionsCard
               pendingSellers={stats.pendingSellers}
               pendingProducts={stats.pendingProducts}
@@ -247,7 +259,7 @@ const AdminDashboard = () => {
 
         {/* Recent Activity */}
         <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 animate-fade-in" style={{ animationDelay: '0.6s' }}>
             <RecentActivityCard activities={activities} isLoading={isLoading} />
           </div>
         </div>
