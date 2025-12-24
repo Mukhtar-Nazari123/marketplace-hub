@@ -1,10 +1,14 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/lib/i18n';
 import { Product } from '@/data/mockData';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Star, Heart, ShoppingCart, Eye, Grid, List } from 'lucide-react';
+import { useCart } from '@/hooks/useCart';
+import { useWishlist } from '@/hooks/useWishlist';
+import { useAuth } from '@/hooks/useAuth';
+import { cn } from '@/lib/utils';
 
 interface ProductGridProps {
   products: Product[];
@@ -13,7 +17,7 @@ interface ProductGridProps {
 }
 
 const ProductGrid = ({ products, viewMode = 'grid', onViewModeChange }: ProductGridProps) => {
-  const { t, language, isRTL } = useLanguage();
+  const { t, isRTL } = useLanguage();
 
   return (
     <div>
@@ -70,6 +74,40 @@ const ProductGrid = ({ products, viewMode = 'grid', onViewModeChange }: ProductG
 const ProductCard = ({ product }: { product: Product }) => {
   const { t, language, isRTL } = useLanguage();
   const [isHovered, setIsHovered] = useState(false);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const { addToCart } = useCart();
+  const { isInWishlist, toggleWishlist } = useWishlist();
+  const { user, role } = useAuth();
+  const navigate = useNavigate();
+
+  const isWishlisted = isInWishlist(product.id);
+  const isBuyer = role === 'buyer';
+
+  const handleAddToCart = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    setIsAddingToCart(true);
+    await addToCart(product.id);
+    setIsAddingToCart(false);
+  };
+
+  const handleWishlistToggle = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    await toggleWishlist(product.id);
+  };
 
   return (
     <div
@@ -100,9 +138,20 @@ const ProductCard = ({ product }: { product: Product }) => {
             isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'
           }`}
         >
-          <button className="p-2 bg-white/90 dark:bg-gray-800/90 rounded-full hover:bg-primary hover:text-white transition-colors shadow-md">
-            <Heart size={18} />
-          </button>
+          {/* Wishlist - only for buyers */}
+          {(!user || isBuyer) && (
+            <button
+              onClick={handleWishlistToggle}
+              className={cn(
+                "p-2 rounded-full transition-colors shadow-md",
+                isWishlisted 
+                  ? "bg-red-500 text-white" 
+                  : "bg-white/90 dark:bg-gray-800/90 hover:bg-primary hover:text-white"
+              )}
+            >
+              <Heart size={18} className={isWishlisted ? "fill-current" : ""} />
+            </button>
+          )}
           <Link
             to={`/products/${product.slug}`}
             className="p-2 bg-white/90 dark:bg-gray-800/90 rounded-full hover:bg-primary hover:text-white transition-colors shadow-md"
@@ -145,9 +194,18 @@ const ProductCard = ({ product }: { product: Product }) => {
         </div>
 
         {/* Add to Cart */}
-        <Button variant="cyan" size="sm" className="w-full gap-2">
-          <ShoppingCart size={16} />
-          {t.product.addToCart}
+        <Button 
+          variant="cyan" 
+          size="sm" 
+          className="w-full gap-2"
+          onClick={handleAddToCart}
+          disabled={isAddingToCart}
+        >
+          <ShoppingCart size={16} className={isAddingToCart ? 'animate-pulse' : ''} />
+          {isAddingToCart 
+            ? (isRTL ? 'در حال افزودن...' : 'Adding...') 
+            : t.product.addToCart
+          }
         </Button>
       </div>
     </div>
@@ -156,6 +214,40 @@ const ProductCard = ({ product }: { product: Product }) => {
 
 const ProductListItem = ({ product }: { product: Product }) => {
   const { t, language, isRTL } = useLanguage();
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const { addToCart } = useCart();
+  const { isInWishlist, toggleWishlist } = useWishlist();
+  const { user, role } = useAuth();
+  const navigate = useNavigate();
+
+  const isWishlisted = isInWishlist(product.id);
+  const isBuyer = role === 'buyer';
+
+  const handleAddToCart = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    setIsAddingToCart(true);
+    await addToCart(product.id);
+    setIsAddingToCart(false);
+  };
+
+  const handleWishlistToggle = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    await toggleWishlist(product.id);
+  };
 
   return (
     <div className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col md:flex-row">
@@ -210,12 +302,28 @@ const ProductListItem = ({ product }: { product: Product }) => {
             )}
           </div>
           <div className="flex gap-2">
-            <Button variant="ghost" size="icon">
-              <Heart size={18} />
-            </Button>
-            <Button variant="cyan" size="sm" className="gap-2">
-              <ShoppingCart size={16} />
-              {t.product.addToCart}
+            {(!user || isBuyer) && (
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={handleWishlistToggle}
+                className={isWishlisted ? 'text-red-500' : ''}
+              >
+                <Heart size={18} className={isWishlisted ? "fill-current" : ""} />
+              </Button>
+            )}
+            <Button 
+              variant="cyan" 
+              size="sm" 
+              className="gap-2"
+              onClick={handleAddToCart}
+              disabled={isAddingToCart}
+            >
+              <ShoppingCart size={16} className={isAddingToCart ? 'animate-pulse' : ''} />
+              {isAddingToCart 
+                ? (isRTL ? 'افزودن...' : 'Adding...') 
+                : t.product.addToCart
+              }
             </Button>
           </div>
         </div>
