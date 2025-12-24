@@ -21,7 +21,7 @@ const Header = () => {
                 <span className="text-accent-foreground font-bold text-xl">M</span>
               </div>
               <div className="hidden sm:block">
-                <h1 className="font-display text-xl font-bold text-foreground">{isRTL ? 'مارکت' : 'Market'}</h1>
+                <h1 className="font-display text-xl font-bold text-foreground">{isRTL ? "مارکت" : "Market"}</h1>
                 <p className="text-xs text-muted-foreground -mt-1">{t.footer.onlineStore}</p>
               </div>
             </Link>
@@ -32,15 +32,15 @@ const Header = () => {
                 <Input
                   type="text"
                   placeholder={t.header.searchPlaceholder}
-                  className={`w-full h-11 rounded-full border-2 border-border focus:border-cyan transition-colors ${isRTL ? 'pr-4 pl-24 text-right' : 'pl-4 pr-24 text-left'}`}
-                  dir={isRTL ? 'rtl' : 'ltr'}
+                  className={`w-full h-11 rounded-full border-2 border-border focus:border-cyan transition-colors ${isRTL ? "pr-4 pl-24 text-right" : "pl-4 pr-24 text-left"}`}
+                  dir={isRTL ? "rtl" : "ltr"}
                 />
                 <Button
                   variant="cyan"
                   size="sm"
-                  className={`absolute top-1/2 -translate-y-1/2 rounded-full px-6 ${isRTL ? 'left-1' : 'right-1'}`}
+                  className={`absolute top-1/2 -translate-y-1/2 rounded-full px-6 ${isRTL ? "left-1" : "right-1"}`}
                 >
-                  <Search className={`h-4 w-4 ${isRTL ? 'ml-1' : 'mr-1'}`} />
+                  <Search className={`h-4 w-4 ${isRTL ? "ml-1" : "mr-1"}`} />
                   {t.header.search}
                 </Button>
               </div>
@@ -57,16 +57,18 @@ const Header = () => {
               <Link to="/cart">
                 <Button variant="ghost" size="icon" className="relative">
                   <ShoppingCart className="h-5 w-5" />
-                  <span className={`absolute -top-1 h-5 w-5 rounded-full bg-orange text-accent-foreground text-xs flex items-center justify-center font-bold ${isRTL ? '-right-1' : '-left-1'}`}>
-                    {isRTL ? '۳' : '3'}
+                  <span
+                    className={`absolute -top-1 h-5 w-5 rounded-full bg-orange text-accent-foreground text-xs flex items-center justify-center font-bold ${isRTL ? "-right-1" : "-left-1"}`}
+                  >
+                    {isRTL ? "۳" : "3"}
                   </span>
                 </Button>
               </Link>
 
               {/* Account */}
-              <Link to="/auth" className="hidden sm:flex items-center gap-2">
+              <Link to="/Login" className="hidden sm:flex items-center gap-2">
                 <User className="h-5 w-5 text-muted-foreground" />
-                <div className={`text-sm ${isRTL ? 'text-right' : 'text-left'}`}>
+                <div className={`text-sm ${isRTL ? "text-right" : "text-left"}`}>
                   <p className="text-muted-foreground">{t.header.signIn}</p>
                   <p className="font-medium text-foreground">{t.header.welcomeGuest}</p>
                 </div>
@@ -78,7 +80,7 @@ const Header = () => {
                 size="icon"
                 className="lg:hidden"
                 onClick={() => setIsMenuOpen(true)}
-                aria-label={isRTL ? 'منو' : 'Menu'}
+                aria-label={isRTL ? "منو" : "Menu"}
               >
                 <Menu className="h-5 w-5" />
               </Button>
@@ -91,13 +93,13 @@ const Header = () => {
               <Input
                 type="text"
                 placeholder={t.header.searchPlaceholder}
-                className={`w-full h-10 rounded-full border-2 border-border ${isRTL ? 'pr-4 pl-20 text-right' : 'pl-4 pr-20 text-left'}`}
-                dir={isRTL ? 'rtl' : 'ltr'}
+                className={`w-full h-10 rounded-full border-2 border-border ${isRTL ? "pr-4 pl-20 text-right" : "pl-4 pr-20 text-left"}`}
+                dir={isRTL ? "rtl" : "ltr"}
               />
               <Button
                 variant="cyan"
                 size="sm"
-                className={`absolute top-1/2 -translate-y-1/2 rounded-full px-4 ${isRTL ? 'left-1' : 'right-1'}`}
+                className={`absolute top-1/2 -translate-y-1/2 rounded-full px-4 ${isRTL ? "left-1" : "right-1"}`}
               >
                 <Search className="h-4 w-4" />
               </Button>
