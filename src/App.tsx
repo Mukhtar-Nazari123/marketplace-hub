@@ -26,6 +26,9 @@ import AdminPromotions from "./pages/admin/AdminPromotions";
 import AdminCMS from "./pages/admin/AdminCMS";
 import AdminSettings from "./pages/admin/AdminSettings";
 import BuyerProfile from "./pages/dashboard/BuyerProfile";
+import DashboardIndex from "./pages/dashboard/DashboardIndex";
+import BuyerDashboard from "./pages/dashboard/BuyerDashboard";
+import SellerDashboard from "./pages/dashboard/SellerDashboard";
 
 const queryClient = new QueryClient();
 
@@ -52,8 +55,10 @@ const App = () => (
               <Route path="/forgot-password" element={<ForgotPassword />} />
               
               {/* Dashboard Routes - All nested under /dashboard */}
+              <Route path="/dashboard" element={<DashboardIndex />} />
+
               {/* Admin Routes */}
-              <Route path="/dashboard" element={<AdminDashboard />} />
+              <Route path="/dashboard/admin" element={<AdminDashboard />} />
               <Route path="/dashboard/users" element={<AdminUsers />} />
               <Route path="/dashboard/products" element={<AdminProducts />} />
               <Route path="/dashboard/orders" element={<AdminOrders />} />
@@ -62,23 +67,23 @@ const App = () => (
               <Route path="/dashboard/promotions" element={<AdminPromotions />} />
               <Route path="/dashboard/cms" element={<AdminCMS />} />
               <Route path="/dashboard/settings" element={<AdminSettings />} />
-              
-              {/* Shared Profile Route (accessible by all authenticated users) */}
+
+              {/* Shared Profile Route (keep existing) */}
               <Route path="/dashboard/profile" element={<BuyerProfile />} />
-              
+
               {/* Buyer Routes */}
-              <Route path="/dashboard/buyer" element={<BuyerProfile />} />
+              <Route path="/dashboard/buyer" element={<BuyerDashboard />} />
               <Route path="/dashboard/buyer/orders" element={<BuyerProfile />} />
               <Route path="/dashboard/buyer/addresses" element={<BuyerProfile />} />
               <Route path="/dashboard/buyer/wishlist" element={<BuyerProfile />} />
               <Route path="/dashboard/buyer/payments" element={<BuyerProfile />} />
-              
-              {/* Seller Routes (placeholder - will be implemented) */}
-              <Route path="/dashboard/seller" element={<AdminDashboard />} />
-              <Route path="/dashboard/seller/products" element={<AdminProducts />} />
-              <Route path="/dashboard/seller/orders" element={<AdminOrders />} />
-              <Route path="/dashboard/seller/analytics" element={<AdminDashboard />} />
-              <Route path="/dashboard/seller/products/new" element={<AdminProducts />} />
+
+              {/* Seller Routes */}
+              <Route path="/dashboard/seller" element={<SellerDashboard />} />
+              <Route path="/dashboard/seller/products" element={<SellerDashboard />} />
+              <Route path="/dashboard/seller/orders" element={<SellerDashboard />} />
+              <Route path="/dashboard/seller/analytics" element={<SellerDashboard />} />
+              <Route path="/dashboard/seller/products/new" element={<SellerDashboard />} />
               
               {/* Legacy Admin Routes - Redirect to new paths */}
               <Route path="/admin" element={<Navigate to="/dashboard" replace />} />

@@ -38,14 +38,14 @@ const Login = () => {
   const redirectBasedOnRole = (userRole: string) => {
     switch (userRole) {
       case "admin":
-        navigate("/admin");
+        navigate("/dashboard/admin", { replace: true });
         break;
       case "seller":
-        navigate("/");
+        navigate("/dashboard/seller", { replace: true });
         break;
       case "buyer":
       default:
-        navigate("/");
+        navigate("/dashboard/buyer", { replace: true });
         break;
     }
   };
@@ -100,7 +100,8 @@ const Login = () => {
         title: isRTL ? "ورود موفق" : "Login Successful",
         description: isRTL ? "خوش آمدید!" : "Welcome back!",
       });
-      // Role-based redirect is handled by the useEffect
+      // Navigate immediately; role-based redirect will resolve via auth state.
+      navigate('/dashboard', { replace: true });
     }
   };
 

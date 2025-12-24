@@ -27,7 +27,9 @@ const Header = () => {
 
   // Get dashboard link based on role
   const getDashboardLink = () => {
-    if (role === 'admin') return '/dashboard';
+    // Role can be null briefly right after login; send to /dashboard which will redirect.
+    if (!role) return '/dashboard';
+    if (role === 'admin') return '/dashboard/admin';
     if (role === 'seller') return '/dashboard/seller';
     return '/dashboard/buyer';
   };
@@ -35,7 +37,8 @@ const Header = () => {
   const getDashboardLabel = () => {
     if (role === 'admin') return isRTL ? 'داشبورد مدیر' : 'Admin Dashboard';
     if (role === 'seller') return isRTL ? 'داشبورد فروشنده' : 'Seller Dashboard';
-    return isRTL ? 'داشبورد خریدار' : 'Buyer Dashboard';
+    if (role === 'buyer') return isRTL ? 'داشبورد خریدار' : 'Buyer Dashboard';
+    return isRTL ? 'داشبورد' : 'Dashboard';
   };
 
   const handleLogout = async () => {
@@ -104,7 +107,7 @@ const Header = () => {
                   {/* Dashboard Link */}
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Link to={getDashboardLink()} className="hidden sm:flex">
+                      <Link to={getDashboardLink()} className="flex">
                         <Button 
                           variant="ghost" 
                           size="icon" 
