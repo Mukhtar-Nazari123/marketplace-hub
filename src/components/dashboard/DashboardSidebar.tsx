@@ -75,16 +75,17 @@ export const DashboardSidebar = () => {
     { title: t.admin.settings.title, icon: Settings, url: '/dashboard/settings' },
   ];
 
-  // Seller navigation items
+  // Seller navigation items (shared dashboard)
   const sellerNavItems = [
     { title: isRTL ? 'داشبورد' : 'Dashboard', icon: LayoutDashboard, url: '/dashboard/seller' },
     { title: isRTL ? 'محصولات من' : 'My Products', icon: Package, url: '/dashboard/seller/products' },
     { title: isRTL ? 'سفارشات' : 'Orders', icon: ShoppingCart, url: '/dashboard/seller/orders' },
     { title: isRTL ? 'آمار فروش' : 'Analytics', icon: BarChart3, url: '/dashboard/seller/analytics' },
+    { title: isRTL ? 'پروفایل' : 'Profile', icon: User, url: '/dashboard/profile' },
     { title: isRTL ? 'افزودن محصول' : 'Add Product', icon: Plus, url: '/dashboard/seller/products/new' },
   ];
 
-  // Buyer navigation items
+  // Buyer navigation items (shared dashboard)
   const buyerNavItems = [
     { title: isRTL ? 'داشبورد' : 'Dashboard', icon: LayoutDashboard, url: '/dashboard/buyer' },
     { title: isRTL ? 'پروفایل' : 'Profile', icon: User, url: '/dashboard/profile' },
