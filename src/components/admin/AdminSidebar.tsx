@@ -47,20 +47,20 @@ export const AdminSidebar = () => {
 
   const mainNavItems = [
     { title: t.admin.dashboard, icon: LayoutDashboard, url: '/admin' },
-    { title: t.admin.users, icon: Users, url: '/admin/users' },
-    { title: t.admin.products, icon: Package, url: '/admin/products' },
-    { title: t.admin.orders, icon: ShoppingCart, url: '/admin/orders' },
-    { title: t.admin.sellerVerification, icon: BadgeCheck, url: '/admin/sellers' },
+    { title: t.admin.users.title, icon: Users, url: '/admin/users' },
+    { title: t.admin.products.title, icon: Package, url: '/admin/products' },
+    { title: t.admin.orders.title, icon: ShoppingCart, url: '/admin/orders' },
+    { title: t.admin.sellers.title, icon: BadgeCheck, url: '/admin/sellers' },
   ];
 
   const contentNavItems = [
-    { title: t.admin.banners, icon: Image, url: '/admin/banners' },
-    { title: t.admin.promotions, icon: Tag, url: '/admin/promotions' },
-    { title: t.admin.cms, icon: FileText, url: '/admin/cms' },
+    { title: t.admin.banners.title, icon: Image, url: '/admin/banners' },
+    { title: t.admin.promotions.title, icon: Tag, url: '/admin/promotions' },
+    { title: t.admin.cms.title, icon: FileText, url: '/admin/cms' },
   ];
 
   const settingsNavItems = [
-    { title: t.admin.settings, icon: Settings, url: '/admin/settings' },
+    { title: t.admin.settings.title, icon: Settings, url: '/admin/settings' },
   ];
 
   const handleLogout = async () => {

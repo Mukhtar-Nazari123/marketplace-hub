@@ -184,7 +184,7 @@ const AdminDashboard = () => {
           <StatsCard
             title={t.admin.activeProducts}
             value={stats.totalProducts}
-            description={`${stats.pendingProducts} ${t.admin.pending}`}
+            description={`${stats.pendingProducts} ${t.admin.pendingReview}`}
             icon={Package}
             iconClassName="bg-accent/10 text-accent"
             delay={1}
