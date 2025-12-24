@@ -36,33 +36,33 @@ export const QuickActionsCard = ({
 
   const quickActions: QuickAction[] = [
     {
-      labelKey: 'userManagement',
+      labelKey: 'users',
       icon: UserPlus,
       path: '/admin/users',
       variant: 'outline',
     },
     {
-      labelKey: 'reviewProducts',
+      labelKey: 'products',
       icon: Package,
       path: '/admin/products',
       variant: pendingProducts > 0 ? 'default' : 'outline',
       badge: pendingProducts,
     },
     {
-      labelKey: 'reviewSellers',
+      labelKey: 'sellers',
       icon: BadgeCheck,
       path: '/admin/sellers',
       variant: pendingSellers > 0 ? 'default' : 'outline',
       badge: pendingSellers,
     },
     {
-      labelKey: 'bannerManagement',
+      labelKey: 'banners',
       icon: Image,
       path: '/admin/banners',
       variant: 'outline',
     },
     {
-      labelKey: 'promotionManagement',
+      labelKey: 'promotions',
       icon: Tag,
       path: '/admin/promotions',
       variant: 'outline',
@@ -70,7 +70,11 @@ export const QuickActionsCard = ({
   ];
 
   const getLabel = (key: string) => {
-    return t.admin[key as keyof typeof t.admin] as string;
+    const section = t.admin[key as keyof typeof t.admin];
+    if (typeof section === 'object' && 'title' in section) {
+      return section.title as string;
+    }
+    return key;
   };
 
   return (
@@ -116,7 +120,7 @@ export const QuickActionsCard = ({
           <div className="mt-4 flex items-center gap-3 rounded-lg bg-amber-500/10 border border-amber-500/20 p-3 text-sm animate-fade-in group hover:bg-amber-500/15 transition-colors duration-300">
             <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0 animate-pulse" />
             <span className="text-amber-700 dark:text-amber-400">
-              {t.admin.needsAttention}: {pendingSellers + pendingProducts} {t.admin.pending}
+              {t.admin.needsAttention}: {pendingSellers + pendingProducts} {t.admin.pendingReview}
             </span>
           </div>
         )}

@@ -64,7 +64,7 @@ export const RevenueChart = ({ data, isLoading }: RevenueChartProps) => {
               value="orders"
               className="transition-all duration-300 data-[state=active]:shadow-md"
             >
-              {t.admin.orders}
+              {t.admin.orders.title}
             </TabsTrigger>
           </TabsList>
 
@@ -171,7 +171,7 @@ export const RevenueChart = ({ data, isLoading }: RevenueChartProps) => {
                       marginBottom: '4px',
                     }}
                     cursor={{ fill: 'hsl(var(--muted)/0.3)' }}
-                    formatter={(value: number) => [value, t.admin.orders]}
+                    formatter={(value: number) => [value, t.admin.orders.title]}
                   />
                   <Bar
                     dataKey="orders"

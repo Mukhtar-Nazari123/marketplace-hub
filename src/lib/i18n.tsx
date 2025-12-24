@@ -717,7 +717,6 @@ export const translations = {
     
     // Admin - Comprehensive translations
     admin: {
-      // Sidebar & Navigation
       panelTitle: "Admin Panel",
       panelSubtitle: "System Management",
       main: "Main",
@@ -725,8 +724,6 @@ export const translations = {
       system: "System",
       manager: "Manager",
       logout: "Logout",
-      
-      // Dashboard
       dashboard: "Dashboard",
       dashboardDescription: "System Overview",
       totalUsers: "Total Users",
@@ -744,139 +741,10 @@ export const translations = {
       needsAttention: "Needs Attention",
       inProgress: "In Progress",
       awaitingVerification: "Awaiting Verification",
-      
-      // Users
-      users: "Users",
-      userManagement: "User Management",
-      userManagementDescription: "View and manage all users",
-      totalOf: "Total of",
-      user: "user",
-      usersCount: "users",
-      refresh: "Refresh",
-      export: "Export",
-      searchByNameEmail: "Search by name or email...",
-      filterByRole: "Filter by Role",
-      allRoles: "All Roles",
-      buyers: "Buyers",
-      sellersList: "Sellers",
-      moderators: "Moderators",
-      admins: "Admins",
-      userDetails: "User Details",
-      fullUserInfo: "Full user information",
-      registrationDate: "Registration Date",
-      role: "Role",
-      admin: "Admin",
-      moderator: "Moderator",
-      seller: "Seller",
-      buyer: "Buyer",
-      unspecified: "Unspecified",
-      actions: "Actions",
-      viewDetails: "View Details",
-      suspendAccount: "Suspend Account",
-      noUsers: "No users found",
-      loadUsersFailed: "Failed to load users",
-      
-      // Products
-      products: "Products",
-      productManagement: "Product Management",
-      productManagementDescription: "Review and manage all products",
-      productsCount: "products",
-      searchByName: "Search by name...",
-      filterByStatus: "Filter by Status",
-      allStatuses: "All Statuses",
-      active: "Active",
-      pending: "Pending",
-      rejected: "Rejected",
-      draft: "Draft",
-      archived: "Archived",
-      productName: "Product Name",
-      price: "Price",
-      status: "Status",
-      dateAdded: "Date Added",
-      approve: "Approve",
-      reject: "Reject",
-      rejectProduct: "Reject Product",
-      rejectProductDescription: "Please enter the reason for rejection",
-      rejectionReason: "Rejection reason...",
-      rejectingProduct: "Rejecting...",
-      productApproved: "Product approved",
-      productRejected: "Product rejected",
-      productApproveFailed: "Failed to approve product",
-      productRejectFailed: "Failed to reject product",
-      loadProductsFailed: "Failed to load products",
-      noProducts: "No products found",
-      enterRejectReason: "Please enter rejection reason",
-      
-      // Orders
-      orders: "Orders",
-      orderManagement: "Order Management",
-      orderManagementDescription: "View and track all orders",
-      ordersCount: "orders",
-      searchByOrderNumber: "Search by order number...",
-      orderNumber: "Order Number",
-      orderStatus: "Order Status",
-      payment: "Payment",
-      amount: "Amount",
-      date: "Date",
-      pendingOrder: "Pending",
-      confirmed: "Confirmed",
-      processing: "Processing",
-      shipped: "Shipped",
-      delivered: "Delivered",
-      cancelled: "Cancelled",
-      refunded: "Refunded",
-      paymentPending: "Payment Pending",
-      paid: "Paid",
-      paymentFailed: "Payment Failed",
-      paymentRefunded: "Refunded",
-      loadOrdersFailed: "Failed to load orders",
-      noOrders: "No orders found",
-      
-      // Sellers
-      sellers: "Sellers",
-      sellerVerification: "Seller Verification",
-      sellerVerificationDescription: "Review seller verification requests",
-      verificationRequests: "Verification Requests",
-      requestsCount: "requests",
-      searchByCompanyName: "Search by company name...",
-      companyName: "Company Name",
-      businessType: "Business Type",
-      approved: "Approved",
-      suspended: "Suspended",
-      rejectVerification: "Reject Verification Request",
-      rejectVerificationDescription: "Please enter the reason for rejection",
-      rejectRequest: "Reject Request",
-      sellerApproved: "Seller approved",
-      sellerRejected: "Seller request rejected",
-      approvalFailed: "Approval failed",
-      rejectionFailed: "Rejection failed",
-      loadVerificationsFailed: "Failed to load verification requests",
-      noVerifications: "No verification requests found",
-      notSpecified: "Not specified",
-      
-      // Banners
-      banners: "Banners",
-      bannerManagement: "Banner Management",
-      
-      // Promotions
-      promotions: "Promotions",
-      promotionManagement: "Promotions & Banners",
-      
-      // CMS
-      cms: "Content Management",
-      cmsManagement: "Website Content Management",
-      
-      // Settings
-      settings: "Settings",
-      systemSettings: "System Settings",
-      
-      // Charts
       revenueOverview: "Revenue Overview",
       monthlyRevenue: "Monthly Revenue",
       monthlyOrders: "Monthly Orders",
       revenue: "Revenue",
-      
-      // Quick Actions
       quickActions: "Quick Actions",
       reviewSellers: "Review Sellers",
       pendingSellerRequests: "Pending seller requests",
@@ -884,8 +752,6 @@ export const translations = {
       pendingProductApprovals: "Pending product approvals",
       viewAllOrders: "View All Orders",
       manageOrders: "Manage orders and deliveries",
-      
-      // Recent Activity
       recentActivity: "Recent Activity",
       newUserRegistration: "New User Registration",
       newUserJoined: "New user joined as buyer",
@@ -896,31 +762,114 @@ export const translations = {
       newVerificationRequest: "New Verification Request",
       newSellerVerification: "New seller verification request",
       
-      // Common actions
-      view: "View",
-      edit: "Edit",
-      delete: "Delete",
-      save: "Save",
-      cancel: "Cancel",
-      close: "Close",
-      confirm: "Confirm",
-      search: "Search",
-      filter: "Filter",
-      
-      // Months
       months: {
-        january: "January",
-        february: "February",
-        march: "March",
-        april: "April",
-        may: "May",
-        june: "June",
-        july: "July",
-        august: "August",
-        september: "September",
-        october: "October",
-        november: "November",
-        december: "December",
+        january: "January", february: "February", march: "March", april: "April",
+        may: "May", june: "June", july: "July", august: "August",
+        september: "September", october: "October", november: "November", december: "December",
+      },
+      
+      users: {
+        title: "User Management", description: "View and manage all users",
+        usersTitle: "Users", totalUsers: "Total {count} users",
+        refresh: "Refresh", export: "Export",
+        searchPlaceholder: "Search by name or email...", filterByRole: "Filter by Role",
+        allRoles: "All Roles", buyers: "Buyers", sellers: "Sellers",
+        moderators: "Moderators", admins: "Admins", user: "User", role: "Role",
+        registrationDate: "Registration Date", actions: "Actions",
+        viewDetails: "View Details", suspendAccount: "Suspend Account",
+        userDetails: "User Details", fullInfo: "Full user information",
+        close: "Close", noUsers: "No users found", loadError: "Failed to load users",
+        roles: { admin: "Admin", moderator: "Moderator", seller: "Seller", buyer: "Buyer", unspecified: "Unspecified" },
+      },
+      
+      products: {
+        title: "Product Management", description: "Review and manage all products",
+        productsTitle: "Products", totalProducts: "Total {count} products",
+        refresh: "Refresh", searchPlaceholder: "Search by name...",
+        filterByStatus: "Filter by Status", allStatuses: "All Statuses",
+        product: "Product", price: "Price", status: "Status", addedDate: "Date Added",
+        actions: "Actions", viewDetails: "View Details", approve: "Approve", reject: "Reject",
+        rejectProduct: "Reject Product", enterRejectionReason: "Please enter rejection reason",
+        rejectionReasonPlaceholder: "Rejection reason...", cancel: "Cancel", rejecting: "Rejecting...",
+        noProducts: "No products found", loadError: "Failed to load products",
+        approveSuccess: "Product approved", approveError: "Failed to approve product",
+        rejectSuccess: "Product rejected", rejectError: "Failed to reject product",
+        statuses: { active: "Active", pending: "Pending", rejected: "Rejected", draft: "Draft", archived: "Archived" },
+      },
+      
+      orders: {
+        title: "Order Management", description: "View and track all orders",
+        ordersTitle: "Orders", totalOrders: "Total {count} orders",
+        refresh: "Refresh", searchPlaceholder: "Search by order number...",
+        filterByStatus: "Filter by Status", allStatuses: "All Statuses",
+        orderNumber: "Order Number", status: "Status", payment: "Payment",
+        amount: "Amount", date: "Date", actions: "Actions", noOrders: "No orders found",
+        loadError: "Failed to load orders",
+        statuses: { pending: "Pending", confirmed: "Confirmed", processing: "Processing", shipped: "Shipped", delivered: "Delivered", cancelled: "Cancelled", refunded: "Refunded" },
+        paymentStatuses: { pending: "Payment Pending", paid: "Paid", failed: "Payment Failed", refunded: "Refunded" },
+      },
+      
+      sellers: {
+        title: "Seller Verification", description: "Review seller verification requests",
+        verificationsTitle: "Verification Requests", totalRequests: "Total {count} requests",
+        refresh: "Refresh", searchPlaceholder: "Search by company name...",
+        companyName: "Company Name", businessType: "Business Type", phone: "Phone",
+        status: "Status", date: "Date", actions: "Actions", unspecified: "Not specified",
+        rejectVerification: "Reject Verification Request", enterRejectionReason: "Please enter rejection reason",
+        rejectionReasonPlaceholder: "Rejection reason...", cancel: "Cancel", rejectRequest: "Reject Request",
+        rejecting: "Rejecting...", noVerifications: "No verification requests found",
+        loadError: "Failed to load verification requests", approveSuccess: "Seller approved",
+        approveError: "Approval failed", rejectSuccess: "Seller request rejected", rejectError: "Rejection failed",
+        statuses: { approved: "Approved", pending: "Pending", rejected: "Rejected", suspended: "Suspended" },
+      },
+      
+      banners: {
+        title: "Banner Management", description: "Manage promotional banners",
+        bannersTitle: "Banners", bannersDescription: "Manage banners and promotions",
+        addBanner: "Add Banner", noBanners: "No banners found",
+        startByAdding: "Start by adding a new banner for the home page",
+        addFirstBanner: "Add First Banner",
+      },
+      
+      promotions: {
+        title: "Promotion Management", description: "Create and manage promotions",
+        promotionsTitle: "Promotions", promotionsDescription: "Manage coupons and discounts",
+        addPromotion: "Add Promotion", noPromotions: "No promotions found",
+        startByCreating: "Start by creating a new promotion", createFirst: "Create First Promotion",
+      },
+      
+      cms: {
+        title: "Content Management", description: "Edit website pages and content",
+        pages: {
+          home: "Home Page", homeDescription: "Manage home page content",
+          about: "About Us", aboutDescription: "Edit about us page",
+          contact: "Contact Us", contactDescription: "Edit contact information",
+          terms: "Terms & Conditions", termsDescription: "Edit terms and conditions",
+          privacy: "Privacy Policy", privacyDescription: "Edit privacy policy",
+        },
+      },
+      
+      settings: {
+        title: "Settings", description: "System settings and configuration",
+        saveChanges: "Save Changes",
+        tabs: { general: "General", notifications: "Notifications", security: "Security" },
+        general: {
+          title: "General Settings", description: "Main system settings",
+          siteName: "Site Name", siteNamePlaceholder: "Store Name",
+          siteEmail: "Site Email", maintenanceMode: "Maintenance Mode",
+          maintenanceDescription: "Temporarily disable the site for maintenance",
+        },
+        notifications: {
+          title: "Notification Settings", description: "Configure email notifications",
+          newOrders: "New Order Notifications", newOrdersDescription: "Receive notifications for new orders",
+          newRegistrations: "New Registration Notifications", newRegistrationsDescription: "Receive notifications for new user registrations",
+          verificationRequests: "Verification Request Notifications", verificationRequestsDescription: "Receive notifications for new verification requests",
+        },
+        security: {
+          title: "Security Settings", description: "Configure security options",
+          twoFactor: "Two-Factor Authentication", twoFactorDescription: "Enable two-factor authentication for admins",
+          activityLog: "Activity Logging", activityLogDescription: "Log all admin activities",
+        },
       },
     },
     
@@ -1035,6 +984,7 @@ interface LanguageContextType {
   t: Translations;
   isRTL: boolean;
   dir: 'rtl' | 'ltr';
+  direction: 'rtl' | 'ltr';
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -1069,9 +1019,10 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const t = translations[language];
   const isRTL = language === 'fa';
   const dir = isRTL ? 'rtl' : 'ltr';
+  const direction = dir;
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t, isRTL, dir }}>
+    <LanguageContext.Provider value={{ language, setLanguage, t, isRTL, dir, direction }}>
       {children}
     </LanguageContext.Provider>
   );

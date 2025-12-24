@@ -22,10 +22,10 @@ export const RecentActivityCard = ({ activities, isLoading }: RecentActivityCard
   
   const getActivityBadge = (type: Activity['type']) => {
     const badges = {
-      user: { label: t.admin.user, className: 'bg-secondary text-secondary-foreground' },
-      order: { label: t.admin.orders, className: 'bg-primary text-primary-foreground' },
-      product: { label: t.admin.products, className: 'bg-accent text-accent-foreground' },
-      seller: { label: t.admin.seller, className: 'bg-emerald-500/10 text-emerald-600' },
+      user: { label: t.admin.users.title, className: 'bg-secondary text-secondary-foreground' },
+      order: { label: t.admin.orders.title, className: 'bg-primary text-primary-foreground' },
+      product: { label: t.admin.products.title, className: 'bg-accent text-accent-foreground' },
+      seller: { label: t.admin.sellers.title, className: 'bg-emerald-500/10 text-emerald-600' },
     };
     
     const badge = badges[type];
@@ -97,7 +97,7 @@ export const RecentActivityCard = ({ activities, isLoading }: RecentActivityCard
               <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
                 <span className="text-2xl">📭</span>
               </div>
-              <p className="text-center">{t.admin.noOrders}</p>
+              <p className="text-center">{t.admin.orders.noOrders}</p>
             </div>
           ) : (
             <div className="space-y-4">
