@@ -12,7 +12,7 @@ import { z } from "zod";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
-  password: z.string().min(1, "Password is required")
+  password: z.string().min(1, "Password is required"),
 });
 
 const Login = () => {
@@ -37,15 +37,15 @@ const Login = () => {
 
   const redirectBasedOnRole = (userRole: string) => {
     switch (userRole) {
-      case 'admin':
-        navigate('/admin');
+      case "admin":
+        navigate("/admin");
         break;
-      case 'seller':
-        navigate('/seller');
+      case "seller":
+        navigate("/");
         break;
-      case 'buyer':
+      case "buyer":
       default:
-        navigate('/');
+        navigate("/");
         break;
     }
   };
@@ -69,11 +69,11 @@ const Login = () => {
     }
   };
 
-  const isFormValid = email.includes('@') && password.length > 0;
+  const isFormValid = email.includes("@") && password.length > 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
     setLoading(true);
@@ -82,23 +82,23 @@ const Login = () => {
 
     if (error) {
       let errorMessage = error.message;
-      
+
       // User-friendly error messages
-      if (error.message.includes('Invalid login credentials')) {
-        errorMessage = isRTL ? 'ایمیل یا رمز عبور اشتباه است' : 'Invalid email or password';
-      } else if (error.message.includes('Email not confirmed')) {
-        errorMessage = isRTL ? 'لطفا ایمیل خود را تایید کنید' : 'Please confirm your email first';
+      if (error.message.includes("Invalid login credentials")) {
+        errorMessage = isRTL ? "ایمیل یا رمز عبور اشتباه است" : "Invalid email or password";
+      } else if (error.message.includes("Email not confirmed")) {
+        errorMessage = isRTL ? "لطفا ایمیل خود را تایید کنید" : "Please confirm your email first";
       }
 
       toast({
         title: isRTL ? "خطا در ورود" : "Login Error",
         description: errorMessage,
-        variant: "destructive"
+        variant: "destructive",
       });
     } else {
       toast({
         title: isRTL ? "ورود موفق" : "Login Successful",
-        description: isRTL ? "خوش آمدید!" : "Welcome back!"
+        description: isRTL ? "خوش آمدید!" : "Welcome back!",
       });
       // Role-based redirect is handled by the useEffect
     }
@@ -113,7 +113,7 @@ const Login = () => {
     forgotPassword: isRTL ? "فراموشی رمز عبور؟" : "Forgot password?",
     login: isRTL ? "ورود" : "Sign In",
     noAccount: isRTL ? "حساب کاربری ندارید؟" : "Don't have an account?",
-    register: isRTL ? "ثبت‌نام" : "Register"
+    register: isRTL ? "ثبت‌نام" : "Register",
   };
 
   return (
@@ -175,21 +175,13 @@ const Login = () => {
                 {texts.rememberMe}
               </Label>
             </div>
-            <Link 
-              to="/forgot-password" 
-              className="text-sm text-primary hover:underline"
-            >
+            <Link to="/forgot-password" className="text-sm text-primary hover:underline">
               {texts.forgotPassword}
             </Link>
           </div>
 
           {/* Submit Button */}
-          <Button
-            type="submit"
-            className="w-full"
-            size="lg"
-            disabled={!isFormValid || loading}
-          >
+          <Button type="submit" className="w-full" size="lg" disabled={!isFormValid || loading}>
             {loading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin mr-2" />
