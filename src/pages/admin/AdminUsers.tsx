@@ -46,9 +46,8 @@ import {
   Download,
   RefreshCw,
 } from 'lucide-react';
-import { format } from 'date-fns';
-import { ar } from 'date-fns/locale';
 import { toast } from 'sonner';
+import { useLanguage, formatDate } from '@/lib/i18n';
 
 interface UserWithRole {
   id: string;
@@ -61,6 +60,7 @@ interface UserWithRole {
 }
 
 const AdminUsers = () => {
+  const { t, direction } = useLanguage();
   const [users, setUsers] = useState<UserWithRole[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<UserWithRole[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -98,7 +98,7 @@ const AdminUsers = () => {
       setFilteredUsers(usersWithRoles);
     } catch (error) {
       console.error('Error fetching users:', error);
-      toast.error('فشل في تحميل المستخدمين');
+      toast.error(t.admin.users.loadError);
     } finally {
       setIsLoading(false);
     }
@@ -130,15 +130,15 @@ const AdminUsers = () => {
   const getRoleBadge = (role: string | null) => {
     switch (role) {
       case 'admin':
-        return <Badge className="bg-destructive text-destructive-foreground">مدير</Badge>;
+        return <Badge className="bg-destructive text-destructive-foreground">{t.admin.users.roles.admin}</Badge>;
       case 'moderator':
-        return <Badge className="bg-warning text-warning-foreground">مشرف</Badge>;
+        return <Badge className="bg-warning text-warning-foreground">{t.admin.users.roles.moderator}</Badge>;
       case 'seller':
-        return <Badge className="bg-success text-success-foreground">بائع</Badge>;
+        return <Badge className="bg-success text-success-foreground">{t.admin.users.roles.seller}</Badge>;
       case 'buyer':
-        return <Badge variant="secondary">مشتري</Badge>;
+        return <Badge variant="secondary">{t.admin.users.roles.buyer}</Badge>;
       default:
-        return <Badge variant="outline">غير محدد</Badge>;
+        return <Badge variant="outline">{t.admin.users.roles.unspecified}</Badge>;
     }
   };
 
@@ -147,26 +147,31 @@ const AdminUsers = () => {
     setIsDetailOpen(true);
   };
 
+  const isRTL = direction === 'rtl';
+  const searchIconClass = isRTL ? 'right-3' : 'left-3';
+  const inputPaddingClass = isRTL ? 'pr-9' : 'pl-9';
+  const iconMarginClass = isRTL ? 'ml-2' : 'mr-2';
+
   return (
-    <AdminLayout title="إدارة المستخدمين" description="عرض وإدارة جميع المستخدمين">
-      <div className="space-y-6">
-        <Card>
+    <AdminLayout title={t.admin.users.title} description={t.admin.users.description}>
+      <div className="space-y-6 animate-fade-in">
+        <Card className="hover-lift">
           <CardHeader>
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
-                <CardTitle>المستخدمين</CardTitle>
+                <CardTitle>{t.admin.users.usersTitle}</CardTitle>
                 <CardDescription>
-                  إجمالي {filteredUsers.length} مستخدم
+                  {t.admin.users.totalUsers.replace('{count}', String(filteredUsers.length))}
                 </CardDescription>
               </div>
               <div className="flex flex-wrap gap-2">
-                <Button variant="outline" size="sm" onClick={fetchUsers}>
-                  <RefreshCw className="ml-2 h-4 w-4" />
-                  تحديث
+                <Button variant="outline" size="sm" onClick={fetchUsers} className="hover-scale">
+                  <RefreshCw className={`h-4 w-4 ${iconMarginClass}`} />
+                  {t.admin.users.refresh}
                 </Button>
-                <Button variant="outline" size="sm">
-                  <Download className="ml-2 h-4 w-4" />
-                  تصدير
+                <Button variant="outline" size="sm" className="hover-scale">
+                  <Download className={`h-4 w-4 ${iconMarginClass}`} />
+                  {t.admin.users.export}
                 </Button>
               </div>
             </div>
@@ -175,25 +180,25 @@ const AdminUsers = () => {
             {/* Filters */}
             <div className="mb-6 flex flex-col gap-4 md:flex-row">
               <div className="relative flex-1">
-                <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Search className={`absolute ${searchIconClass} top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground`} />
                 <Input
-                  placeholder="البحث بالاسم أو البريد..."
+                  placeholder={t.admin.users.searchPlaceholder}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pr-9"
+                  className={inputPaddingClass}
                 />
               </div>
               <Select value={roleFilter} onValueChange={setRoleFilter}>
                 <SelectTrigger className="w-full md:w-[180px]">
-                  <Filter className="ml-2 h-4 w-4" />
-                  <SelectValue placeholder="تصفية حسب الدور" />
+                  <Filter className={`h-4 w-4 ${iconMarginClass}`} />
+                  <SelectValue placeholder={t.admin.users.filterByRole} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">جميع الأدوار</SelectItem>
-                  <SelectItem value="buyer">المشترين</SelectItem>
-                  <SelectItem value="seller">البائعين</SelectItem>
-                  <SelectItem value="moderator">المشرفين</SelectItem>
-                  <SelectItem value="admin">المديرين</SelectItem>
+                  <SelectItem value="all">{t.admin.users.allRoles}</SelectItem>
+                  <SelectItem value="buyer">{t.admin.users.buyers}</SelectItem>
+                  <SelectItem value="seller">{t.admin.users.sellers}</SelectItem>
+                  <SelectItem value="moderator">{t.admin.users.moderators}</SelectItem>
+                  <SelectItem value="admin">{t.admin.users.admins}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -203,10 +208,10 @@ const AdminUsers = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>المستخدم</TableHead>
-                    <TableHead>الدور</TableHead>
-                    <TableHead>تاريخ التسجيل</TableHead>
-                    <TableHead className="text-left">الإجراءات</TableHead>
+                    <TableHead>{t.admin.users.user}</TableHead>
+                    <TableHead>{t.admin.users.role}</TableHead>
+                    <TableHead>{t.admin.users.registrationDate}</TableHead>
+                    <TableHead className={isRTL ? 'text-left' : 'text-right'}>{t.admin.users.actions}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -236,12 +241,12 @@ const AdminUsers = () => {
                   ) : filteredUsers.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={4} className="h-24 text-center">
-                        لا يوجد مستخدمين
+                        {t.admin.users.noUsers}
                       </TableCell>
                     </TableRow>
                   ) : (
                     filteredUsers.map((user) => (
-                      <TableRow key={user.id}>
+                      <TableRow key={user.id} className="hover:bg-muted/50 transition-colors">
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground">
@@ -257,9 +262,7 @@ const AdminUsers = () => {
                         </TableCell>
                         <TableCell>{getRoleBadge(user.role)}</TableCell>
                         <TableCell>
-                          {format(new Date(user.created_at), 'dd MMM yyyy', {
-                            locale: ar,
-                          })}
+                          {formatDate(new Date(user.created_at), direction === 'rtl' ? 'fa' : 'en')}
                         </TableCell>
                         <TableCell>
                           <DropdownMenu>
@@ -268,17 +271,17 @@ const AdminUsers = () => {
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="start">
-                              <DropdownMenuLabel>الإجراءات</DropdownMenuLabel>
+                            <DropdownMenuContent align={isRTL ? 'start' : 'end'}>
+                              <DropdownMenuLabel>{t.admin.users.actions}</DropdownMenuLabel>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem onClick={() => handleViewUser(user)}>
-                                <Eye className="ml-2 h-4 w-4" />
-                                عرض التفاصيل
+                                <Eye className={`h-4 w-4 ${iconMarginClass}`} />
+                                {t.admin.users.viewDetails}
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem className="text-destructive">
-                                <UserX className="ml-2 h-4 w-4" />
-                                تعليق الحساب
+                                <UserX className={`h-4 w-4 ${iconMarginClass}`} />
+                                {t.admin.users.suspendAccount}
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -296,9 +299,9 @@ const AdminUsers = () => {
         <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
-              <DialogTitle>تفاصيل المستخدم</DialogTitle>
+              <DialogTitle>{t.admin.users.userDetails}</DialogTitle>
               <DialogDescription>
-                معلومات كاملة عن المستخدم
+                {t.admin.users.fullInfo}
               </DialogDescription>
             </DialogHeader>
             {selectedUser && (
@@ -316,18 +319,16 @@ const AdminUsers = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">
-                        الدور
+                        {t.admin.users.role}
                       </label>
                       <div className="mt-1">{getRoleBadge(selectedUser.role)}</div>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">
-                        تاريخ التسجيل
+                        {t.admin.users.registrationDate}
                       </label>
                       <p className="mt-1">
-                        {format(new Date(selectedUser.created_at), 'dd MMM yyyy', {
-                          locale: ar,
-                        })}
+                        {formatDate(new Date(selectedUser.created_at), direction === 'rtl' ? 'fa' : 'en')}
                       </p>
                     </div>
                   </div>
@@ -336,7 +337,7 @@ const AdminUsers = () => {
             )}
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsDetailOpen(false)}>
-                إغلاق
+                {t.admin.users.close}
               </Button>
             </DialogFooter>
           </DialogContent>

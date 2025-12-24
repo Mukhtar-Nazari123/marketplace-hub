@@ -6,113 +6,116 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useLanguage } from '@/lib/i18n';
 
 const AdminSettings = () => {
+  const { t } = useLanguage();
+
   return (
-    <AdminLayout title="الإعدادات" description="إعدادات النظام والتكوين">
-      <div className="space-y-6">
+    <AdminLayout title={t.admin.settings.title} description={t.admin.settings.description}>
+      <div className="space-y-6 animate-fade-in">
         <Tabs defaultValue="general" className="space-y-4">
           <TabsList>
-            <TabsTrigger value="general">عام</TabsTrigger>
-            <TabsTrigger value="notifications">الإشعارات</TabsTrigger>
-            <TabsTrigger value="security">الأمان</TabsTrigger>
+            <TabsTrigger value="general">{t.admin.settings.tabs.general}</TabsTrigger>
+            <TabsTrigger value="notifications">{t.admin.settings.tabs.notifications}</TabsTrigger>
+            <TabsTrigger value="security">{t.admin.settings.tabs.security}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="general">
-            <Card>
+            <Card className="hover-lift">
               <CardHeader>
-                <CardTitle>الإعدادات العامة</CardTitle>
-                <CardDescription>إعدادات النظام الأساسية</CardDescription>
+                <CardTitle>{t.admin.settings.general.title}</CardTitle>
+                <CardDescription>{t.admin.settings.general.description}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="siteName">اسم الموقع</Label>
-                  <Input id="siteName" placeholder="اسم المتجر" />
+                  <Label htmlFor="siteName">{t.admin.settings.general.siteName}</Label>
+                  <Input id="siteName" placeholder={t.admin.settings.general.siteNamePlaceholder} />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="siteEmail">البريد الإلكتروني</Label>
+                  <Label htmlFor="siteEmail">{t.admin.settings.general.siteEmail}</Label>
                   <Input id="siteEmail" type="email" placeholder="admin@store.com" />
                 </div>
                 <Separator />
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>وضع الصيانة</Label>
+                    <Label>{t.admin.settings.general.maintenanceMode}</Label>
                     <p className="text-sm text-muted-foreground">
-                      تعطيل الموقع مؤقتاً للصيانة
+                      {t.admin.settings.general.maintenanceDescription}
                     </p>
                   </div>
                   <Switch />
                 </div>
-                <Button>حفظ التغييرات</Button>
+                <Button className="hover-scale">{t.admin.settings.saveChanges}</Button>
               </CardContent>
             </Card>
           </TabsContent>
 
           <TabsContent value="notifications">
-            <Card>
+            <Card className="hover-lift">
               <CardHeader>
-                <CardTitle>إعدادات الإشعارات</CardTitle>
-                <CardDescription>تكوين إشعارات البريد الإلكتروني</CardDescription>
+                <CardTitle>{t.admin.settings.notifications.title}</CardTitle>
+                <CardDescription>{t.admin.settings.notifications.description}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>إشعارات الطلبات الجديدة</Label>
+                    <Label>{t.admin.settings.notifications.newOrders}</Label>
                     <p className="text-sm text-muted-foreground">
-                      تلقي إشعار عند إنشاء طلب جديد
+                      {t.admin.settings.notifications.newOrdersDescription}
                     </p>
                   </div>
                   <Switch defaultChecked />
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>إشعارات التسجيل الجديد</Label>
+                    <Label>{t.admin.settings.notifications.newRegistrations}</Label>
                     <p className="text-sm text-muted-foreground">
-                      تلقي إشعار عند تسجيل مستخدم جديد
+                      {t.admin.settings.notifications.newRegistrationsDescription}
                     </p>
                   </div>
                   <Switch defaultChecked />
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>إشعارات طلبات التحقق</Label>
+                    <Label>{t.admin.settings.notifications.verificationRequests}</Label>
                     <p className="text-sm text-muted-foreground">
-                      تلقي إشعار عند طلب تحقق جديد
+                      {t.admin.settings.notifications.verificationRequestsDescription}
                     </p>
                   </div>
                   <Switch defaultChecked />
                 </div>
-                <Button>حفظ التغييرات</Button>
+                <Button className="hover-scale">{t.admin.settings.saveChanges}</Button>
               </CardContent>
             </Card>
           </TabsContent>
 
           <TabsContent value="security">
-            <Card>
+            <Card className="hover-lift">
               <CardHeader>
-                <CardTitle>إعدادات الأمان</CardTitle>
-                <CardDescription>تكوين خيارات الأمان</CardDescription>
+                <CardTitle>{t.admin.settings.security.title}</CardTitle>
+                <CardDescription>{t.admin.settings.security.description}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>المصادقة الثنائية</Label>
+                    <Label>{t.admin.settings.security.twoFactor}</Label>
                     <p className="text-sm text-muted-foreground">
-                      تفعيل المصادقة الثنائية للمديرين
+                      {t.admin.settings.security.twoFactorDescription}
                     </p>
                   </div>
                   <Switch />
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>تسجيل الأنشطة</Label>
+                    <Label>{t.admin.settings.security.activityLog}</Label>
                     <p className="text-sm text-muted-foreground">
-                      تسجيل جميع أنشطة المديرين
+                      {t.admin.settings.security.activityLogDescription}
                     </p>
                   </div>
                   <Switch defaultChecked />
                 </div>
-                <Button>حفظ التغييرات</Button>
+                <Button className="hover-scale">{t.admin.settings.saveChanges}</Button>
               </CardContent>
             </Card>
           </TabsContent>
