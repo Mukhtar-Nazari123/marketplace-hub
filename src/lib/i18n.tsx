@@ -230,31 +230,213 @@ export const translations = {
       by: "توسط",
     },
     
-    // Admin
+    // Admin - Comprehensive translations
     admin: {
-      dashboard: "داشبورد مدیریت",
-      users: "مدیریت کاربران",
-      products: "مدیریت محصولات",
-      orders: "مدیریت سفارشات",
-      sellers: "تأیید فروشندگان",
-      cms: "مدیریت محتوا",
-      promotions: "تبلیغات و بنرها",
-      settings: "تنظیمات سیستم",
-      logs: "گزارش‌ها و نظارت",
+      // Sidebar & Navigation
+      panelTitle: "پنل مدیریت",
+      panelSubtitle: "مدیریت سیستم",
+      main: "اصلی",
+      content: "محتوا",
+      system: "سیستم",
+      manager: "مدیر",
+      logout: "خروج",
+      
+      // Dashboard
+      dashboard: "داشبورد",
+      dashboardDescription: "نمای کلی سیستم",
       totalUsers: "کل کاربران",
       totalOrders: "کل سفارشات",
       totalRevenue: "کل درآمد",
       pendingSellers: "فروشندگان در انتظار",
+      activeProducts: "محصولات فعال",
+      newRegistrations: "ثبت‌نام‌های جدید",
+      activeSellers: "فروشندگان فعال",
+      pendingProducts: "محصولات در انتظار",
+      alerts: "هشدارها",
+      thisWeek: "این هفته",
+      fromLastMonth: "از ماه گذشته",
+      pendingReview: "در انتظار بررسی",
+      needsAttention: "نیاز به توجه",
+      inProgress: "در حال پردازش",
+      awaitingVerification: "در انتظار تأیید",
+      
+      // Users
+      users: "کاربران",
+      userManagement: "مدیریت کاربران",
+      userManagementDescription: "مشاهده و مدیریت همه کاربران",
+      totalOf: "مجموع",
+      user: "کاربر",
+      usersCount: "کاربر",
+      refresh: "بروزرسانی",
+      export: "خروجی",
+      searchByNameEmail: "جستجو با نام یا ایمیل...",
+      filterByRole: "فیلتر بر اساس نقش",
+      allRoles: "همه نقش‌ها",
       buyers: "خریداران",
       sellersList: "فروشندگان",
-      approved: "تأیید شده",
+      moderators: "ناظران",
+      admins: "مدیران",
+      userDetails: "جزئیات کاربر",
+      fullUserInfo: "اطلاعات کامل کاربر",
+      registrationDate: "تاریخ ثبت‌نام",
+      role: "نقش",
+      admin: "مدیر",
+      moderator: "ناظر",
+      seller: "فروشنده",
+      buyer: "خریدار",
+      unspecified: "نامشخص",
+      actions: "اقدامات",
+      viewDetails: "مشاهده جزئیات",
+      suspendAccount: "تعلیق حساب",
+      noUsers: "کاربری یافت نشد",
+      loadUsersFailed: "خطا در بارگذاری کاربران",
+      
+      // Products
+      products: "محصولات",
+      productManagement: "مدیریت محصولات",
+      productManagementDescription: "بررسی و مدیریت همه محصولات",
+      productsCount: "محصول",
+      searchByName: "جستجو بر اساس نام...",
+      filterByStatus: "فیلتر بر اساس وضعیت",
+      allStatuses: "همه وضعیت‌ها",
+      active: "فعال",
       pending: "در انتظار",
       rejected: "رد شده",
+      draft: "پیش‌نویس",
+      archived: "بایگانی",
+      productName: "نام محصول",
+      price: "قیمت",
+      status: "وضعیت",
+      dateAdded: "تاریخ افزودن",
       approve: "تأیید",
       reject: "رد",
+      rejectProduct: "رد محصول",
+      rejectProductDescription: "لطفاً دلیل رد محصول را وارد کنید",
+      rejectionReason: "دلیل رد...",
+      rejectingProduct: "در حال رد...",
+      productApproved: "محصول تأیید شد",
+      productRejected: "محصول رد شد",
+      productApproveFailed: "خطا در تأیید محصول",
+      productRejectFailed: "خطا در رد محصول",
+      loadProductsFailed: "خطا در بارگذاری محصولات",
+      noProducts: "محصولی یافت نشد",
+      enterRejectReason: "لطفاً دلیل رد را وارد کنید",
+      
+      // Orders
+      orders: "سفارشات",
+      orderManagement: "مدیریت سفارشات",
+      orderManagementDescription: "مشاهده و پیگیری همه سفارشات",
+      ordersCount: "سفارش",
+      searchByOrderNumber: "جستجو با شماره سفارش...",
+      orderNumber: "شماره سفارش",
+      orderStatus: "وضعیت سفارش",
+      payment: "پرداخت",
+      amount: "مبلغ",
+      date: "تاریخ",
+      pendingOrder: "در انتظار",
+      confirmed: "تأیید شده",
+      processing: "در حال پردازش",
+      shipped: "ارسال شده",
+      delivered: "تحویل داده شده",
+      cancelled: "لغو شده",
+      refunded: "بازپرداخت شده",
+      paymentPending: "در انتظار پرداخت",
+      paid: "پرداخت شده",
+      paymentFailed: "پرداخت ناموفق",
+      paymentRefunded: "بازپرداخت شده",
+      loadOrdersFailed: "خطا در بارگذاری سفارشات",
+      noOrders: "سفارشی یافت نشد",
+      
+      // Sellers
+      sellers: "فروشندگان",
+      sellerVerification: "تأیید فروشندگان",
+      sellerVerificationDescription: "بررسی درخواست‌های تأیید فروشندگان",
+      verificationRequests: "درخواست‌های تأیید",
+      requestsCount: "درخواست",
+      searchByCompanyName: "جستجو با نام شرکت...",
+      companyName: "نام شرکت",
+      businessType: "نوع فعالیت",
+      approved: "تأیید شده",
+      suspended: "معلق",
+      rejectVerification: "رد درخواست تأیید",
+      rejectVerificationDescription: "لطفاً دلیل رد درخواست را وارد کنید",
+      rejectRequest: "رد درخواست",
+      sellerApproved: "فروشنده تأیید شد",
+      sellerRejected: "درخواست فروشنده رد شد",
+      approvalFailed: "خطا در تأیید",
+      rejectionFailed: "خطا در رد",
+      loadVerificationsFailed: "خطا در بارگذاری درخواست‌ها",
+      noVerifications: "درخواست تأییدی یافت نشد",
+      notSpecified: "مشخص نشده",
+      
+      // Banners
+      banners: "بنرها",
+      bannerManagement: "مدیریت بنرها",
+      
+      // Promotions
+      promotions: "تبلیغات",
+      promotionManagement: "مدیریت تبلیغات و بنرها",
+      
+      // CMS
+      cms: "مدیریت محتوا",
+      cmsManagement: "مدیریت محتوای سایت",
+      
+      // Settings
+      settings: "تنظیمات",
+      systemSettings: "تنظیمات سیستم",
+      
+      // Charts
+      revenueOverview: "نمودار درآمد",
+      monthlyRevenue: "درآمد ماهانه",
+      monthlyOrders: "سفارشات ماهانه",
+      revenue: "درآمد",
+      
+      // Quick Actions
+      quickActions: "اقدامات سریع",
+      reviewSellers: "بررسی فروشندگان",
+      pendingSellerRequests: "درخواست فروشندگان در انتظار",
+      reviewProducts: "بررسی محصولات",
+      pendingProductApprovals: "محصولات در انتظار تأیید",
+      viewAllOrders: "مشاهده همه سفارشات",
+      manageOrders: "مدیریت سفارشات و تحویل‌ها",
+      
+      // Recent Activity
+      recentActivity: "فعالیت‌های اخیر",
+      newUserRegistration: "ثبت‌نام کاربر جدید",
+      newUserJoined: "کاربر جدید به عنوان خریدار پیوست",
+      newOrder: "سفارش جدید",
+      newOrderCreated: "سفارش جدید با ارزش ۱۵۰ دلار ایجاد شد",
+      newProductPending: "محصول جدید در انتظار",
+      newProductNeedsReview: "محصول جدید نیاز به بررسی دارد",
+      newVerificationRequest: "درخواست تأیید جدید",
+      newSellerVerification: "فروشنده جدید درخواست تأیید دارد",
+      
+      // Common actions
       view: "مشاهده",
       edit: "ویرایش",
       delete: "حذف",
+      save: "ذخیره",
+      cancel: "انصراف",
+      close: "بستن",
+      confirm: "تأیید",
+      search: "جستجو",
+      filter: "فیلتر",
+      
+      // Months
+      months: {
+        january: "حمل",
+        february: "ثور",
+        march: "جوزا",
+        april: "سرطان",
+        may: "اسد",
+        june: "سنبله",
+        july: "میزان",
+        august: "عقرب",
+        september: "قوس",
+        october: "جدی",
+        november: "دلو",
+        december: "حوت",
+      },
     },
     
     // Common
@@ -265,10 +447,22 @@ export const translations = {
       backToHome: "بازگشت به صفحه اصلی",
       pageNotFound: "صفحه یافت نشد",
       search: "جستجو",
-      cancel: "انسراف",
+      cancel: "انصراف",
       save: "ذخیره",
       submit: "ارسال",
       close: "بستن",
+      yes: "بله",
+      no: "خیر",
+      confirm: "تأیید",
+      delete: "حذف",
+      edit: "ویرایش",
+      view: "مشاهده",
+      all: "همه",
+      none: "هیچکدام",
+      or: "یا",
+      and: "و",
+      from: "از",
+      to: "تا",
     },
     
     // Pages
@@ -299,6 +493,48 @@ export const translations = {
       signUp: "ثبت نام کنید",
       signIn: "وارد شوید",
       logout: "خروج",
+      fullName: "نام کامل",
+      selectRole: "نقش خود را انتخاب کنید",
+      createAccount: "ایجاد حساب کاربری",
+      orContinueWith: "یا ادامه دهید با",
+      agreeToTerms: "با ثبت نام، شما با",
+      termsOfService: "شرایط خدمات",
+      privacyPolicy: "سیاست حریم خصوصی",
+      agree: "موافقت می‌کنید",
+      resetPassword: "بازیابی رمز عبور",
+      sendResetLink: "ارسال لینک بازیابی",
+      backToLogin: "بازگشت به ورود",
+      checkEmail: "ایمیل خود را بررسی کنید",
+      resetLinkSent: "لینک بازیابی رمز عبور ارسال شد",
+    },
+    
+    // Validation messages
+    validation: {
+      required: "این فیلد الزامی است",
+      invalidEmail: "ایمیل نامعتبر است",
+      passwordTooShort: "رمز عبور باید حداقل ۸ کاراکتر باشد",
+      passwordsDoNotMatch: "رمز عبور مطابقت ندارد",
+      invalidPhone: "شماره تلفن نامعتبر است",
+      minLength: "حداقل {min} کاراکتر وارد کنید",
+      maxLength: "حداکثر {max} کاراکتر مجاز است",
+    },
+    
+    // Error messages
+    errors: {
+      somethingWentWrong: "خطایی رخ داد",
+      tryAgain: "لطفاً دوباره تلاش کنید",
+      networkError: "خطای شبکه",
+      unauthorized: "دسترسی غیر مجاز",
+      notFound: "یافت نشد",
+      serverError: "خطای سرور",
+    },
+    
+    // Success messages
+    success: {
+      saved: "با موفقیت ذخیره شد",
+      deleted: "با موفقیت حذف شد",
+      updated: "با موفقیت بروزرسانی شد",
+      created: "با موفقیت ایجاد شد",
     },
   },
   
@@ -530,31 +766,213 @@ export const translations = {
       by: "By",
     },
     
-    // Admin
+    // Admin - Comprehensive translations
     admin: {
-      dashboard: "Admin Dashboard",
-      users: "User Management",
-      products: "Product Management",
-      orders: "Order Management",
-      sellers: "Seller Verification",
-      cms: "Content Management",
-      promotions: "Promotions & Banners",
-      settings: "System Settings",
-      logs: "Logs & Monitoring",
+      // Sidebar & Navigation
+      panelTitle: "Admin Panel",
+      panelSubtitle: "System Management",
+      main: "Main",
+      content: "Content",
+      system: "System",
+      manager: "Manager",
+      logout: "Logout",
+      
+      // Dashboard
+      dashboard: "Dashboard",
+      dashboardDescription: "System Overview",
       totalUsers: "Total Users",
       totalOrders: "Total Orders",
       totalRevenue: "Total Revenue",
       pendingSellers: "Pending Sellers",
+      activeProducts: "Active Products",
+      newRegistrations: "New Registrations",
+      activeSellers: "Active Sellers",
+      pendingProducts: "Pending Products",
+      alerts: "Alerts",
+      thisWeek: "This Week",
+      fromLastMonth: "From Last Month",
+      pendingReview: "Pending Review",
+      needsAttention: "Needs Attention",
+      inProgress: "In Progress",
+      awaitingVerification: "Awaiting Verification",
+      
+      // Users
+      users: "Users",
+      userManagement: "User Management",
+      userManagementDescription: "View and manage all users",
+      totalOf: "Total of",
+      user: "user",
+      usersCount: "users",
+      refresh: "Refresh",
+      export: "Export",
+      searchByNameEmail: "Search by name or email...",
+      filterByRole: "Filter by Role",
+      allRoles: "All Roles",
       buyers: "Buyers",
       sellersList: "Sellers",
-      approved: "Approved",
+      moderators: "Moderators",
+      admins: "Admins",
+      userDetails: "User Details",
+      fullUserInfo: "Full user information",
+      registrationDate: "Registration Date",
+      role: "Role",
+      admin: "Admin",
+      moderator: "Moderator",
+      seller: "Seller",
+      buyer: "Buyer",
+      unspecified: "Unspecified",
+      actions: "Actions",
+      viewDetails: "View Details",
+      suspendAccount: "Suspend Account",
+      noUsers: "No users found",
+      loadUsersFailed: "Failed to load users",
+      
+      // Products
+      products: "Products",
+      productManagement: "Product Management",
+      productManagementDescription: "Review and manage all products",
+      productsCount: "products",
+      searchByName: "Search by name...",
+      filterByStatus: "Filter by Status",
+      allStatuses: "All Statuses",
+      active: "Active",
       pending: "Pending",
       rejected: "Rejected",
+      draft: "Draft",
+      archived: "Archived",
+      productName: "Product Name",
+      price: "Price",
+      status: "Status",
+      dateAdded: "Date Added",
       approve: "Approve",
       reject: "Reject",
+      rejectProduct: "Reject Product",
+      rejectProductDescription: "Please enter the reason for rejection",
+      rejectionReason: "Rejection reason...",
+      rejectingProduct: "Rejecting...",
+      productApproved: "Product approved",
+      productRejected: "Product rejected",
+      productApproveFailed: "Failed to approve product",
+      productRejectFailed: "Failed to reject product",
+      loadProductsFailed: "Failed to load products",
+      noProducts: "No products found",
+      enterRejectReason: "Please enter rejection reason",
+      
+      // Orders
+      orders: "Orders",
+      orderManagement: "Order Management",
+      orderManagementDescription: "View and track all orders",
+      ordersCount: "orders",
+      searchByOrderNumber: "Search by order number...",
+      orderNumber: "Order Number",
+      orderStatus: "Order Status",
+      payment: "Payment",
+      amount: "Amount",
+      date: "Date",
+      pendingOrder: "Pending",
+      confirmed: "Confirmed",
+      processing: "Processing",
+      shipped: "Shipped",
+      delivered: "Delivered",
+      cancelled: "Cancelled",
+      refunded: "Refunded",
+      paymentPending: "Payment Pending",
+      paid: "Paid",
+      paymentFailed: "Payment Failed",
+      paymentRefunded: "Refunded",
+      loadOrdersFailed: "Failed to load orders",
+      noOrders: "No orders found",
+      
+      // Sellers
+      sellers: "Sellers",
+      sellerVerification: "Seller Verification",
+      sellerVerificationDescription: "Review seller verification requests",
+      verificationRequests: "Verification Requests",
+      requestsCount: "requests",
+      searchByCompanyName: "Search by company name...",
+      companyName: "Company Name",
+      businessType: "Business Type",
+      approved: "Approved",
+      suspended: "Suspended",
+      rejectVerification: "Reject Verification Request",
+      rejectVerificationDescription: "Please enter the reason for rejection",
+      rejectRequest: "Reject Request",
+      sellerApproved: "Seller approved",
+      sellerRejected: "Seller request rejected",
+      approvalFailed: "Approval failed",
+      rejectionFailed: "Rejection failed",
+      loadVerificationsFailed: "Failed to load verification requests",
+      noVerifications: "No verification requests found",
+      notSpecified: "Not specified",
+      
+      // Banners
+      banners: "Banners",
+      bannerManagement: "Banner Management",
+      
+      // Promotions
+      promotions: "Promotions",
+      promotionManagement: "Promotions & Banners",
+      
+      // CMS
+      cms: "Content Management",
+      cmsManagement: "Website Content Management",
+      
+      // Settings
+      settings: "Settings",
+      systemSettings: "System Settings",
+      
+      // Charts
+      revenueOverview: "Revenue Overview",
+      monthlyRevenue: "Monthly Revenue",
+      monthlyOrders: "Monthly Orders",
+      revenue: "Revenue",
+      
+      // Quick Actions
+      quickActions: "Quick Actions",
+      reviewSellers: "Review Sellers",
+      pendingSellerRequests: "Pending seller requests",
+      reviewProducts: "Review Products",
+      pendingProductApprovals: "Pending product approvals",
+      viewAllOrders: "View All Orders",
+      manageOrders: "Manage orders and deliveries",
+      
+      // Recent Activity
+      recentActivity: "Recent Activity",
+      newUserRegistration: "New User Registration",
+      newUserJoined: "New user joined as buyer",
+      newOrder: "New Order",
+      newOrderCreated: "New order created worth $150",
+      newProductPending: "New Product Pending",
+      newProductNeedsReview: "New product needs review",
+      newVerificationRequest: "New Verification Request",
+      newSellerVerification: "New seller verification request",
+      
+      // Common actions
       view: "View",
       edit: "Edit",
       delete: "Delete",
+      save: "Save",
+      cancel: "Cancel",
+      close: "Close",
+      confirm: "Confirm",
+      search: "Search",
+      filter: "Filter",
+      
+      // Months
+      months: {
+        january: "January",
+        february: "February",
+        march: "March",
+        april: "April",
+        may: "May",
+        june: "June",
+        july: "July",
+        august: "August",
+        september: "September",
+        october: "October",
+        november: "November",
+        december: "December",
+      },
     },
     
     // Common
@@ -569,6 +987,18 @@ export const translations = {
       save: "Save",
       submit: "Submit",
       close: "Close",
+      yes: "Yes",
+      no: "No",
+      confirm: "Confirm",
+      delete: "Delete",
+      edit: "Edit",
+      view: "View",
+      all: "All",
+      none: "None",
+      or: "or",
+      and: "and",
+      from: "from",
+      to: "to",
     },
     
     // Pages
@@ -599,6 +1029,48 @@ export const translations = {
       signUp: "Sign Up",
       signIn: "Sign In",
       logout: "Logout",
+      fullName: "Full Name",
+      selectRole: "Select your role",
+      createAccount: "Create Account",
+      orContinueWith: "Or continue with",
+      agreeToTerms: "By signing up, you agree to our",
+      termsOfService: "Terms of Service",
+      privacyPolicy: "Privacy Policy",
+      agree: "",
+      resetPassword: "Reset Password",
+      sendResetLink: "Send Reset Link",
+      backToLogin: "Back to Login",
+      checkEmail: "Check your email",
+      resetLinkSent: "Password reset link sent",
+    },
+    
+    // Validation messages
+    validation: {
+      required: "This field is required",
+      invalidEmail: "Invalid email address",
+      passwordTooShort: "Password must be at least 8 characters",
+      passwordsDoNotMatch: "Passwords do not match",
+      invalidPhone: "Invalid phone number",
+      minLength: "Enter at least {min} characters",
+      maxLength: "Maximum {max} characters allowed",
+    },
+    
+    // Error messages
+    errors: {
+      somethingWentWrong: "Something went wrong",
+      tryAgain: "Please try again",
+      networkError: "Network error",
+      unauthorized: "Unauthorized access",
+      notFound: "Not found",
+      serverError: "Server error",
+    },
+    
+    // Success messages
+    success: {
+      saved: "Successfully saved",
+      deleted: "Successfully deleted",
+      updated: "Successfully updated",
+      created: "Successfully created",
     },
   },
 };
@@ -613,6 +1085,7 @@ interface LanguageContextType {
   setLanguage: (lang: Language) => void;
   t: Translations;
   isRTL: boolean;
+  dir: 'rtl' | 'ltr';
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -630,18 +1103,26 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem('language', lang);
     document.documentElement.dir = lang === 'fa' ? 'rtl' : 'ltr';
     document.documentElement.lang = lang;
+    // Update the font family based on language
+    document.body.style.fontFamily = lang === 'fa' 
+      ? "'Vazirmatn', sans-serif" 
+      : "'Inter', 'Vazirmatn', sans-serif";
   };
 
   useEffect(() => {
     document.documentElement.dir = language === 'fa' ? 'rtl' : 'ltr';
     document.documentElement.lang = language;
+    document.body.style.fontFamily = language === 'fa' 
+      ? "'Vazirmatn', sans-serif" 
+      : "'Inter', 'Vazirmatn', sans-serif";
   }, [language]);
 
   const t = translations[language];
   const isRTL = language === 'fa';
+  const dir = isRTL ? 'rtl' : 'ltr';
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t, isRTL }}>
+    <LanguageContext.Provider value={{ language, setLanguage, t, isRTL, dir }}>
       {children}
     </LanguageContext.Provider>
   );
@@ -653,4 +1134,38 @@ export const useLanguage = () => {
     throw new Error('useLanguage must be used within a LanguageProvider');
   }
   return context;
+};
+
+// Date formatting utilities
+export const formatDate = (date: Date | string, language: Language): string => {
+  const d = new Date(date);
+  if (language === 'fa') {
+    // Use Persian/Dari formatting
+    return d.toLocaleDateString('fa-AF', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  }
+  return d.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+};
+
+// Number formatting utilities
+export const formatNumber = (num: number, language: Language): string => {
+  if (language === 'fa') {
+    return num.toLocaleString('fa-AF');
+  }
+  return num.toLocaleString('en-US');
+};
+
+// Currency formatting utilities
+export const formatCurrency = (amount: number, language: Language): string => {
+  if (language === 'fa') {
+    return `${formatNumber(amount, language)} افغانی`;
+  }
+  return `$${formatNumber(amount, language)}`;
 };
