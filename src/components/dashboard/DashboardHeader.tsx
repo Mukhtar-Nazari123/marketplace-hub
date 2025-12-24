@@ -24,7 +24,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { LogOut, User, Settings, Moon, Sun, ChevronDown } from 'lucide-react';
+import { LogOut, User, Settings, Moon, Sun, ChevronDown, Home } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -86,6 +86,23 @@ export const DashboardHeader = ({ title, description }: DashboardHeaderProps) =>
       </div>
 
       <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+        {/* Return to Home */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate('/')}
+              className="rounded-full transition-all duration-300 hover:bg-accent hover:scale-110"
+            >
+              <Home className="h-5 w-5" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            {isRTL ? 'بازگشت به خانه' : 'Return to Home'}
+          </TooltipContent>
+        </Tooltip>
+
         {/* Theme Toggle */}
         <Tooltip>
           <TooltipTrigger asChild>
