@@ -1,17 +1,29 @@
-import { Search, ShoppingCart, User, Menu, LayoutDashboard } from "lucide-react";
+import { Search, ShoppingCart, User, Menu, LayoutDashboard, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import MobileMenu from "./MobileMenu";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { t, isRTL } = useLanguage();
-  const { user, role } = useAuth();
+  const { user, role, signOut } = useAuth();
+  const navigate = useNavigate();
 
   // Get dashboard link based on role
   const getDashboardLink = () => {
@@ -24,6 +36,11 @@ const Header = () => {
     if (role === 'admin') return isRTL ? 'داشبورد مدیر' : 'Admin Dashboard';
     if (role === 'seller') return isRTL ? 'داشبورد فروشنده' : 'Seller Dashboard';
     return isRTL ? 'داشبورد خریدار' : 'Buyer Dashboard';
+  };
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/login');
   };
 
   return (
@@ -81,25 +98,70 @@ const Header = () => {
                 </Button>
               </Link>
 
-              {/* Account / Dashboard */}
+              {/* Account / Dashboard / Logout */}
               {user ? (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Link to={getDashboardLink()} className="hidden sm:flex">
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="relative transition-all duration-300 hover:bg-primary/10 hover:scale-110"
-                        aria-label={getDashboardLabel()}
-                      >
-                        <LayoutDashboard className="h-5 w-5 text-primary" />
-                      </Button>
-                    </Link>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    {getDashboardLabel()}
-                  </TooltipContent>
-                </Tooltip>
+                <div className="flex items-center gap-1 sm:gap-2">
+                  {/* Dashboard Link */}
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Link to={getDashboardLink()} className="hidden sm:flex">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="relative transition-all duration-300 hover:bg-primary/10 hover:scale-110"
+                          aria-label={getDashboardLabel()}
+                        >
+                          <LayoutDashboard className="h-5 w-5 text-primary" />
+                        </Button>
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {getDashboardLabel()}
+                    </TooltipContent>
+                  </Tooltip>
+
+                  {/* Logout Button */}
+                  <AlertDialog>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <AlertDialogTrigger asChild>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="transition-all duration-300 hover:bg-destructive/10 hover:scale-110"
+                            aria-label={isRTL ? 'خروج' : 'Logout'}
+                          >
+                            <LogOut className="h-5 w-5 text-destructive" />
+                          </Button>
+                        </AlertDialogTrigger>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        {isRTL ? 'خروج' : 'Logout'}
+                      </TooltipContent>
+                    </Tooltip>
+                    <AlertDialogContent dir={isRTL ? 'rtl' : 'ltr'}>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          {isRTL ? 'خروج از حساب' : 'Logout'}
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          {isRTL ? 'آیا مطمئن هستید که می‌خواهید از حساب خود خارج شوید؟' : 'Are you sure you want to logout from your account?'}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter className={isRTL ? 'flex-row-reverse gap-2' : ''}>
+                        <AlertDialogCancel>
+                          {isRTL ? 'انصراف' : 'Cancel'}
+                        </AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={handleLogout}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          {isRTL ? 'خروج' : 'Logout'}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
               ) : (
                 <Link to="/login" className="hidden sm:flex items-center gap-2">
                   <User className="h-5 w-5 text-muted-foreground" />
