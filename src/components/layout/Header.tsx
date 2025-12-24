@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
+import { useCart } from "@/hooks/useCart";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   AlertDialog,
@@ -23,6 +24,7 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { t, isRTL } = useLanguage();
   const { user, role, signOut } = useAuth();
+  const { itemCount } = useCart();
   const navigate = useNavigate();
 
   // Get dashboard link based on role
@@ -44,6 +46,14 @@ const Header = () => {
   const handleLogout = async () => {
     await signOut();
     navigate('/login');
+  };
+
+  // Format cart count for RTL
+  const formatCount = (count: number) => {
+    if (isRTL) {
+      return count.toString().replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]);
+    }
+    return count.toString();
   };
 
   return (
@@ -93,11 +103,13 @@ const Header = () => {
               <Link to="/cart">
                 <Button variant="ghost" size="icon" className="relative">
                   <ShoppingCart className="h-5 w-5" />
-                  <span
-                    className={`absolute -top-1 h-5 w-5 rounded-full bg-orange text-accent-foreground text-xs flex items-center justify-center font-bold ${isRTL ? "-right-1" : "-left-1"}`}
-                  >
-                    {isRTL ? "۳" : "3"}
-                  </span>
+                  {itemCount > 0 && (
+                    <span
+                      className={`absolute -top-1 h-5 w-5 rounded-full bg-orange text-accent-foreground text-xs flex items-center justify-center font-bold ${isRTL ? "-right-1" : "-left-1"}`}
+                    >
+                      {formatCount(itemCount > 99 ? 99 : itemCount)}
+                    </span>
+                  )}
                 </Button>
               </Link>
 

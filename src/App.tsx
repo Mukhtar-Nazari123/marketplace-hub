@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LanguageProvider } from "@/lib/i18n";
 import { AuthProvider } from "@/hooks/useAuth";
+import { CartProvider } from "@/hooks/useCart";
+import { WishlistProvider } from "@/hooks/useWishlist";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Products from "./pages/Products";
@@ -37,10 +39,12 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <LanguageProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
+        <CartProvider>
+          <WishlistProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
             <Routes>
               {/* Public Routes */}
               <Route path="/" element={<Index />} />
@@ -92,8 +96,10 @@ const App = () => (
               
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
+              </BrowserRouter>
+            </TooltipProvider>
+          </WishlistProvider>
+        </CartProvider>
       </LanguageProvider>
     </AuthProvider>
   </QueryClientProvider>
