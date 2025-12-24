@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useLanguage } from '@/lib/i18n';
 import {
   Sidebar,
   SidebarContent,
@@ -26,41 +27,49 @@ import {
   LogOut,
   Store,
   ChevronDown,
+  Globe,
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-
-const mainNavItems = [
-  { title: 'Dashboard', icon: LayoutDashboard, url: '/admin' },
-  { title: 'Users', icon: Users, url: '/admin/users' },
-  { title: 'Products', icon: Package, url: '/admin/products' },
-  { title: 'Orders', icon: ShoppingCart, url: '/admin/orders' },
-  { title: 'Seller Verification', icon: BadgeCheck, url: '/admin/sellers' },
-];
-
-const contentNavItems = [
-  { title: 'Banners', icon: Image, url: '/admin/banners' },
-  { title: 'Promotions', icon: Tag, url: '/admin/promotions' },
-  { title: 'CMS Content', icon: FileText, url: '/admin/cms' },
-];
-
-const settingsNavItems = [
-  { title: 'Settings', icon: Settings, url: '/admin/settings' },
-];
+import { Button } from '@/components/ui/button';
 
 export const AdminSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const { t, language, setLanguage, isRTL } = useLanguage();
+
+  const mainNavItems = [
+    { title: t.admin.dashboard, icon: LayoutDashboard, url: '/admin' },
+    { title: t.admin.users, icon: Users, url: '/admin/users' },
+    { title: t.admin.products, icon: Package, url: '/admin/products' },
+    { title: t.admin.orders, icon: ShoppingCart, url: '/admin/orders' },
+    { title: t.admin.sellerVerification, icon: BadgeCheck, url: '/admin/sellers' },
+  ];
+
+  const contentNavItems = [
+    { title: t.admin.banners, icon: Image, url: '/admin/banners' },
+    { title: t.admin.promotions, icon: Tag, url: '/admin/promotions' },
+    { title: t.admin.cms, icon: FileText, url: '/admin/cms' },
+  ];
+
+  const settingsNavItems = [
+    { title: t.admin.settings, icon: Settings, url: '/admin/settings' },
+  ];
 
   const handleLogout = async () => {
     await signOut();
     navigate('/login');
+  };
+
+  const toggleLanguage = () => {
+    setLanguage(language === 'fa' ? 'en' : 'fa');
   };
 
   const isActive = (url: string) => {
@@ -71,7 +80,7 @@ export const AdminSidebar = () => {
   };
 
   return (
-    <Sidebar collapsible="icon" side="right">
+    <Sidebar collapsible="icon" side={isRTL ? 'right' : 'left'}>
       <SidebarHeader className="border-b">
         <SidebarMenu>
           <SidebarMenuItem>
@@ -80,8 +89,8 @@ export const AdminSidebar = () => {
                 <Store className="size-4" />
               </div>
               <div className="flex flex-col gap-0.5 leading-none">
-                <span className="font-semibold">لوحة الإدارة</span>
-                <span className="text-xs text-muted-foreground">Admin Panel</span>
+                <span className="font-semibold">{t.admin.panelTitle}</span>
+                <span className="text-xs text-muted-foreground">{t.admin.panelSubtitle}</span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -90,11 +99,11 @@ export const AdminSidebar = () => {
       
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>الرئيسية</SidebarGroupLabel>
+          <SidebarGroupLabel>{t.admin.main}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {mainNavItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
+                <SidebarMenuItem key={item.url}>
                   <SidebarMenuButton
                     asChild
                     isActive={isActive(item.url)}
@@ -112,11 +121,11 @@ export const AdminSidebar = () => {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>المحتوى</SidebarGroupLabel>
+          <SidebarGroupLabel>{t.admin.content}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {contentNavItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
+                <SidebarMenuItem key={item.url}>
                   <SidebarMenuButton
                     asChild
                     isActive={isActive(item.url)}
@@ -134,11 +143,11 @@ export const AdminSidebar = () => {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>النظام</SidebarGroupLabel>
+          <SidebarGroupLabel>{t.admin.system}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {settingsNavItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
+                <SidebarMenuItem key={item.url}>
                   <SidebarMenuButton
                     asChild
                     isActive={isActive(item.url)}
@@ -151,6 +160,20 @@ export const AdminSidebar = () => {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Language Switcher */}
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton onClick={toggleLanguage} tooltip={language === 'fa' ? 'English' : 'دری'}>
+                  <Globe />
+                  <span>{language === 'fa' ? 'English' : 'دری'}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -170,24 +193,29 @@ export const AdminSidebar = () => {
                       {user?.email?.charAt(0).toUpperCase() || 'A'}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="grid flex-1 text-right text-sm leading-tight">
-                    <span className="truncate font-semibold">المدير</span>
+                  <div className={`grid flex-1 text-sm leading-tight ${isRTL ? 'text-right' : 'text-left'}`}>
+                    <span className="truncate font-semibold">{t.admin.manager}</span>
                     <span className="truncate text-xs text-muted-foreground">
                       {user?.email}
                     </span>
                   </div>
-                  <ChevronDown className="mr-auto size-4" />
+                  <ChevronDown className={`size-4 ${isRTL ? 'mr-auto' : 'ml-auto'}`} />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
                 side="top"
-                align="end"
+                align={isRTL ? 'start' : 'end'}
                 sideOffset={4}
               >
+                <DropdownMenuItem onClick={toggleLanguage}>
+                  <Globe className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                  {language === 'fa' ? 'English' : 'دری'}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="text-destructive">
-                  <LogOut className="ml-2 h-4 w-4" />
-                  تسجيل الخروج
+                  <LogOut className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                  {t.admin.logout}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

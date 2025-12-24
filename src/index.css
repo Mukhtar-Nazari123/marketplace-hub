@@ -2,7 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Persian/Dari font for RTL */
 @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap');
+/* English font for LTR */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 @layer base {
   :root {
@@ -130,17 +133,32 @@
     @apply border-border;
   }
 
-  html {
+  /* Direction is controlled by JS based on language */
+  html[dir="rtl"] {
     direction: rtl;
   }
 
+  html[dir="ltr"] {
+    direction: ltr;
+  }
+
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Vazirmatn', 'Inter', sans-serif;
+  }
+
+  /* RTL specific font */
+  html[dir="rtl"] body {
     font-family: 'Vazirmatn', sans-serif;
   }
 
+  /* LTR specific font */
+  html[dir="ltr"] body {
+    font-family: 'Inter', 'Vazirmatn', sans-serif;
+  }
+
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Vazirmatn', sans-serif;
+    font-family: inherit;
   }
 }
 

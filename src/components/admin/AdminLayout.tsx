@@ -1,6 +1,7 @@
 import { ReactNode, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useLanguage } from '@/lib/i18n';
 import { AdminSidebar } from './AdminSidebar';
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
 import { Separator } from '@/components/ui/separator';
@@ -15,6 +16,7 @@ interface AdminLayoutProps {
 
 export const AdminLayout = ({ children, title, description }: AdminLayoutProps) => {
   const { user, role, loading } = useAuth();
+  const { isRTL } = useLanguage();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,8 +41,8 @@ export const AdminLayout = ({ children, title, description }: AdminLayoutProps) 
     <SidebarProvider>
       <AdminSidebar />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
-          <SidebarTrigger className="-mr-1" />
+        <header className={`flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <SidebarTrigger className={isRTL ? 'ml-1' : '-mr-1'} />
           <Separator orientation="vertical" className="mx-2 h-4" />
           <Breadcrumb>
             <BreadcrumbList>
@@ -50,7 +52,7 @@ export const AdminLayout = ({ children, title, description }: AdminLayoutProps) 
             </BreadcrumbList>
           </Breadcrumb>
           {description && (
-            <span className="text-sm text-muted-foreground mr-auto">{description}</span>
+            <span className={`text-sm text-muted-foreground ${isRTL ? 'ml-auto' : 'mr-auto'}`}>{description}</span>
           )}
         </header>
         <main className="flex-1 overflow-auto p-6">
