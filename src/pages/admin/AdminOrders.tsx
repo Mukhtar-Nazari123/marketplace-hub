@@ -21,9 +21,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Search, Filter, RefreshCw, Eye } from 'lucide-react';
-import { format } from 'date-fns';
-import { ar } from 'date-fns/locale';
 import { toast } from 'sonner';
+import { useLanguage, formatDate, formatCurrency } from '@/lib/i18n';
 
 interface Order {
   id: string;
@@ -36,6 +35,7 @@ interface Order {
 }
 
 const AdminOrders = () => {
+  const { t, direction } = useLanguage();
   const [orders, setOrders] = useState<Order[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -56,7 +56,7 @@ const AdminOrders = () => {
       setFilteredOrders(data || []);
     } catch (error) {
       console.error('Error fetching orders:', error);
-      toast.error('فشل في تحميل الطلبات');
+      toast.error(t.admin.orders.loadError);
     } finally {
       setIsLoading(false);
     }
@@ -84,13 +84,13 @@ const AdminOrders = () => {
 
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { label: string; className: string }> = {
-      pending: { label: 'قيد الانتظار', className: 'bg-warning text-warning-foreground' },
-      confirmed: { label: 'مؤكد', className: 'bg-primary text-primary-foreground' },
-      processing: { label: 'قيد المعالجة', className: 'bg-info text-primary-foreground' },
-      shipped: { label: 'تم الشحن', className: 'bg-accent text-accent-foreground' },
-      delivered: { label: 'تم التسليم', className: 'bg-success text-success-foreground' },
-      cancelled: { label: 'ملغي', className: 'bg-destructive text-destructive-foreground' },
-      refunded: { label: 'مسترد', className: 'bg-muted text-muted-foreground' },
+      pending: { label: t.admin.orders.statuses.pending, className: 'bg-warning text-warning-foreground' },
+      confirmed: { label: t.admin.orders.statuses.confirmed, className: 'bg-primary text-primary-foreground' },
+      processing: { label: t.admin.orders.statuses.processing, className: 'bg-info text-primary-foreground' },
+      shipped: { label: t.admin.orders.statuses.shipped, className: 'bg-accent text-accent-foreground' },
+      delivered: { label: t.admin.orders.statuses.delivered, className: 'bg-success text-success-foreground' },
+      cancelled: { label: t.admin.orders.statuses.cancelled, className: 'bg-destructive text-destructive-foreground' },
+      refunded: { label: t.admin.orders.statuses.refunded, className: 'bg-muted text-muted-foreground' },
     };
 
     const info = statusMap[status] || { label: status, className: '' };
@@ -99,31 +99,36 @@ const AdminOrders = () => {
 
   const getPaymentBadge = (status: string) => {
     const statusMap: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
-      pending: { label: 'في الانتظار', variant: 'secondary' },
-      paid: { label: 'مدفوع', variant: 'default' },
-      failed: { label: 'فشل', variant: 'destructive' },
-      refunded: { label: 'مسترد', variant: 'outline' },
+      pending: { label: t.admin.orders.paymentStatuses.pending, variant: 'secondary' },
+      paid: { label: t.admin.orders.paymentStatuses.paid, variant: 'default' },
+      failed: { label: t.admin.orders.paymentStatuses.failed, variant: 'destructive' },
+      refunded: { label: t.admin.orders.paymentStatuses.refunded, variant: 'outline' },
     };
 
     const info = statusMap[status] || { label: status, variant: 'outline' as const };
     return <Badge variant={info.variant}>{info.label}</Badge>;
   };
 
+  const isRTL = direction === 'rtl';
+  const searchIconClass = isRTL ? 'right-3' : 'left-3';
+  const inputPaddingClass = isRTL ? 'pr-9' : 'pl-9';
+  const iconMarginClass = isRTL ? 'ml-2' : 'mr-2';
+
   return (
-    <AdminLayout title="إدارة الطلبات" description="عرض ومتابعة جميع الطلبات">
-      <div className="space-y-6">
-        <Card>
+    <AdminLayout title={t.admin.orders.title} description={t.admin.orders.description}>
+      <div className="space-y-6 animate-fade-in">
+        <Card className="hover-lift">
           <CardHeader>
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
-                <CardTitle>الطلبات</CardTitle>
+                <CardTitle>{t.admin.orders.ordersTitle}</CardTitle>
                 <CardDescription>
-                  إجمالي {filteredOrders.length} طلب
+                  {t.admin.orders.totalOrders.replace('{count}', String(filteredOrders.length))}
                 </CardDescription>
               </div>
-              <Button variant="outline" size="sm" onClick={fetchOrders}>
-                <RefreshCw className="ml-2 h-4 w-4" />
-                تحديث
+              <Button variant="outline" size="sm" onClick={fetchOrders} className="hover-scale">
+                <RefreshCw className={`h-4 w-4 ${iconMarginClass}`} />
+                {t.admin.orders.refresh}
               </Button>
             </div>
           </CardHeader>
@@ -131,27 +136,27 @@ const AdminOrders = () => {
             {/* Filters */}
             <div className="mb-6 flex flex-col gap-4 md:flex-row">
               <div className="relative flex-1">
-                <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Search className={`absolute ${searchIconClass} top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground`} />
                 <Input
-                  placeholder="البحث برقم الطلب..."
+                  placeholder={t.admin.orders.searchPlaceholder}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pr-9"
+                  className={inputPaddingClass}
                 />
               </div>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-full md:w-[180px]">
-                  <Filter className="ml-2 h-4 w-4" />
-                  <SelectValue placeholder="تصفية حسب الحالة" />
+                  <Filter className={`h-4 w-4 ${iconMarginClass}`} />
+                  <SelectValue placeholder={t.admin.orders.filterByStatus} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">جميع الحالات</SelectItem>
-                  <SelectItem value="pending">قيد الانتظار</SelectItem>
-                  <SelectItem value="confirmed">مؤكد</SelectItem>
-                  <SelectItem value="processing">قيد المعالجة</SelectItem>
-                  <SelectItem value="shipped">تم الشحن</SelectItem>
-                  <SelectItem value="delivered">تم التسليم</SelectItem>
-                  <SelectItem value="cancelled">ملغي</SelectItem>
+                  <SelectItem value="all">{t.admin.orders.allStatuses}</SelectItem>
+                  <SelectItem value="pending">{t.admin.orders.statuses.pending}</SelectItem>
+                  <SelectItem value="confirmed">{t.admin.orders.statuses.confirmed}</SelectItem>
+                  <SelectItem value="processing">{t.admin.orders.statuses.processing}</SelectItem>
+                  <SelectItem value="shipped">{t.admin.orders.statuses.shipped}</SelectItem>
+                  <SelectItem value="delivered">{t.admin.orders.statuses.delivered}</SelectItem>
+                  <SelectItem value="cancelled">{t.admin.orders.statuses.cancelled}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -161,12 +166,12 @@ const AdminOrders = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>رقم الطلب</TableHead>
-                    <TableHead>الحالة</TableHead>
-                    <TableHead>الدفع</TableHead>
-                    <TableHead>المبلغ</TableHead>
-                    <TableHead>التاريخ</TableHead>
-                    <TableHead className="text-left">الإجراءات</TableHead>
+                    <TableHead>{t.admin.orders.orderNumber}</TableHead>
+                    <TableHead>{t.admin.orders.status}</TableHead>
+                    <TableHead>{t.admin.orders.payment}</TableHead>
+                    <TableHead>{t.admin.orders.amount}</TableHead>
+                    <TableHead>{t.admin.orders.date}</TableHead>
+                    <TableHead className={isRTL ? 'text-left' : 'text-right'}>{t.admin.orders.actions}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -183,22 +188,20 @@ const AdminOrders = () => {
                   ) : filteredOrders.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={6} className="h-24 text-center">
-                        لا يوجد طلبات
+                        {t.admin.orders.noOrders}
                       </TableCell>
                     </TableRow>
                   ) : (
                     filteredOrders.map((order) => (
-                      <TableRow key={order.id}>
+                      <TableRow key={order.id} className="hover:bg-muted/50 transition-colors">
                         <TableCell className="font-medium">
                           {order.order_number}
                         </TableCell>
                         <TableCell>{getStatusBadge(order.status)}</TableCell>
                         <TableCell>{getPaymentBadge(order.payment_status)}</TableCell>
-                        <TableCell>${Number(order.total).toFixed(2)}</TableCell>
+                        <TableCell>{formatCurrency(Number(order.total), direction === 'rtl' ? 'fa' : 'en')}</TableCell>
                         <TableCell>
-                          {format(new Date(order.created_at), 'dd MMM yyyy', {
-                            locale: ar,
-                          })}
+                          {formatDate(new Date(order.created_at), direction === 'rtl' ? 'fa' : 'en')}
                         </TableCell>
                         <TableCell>
                           <Button variant="ghost" size="icon">

@@ -29,9 +29,8 @@ import {
   RefreshCw,
   Eye,
 } from 'lucide-react';
-import { format } from 'date-fns';
-import { ar } from 'date-fns/locale';
 import { toast } from 'sonner';
+import { useLanguage, formatDate } from '@/lib/i18n';
 
 interface SellerVerification {
   id: string;
@@ -45,6 +44,7 @@ interface SellerVerification {
 }
 
 const AdminSellers = () => {
+  const { t, direction } = useLanguage();
   const [verifications, setVerifications] = useState<SellerVerification[]>([]);
   const [filteredVerifications, setFilteredVerifications] = useState<SellerVerification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -68,7 +68,7 @@ const AdminSellers = () => {
       setFilteredVerifications(data || []);
     } catch (error) {
       console.error('Error fetching verifications:', error);
-      toast.error('فشل في تحميل طلبات التحقق');
+      toast.error(t.admin.sellers.loadError);
     } finally {
       setIsLoading(false);
     }
@@ -95,13 +95,13 @@ const AdminSellers = () => {
   const getStatusBadge = (status: SellerVerification['status']) => {
     switch (status) {
       case 'approved':
-        return <Badge className="bg-success text-success-foreground">موافق عليه</Badge>;
+        return <Badge className="bg-success text-success-foreground">{t.admin.sellers.statuses.approved}</Badge>;
       case 'pending':
-        return <Badge className="bg-warning text-warning-foreground">قيد المراجعة</Badge>;
+        return <Badge className="bg-warning text-warning-foreground">{t.admin.sellers.statuses.pending}</Badge>;
       case 'rejected':
-        return <Badge className="bg-destructive text-destructive-foreground">مرفوض</Badge>;
+        return <Badge className="bg-destructive text-destructive-foreground">{t.admin.sellers.statuses.rejected}</Badge>;
       case 'suspended':
-        return <Badge variant="outline">معلق</Badge>;
+        return <Badge variant="outline">{t.admin.sellers.statuses.suspended}</Badge>;
       default:
         return null;
     }
@@ -117,11 +117,11 @@ const AdminSellers = () => {
 
       if (error) throw error;
 
-      toast.success('تمت الموافقة على البائع');
+      toast.success(t.admin.sellers.approveSuccess);
       fetchVerifications();
     } catch (error) {
       console.error('Error approving seller:', error);
-      toast.error('فشل في الموافقة');
+      toast.error(t.admin.sellers.approveError);
     } finally {
       setIsSubmitting(false);
     }
@@ -129,7 +129,7 @@ const AdminSellers = () => {
 
   const handleReject = async () => {
     if (!selectedVerification || !rejectionReason.trim()) {
-      toast.error('يرجى إدخال سبب الرفض');
+      toast.error(t.admin.sellers.enterRejectionReason);
       return;
     }
 
@@ -146,34 +146,38 @@ const AdminSellers = () => {
 
       if (error) throw error;
 
-      toast.success('تم رفض طلب البائع');
+      toast.success(t.admin.sellers.rejectSuccess);
       setIsRejectDialogOpen(false);
       setRejectionReason('');
       setSelectedVerification(null);
       fetchVerifications();
     } catch (error) {
       console.error('Error rejecting seller:', error);
-      toast.error('فشل في الرفض');
+      toast.error(t.admin.sellers.rejectError);
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const isRTL = direction === 'rtl';
+  const searchIconClass = isRTL ? 'right-3' : 'left-3';
+  const inputPaddingClass = isRTL ? 'pr-9' : 'pl-9';
+
   return (
-    <AdminLayout title="التحقق من البائعين" description="مراجعة طلبات التحقق من البائعين">
-      <div className="space-y-6">
-        <Card>
+    <AdminLayout title={t.admin.sellers.title} description={t.admin.sellers.description}>
+      <div className="space-y-6 animate-fade-in">
+        <Card className="hover-lift">
           <CardHeader>
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
-                <CardTitle>طلبات التحقق</CardTitle>
+                <CardTitle>{t.admin.sellers.verificationsTitle}</CardTitle>
                 <CardDescription>
-                  إجمالي {filteredVerifications.length} طلب
+                  {t.admin.sellers.totalRequests.replace('{count}', String(filteredVerifications.length))}
                 </CardDescription>
               </div>
-              <Button variant="outline" size="sm" onClick={fetchVerifications}>
-                <RefreshCw className="ml-2 h-4 w-4" />
-                تحديث
+              <Button variant="outline" size="sm" onClick={fetchVerifications} className="hover-scale">
+                <RefreshCw className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                {t.admin.sellers.refresh}
               </Button>
             </div>
           </CardHeader>
@@ -181,12 +185,12 @@ const AdminSellers = () => {
             {/* Search */}
             <div className="mb-6">
               <div className="relative max-w-sm">
-                <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Search className={`absolute ${searchIconClass} top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground`} />
                 <Input
-                  placeholder="البحث باسم الشركة..."
+                  placeholder={t.admin.sellers.searchPlaceholder}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pr-9"
+                  className={inputPaddingClass}
                 />
               </div>
             </div>
@@ -196,12 +200,12 @@ const AdminSellers = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>اسم الشركة</TableHead>
-                    <TableHead>نوع النشاط</TableHead>
-                    <TableHead>الهاتف</TableHead>
-                    <TableHead>الحالة</TableHead>
-                    <TableHead>التاريخ</TableHead>
-                    <TableHead className="text-left">الإجراءات</TableHead>
+                    <TableHead>{t.admin.sellers.companyName}</TableHead>
+                    <TableHead>{t.admin.sellers.businessType}</TableHead>
+                    <TableHead>{t.admin.sellers.phone}</TableHead>
+                    <TableHead>{t.admin.sellers.status}</TableHead>
+                    <TableHead>{t.admin.sellers.date}</TableHead>
+                    <TableHead className={isRTL ? 'text-left' : 'text-right'}>{t.admin.sellers.actions}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -218,22 +222,20 @@ const AdminSellers = () => {
                   ) : filteredVerifications.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={6} className="h-24 text-center">
-                        لا يوجد طلبات تحقق
+                        {t.admin.sellers.noVerifications}
                       </TableCell>
                     </TableRow>
                   ) : (
                     filteredVerifications.map((verification) => (
-                      <TableRow key={verification.id}>
+                      <TableRow key={verification.id} className="hover:bg-muted/50 transition-colors">
                         <TableCell className="font-medium">
-                          {verification.business_name || 'غير محدد'}
+                          {verification.business_name || t.admin.sellers.unspecified}
                         </TableCell>
                         <TableCell>{verification.business_type || '-'}</TableCell>
                         <TableCell>{verification.phone || '-'}</TableCell>
                         <TableCell>{getStatusBadge(verification.status)}</TableCell>
                         <TableCell>
-                          {format(new Date(verification.created_at), 'dd MMM yyyy', {
-                            locale: ar,
-                          })}
+                          {formatDate(new Date(verification.created_at), direction === 'rtl' ? 'fa' : 'en')}
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-1">
@@ -280,14 +282,14 @@ const AdminSellers = () => {
         <Dialog open={isRejectDialogOpen} onOpenChange={setIsRejectDialogOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>رفض طلب التحقق</DialogTitle>
+              <DialogTitle>{t.admin.sellers.rejectVerification}</DialogTitle>
               <DialogDescription>
-                يرجى إدخال سبب رفض طلب التحقق
+                {t.admin.sellers.enterRejectionReason}
               </DialogDescription>
             </DialogHeader>
             <div className="py-4">
               <Textarea
-                placeholder="سبب الرفض..."
+                placeholder={t.admin.sellers.rejectionReasonPlaceholder}
                 value={rejectionReason}
                 onChange={(e) => setRejectionReason(e.target.value)}
                 rows={4}
@@ -301,14 +303,14 @@ const AdminSellers = () => {
                   setRejectionReason('');
                 }}
               >
-                إلغاء
+                {t.admin.sellers.cancel}
               </Button>
               <Button
                 variant="destructive"
                 onClick={handleReject}
                 disabled={isSubmitting || !rejectionReason.trim()}
               >
-                {isSubmitting ? 'جاري الرفض...' : 'رفض الطلب'}
+                {isSubmitting ? t.admin.sellers.rejecting : t.admin.sellers.rejectRequest}
               </Button>
             </DialogFooter>
           </DialogContent>
