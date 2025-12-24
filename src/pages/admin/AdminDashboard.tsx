@@ -169,7 +169,7 @@ const AdminDashboard = () => {
   }, [t]);
 
   return (
-    <DashboardLayout title={t.admin.dashboard} description={t.admin.dashboardDescription} allowedRoles={['admin']}>
+    <AdminLayout title={t.admin.dashboard} description={t.admin.dashboardDescription}>
       <div className="space-y-6">
         {/* Stats Grid */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
