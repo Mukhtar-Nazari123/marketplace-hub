@@ -58,7 +58,7 @@ export const DashboardSidebar = () => {
 
   // Admin navigation items
   const adminMainNavItems = [
-    { title: t.admin.dashboard, icon: LayoutDashboard, url: '/dashboard' },
+    { title: t.admin.dashboard, icon: LayoutDashboard, url: '/dashboard/admin' },
     { title: t.admin.users.title, icon: Users, url: '/dashboard/users' },
     { title: t.admin.products.title, icon: Package, url: '/dashboard/products' },
     { title: t.admin.orders.title, icon: ShoppingCart, url: '/dashboard/orders' },
@@ -105,8 +105,8 @@ export const DashboardSidebar = () => {
   };
 
   const isActive = (url: string) => {
-    if (url === '/dashboard' && role === 'admin') {
-      return location.pathname === '/dashboard';
+    if (url === '/dashboard/admin' && role === 'admin') {
+      return location.pathname === '/dashboard/admin';
     }
     return location.pathname.startsWith(url);
   };

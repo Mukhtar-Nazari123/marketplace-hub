@@ -46,21 +46,21 @@ export const AdminSidebar = () => {
   const { t, language, setLanguage, isRTL } = useLanguage();
 
   const mainNavItems = [
-    { title: t.admin.dashboard, icon: LayoutDashboard, url: '/admin' },
-    { title: t.admin.users.title, icon: Users, url: '/admin/users' },
-    { title: t.admin.products.title, icon: Package, url: '/admin/products' },
-    { title: t.admin.orders.title, icon: ShoppingCart, url: '/admin/orders' },
-    { title: t.admin.sellers.title, icon: BadgeCheck, url: '/admin/sellers' },
+    { title: t.admin.dashboard, icon: LayoutDashboard, url: '/dashboard/admin' },
+    { title: t.admin.users.title, icon: Users, url: '/dashboard/users' },
+    { title: t.admin.products.title, icon: Package, url: '/dashboard/products' },
+    { title: t.admin.orders.title, icon: ShoppingCart, url: '/dashboard/orders' },
+    { title: t.admin.sellers.title, icon: BadgeCheck, url: '/dashboard/sellers' },
   ];
 
   const contentNavItems = [
-    { title: t.admin.banners.title, icon: Image, url: '/admin/banners' },
-    { title: t.admin.promotions.title, icon: Tag, url: '/admin/promotions' },
-    { title: t.admin.cms.title, icon: FileText, url: '/admin/cms' },
+    { title: t.admin.banners.title, icon: Image, url: '/dashboard/banners' },
+    { title: t.admin.promotions.title, icon: Tag, url: '/dashboard/promotions' },
+    { title: t.admin.cms.title, icon: FileText, url: '/dashboard/cms' },
   ];
 
   const settingsNavItems = [
-    { title: t.admin.settings.title, icon: Settings, url: '/admin/settings' },
+    { title: t.admin.settings.title, icon: Settings, url: '/dashboard/settings' },
   ];
 
   const handleLogout = async () => {
@@ -73,8 +73,8 @@ export const AdminSidebar = () => {
   };
 
   const isActive = (url: string) => {
-    if (url === '/admin') {
-      return location.pathname === '/admin';
+    if (url === '/dashboard/admin') {
+      return location.pathname === '/dashboard/admin';
     }
     return location.pathname.startsWith(url);
   };

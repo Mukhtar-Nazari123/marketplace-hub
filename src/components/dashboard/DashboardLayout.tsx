@@ -31,7 +31,7 @@ export const DashboardLayout = ({
         navigate('/login', { state: { from: location.pathname } });
       } else if (role && !allowedRoles.includes(role)) {
         // Redirect to appropriate dashboard based on role
-        if (role === 'admin') navigate('/dashboard');
+        if (role === 'admin') navigate('/dashboard/admin');
         else if (role === 'seller') navigate('/dashboard/seller');
         else navigate('/dashboard/buyer');
       }
