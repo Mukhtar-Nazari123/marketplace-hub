@@ -36,17 +36,12 @@ const Login = () => {
   }, [user, authLoading, role]);
 
   const redirectBasedOnRole = (userRole: string) => {
-    switch (userRole) {
-      case "admin":
-        navigate("/dashboard/admin", { replace: true });
-        break;
-      case "seller":
-        navigate("/dashboard/seller", { replace: true });
-        break;
-      case "buyer":
-      default:
-        navigate("/dashboard/buyer", { replace: true });
-        break;
+    // Admins go to dashboard, buyers and sellers go to home page
+    if (userRole === "admin") {
+      navigate("/dashboard/admin", { replace: true });
+    } else {
+      // Buyers and sellers redirect to home page
+      navigate("/", { replace: true });
     }
   };
 
@@ -100,8 +95,8 @@ const Login = () => {
         title: isRTL ? "ورود موفق" : "Login Successful",
         description: isRTL ? "خوش آمدید!" : "Welcome back!",
       });
-      // Navigate immediately; role-based redirect will resolve via auth state.
-      navigate('/dashboard', { replace: true });
+      // Navigate to home for buyers/sellers, dashboard resolver will handle admins
+      navigate('/', { replace: true });
     }
   };
 

@@ -33,6 +33,7 @@ import {
   CreditCard,
   BarChart3,
   Plus,
+  Home,
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -186,10 +187,22 @@ export const DashboardSidebar = () => {
         {/* Buyer Navigation */}
         {role === 'buyer' && renderNavItems(buyerNavItems)}
 
-        {/* Language Switcher */}
+        {/* Home & Language Switcher */}
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
+              {/* Return to Home */}
+              <SidebarMenuItem>
+                <SidebarMenuButton 
+                  onClick={() => navigate('/')} 
+                  tooltip={isRTL ? 'صفحه اصلی' : 'Home'}
+                  className="transition-all duration-200 hover:translate-x-1"
+                >
+                  <Home className="transition-transform duration-200 hover:scale-110" />
+                  <span>{isRTL ? 'صفحه اصلی' : 'Home'}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              {/* Language Switcher */}
               <SidebarMenuItem>
                 <SidebarMenuButton 
                   onClick={toggleLanguage} 

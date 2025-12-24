@@ -29,6 +29,7 @@ import BuyerProfile from "./pages/dashboard/BuyerProfile";
 import DashboardIndex from "./pages/dashboard/DashboardIndex";
 import BuyerDashboard from "./pages/dashboard/BuyerDashboard";
 import SellerDashboard from "./pages/dashboard/SellerDashboard";
+import Wishlist from "./pages/dashboard/Wishlist";
 
 const queryClient = new QueryClient();
 
@@ -75,7 +76,7 @@ const App = () => (
               <Route path="/dashboard/buyer" element={<BuyerDashboard />} />
               <Route path="/dashboard/buyer/orders" element={<BuyerProfile />} />
               <Route path="/dashboard/buyer/addresses" element={<BuyerProfile />} />
-              <Route path="/dashboard/buyer/wishlist" element={<BuyerProfile />} />
+              <Route path="/dashboard/buyer/wishlist" element={<Wishlist />} />
               <Route path="/dashboard/buyer/payments" element={<BuyerProfile />} />
 
               {/* Seller Routes */}
