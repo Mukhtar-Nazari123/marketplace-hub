@@ -1,14 +1,30 @@
-import { Search, ShoppingCart, User, Menu } from "lucide-react";
+import { Search, ShoppingCart, User, Menu, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/lib/i18n";
+import { useAuth } from "@/hooks/useAuth";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import MobileMenu from "./MobileMenu";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { t, isRTL } = useLanguage();
+  const { user, role } = useAuth();
+
+  // Get dashboard link based on role
+  const getDashboardLink = () => {
+    if (role === 'admin') return '/dashboard';
+    if (role === 'seller') return '/dashboard/seller';
+    return '/dashboard/buyer';
+  };
+
+  const getDashboardLabel = () => {
+    if (role === 'admin') return isRTL ? 'داشبورد مدیر' : 'Admin Dashboard';
+    if (role === 'seller') return isRTL ? 'داشبورد فروشنده' : 'Seller Dashboard';
+    return isRTL ? 'داشبورد خریدار' : 'Buyer Dashboard';
+  };
 
   return (
     <>
@@ -65,14 +81,34 @@ const Header = () => {
                 </Button>
               </Link>
 
-              {/* Account */}
-              <Link to="/Login" className="hidden sm:flex items-center gap-2">
-                <User className="h-5 w-5 text-muted-foreground" />
-                <div className={`text-sm ${isRTL ? "text-right" : "text-left"}`}>
-                  <p className="text-muted-foreground">{t.header.signIn}</p>
-                  <p className="font-medium text-foreground">{t.header.welcomeGuest}</p>
-                </div>
-              </Link>
+              {/* Account / Dashboard */}
+              {user ? (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Link to={getDashboardLink()} className="hidden sm:flex">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="relative transition-all duration-300 hover:bg-primary/10 hover:scale-110"
+                        aria-label={getDashboardLabel()}
+                      >
+                        <LayoutDashboard className="h-5 w-5 text-primary" />
+                      </Button>
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {getDashboardLabel()}
+                  </TooltipContent>
+                </Tooltip>
+              ) : (
+                <Link to="/login" className="hidden sm:flex items-center gap-2">
+                  <User className="h-5 w-5 text-muted-foreground" />
+                  <div className={`text-sm ${isRTL ? "text-right" : "text-left"}`}>
+                    <p className="text-muted-foreground">{t.header.signIn}</p>
+                    <p className="font-medium text-foreground">{t.header.welcomeGuest}</p>
+                  </div>
+                </Link>
+              )}
 
               {/* Mobile Menu Button */}
               <Button
