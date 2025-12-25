@@ -4,14 +4,27 @@ import { useAuth } from '@/hooks/useAuth';
 
 export type SellerStatus = 'pending' | 'approved' | 'rejected' | 'suspended' | null;
 
+export interface SellerVerificationData {
+  status: SellerStatus;
+  profile_completed: boolean;
+  completion_step: number;
+  business_name: string | null;
+  store_logo: string | null;
+  store_banner: string | null;
+}
+
 export const useSellerStatus = () => {
   const { user, role } = useAuth();
   const [status, setStatus] = useState<SellerStatus>(null);
+  const [profileCompleted, setProfileCompleted] = useState(false);
+  const [completionStep, setCompletionStep] = useState(0);
   const [loading, setLoading] = useState(true);
 
   const fetchStatus = useCallback(async () => {
     if (!user || role !== 'seller') {
       setStatus(null);
+      setProfileCompleted(false);
+      setCompletionStep(0);
       setLoading(false);
       return;
     }
@@ -19,7 +32,7 @@ export const useSellerStatus = () => {
     try {
       const { data, error } = await supabase
         .from('seller_verifications')
-        .select('status')
+        .select('status, profile_completed, completion_step')
         .eq('seller_id', user.id)
         .maybeSingle();
 
@@ -28,6 +41,8 @@ export const useSellerStatus = () => {
         setStatus(null);
       } else if (data) {
         setStatus(data.status as SellerStatus);
+        setProfileCompleted(data.profile_completed ?? false);
+        setCompletionStep(data.completion_step ?? 0);
       } else {
         // No verification record exists, create one as pending
         const { error: insertError } = await supabase
@@ -41,6 +56,8 @@ export const useSellerStatus = () => {
           console.error('Error creating seller verification:', insertError);
         }
         setStatus('pending');
+        setProfileCompleted(false);
+        setCompletionStep(0);
       }
     } catch (error) {
       console.error('Error in seller status:', error);
@@ -54,5 +71,5 @@ export const useSellerStatus = () => {
     fetchStatus();
   }, [fetchStatus]);
 
-  return { status, loading, refetch: fetchStatus };
+  return { status, profileCompleted, completionStep, loading, refetch: fetchStatus };
 };
