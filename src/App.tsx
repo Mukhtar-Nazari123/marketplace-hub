@@ -7,6 +7,7 @@ import { LanguageProvider } from "@/lib/i18n";
 import { AuthProvider } from "@/hooks/useAuth";
 import { CartProvider } from "@/hooks/useCart";
 import { WishlistProvider } from "@/hooks/useWishlist";
+import { ThemeProvider } from "next-themes";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Products from "./pages/Products";
@@ -41,13 +42,14 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <LanguageProvider>
-        <CartProvider>
-          <WishlistProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
+    <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+      <AuthProvider>
+        <LanguageProvider>
+          <CartProvider>
+            <WishlistProvider>
+              <TooltipProvider>
+                <Toaster />
+                <Sonner />
               <BrowserRouter>
             <Routes>
               {/* Public Routes */}
@@ -107,11 +109,12 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
               </BrowserRouter>
-            </TooltipProvider>
-          </WishlistProvider>
-        </CartProvider>
-      </LanguageProvider>
-    </AuthProvider>
+              </TooltipProvider>
+            </WishlistProvider>
+          </CartProvider>
+        </LanguageProvider>
+      </AuthProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 
