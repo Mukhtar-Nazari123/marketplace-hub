@@ -489,51 +489,81 @@ export type Database = {
         Row: {
           address: Json | null
           admin_notes: string | null
+          business_description: string | null
           business_name: string | null
           business_type: string | null
+          completion_step: number | null
+          contact_email: string | null
+          contact_phone: string | null
           created_at: string
           documents: Json | null
           id: string
           phone: string | null
+          profile_completed: boolean | null
           rejection_reason: string | null
+          return_policy: string | null
           reviewed_at: string | null
           reviewed_by: string | null
           seller_id: string
+          shipping_policy: string | null
           status: string
+          store_banner: string | null
+          store_logo: string | null
+          store_visible: boolean | null
           tax_id: string | null
           updated_at: string
         }
         Insert: {
           address?: Json | null
           admin_notes?: string | null
+          business_description?: string | null
           business_name?: string | null
           business_type?: string | null
+          completion_step?: number | null
+          contact_email?: string | null
+          contact_phone?: string | null
           created_at?: string
           documents?: Json | null
           id?: string
           phone?: string | null
+          profile_completed?: boolean | null
           rejection_reason?: string | null
+          return_policy?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           seller_id: string
+          shipping_policy?: string | null
           status?: string
+          store_banner?: string | null
+          store_logo?: string | null
+          store_visible?: boolean | null
           tax_id?: string | null
           updated_at?: string
         }
         Update: {
           address?: Json | null
           admin_notes?: string | null
+          business_description?: string | null
           business_name?: string | null
           business_type?: string | null
+          completion_step?: number | null
+          contact_email?: string | null
+          contact_phone?: string | null
           created_at?: string
           documents?: Json | null
           id?: string
           phone?: string | null
+          profile_completed?: boolean | null
           rejection_reason?: string | null
+          return_policy?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           seller_id?: string
+          shipping_policy?: string | null
           status?: string
+          store_banner?: string | null
+          store_logo?: string | null
+          store_visible?: boolean | null
           tax_id?: string | null
           updated_at?: string
         }

@@ -33,6 +33,8 @@ import DashboardIndex from "./pages/dashboard/DashboardIndex";
 import BuyerDashboard from "./pages/dashboard/BuyerDashboard";
 import SellerDashboard from "./pages/dashboard/SellerDashboard";
 import SellerPending from "./pages/dashboard/SellerPending";
+import SellerProfileChoice from "./pages/seller/SellerProfileChoice";
+import SellerProfileComplete from "./pages/seller/SellerProfileComplete";
 import Wishlist from "./pages/dashboard/Wishlist";
 
 const queryClient = new QueryClient();
@@ -93,6 +95,10 @@ const App = () => (
               <Route path="/dashboard/seller/analytics" element={<SellerDashboard />} />
               <Route path="/dashboard/seller/products/new" element={<SellerDashboard />} />
               <Route path="/dashboard/seller/pending" element={<SellerPending />} />
+              
+              {/* Seller Onboarding Routes */}
+              <Route path="/seller/profile-choice" element={<SellerProfileChoice />} />
+              <Route path="/seller/complete-profile" element={<SellerProfileComplete />} />
               
               {/* Legacy Admin Routes - Redirect to new paths */}
               <Route path="/admin" element={<Navigate to="/dashboard" replace />} />
