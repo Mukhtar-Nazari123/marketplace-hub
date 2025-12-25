@@ -94,7 +94,9 @@ const Register = () => {
         title: isRTL ? "ثبت‌نام موفق" : "Registration Successful",
         description: isRTL ? "ایمیل تایید برای شما ارسال شد" : "A confirmation email has been sent to you"
       });
-      setTimeout(() => navigate('/login'), 2000);
+      // Redirect sellers to profile choice, buyers to login
+      const redirectPath = selectedRole === 'seller' ? '/seller/profile-choice' : '/login';
+      setTimeout(() => navigate(redirectPath), 2000);
     }
   };
 
