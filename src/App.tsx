@@ -18,6 +18,7 @@ import Blog from "./pages/Blog";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
+import Cart from "./pages/Cart";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminProducts from "./pages/admin/AdminProducts";
@@ -31,6 +32,7 @@ import BuyerProfile from "./pages/dashboard/BuyerProfile";
 import DashboardIndex from "./pages/dashboard/DashboardIndex";
 import BuyerDashboard from "./pages/dashboard/BuyerDashboard";
 import SellerDashboard from "./pages/dashboard/SellerDashboard";
+import SellerPending from "./pages/dashboard/SellerPending";
 import Wishlist from "./pages/dashboard/Wishlist";
 
 const queryClient = new QueryClient();
@@ -58,6 +60,7 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/cart" element={<Cart />} />
               
               {/* Dashboard Routes - All nested under /dashboard */}
               <Route path="/dashboard" element={<DashboardIndex />} />
@@ -89,6 +92,7 @@ const App = () => (
               <Route path="/dashboard/seller/orders" element={<SellerDashboard />} />
               <Route path="/dashboard/seller/analytics" element={<SellerDashboard />} />
               <Route path="/dashboard/seller/products/new" element={<SellerDashboard />} />
+              <Route path="/dashboard/seller/pending" element={<SellerPending />} />
               
               {/* Legacy Admin Routes - Redirect to new paths */}
               <Route path="/admin" element={<Navigate to="/dashboard" replace />} />

@@ -1,6 +1,7 @@
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useSellerStatus } from '@/hooks/useSellerStatus';
 import { useLanguage } from '@/lib/i18n';
 import { DashboardSidebar } from './DashboardSidebar';
 import { DashboardHeader } from './DashboardHeader';
@@ -21,6 +22,7 @@ export const DashboardLayout = ({
   allowedRoles = ['admin', 'seller', 'buyer', 'moderator'] 
 }: DashboardLayoutProps) => {
   const { user, role, loading } = useAuth();
+  const { status: sellerStatus, loading: sellerStatusLoading } = useSellerStatus();
   const { isRTL } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
@@ -38,7 +40,16 @@ export const DashboardLayout = ({
     }
   }, [user, role, loading, navigate, allowedRoles, location.pathname]);
 
-  if (loading) {
+  // Check seller status - redirect pending/rejected sellers to pending page
+  useEffect(() => {
+    if (!loading && !sellerStatusLoading && role === 'seller' && allowedRoles.includes('seller')) {
+      if (sellerStatus && sellerStatus !== 'approved') {
+        navigate('/dashboard/seller/pending');
+      }
+    }
+  }, [role, sellerStatus, sellerStatusLoading, loading, navigate, allowedRoles]);
+
+  if (loading || (role === 'seller' && sellerStatusLoading)) {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
@@ -52,6 +63,11 @@ export const DashboardLayout = ({
   }
 
   if (!user || (role && !allowedRoles.includes(role))) {
+    return null;
+  }
+
+  // Block non-approved sellers from dashboard
+  if (role === 'seller' && sellerStatus && sellerStatus !== 'approved') {
     return null;
   }
 
