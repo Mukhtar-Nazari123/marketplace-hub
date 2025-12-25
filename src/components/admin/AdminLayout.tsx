@@ -1,12 +1,13 @@
 import { ReactNode, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/lib/i18n';
 import { AdminSidebar } from './AdminSidebar';
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
 import { Separator } from '@/components/ui/separator';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from '@/components/ui/breadcrumb';
-import { Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Loader2, Home } from 'lucide-react';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -54,6 +55,14 @@ export const AdminLayout = ({ children, title, description }: AdminLayoutProps) 
           {description && (
             <span className={`text-sm text-muted-foreground ${isRTL ? 'ml-auto' : 'mr-auto'}`}>{description}</span>
           )}
+          <div className={`${isRTL ? 'mr-auto' : 'ml-auto'}`}>
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/">
+                <Home className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                {isRTL ? 'صفحه اصلی' : 'Home'}
+              </Link>
+            </Button>
+          </div>
         </header>
         <main className="flex-1 overflow-auto p-6">
           {children}
