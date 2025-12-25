@@ -1,4 +1,4 @@
-import { Search, ShoppingCart, User, Menu, LayoutDashboard, LogOut } from "lucide-react";
+import { Search, ShoppingCart, User, Menu, LayoutDashboard, LogOut, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
@@ -19,10 +19,16 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import MobileMenu from "./MobileMenu";
+import { useTheme } from "next-themes";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { t, isRTL } = useLanguage();
+  const { theme, setTheme } = useTheme();
+
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
   const { user, role, signOut } = useAuth();
   const { itemCount } = useCart();
   const navigate = useNavigate();
@@ -98,6 +104,28 @@ const Header = () => {
               <Button variant="ghost" size="icon" className="md:hidden">
                 <Search className="h-5 w-5" />
               </Button>
+
+              {/* Theme Toggle */}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={toggleTheme}
+                    className="transition-all duration-300 hover:bg-primary/10 hover:scale-110"
+                    aria-label={theme === 'dark' ? (isRTL ? 'حالت روشن' : 'Light mode') : (isRTL ? 'حالت تاریک' : 'Dark mode')}
+                  >
+                    {theme === 'dark' ? (
+                      <Sun className="h-5 w-5 text-warning" />
+                    ) : (
+                      <Moon className="h-5 w-5 text-primary" />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {theme === 'dark' ? (isRTL ? 'حالت روشن' : 'Light mode') : (isRTL ? 'حالت تاریک' : 'Dark mode')}
+                </TooltipContent>
+              </Tooltip>
 
               {/* Cart */}
               <Link to="/cart">

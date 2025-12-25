@@ -22,37 +22,68 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
+import { Separator } from '@/components/ui/separator';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Search,
   CheckCircle,
   XCircle,
   RefreshCw,
   Eye,
+  Store,
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Building2,
+  FileText,
+  Truck,
+  RotateCcw,
+  Image,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLanguage, formatDate } from '@/lib/i18n';
+
+interface SellerVerificationData {
+  id: string;
+  seller_id: string;
+  status: string;
+  business_name: string | null;
+  business_type: string | null;
+  business_description: string | null;
+  phone: string | null;
+  contact_email: string | null;
+  contact_phone: string | null;
+  store_logo: string | null;
+  store_banner: string | null;
+  shipping_policy: string | null;
+  return_policy: string | null;
+  store_visible: boolean | null;
+  address: any;
+  rejection_reason: string | null;
+  created_at: string;
+  updated_at: string;
+}
 
 interface SellerData {
   user_id: string;
   full_name: string;
   email: string;
+  avatar_url: string | null;
   created_at: string;
-  verification_id: string | null;
-  business_name: string | null;
-  business_type: string | null;
-  phone: string | null;
-  status: string;
-  rejection_reason: string | null;
+  verification: SellerVerificationData | null;
 }
 
 const AdminSellers = () => {
-  const { t, direction } = useLanguage();
+  const { t, direction, isRTL } = useLanguage();
   const [sellers, setSellers] = useState<SellerData[]>([]);
   const [filteredSellers, setFilteredSellers] = useState<SellerData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSeller, setSelectedSeller] = useState<SellerData | null>(null);
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -79,7 +110,7 @@ const AdminSellers = () => {
       // Get profiles for these sellers
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
-        .select('user_id, full_name, email')
+        .select('user_id, full_name, email, avatar_url')
         .in('user_id', userIds);
 
       if (profilesError) throw profilesError;
@@ -101,13 +132,9 @@ const AdminSellers = () => {
           user_id: role.user_id,
           full_name: profile?.full_name || 'Unknown',
           email: profile?.email || 'Unknown',
+          avatar_url: profile?.avatar_url || null,
           created_at: role.created_at,
-          verification_id: verification?.id || null,
-          business_name: verification?.business_name || null,
-          business_type: verification?.business_type || null,
-          phone: verification?.phone || null,
-          status: verification?.status || 'pending',
-          rejection_reason: verification?.rejection_reason || null,
+          verification: verification || null,
         };
       });
 
@@ -133,8 +160,8 @@ const AdminSellers = () => {
         (s) =>
           s.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
           s.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          s.business_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          s.phone?.includes(searchQuery)
+          s.verification?.business_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          s.verification?.phone?.includes(searchQuery)
       );
     }
 
@@ -159,16 +186,14 @@ const AdminSellers = () => {
   const handleApprove = async (seller: SellerData) => {
     setIsSubmitting(true);
     try {
-      if (seller.verification_id) {
-        // Update existing verification
+      if (seller.verification?.id) {
         const { error } = await supabase
           .from('seller_verifications')
           .update({ status: 'approved', reviewed_at: new Date().toISOString() })
-          .eq('id', seller.verification_id);
+          .eq('id', seller.verification.id);
 
         if (error) throw error;
       } else {
-        // Create new verification record with approved status
         const { error } = await supabase
           .from('seller_verifications')
           .insert({ 
@@ -181,6 +206,8 @@ const AdminSellers = () => {
       }
 
       toast.success(t.admin.sellers.approveSuccess);
+      setIsViewDialogOpen(false);
+      setSelectedSeller(null);
       fetchSellers();
     } catch (error) {
       console.error('Error approving seller:', error);
@@ -198,8 +225,7 @@ const AdminSellers = () => {
 
     setIsSubmitting(true);
     try {
-      if (selectedSeller.verification_id) {
-        // Update existing verification
+      if (selectedSeller.verification?.id) {
         const { error } = await supabase
           .from('seller_verifications')
           .update({
@@ -207,11 +233,10 @@ const AdminSellers = () => {
             rejection_reason: rejectionReason,
             reviewed_at: new Date().toISOString(),
           })
-          .eq('id', selectedSeller.verification_id);
+          .eq('id', selectedSeller.verification.id);
 
         if (error) throw error;
       } else {
-        // Create new verification record with rejected status
         const { error } = await supabase
           .from('seller_verifications')
           .insert({ 
@@ -226,6 +251,7 @@ const AdminSellers = () => {
 
       toast.success(t.admin.sellers.rejectSuccess);
       setIsRejectDialogOpen(false);
+      setIsViewDialogOpen(false);
       setRejectionReason('');
       setSelectedSeller(null);
       fetchSellers();
@@ -237,9 +263,24 @@ const AdminSellers = () => {
     }
   };
 
-  const isRTL = direction === 'rtl';
+  const handleViewSeller = (seller: SellerData) => {
+    setSelectedSeller(seller);
+    setIsViewDialogOpen(true);
+  };
+
   const searchIconClass = isRTL ? 'right-3' : 'left-3';
   const inputPaddingClass = isRTL ? 'pr-9' : 'pl-9';
+  const iconMargin = isRTL ? 'ml-2' : 'mr-2';
+
+  const InfoRow = ({ icon: Icon, label, value }: { icon: any; label: string; value: string | null | undefined }) => (
+    <div className="flex items-start gap-3 py-2">
+      <Icon className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+      <div className="flex-1 min-w-0">
+        <p className="text-xs text-muted-foreground">{label}</p>
+        <p className="text-sm font-medium break-words">{value || (isRTL ? 'مشخص نشده' : 'Not specified')}</p>
+      </div>
+    </div>
+  );
 
   return (
     <AdminLayout title={t.admin.sellers.title} description={t.admin.sellers.description}>
@@ -254,7 +295,7 @@ const AdminSellers = () => {
                 </CardDescription>
               </div>
               <Button variant="outline" size="sm" onClick={fetchSellers} className="hover-scale">
-                <RefreshCw className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                <RefreshCw className={`h-4 w-4 ${iconMargin}`} />
                 {t.admin.sellers.refresh}
               </Button>
             </div>
@@ -307,17 +348,23 @@ const AdminSellers = () => {
                     filteredSellers.map((seller) => (
                       <TableRow key={seller.user_id} className="hover:bg-muted/50 transition-colors">
                         <TableCell className="font-medium">
-                          {seller.full_name}
+                          <div className="flex items-center gap-2">
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage src={seller.avatar_url || ''} />
+                              <AvatarFallback>{seller.full_name.charAt(0).toUpperCase()}</AvatarFallback>
+                            </Avatar>
+                            {seller.full_name}
+                          </div>
                         </TableCell>
                         <TableCell>{seller.email}</TableCell>
-                        <TableCell>{seller.business_name || t.admin.sellers.unspecified}</TableCell>
-                        <TableCell>{getStatusBadge(seller.status)}</TableCell>
+                        <TableCell>{seller.verification?.business_name || t.admin.sellers.unspecified}</TableCell>
+                        <TableCell>{getStatusBadge(seller.verification?.status || 'pending')}</TableCell>
                         <TableCell>
                           {formatDate(new Date(seller.created_at), direction === 'rtl' ? 'fa' : 'en')}
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-1">
-                            {seller.status === 'pending' && (
+                          <div className={`flex items-center gap-1 ${isRTL ? 'justify-start' : 'justify-end'}`}>
+                            {seller.verification?.status === 'pending' && (
                               <>
                                 <Button
                                   variant="ghost"
@@ -342,7 +389,11 @@ const AdminSellers = () => {
                                 </Button>
                               </>
                             )}
-                            <Button variant="ghost" size="icon">
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              onClick={() => handleViewSeller(seller)}
+                            >
                               <Eye className="h-4 w-4" />
                             </Button>
                           </div>
@@ -356,9 +407,205 @@ const AdminSellers = () => {
           </CardContent>
         </Card>
 
+        {/* View Seller Details Dialog */}
+        <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+          <DialogContent className="max-w-2xl max-h-[90vh]" dir={isRTL ? 'rtl' : 'ltr'}>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Store className="h-5 w-5" />
+                {isRTL ? 'جزئیات فروشنده' : 'Seller Details'}
+              </DialogTitle>
+              <DialogDescription>
+                {isRTL ? 'مشاهده اطلاعات کامل فروشنده' : 'View complete seller information'}
+              </DialogDescription>
+            </DialogHeader>
+            
+            {selectedSeller && (
+              <ScrollArea className="max-h-[60vh] pr-4">
+                <div className="space-y-6">
+                  {/* Status Badge */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">
+                      {isRTL ? 'وضعیت:' : 'Status:'}
+                    </span>
+                    {getStatusBadge(selectedSeller.verification?.status || 'pending')}
+                  </div>
+
+                  {/* Personal Information */}
+                  <div>
+                    <h4 className="font-semibold mb-3 flex items-center gap-2">
+                      <User className="h-4 w-4" />
+                      {isRTL ? 'اطلاعات شخصی' : 'Personal Information'}
+                    </h4>
+                    <Card>
+                      <CardContent className="pt-4">
+                        <div className="flex items-center gap-4 mb-4">
+                          <Avatar className="h-16 w-16">
+                            <AvatarImage src={selectedSeller.avatar_url || ''} />
+                            <AvatarFallback className="text-lg">
+                              {selectedSeller.full_name.charAt(0).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <h3 className="text-lg font-semibold">{selectedSeller.full_name}</h3>
+                            <p className="text-sm text-muted-foreground">{selectedSeller.email}</p>
+                          </div>
+                        </div>
+                        <InfoRow icon={Phone} label={isRTL ? 'تلفن' : 'Phone'} value={selectedSeller.verification?.phone} />
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  <Separator />
+
+                  {/* Store / Company Details */}
+                  <div>
+                    <h4 className="font-semibold mb-3 flex items-center gap-2">
+                      <Building2 className="h-4 w-4" />
+                      {isRTL ? 'اطلاعات فروشگاه / شرکت' : 'Store / Company Details'}
+                    </h4>
+                    <Card>
+                      <CardContent className="pt-4 space-y-2">
+                        <InfoRow icon={Store} label={isRTL ? 'نام فروشگاه' : 'Store Name'} value={selectedSeller.verification?.business_name} />
+                        <InfoRow icon={Building2} label={isRTL ? 'نوع کسب‌وکار' : 'Business Type'} value={selectedSeller.verification?.business_type} />
+                        <InfoRow icon={FileText} label={isRTL ? 'توضیحات کسب‌وکار' : 'Business Description'} value={selectedSeller.verification?.business_description} />
+                        <InfoRow icon={Mail} label={isRTL ? 'ایمیل تماس' : 'Contact Email'} value={selectedSeller.verification?.contact_email} />
+                        <InfoRow icon={Phone} label={isRTL ? 'تلفن تماس' : 'Contact Phone'} value={selectedSeller.verification?.contact_phone} />
+                        <InfoRow 
+                          icon={MapPin} 
+                          label={isRTL ? 'آدرس' : 'Address'} 
+                          value={selectedSeller.verification?.address 
+                            ? (typeof selectedSeller.verification.address === 'object' 
+                              ? JSON.stringify(selectedSeller.verification.address) 
+                              : selectedSeller.verification.address)
+                            : null
+                          } 
+                        />
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Store Logo and Banner */}
+                  {(selectedSeller.verification?.store_logo || selectedSeller.verification?.store_banner) && (
+                    <>
+                      <Separator />
+                      <div>
+                        <h4 className="font-semibold mb-3 flex items-center gap-2">
+                          <Image className="h-4 w-4" />
+                          {isRTL ? 'لوگو و بنر' : 'Logo & Banner'}
+                        </h4>
+                        <Card>
+                          <CardContent className="pt-4 space-y-4">
+                            {selectedSeller.verification?.store_logo && (
+                              <div>
+                                <p className="text-xs text-muted-foreground mb-2">{isRTL ? 'لوگو فروشگاه' : 'Store Logo'}</p>
+                                <img 
+                                  src={selectedSeller.verification.store_logo} 
+                                  alt="Store Logo" 
+                                  className="h-20 w-20 object-cover rounded-lg border"
+                                />
+                              </div>
+                            )}
+                            {selectedSeller.verification?.store_banner && (
+                              <div>
+                                <p className="text-xs text-muted-foreground mb-2">{isRTL ? 'بنر فروشگاه' : 'Store Banner'}</p>
+                                <img 
+                                  src={selectedSeller.verification.store_banner} 
+                                  alt="Store Banner" 
+                                  className="w-full h-32 object-cover rounded-lg border"
+                                />
+                              </div>
+                            )}
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </>
+                  )}
+
+                  <Separator />
+
+                  {/* Policies */}
+                  <div>
+                    <h4 className="font-semibold mb-3 flex items-center gap-2">
+                      <FileText className="h-4 w-4" />
+                      {isRTL ? 'سیاست‌ها' : 'Policies'}
+                    </h4>
+                    <Card>
+                      <CardContent className="pt-4 space-y-2">
+                        <InfoRow icon={Truck} label={isRTL ? 'سیاست ارسال' : 'Shipping Policy'} value={selectedSeller.verification?.shipping_policy} />
+                        <InfoRow icon={RotateCcw} label={isRTL ? 'سیاست بازگشت' : 'Return Policy'} value={selectedSeller.verification?.return_policy} />
+                        <div className="flex items-center gap-3 py-2">
+                          <Store className="h-4 w-4 text-muted-foreground shrink-0" />
+                          <div>
+                            <p className="text-xs text-muted-foreground">{isRTL ? 'قابلیت رؤیت فروشگاه' : 'Store Visibility'}</p>
+                            <Badge variant={selectedSeller.verification?.store_visible ? 'default' : 'secondary'}>
+                              {selectedSeller.verification?.store_visible 
+                                ? (isRTL ? 'قابل مشاهده' : 'Visible') 
+                                : (isRTL ? 'مخفی' : 'Hidden')
+                              }
+                            </Badge>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Rejection Reason (if rejected) */}
+                  {selectedSeller.verification?.status === 'rejected' && selectedSeller.verification?.rejection_reason && (
+                    <>
+                      <Separator />
+                      <div>
+                        <h4 className="font-semibold mb-3 text-destructive flex items-center gap-2">
+                          <XCircle className="h-4 w-4" />
+                          {isRTL ? 'دلیل رد' : 'Rejection Reason'}
+                        </h4>
+                        <Card className="border-destructive/50">
+                          <CardContent className="pt-4">
+                            <p className="text-sm">{selectedSeller.verification.rejection_reason}</p>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </ScrollArea>
+            )}
+
+            <DialogFooter className="gap-2 sm:gap-0">
+              {selectedSeller?.verification?.status === 'pending' && (
+                <>
+                  <Button
+                    variant="destructive"
+                    onClick={() => {
+                      setIsViewDialogOpen(false);
+                      setIsRejectDialogOpen(true);
+                    }}
+                    disabled={isSubmitting}
+                  >
+                    <XCircle className={`h-4 w-4 ${iconMargin}`} />
+                    {isRTL ? 'رد کردن' : 'Reject'}
+                  </Button>
+                  <Button
+                    variant="default"
+                    className="bg-success text-success-foreground hover:bg-success/90"
+                    onClick={() => selectedSeller && handleApprove(selectedSeller)}
+                    disabled={isSubmitting}
+                  >
+                    <CheckCircle className={`h-4 w-4 ${iconMargin}`} />
+                    {isSubmitting ? (isRTL ? 'در حال تأیید...' : 'Approving...') : (isRTL ? 'تأیید' : 'Approve')}
+                  </Button>
+                </>
+              )}
+              <Button variant="outline" onClick={() => setIsViewDialogOpen(false)}>
+                {isRTL ? 'بستن' : 'Close'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         {/* Reject Dialog */}
         <Dialog open={isRejectDialogOpen} onOpenChange={setIsRejectDialogOpen}>
-          <DialogContent>
+          <DialogContent dir={isRTL ? 'rtl' : 'ltr'}>
             <DialogHeader>
               <DialogTitle>{t.admin.sellers.rejectVerification}</DialogTitle>
               <DialogDescription>
