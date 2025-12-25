@@ -37,6 +37,16 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
   Search,
   MoreHorizontal,
   Eye,
@@ -45,6 +55,7 @@ import {
   Filter,
   Download,
   RefreshCw,
+  Trash2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLanguage, formatDate } from '@/lib/i18n';
@@ -68,6 +79,9 @@ const AdminUsers = () => {
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [selectedUser, setSelectedUser] = useState<UserWithRole | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<UserWithRole | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [isSuspending, setIsSuspending] = useState(false);
 
   const fetchUsers = async () => {
@@ -145,6 +159,44 @@ const AdminUsers = () => {
   const handleViewUser = (user: UserWithRole) => {
     setSelectedUser(user);
     setIsDetailOpen(true);
+  };
+
+  const handleDeleteClick = (user: UserWithRole) => {
+    setUserToDelete(user);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
+    
+    setIsDeleting(true);
+    try {
+      // Delete from user_roles first
+      const { error: roleError } = await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', userToDelete.user_id);
+
+      if (roleError) throw roleError;
+
+      // Delete from profiles
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('user_id', userToDelete.user_id);
+
+      if (profileError) throw profileError;
+
+      toast.success(isRTL ? 'کاربر با موفقیت حذف شد' : 'User deleted successfully');
+      setIsDeleteDialogOpen(false);
+      setUserToDelete(null);
+      fetchUsers();
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      toast.error(isRTL ? 'خطا در حذف کاربر' : 'Error deleting user');
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const isRTL = direction === 'rtl';
@@ -283,6 +335,13 @@ const AdminUsers = () => {
                                 <UserX className={`h-4 w-4 ${iconMarginClass}`} />
                                 {t.admin.users.suspendAccount}
                               </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                className="text-destructive"
+                                onClick={() => handleDeleteClick(user)}
+                              >
+                                <Trash2 className={`h-4 w-4 ${iconMarginClass}`} />
+                                {isRTL ? 'حذف کاربر' : 'Delete User'}
+                              </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
@@ -342,6 +401,38 @@ const AdminUsers = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <AlertDialogContent dir={isRTL ? 'rtl' : 'ltr'}>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {isRTL ? 'حذف کاربر' : 'Delete User'}
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {isRTL 
+                  ? `آیا مطمئن هستید که می‌خواهید کاربر "${userToDelete?.full_name}" را حذف کنید؟ این عمل قابل بازگشت نیست.`
+                  : `Are you sure you want to delete user "${userToDelete?.full_name}"? This action cannot be undone.`
+                }
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className={isRTL ? 'flex-row-reverse gap-2' : ''}>
+              <AlertDialogCancel disabled={isDeleting}>
+                {isRTL ? 'انصراف' : 'Cancel'}
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDeleteUser}
+                disabled={isDeleting}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {isDeleting 
+                  ? (isRTL ? 'در حال حذف...' : 'Deleting...') 
+                  : (isRTL ? 'حذف' : 'Delete')
+                }
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </AdminLayout>
   );

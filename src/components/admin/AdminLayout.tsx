@@ -7,7 +7,9 @@ import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/s
 import { Separator } from '@/components/ui/separator';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/button';
-import { Loader2, Home } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Loader2, Home, Moon, Sun } from 'lucide-react';
+import { useTheme } from 'next-themes';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -19,6 +21,11 @@ export const AdminLayout = ({ children, title, description }: AdminLayoutProps) 
   const { user, role, loading } = useAuth();
   const { isRTL } = useLanguage();
   const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
+
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
 
   useEffect(() => {
     if (!loading && (!user || role !== 'admin')) {
@@ -55,7 +62,27 @@ export const AdminLayout = ({ children, title, description }: AdminLayoutProps) 
           {description && (
             <span className={`text-sm text-muted-foreground ${isRTL ? 'ml-auto' : 'mr-auto'}`}>{description}</span>
           )}
-          <div className={`${isRTL ? 'mr-auto' : 'ml-auto'}`}>
+          <div className={`flex items-center gap-2 ${isRTL ? 'mr-auto' : 'ml-auto'}`}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleTheme}
+                  className="transition-all duration-300 hover:bg-primary/10 hover:scale-110"
+                  aria-label={theme === 'dark' ? (isRTL ? 'حالت روشن' : 'Light mode') : (isRTL ? 'حالت تاریک' : 'Dark mode')}
+                >
+                  {theme === 'dark' ? (
+                    <Sun className="h-4 w-4 text-warning" />
+                  ) : (
+                    <Moon className="h-4 w-4 text-primary" />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {theme === 'dark' ? (isRTL ? 'حالت روشن' : 'Light mode') : (isRTL ? 'حالت تاریک' : 'Dark mode')}
+              </TooltipContent>
+            </Tooltip>
             <Button variant="outline" size="sm" asChild>
               <Link to="/">
                 <Home className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
