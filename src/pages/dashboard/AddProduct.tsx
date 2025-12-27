@@ -202,16 +202,19 @@ const AddProduct = () => {
         compare_at_price: formData.discountPrice,
         quantity: formData.quantity,
         sku: formData.sku || null,
-        category_id: formData.categoryId || null,
+        category_id: null, // Using null since categories table uses UUIDs, storing category info in metadata
         images: imageUrls,
-        status: 'draft',
+        status: 'draft' as const,
         metadata: {
           shortDescription: formData.shortDescription,
           brand: formData.brand,
           attributes: formData.attributes,
           videoUrl,
           stockPerSize: formData.stockPerSize,
+          categoryId: formData.categoryId,
+          categoryName: formData.categoryName,
           subCategoryId: formData.subCategoryId,
+          subCategoryName: formData.subCategoryName,
         },
       };
 
@@ -274,16 +277,19 @@ const AddProduct = () => {
         compare_at_price: formData.discountPrice,
         quantity: formData.quantity,
         sku: formData.sku || null,
-        category_id: formData.categoryId || null,
+        category_id: null, // Using null since categories table uses UUIDs, storing category info in metadata
         images: imageUrls,
-        status,
+        status: status as 'draft' | 'pending' | 'active',
         metadata: {
           shortDescription: formData.shortDescription,
           brand: formData.brand,
           attributes: formData.attributes,
           videoUrl,
           stockPerSize: formData.stockPerSize,
+          categoryId: formData.categoryId,
+          categoryName: formData.categoryName,
           subCategoryId: formData.subCategoryId,
+          subCategoryName: formData.subCategoryName,
         },
       };
 
