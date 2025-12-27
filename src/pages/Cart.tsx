@@ -10,8 +10,21 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
-import { ShoppingCart, Trash2, Plus, Minus, ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-react';
+import { ShoppingCart, Trash2, Plus, Minus, ChevronLeft, ChevronRight, ShoppingBag, Eye } from 'lucide-react';
 import { useEffect } from 'react';
+
+interface CartItemProduct {
+  id: string;
+  name: string;
+  price: number;
+  images: string[] | null;
+  quantity: number;
+  slug?: string;
+  metadata?: {
+    currency?: string;
+    [key: string]: unknown;
+  } | null;
+}
 
 const Cart = () => {
   const { t, isRTL } = useLanguage();
@@ -27,12 +40,36 @@ const Cart = () => {
     }
   }, [user, role, authLoading, navigate]);
 
-  const subtotal = items.reduce((sum, item) => {
-    return sum + (item.product?.price || 0) * item.quantity;
-  }, 0);
+  const getCurrencySymbol = (product: CartItemProduct | undefined) => {
+    const currency = product?.metadata?.currency || 'AFN';
+    if (currency === 'USD') return '$';
+    return isRTL ? '؋' : 'AFN';
+  };
 
+  // Calculate totals - group by currency
+  const itemsWithCurrency = items.map(item => {
+    const product = item.product as CartItemProduct | undefined;
+    const currency = product?.metadata?.currency || 'AFN';
+    return {
+      ...item,
+      currency,
+      currencySymbol: getCurrencySymbol(product),
+      itemTotal: (product?.price || 0) * item.quantity
+    };
+  });
+
+  // Group totals by currency
+  const totalsByCurrency: Record<string, number> = {};
+  itemsWithCurrency.forEach(item => {
+    const key = item.currency;
+    totalsByCurrency[key] = (totalsByCurrency[key] || 0) + item.itemTotal;
+  });
+
+  const primaryCurrency = Object.keys(totalsByCurrency)[0] || 'AFN';
+  const subtotal = totalsByCurrency[primaryCurrency] || 0;
   const shippingCost = subtotal > 0 ? 50 : 0;
   const total = subtotal + shippingCost;
+  const primarySymbol = primaryCurrency === 'USD' ? '$' : (isRTL ? '؋' : 'AFN');
 
   const texts = {
     title: isRTL ? 'سبد خرید' : 'Shopping Cart',
@@ -47,9 +84,9 @@ const Cart = () => {
     orderTotal: isRTL ? 'جمع کل' : 'Order Total',
     checkout: isRTL ? 'تکمیل خرید' : 'Checkout',
     clearCart: isRTL ? 'پاک کردن سبد' : 'Clear Cart',
-    currency: isRTL ? 'افغانی' : 'AFN',
     loading: isRTL ? 'در حال بارگذاری...' : 'Loading...',
     outOfStock: isRTL ? 'ناموجود' : 'Out of Stock',
+    viewDetails: isRTL ? 'مشاهده جزئیات' : 'View Details',
   };
 
   if (authLoading || loading) {
@@ -89,6 +126,11 @@ const Cart = () => {
         <h1 className="text-2xl font-bold mb-6 flex items-center gap-2">
           <ShoppingCart className="h-6 w-6 text-primary" />
           {texts.title}
+          {items.length > 0 && (
+            <span className="text-muted-foreground font-normal text-lg">
+              ({items.length} {isRTL ? 'محصول' : 'items'})
+            </span>
+          )}
         </h1>
 
         {items.length === 0 ? (
@@ -105,96 +147,123 @@ const Cart = () => {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Cart Items */}
             <div className="lg:col-span-2 space-y-4">
-              {items.map((item) => (
-                <Card key={item.id} className="overflow-hidden">
-                  <CardContent className="p-4">
-                    <div className="flex gap-4">
-                      {/* Product Image */}
-                      <div className="w-24 h-24 bg-muted rounded-lg overflow-hidden flex-shrink-0">
-                        {item.product?.images?.[0] ? (
-                          <img
-                            src={item.product.images[0]}
-                            alt={item.product.name}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                            <ShoppingBag size={32} />
+              {itemsWithCurrency.map((item) => {
+                const product = item.product as CartItemProduct | undefined;
+                const productSlug = product?.slug || product?.id || item.product_id;
+                
+                return (
+                  <Card key={item.id} className="overflow-hidden">
+                    <CardContent className="p-4">
+                      <div className="flex gap-4">
+                        {/* Product Image */}
+                        <Link 
+                          to={`/products/${productSlug}`}
+                          className="w-24 h-24 bg-muted rounded-lg overflow-hidden flex-shrink-0 hover:opacity-80 transition-opacity"
+                        >
+                          {product?.images?.[0] ? (
+                            <img
+                              src={product.images[0]}
+                              alt={product.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                              <ShoppingBag size={32} />
+                            </div>
+                          )}
+                        </Link>
+
+                        {/* Product Details */}
+                        <div className="flex-1 min-w-0">
+                          <Link 
+                            to={`/products/${productSlug}`}
+                            className="font-medium text-foreground line-clamp-2 mb-1 hover:text-primary transition-colors"
+                          >
+                            {product?.name || 'Product'}
+                          </Link>
+                          <p className="text-primary font-bold">
+                            {product?.price?.toLocaleString() || 0} {item.currencySymbol}
+                          </p>
+
+                          {/* Quantity Controls */}
+                          <div className="flex items-center gap-2 mt-3">
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => updateQuantity(item.product_id, item.quantity - 1)}
+                              disabled={item.quantity <= 1}
+                            >
+                              <Minus size={14} />
+                            </Button>
+                            <Input
+                              type="number"
+                              value={item.quantity}
+                              onChange={(e) => {
+                                const val = parseInt(e.target.value);
+                                if (val >= 1) updateQuantity(item.product_id, val);
+                              }}
+                              className="w-16 h-8 text-center"
+                              min={1}
+                            />
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => updateQuantity(item.product_id, item.quantity + 1)}
+                              disabled={product?.quantity !== undefined && item.quantity >= product.quantity}
+                            >
+                              <Plus size={14} />
+                            </Button>
                           </div>
-                        )}
-                      </div>
 
-                      {/* Product Details */}
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-medium text-foreground line-clamp-2 mb-1">
-                          {item.product?.name || 'Product'}
-                        </h3>
-                        <p className="text-primary font-bold">
-                          {item.product?.price?.toLocaleString() || 0} {texts.currency}
-                        </p>
-
-                        {/* Quantity Controls */}
-                        <div className="flex items-center gap-2 mt-3">
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() => updateQuantity(item.product_id, item.quantity - 1)}
-                            disabled={item.quantity <= 1}
-                          >
-                            <Minus size={14} />
-                          </Button>
-                          <Input
-                            type="number"
-                            value={item.quantity}
-                            onChange={(e) => {
-                              const val = parseInt(e.target.value);
-                              if (val >= 1) updateQuantity(item.product_id, val);
-                            }}
-                            className="w-16 h-8 text-center"
-                            min={1}
-                          />
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() => updateQuantity(item.product_id, item.quantity + 1)}
-                            disabled={item.product?.quantity !== undefined && item.quantity >= item.product.quantity}
-                          >
-                            <Plus size={14} />
-                          </Button>
+                          {product?.quantity !== undefined && item.quantity >= product.quantity && (
+                            <p className="text-xs text-destructive mt-1">
+                              {isRTL ? 'حداکثر موجودی' : 'Max stock reached'}
+                            </p>
+                          )}
                         </div>
 
-                        {item.product?.quantity !== undefined && item.quantity >= item.product.quantity && (
-                          <p className="text-xs text-destructive mt-1">
-                            {isRTL ? 'حداکثر موجودی' : 'Max stock reached'}
+                        {/* Item Total & Actions */}
+                        <div className="flex flex-col items-end justify-between">
+                          <div className="flex gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-primary hover:text-primary hover:bg-primary/10"
+                              onClick={() => navigate(`/products/${productSlug}`)}
+                              title={texts.viewDetails}
+                            >
+                              <Eye size={18} />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                              onClick={() => removeFromCart(item.product_id)}
+                            >
+                              <Trash2 size={18} />
+                            </Button>
+                          </div>
+                          <p className="font-bold text-foreground">
+                            {item.itemTotal.toLocaleString()} {item.currencySymbol}
                           </p>
-                        )}
+                        </div>
                       </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
 
-                      {/* Item Total & Remove */}
-                      <div className="flex flex-col items-end justify-between">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-destructive hover:text-destructive"
-                          onClick={() => removeFromCart(item.product_id)}
-                        >
-                          <Trash2 size={18} />
-                        </Button>
-                        <p className="font-bold text-foreground">
-                          {((item.product?.price || 0) * item.quantity).toLocaleString()} {texts.currency}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-
-              <Button variant="outline" onClick={clearCart} className="gap-2">
-                <Trash2 size={16} />
-                {texts.clearCart}
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={clearCart} className="gap-2">
+                  <Trash2 size={16} />
+                  {texts.clearCart}
+                </Button>
+                <Button variant="ghost" asChild>
+                  <Link to="/products">{texts.continueShopping}</Link>
+                </Button>
+              </div>
             </div>
 
             {/* Order Summary */}
@@ -204,19 +273,43 @@ const Cart = () => {
                   <CardTitle>{isRTL ? 'خلاصه سفارش' : 'Order Summary'}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">{texts.subtotal}</span>
-                    <span className="font-medium">{subtotal.toLocaleString()} {texts.currency}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">{texts.shipping}</span>
-                    <span className="font-medium">{shippingCost.toLocaleString()} {texts.currency}</span>
-                  </div>
-                  <Separator />
-                  <div className="flex justify-between text-lg font-bold">
-                    <span>{texts.orderTotal}</span>
-                    <span className="text-primary">{total.toLocaleString()} {texts.currency}</span>
-                  </div>
+                  {/* Show totals per currency if mixed */}
+                  {Object.keys(totalsByCurrency).length > 1 ? (
+                    <>
+                      {Object.entries(totalsByCurrency).map(([currency, amount]) => {
+                        const symbol = currency === 'USD' ? '$' : (isRTL ? '؋' : 'AFN');
+                        return (
+                          <div key={currency} className="flex justify-between">
+                            <span className="text-muted-foreground">
+                              {texts.subtotal} ({currency})
+                            </span>
+                            <span className="font-medium">{amount.toLocaleString()} {symbol}</span>
+                          </div>
+                        );
+                      })}
+                      <p className="text-xs text-muted-foreground">
+                        {isRTL 
+                          ? 'توجه: سبد خرید شامل محصولات با ارز متفاوت است' 
+                          : 'Note: Cart contains items in different currencies'}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">{texts.subtotal}</span>
+                        <span className="font-medium">{subtotal.toLocaleString()} {primarySymbol}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">{texts.shipping}</span>
+                        <span className="font-medium">{shippingCost.toLocaleString()} {primarySymbol}</span>
+                      </div>
+                      <Separator />
+                      <div className="flex justify-between text-lg font-bold">
+                        <span>{texts.orderTotal}</span>
+                        <span className="text-primary">{total.toLocaleString()} {primarySymbol}</span>
+                      </div>
+                    </>
+                  )}
                 </CardContent>
                 <CardFooter>
                   <Button className="w-full" variant="cyan" size="lg">

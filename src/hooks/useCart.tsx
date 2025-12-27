@@ -53,9 +53,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           products (
             id,
             name,
+            slug,
             price,
             images,
-            quantity
+            quantity,
+            metadata
           )
         `)
         .eq('user_id', user.id);
