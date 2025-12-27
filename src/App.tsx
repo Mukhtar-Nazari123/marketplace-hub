@@ -7,6 +7,7 @@ import { LanguageProvider } from "@/lib/i18n";
 import { AuthProvider } from "@/hooks/useAuth";
 import { CartProvider } from "@/hooks/useCart";
 import { WishlistProvider } from "@/hooks/useWishlist";
+import { CategoriesProvider } from "@/hooks/useCategories";
 import { ThemeProvider } from "next-themes";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -50,9 +51,10 @@ const App = () => (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
       <AuthProvider>
         <LanguageProvider>
-          <CartProvider>
-            <WishlistProvider>
-              <TooltipProvider>
+          <CategoriesProvider>
+            <CartProvider>
+              <WishlistProvider>
+                <TooltipProvider>
                 <Toaster />
                 <Sonner />
                 <BrowserRouter>
@@ -116,9 +118,10 @@ const App = () => (
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </BrowserRouter>
-              </TooltipProvider>
-            </WishlistProvider>
-          </CartProvider>
+                </TooltipProvider>
+              </WishlistProvider>
+            </CartProvider>
+          </CategoriesProvider>
         </LanguageProvider>
       </AuthProvider>
     </ThemeProvider>

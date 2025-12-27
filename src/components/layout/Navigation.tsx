@@ -4,21 +4,15 @@ import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/lib/i18n";
+import { useCategories } from "@/hooks/useCategories";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Navigation = () => {
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const { t, isRTL } = useLanguage();
+  const { getRootCategories, loading } = useCategories();
 
-  const categories = [
-    t.categories.electronics,
-    t.categories.fashion,
-    t.categories.homeGarden,
-    t.categories.sports,
-    t.categories.healthBeauty,
-    t.categories.toysGames,
-    t.categories.automotive,
-    t.categories.booksMedia,
-  ];
+  const rootCategories = getRootCategories();
 
   const navLinks = [
     { label: t.nav.products, icon: Package, href: "/products" },
@@ -48,16 +42,29 @@ const Navigation = () => {
             {/* Category Dropdown Menu */}
             {isCategoryOpen && (
               <div className={`absolute top-full w-64 bg-card border border-border shadow-xl rounded-b-lg z-50 animate-fade-in ${isRTL ? 'left-0' : 'right-0'}`}>
-                {categories.map((category, index) => (
-                  <Link
-                    key={category}
-                    to={`/categories/${encodeURIComponent(category)}`}
-                    className="flex items-center px-4 py-3 hover:bg-orange/10 hover:text-orange transition-colors border-b border-border last:border-b-0"
-                    style={{ animationDelay: `${index * 50}ms` }}
-                  >
-                    {category}
-                  </Link>
-                ))}
+                {loading ? (
+                  <div className="p-4 space-y-2">
+                    {[...Array(4)].map((_, i) => (
+                      <Skeleton key={i} className="h-8 w-full" />
+                    ))}
+                  </div>
+                ) : rootCategories.length > 0 ? (
+                  rootCategories.map((category, index) => (
+                    <Link
+                      key={category.id}
+                      to={`/categories?category=${category.slug}`}
+                      className="flex items-center px-4 py-3 hover:bg-orange/10 hover:text-orange transition-colors border-b border-border last:border-b-0"
+                      style={{ animationDelay: `${index * 50}ms` }}
+                      onClick={() => setIsCategoryOpen(false)}
+                    >
+                      {category.name}
+                    </Link>
+                  ))
+                ) : (
+                  <div className="px-4 py-3 text-muted-foreground text-sm">
+                    {isRTL ? 'دسته‌بندی موجود نیست' : 'No categories available'}
+                  </div>
+                )}
               </div>
             )}
           </div>

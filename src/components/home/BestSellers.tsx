@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import ProductCard from "./ProductCard";
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/lib/i18n";
+import { useCategories } from "@/hooks/useCategories";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -18,18 +19,19 @@ interface Product {
 
 const BestSellers = () => {
   const { t, isRTL } = useLanguage();
+  const { getRootCategories, loading: categoriesLoading } = useCategories();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
-  const categories = [
-    t.categories.electronics,
-    t.bestSellers.television,
-    t.bestSellers.airConditional,
-    t.bestSellers.laptopsAccessories,
-    t.bestSellers.smartphoneTablets,
-  ];
-  
-  const [activeCategory, setActiveCategory] = useState(categories[0]);
+  const rootCategories = getRootCategories().slice(0, 5);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+
+  // Set first category as active when categories load
+  useEffect(() => {
+    if (rootCategories.length > 0 && !activeCategory) {
+      setActiveCategory(rootCategories[0].slug);
+    }
+  }, [rootCategories, activeCategory]);
 
   useEffect(() => {
     fetchActiveProducts();
@@ -88,17 +90,27 @@ const BestSellers = () => {
             </Button>
           </div>
           <div className="flex items-center gap-2 overflow-x-auto pb-2 lg:pb-0">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setActiveCategory(category)}
-                className={`px-4 py-2 text-sm font-medium whitespace-nowrap rounded-lg transition-all ${
-                  activeCategory === category ? "bg-cyan text-primary-foreground" : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                }`}
-              >
-                {category}
-              </button>
-            ))}
+            {categoriesLoading ? (
+              [...Array(4)].map((_, i) => (
+                <Skeleton key={i} className="h-10 w-24" />
+              ))
+            ) : rootCategories.length > 0 ? (
+              rootCategories.map((category) => (
+                <button
+                  key={category.id}
+                  onClick={() => setActiveCategory(category.slug)}
+                  className={`px-4 py-2 text-sm font-medium whitespace-nowrap rounded-lg transition-all ${
+                    activeCategory === category.slug ? "bg-cyan text-primary-foreground" : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  }`}
+                >
+                  {category.name}
+                </button>
+              ))
+            ) : (
+              <span className="text-sm text-muted-foreground">
+                {isRTL ? 'دسته‌بندی موجود نیست' : 'No categories'}
+              </span>
+            )}
           </div>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">

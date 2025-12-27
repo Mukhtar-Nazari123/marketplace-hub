@@ -1,7 +1,8 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useLanguage } from '@/lib/i18n';
-import { categories, products } from '@/data/mockData';
+import { useCategories } from '@/hooks/useCategories';
+import { supabase } from '@/integrations/supabase/client';
 import ProductFilters, { FilterState } from '@/components/ui/ProductFilters';
 import ProductGrid from '@/components/products/ProductGrid';
 import TopBar from '@/components/layout/TopBar';
@@ -9,7 +10,8 @@ import Header from '@/components/layout/Header';
 import Navigation from '@/components/layout/Navigation';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, SlidersHorizontal, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, SlidersHorizontal, X, Package } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Select,
   SelectContent,
@@ -17,13 +19,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { products as mockProducts } from '@/data/mockData';
+
+interface DbProduct {
+  id: string;
+  name: string;
+  slug: string;
+  price: number;
+  compare_at_price: number | null;
+  images: string[] | null;
+  category_id: string | null;
+  quantity: number;
+  is_featured: boolean;
+  metadata: Record<string, unknown> | null;
+}
 
 const Categories = () => {
-  const { t, language, isRTL } = useLanguage();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const selectedCategory = searchParams.get('category');
-  const selectedSubcategory = searchParams.get('subcategory');
+  const { t, isRTL } = useLanguage();
+  const [searchParams] = useSearchParams();
+  const selectedCategorySlug = searchParams.get('category');
+  const selectedSubcategorySlug = searchParams.get('subcategory');
 
+  const { getRootCategories, getCategoryBySlug, getSubcategories, loading: categoriesLoading } = useCategories();
+  const rootCategories = getRootCategories();
+  
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState('latest');
   const [showFilters, setShowFilters] = useState(false);
@@ -35,21 +54,85 @@ const Categories = () => {
     inStock: false,
     onSale: false,
   });
+  const [dbProducts, setDbProducts] = useState<DbProduct[]>([]);
+  const [productsLoading, setProductsLoading] = useState(true);
 
-  const currentCategory = categories.find(c => c.slug === selectedCategory);
+  const currentCategory = selectedCategorySlug ? getCategoryBySlug(selectedCategorySlug) : undefined;
+  const currentSubcategory = selectedSubcategorySlug ? getCategoryBySlug(selectedSubcategorySlug) : undefined;
+  const subcategories = currentCategory ? getSubcategories(currentCategory.id) : [];
+
+  // Fetch products from database
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setProductsLoading(true);
+      try {
+        let query = supabase
+          .from('products')
+          .select('id, name, slug, price, compare_at_price, images, category_id, quantity, is_featured, metadata')
+          .eq('status', 'active');
+
+        if (currentCategory) {
+          // Get all category IDs including subcategories
+          const categoryIds = [currentCategory.id, ...subcategories.map(s => s.id)];
+          if (currentSubcategory) {
+            query = query.eq('category_id', currentSubcategory.id);
+          } else {
+            query = query.in('category_id', categoryIds);
+          }
+        }
+
+        const { data, error } = await query.order('created_at', { ascending: false });
+
+        if (error) throw error;
+        setDbProducts((data || []) as DbProduct[]);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      } finally {
+        setProductsLoading(false);
+      }
+    };
+
+    if (!categoriesLoading) {
+      fetchProducts();
+    }
+  }, [currentCategory, currentSubcategory, subcategories, categoriesLoading]);
+
+  // Convert DB products to display format
+  const displayProducts = useMemo(() => {
+    return dbProducts.map(p => {
+      const metadata = p.metadata as { currency?: 'AFN' | 'USD' } | null;
+      const discount = p.compare_at_price 
+        ? Math.round(((p.compare_at_price - p.price) / p.compare_at_price) * 100)
+        : undefined;
+
+      return {
+        id: p.id,
+        name: { fa: p.name, en: p.name },
+        slug: p.slug,
+        price: p.price,
+        originalPrice: p.compare_at_price || undefined,
+        images: p.images || [],
+        category: currentCategory?.slug || '',
+        subcategory: currentSubcategory?.slug,
+        brand: 'Unknown',
+        rating: 4,
+        reviewCount: 0,
+        inStock: p.quantity > 0,
+        isNew: p.is_featured,
+        isHot: false,
+        discount,
+        seller: { id: '', name: '', rating: 0, productCount: 0, avatar: '' },
+        description: { fa: '', en: '' },
+        specifications: [],
+      };
+    });
+  }, [dbProducts, currentCategory, currentSubcategory]);
+
+  // Use mock products as fallback if no DB products
+  const allProducts = displayProducts.length > 0 ? displayProducts : mockProducts;
 
   const filteredProducts = useMemo(() => {
-    let result = [...products];
-
-    // Filter by category
-    if (selectedCategory) {
-      result = result.filter(p => p.category === selectedCategory);
-    }
-
-    // Filter by subcategory
-    if (selectedSubcategory) {
-      result = result.filter(p => p.subcategory === selectedSubcategory);
-    }
+    let result = [...allProducts];
 
     // Filter by price range
     result = result.filter(
@@ -59,11 +142,6 @@ const Categories = () => {
     // Filter by rating
     if (filters.rating > 0) {
       result = result.filter(p => p.rating >= filters.rating);
-    }
-
-    // Filter by brands
-    if (filters.brands.length > 0) {
-      result = result.filter(p => filters.brands.includes(p.brand));
     }
 
     // Filter by stock
@@ -94,7 +172,9 @@ const Categories = () => {
     }
 
     return result;
-  }, [selectedCategory, selectedSubcategory, filters, sortBy]);
+  }, [allProducts, filters, sortBy]);
+
+  const isLoading = categoriesLoading || productsLoading;
 
   return (
     <div className="min-h-screen bg-background">
@@ -110,11 +190,19 @@ const Categories = () => {
               {t.pages.home}
             </Link>
             {isRTL ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
-            <span className="text-foreground">{t.categories.title}</span>
+            <Link to="/categories" className="text-muted-foreground hover:text-primary">
+              {t.categories.title}
+            </Link>
             {currentCategory && (
               <>
                 {isRTL ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
-                <span className="text-primary">{currentCategory.name[language]}</span>
+                <span className="text-primary">{currentCategory.name}</span>
+              </>
+            )}
+            {currentSubcategory && (
+              <>
+                {isRTL ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
+                <span className="text-primary">{currentSubcategory.name}</span>
               </>
             )}
           </div>
@@ -128,40 +216,52 @@ const Categories = () => {
             {/* Categories List */}
             <div className="bg-card rounded-xl p-4 shadow-sm border border-border mb-6">
               <h3 className="font-bold text-foreground mb-4">{t.categories.allCategories}</h3>
-              <div className="space-y-2">
-                {categories.map((cat) => (
-                  <div key={cat.id}>
-                    <Link
-                      to={`/categories?category=${cat.slug}`}
-                      className={`flex items-center justify-between p-2 rounded-lg transition-colors ${
-                        selectedCategory === cat.slug
-                          ? 'bg-primary/10 text-primary'
-                          : 'hover:bg-muted'
-                      }`}
-                    >
-                      <span className="text-sm">{cat.name[language]}</span>
-                      {isRTL ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
-                    </Link>
-                    {selectedCategory === cat.slug && cat.subcategories.length > 0 && (
-                      <div className={`${isRTL ? 'pr-4' : 'pl-4'} mt-1 space-y-1`}>
-                        {cat.subcategories.map((sub) => (
-                          <Link
-                            key={sub.id}
-                            to={`/categories?category=${cat.slug}&subcategory=${sub.slug}`}
-                            className={`block p-2 text-sm rounded-lg transition-colors ${
-                              selectedSubcategory === sub.slug
-                                ? 'bg-primary/10 text-primary'
-                                : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                            }`}
-                          >
-                            {sub.name[language]}
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
+              {categoriesLoading ? (
+                <div className="space-y-2">
+                  {[...Array(5)].map((_, i) => (
+                    <Skeleton key={i} className="h-10 w-full" />
+                  ))}
+                </div>
+              ) : rootCategories.length > 0 ? (
+                <div className="space-y-2">
+                  {rootCategories.map((cat) => (
+                    <div key={cat.id}>
+                      <Link
+                        to={`/categories?category=${cat.slug}`}
+                        className={`flex items-center justify-between p-2 rounded-lg transition-colors ${
+                          selectedCategorySlug === cat.slug
+                            ? 'bg-primary/10 text-primary'
+                            : 'hover:bg-muted'
+                        }`}
+                      >
+                        <span className="text-sm">{cat.name}</span>
+                        {isRTL ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
+                      </Link>
+                      {selectedCategorySlug === cat.slug && cat.subcategories && cat.subcategories.length > 0 && (
+                        <div className={`${isRTL ? 'pr-4' : 'pl-4'} mt-1 space-y-1`}>
+                          {cat.subcategories.map((sub) => (
+                            <Link
+                              key={sub.id}
+                              to={`/categories?category=${cat.slug}&subcategory=${sub.slug}`}
+                              className={`block p-2 text-sm rounded-lg transition-colors ${
+                                selectedSubcategorySlug === sub.slug
+                                  ? 'bg-primary/10 text-primary'
+                                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                              }`}
+                            >
+                              {sub.name}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  {isRTL ? 'دسته‌بندی موجود نیست' : 'No categories available'}
+                </p>
+              )}
             </div>
 
             <ProductFilters onFilterChange={setFilters} />
@@ -173,7 +273,7 @@ const Categories = () => {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
               <div>
                 <h1 className="text-2xl font-bold text-foreground">
-                  {currentCategory ? currentCategory.name[language] : t.categories.allCategories}
+                  {currentSubcategory?.name || currentCategory?.name || t.categories.allCategories}
                 </h1>
                 <p className="text-muted-foreground">
                   {filteredProducts.length} {isRTL ? 'محصول' : 'products'}
@@ -207,37 +307,72 @@ const Categories = () => {
             </div>
 
             {/* Category Cards (when no category selected) */}
-            {!selectedCategory && (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
-                {categories.map((cat) => (
-                  <Link
-                    key={cat.id}
-                    to={`/categories?category=${cat.slug}`}
-                    className="group relative aspect-square rounded-xl overflow-hidden"
-                  >
-                    <img
-                      src={cat.image}
-                      alt={cat.name[language]}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                    <div className="absolute bottom-0 left-0 right-0 p-4">
-                      <h3 className="text-white font-bold text-lg">{cat.name[language]}</h3>
-                      <p className="text-white/70 text-sm">
-                        {cat.subcategories.length} {t.categories.subcategories}
-                      </p>
-                    </div>
-                  </Link>
-                ))}
+            {!selectedCategorySlug && (
+              <div className="mb-8">
+                {categoriesLoading ? (
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {[...Array(4)].map((_, i) => (
+                      <Skeleton key={i} className="aspect-square rounded-xl" />
+                    ))}
+                  </div>
+                ) : rootCategories.length > 0 ? (
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {rootCategories.map((cat) => (
+                      <Link
+                        key={cat.id}
+                        to={`/categories?category=${cat.slug}`}
+                        className="group relative aspect-square rounded-xl overflow-hidden bg-gradient-to-br from-primary/10 to-primary/5 border border-border"
+                      >
+                        {cat.image_url ? (
+                          <img
+                            src={cat.image_url}
+                            alt={cat.name}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Package className="h-16 w-16 text-muted-foreground" />
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                        <div className="absolute bottom-0 left-0 right-0 p-4">
+                          <h3 className="text-white font-bold text-lg">{cat.name}</h3>
+                          <p className="text-white/70 text-sm">
+                            {cat.subcategories?.length || 0} {t.categories.subcategories}
+                          </p>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <Package className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+                    <p className="text-muted-foreground">
+                      {isRTL ? 'هنوز دسته‌بندی‌ای وجود ندارد' : 'No categories available yet'}
+                    </p>
+                  </div>
+                )}
               </div>
             )}
 
             {/* Products Grid */}
-            <ProductGrid
-              products={filteredProducts}
-              viewMode={viewMode}
-              onViewModeChange={setViewMode}
-            />
+            {isLoading ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {[...Array(8)].map((_, i) => (
+                  <div key={i} className="space-y-3">
+                    <Skeleton className="aspect-square rounded-lg" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <ProductGrid
+                products={filteredProducts}
+                viewMode={viewMode}
+                onViewModeChange={setViewMode}
+              />
+            )}
           </main>
         </div>
       </div>
