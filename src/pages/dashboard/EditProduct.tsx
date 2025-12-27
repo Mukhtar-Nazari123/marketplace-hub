@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { useLanguage } from '@/lib/i18n';
 import { useAuth } from '@/hooks/useAuth';
@@ -14,38 +14,18 @@ import { PricingStep } from '@/components/products/add/PricingStep';
 import { ReviewStep } from '@/components/products/add/ReviewStep';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, ArrowRight, Save, Send, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ProductFormData } from './AddProduct';
 
-export interface ProductFormData {
-  // Category
-  categoryId: string;
-  categoryName: string;
-  subCategoryId: string;
-  subCategoryName: string;
-  
-  // Basic Info
-  name: string;
-  shortDescription: string;
-  description: string;
-  brand: string;
-  
-  // Category-specific attributes
-  attributes: Record<string, string | boolean | string[]>;
-  
-  // Media
-  images: File[];
-  imageUrls: string[];
-  video: File | null;
-  videoUrl: string;
-  
-  // Pricing & Inventory
-  price: number;
-  discountPrice: number | null;
-  quantity: number;
-  sku: string;
-  stockPerSize?: Record<string, number>;
-}
+const STEPS = [
+  { id: 1, title: 'Category', titleFa: 'دسته‌بندی' },
+  { id: 2, title: 'Basic Info', titleFa: 'اطلاعات پایه' },
+  { id: 3, title: 'Media', titleFa: 'رسانه' },
+  { id: 4, title: 'Pricing', titleFa: 'قیمت‌گذاری' },
+  { id: 5, title: 'Review', titleFa: 'بررسی' },
+];
 
 const initialFormData: ProductFormData = {
   categoryId: '',
@@ -68,15 +48,8 @@ const initialFormData: ProductFormData = {
   stockPerSize: {},
 };
 
-const STEPS = [
-  { id: 1, title: 'Category', titleFa: 'دسته‌بندی' },
-  { id: 2, title: 'Basic Info', titleFa: 'اطلاعات پایه' },
-  { id: 3, title: 'Media', titleFa: 'رسانه' },
-  { id: 4, title: 'Pricing', titleFa: 'قیمت‌گذاری' },
-  { id: 5, title: 'Review', titleFa: 'بررسی' },
-];
-
-const AddProduct = () => {
+const EditProduct = () => {
+  const { id } = useParams<{ id: string }>();
   const { isRTL } = useLanguage();
   const { user } = useAuth();
   const { status: sellerStatus } = useSellerStatus();
@@ -86,19 +59,63 @@ const AddProduct = () => {
   const [formData, setFormData] = useState<ProductFormData>(initialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [draftId, setDraftId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const isVerifiedSeller = sellerStatus === 'approved';
 
-  // Auto-save draft every 30 seconds
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (formData.name && user) {
-        saveDraft(true);
+    if (id && user) {
+      fetchProduct();
+    }
+  }, [id, user]);
+
+  const fetchProduct = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('id', id)
+        .eq('seller_id', user?.id)
+        .single();
+
+      if (error) throw error;
+
+      if (!data) {
+        toast.error(isRTL ? 'محصول یافت نشد' : 'Product not found');
+        navigate('/dashboard/seller/products');
+        return;
       }
-    }, 30000);
-    return () => clearInterval(interval);
-  }, [formData, user]);
+
+      const metadata = (data.metadata as Record<string, unknown>) || {};
+      
+      setFormData({
+        categoryId: (metadata.categoryId as string) || '',
+        categoryName: (metadata.categoryName as string) || '',
+        subCategoryId: (metadata.subCategoryId as string) || '',
+        subCategoryName: (metadata.subCategoryName as string) || '',
+        name: data.name,
+        shortDescription: (metadata.shortDescription as string) || '',
+        description: data.description || '',
+        brand: (metadata.brand as string) || '',
+        attributes: (metadata.attributes as Record<string, string | boolean | string[]>) || {},
+        images: [],
+        imageUrls: data.images || [],
+        video: null,
+        videoUrl: (metadata.videoUrl as string) || '',
+        price: data.price,
+        discountPrice: data.compare_at_price,
+        quantity: data.quantity,
+        sku: data.sku || '',
+        stockPerSize: (metadata.stockPerSize as Record<string, number>) || {},
+      });
+    } catch (error) {
+      console.error('Error fetching product:', error);
+      toast.error(isRTL ? 'خطا در دریافت محصول' : 'Error fetching product');
+      navigate('/dashboard/seller/products');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const updateFormData = (updates: Partial<ProductFormData>) => {
     setFormData(prev => ({ ...prev, ...updates }));
@@ -147,10 +164,9 @@ const AddProduct = () => {
     let uploadedVideoUrl = formData.videoUrl;
 
     try {
-      // Upload images - path must start with user ID for RLS policy
       for (const image of formData.images) {
         const fileName = `${user?.id}/products/${Date.now()}-${image.name}`;
-        const { data, error } = await supabase.storage
+        const { error } = await supabase.storage
           .from('seller-assets')
           .upload(fileName, image);
 
@@ -163,10 +179,9 @@ const AddProduct = () => {
         uploadedImageUrls.push(urlData.publicUrl);
       }
 
-      // Upload video if exists - path must start with user ID for RLS policy
       if (formData.video) {
         const fileName = `${user?.id}/videos/${Date.now()}-${formData.video.name}`;
-        const { data, error } = await supabase.storage
+        const { error } = await supabase.storage
           .from('seller-assets')
           .upload(fileName, formData.video);
 
@@ -185,70 +200,8 @@ const AddProduct = () => {
     }
   };
 
-  const saveDraft = async (silent = false) => {
-    if (!user) return;
-
-    try {
-      const { imageUrls, videoUrl } = formData.images.length > 0 || formData.video
-        ? await uploadMedia()
-        : { imageUrls: formData.imageUrls, videoUrl: formData.videoUrl };
-
-      const productData = {
-        seller_id: user.id,
-        name: formData.name || 'Untitled Draft',
-        slug: formData.name ? formData.name.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now() : `draft-${Date.now()}`,
-        description: formData.description,
-        price: formData.price || 0,
-        compare_at_price: formData.discountPrice,
-        quantity: formData.quantity,
-        sku: formData.sku || null,
-        category_id: null, // Using null since categories table uses UUIDs, storing category info in metadata
-        images: imageUrls,
-        status: 'draft' as const,
-        metadata: {
-          shortDescription: formData.shortDescription,
-          brand: formData.brand,
-          attributes: formData.attributes,
-          videoUrl,
-          stockPerSize: formData.stockPerSize,
-          categoryId: formData.categoryId,
-          categoryName: formData.categoryName,
-          subCategoryId: formData.subCategoryId,
-          subCategoryName: formData.subCategoryName,
-        },
-      };
-
-      if (draftId) {
-        const { error } = await supabase
-          .from('products')
-          .update(productData)
-          .eq('id', draftId);
-
-        if (error) throw error;
-      } else {
-        const { data, error } = await supabase
-          .from('products')
-          .insert(productData)
-          .select('id')
-          .single();
-
-        if (error) throw error;
-        setDraftId(data.id);
-      }
-
-      if (!silent) {
-        toast.success(isRTL ? 'پیش‌نویس ذخیره شد' : 'Draft saved');
-      }
-    } catch (error) {
-      console.error('Error saving draft:', error);
-      if (!silent) {
-        toast.error(isRTL ? 'خطا در ذخیره پیش‌نویس' : 'Error saving draft');
-      }
-    }
-  };
-
-  const submitProduct = async (asDraft = false) => {
-    if (!user) return;
+  const updateProduct = async (asDraft = false) => {
+    if (!user || !id) return;
 
     setIsSubmitting(true);
 
@@ -263,13 +216,9 @@ const AddProduct = () => {
         return;
       }
 
-      let status = 'draft';
-      if (!asDraft) {
-        status = isVerifiedSeller ? 'pending' : 'draft';
-      }
+      let status = asDraft ? 'draft' : (isVerifiedSeller ? 'pending' : 'draft');
 
       const productData = {
-        seller_id: user.id,
         name: formData.name,
         slug: formData.name.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now(),
         description: formData.description,
@@ -277,9 +226,9 @@ const AddProduct = () => {
         compare_at_price: formData.discountPrice,
         quantity: formData.quantity,
         sku: formData.sku || null,
-        category_id: null, // Using null since categories table uses UUIDs, storing category info in metadata
+        category_id: null,
         images: imageUrls,
-        status: status as 'draft' | 'pending' | 'active',
+        status,
         metadata: {
           shortDescription: formData.shortDescription,
           brand: formData.brand,
@@ -293,33 +242,25 @@ const AddProduct = () => {
         },
       };
 
-      if (draftId) {
-        const { error } = await supabase
-          .from('products')
-          .update(productData)
-          .eq('id', draftId);
+      const { error } = await supabase
+        .from('products')
+        .update(productData)
+        .eq('id', id);
 
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from('products')
-          .insert(productData);
-
-        if (error) throw error;
-      }
+      if (error) throw error;
 
       if (asDraft) {
         toast.success(isRTL ? 'پیش‌نویس ذخیره شد' : 'Draft saved successfully');
       } else if (isVerifiedSeller) {
         toast.success(isRTL ? 'محصول برای بررسی ارسال شد' : 'Product submitted for review');
       } else {
-        toast.info(isRTL ? 'محصول به عنوان پیش‌نویس ذخیره شد. پس از تأیید حساب می‌توانید منتشر کنید.' : 'Product saved as draft. You can publish after account verification.');
+        toast.info(isRTL ? 'محصول به عنوان پیش‌نویس ذخیره شد' : 'Product saved as draft');
       }
 
       navigate('/dashboard/seller/products');
     } catch (error) {
-      console.error('Error submitting product:', error);
-      toast.error(isRTL ? 'خطا در ارسال محصول' : 'Error submitting product');
+      console.error('Error updating product:', error);
+      toast.error(isRTL ? 'خطا در بروزرسانی محصول' : 'Error updating product');
     } finally {
       setIsSubmitting(false);
     }
@@ -342,35 +283,50 @@ const AddProduct = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <DashboardLayout
+        title={isRTL ? 'ویرایش محصول' : 'Edit Product'}
+        description={isRTL ? 'ویرایش محصول' : 'Edit your product'}
+        allowedRoles={['seller']}
+      >
+        <div className="max-w-4xl mx-auto space-y-6">
+          <Card className="p-6">
+            <Skeleton className="h-12 w-full" />
+          </Card>
+          <Card className="p-6">
+            <Skeleton className="h-64 w-full" />
+          </Card>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout
-      title={isRTL ? 'افزودن محصول' : 'Add Product'}
-      description={isRTL ? 'محصول جدید به فروشگاه اضافه کنید' : 'Add a new product to your store'}
+      title={isRTL ? 'ویرایش محصول' : 'Edit Product'}
+      description={isRTL ? 'ویرایش محصول' : 'Edit your product'}
       allowedRoles={['seller']}
     >
       <div className="max-w-4xl mx-auto space-y-6">
-        {/* Seller verification warning */}
         {!isVerifiedSeller && (
           <Card className="p-4 border-warning/50 bg-warning/10">
             <p className="text-sm text-warning-foreground">
               {isRTL
-                ? 'حساب شما هنوز تأیید نشده است. می‌توانید محصولات را به عنوان پیش‌نویس ذخیره کنید اما قادر به انتشار نیستید.'
-                : 'Your account is not verified yet. You can save products as drafts but cannot publish them.'}
+                ? 'حساب شما هنوز تأیید نشده است. می‌توانید محصولات را به عنوان پیش‌نویس ذخیره کنید.'
+                : 'Your account is not verified yet. You can save products as drafts.'}
             </p>
           </Card>
         )}
 
-        {/* Stepper */}
         <Card className="p-6">
           <ProductStepper steps={STEPS} currentStep={currentStep} onStepClick={goToStep} />
         </Card>
 
-        {/* Step Content */}
         <Card className="p-6 animate-fade-in">
           {renderStep()}
         </Card>
 
-        {/* Navigation Buttons */}
         <div className={cn(
           "flex gap-4",
           isRTL ? "flex-row-reverse" : "flex-row",
@@ -378,11 +334,7 @@ const AddProduct = () => {
         )}>
           <div className={cn("flex gap-2", isRTL && "flex-row-reverse")}>
             {currentStep > 1 && (
-              <Button
-                variant="outline"
-                onClick={prevStep}
-                className="gap-2"
-              >
+              <Button variant="outline" onClick={prevStep} className="gap-2">
                 {isRTL ? <ArrowRight className="h-4 w-4" /> : <ArrowLeft className="h-4 w-4" />}
                 {isRTL ? 'قبلی' : 'Previous'}
               </Button>
@@ -390,22 +342,8 @@ const AddProduct = () => {
           </div>
 
           <div className={cn("flex gap-2", isRTL && "flex-row-reverse")}>
-            <Button
-              variant="outline"
-              onClick={() => saveDraft()}
-              disabled={isSubmitting || !formData.name}
-              className="gap-2"
-            >
-              <Save className="h-4 w-4" />
-              {isRTL ? 'ذخیره پیش‌نویس' : 'Save Draft'}
-            </Button>
-
             {currentStep < 5 ? (
-              <Button
-                onClick={nextStep}
-                disabled={!canProceed}
-                className="gap-2"
-              >
+              <Button onClick={nextStep} disabled={!canProceed} className="gap-2">
                 {isRTL ? 'بعدی' : 'Next'}
                 {isRTL ? <ArrowLeft className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
               </Button>
@@ -413,7 +351,7 @@ const AddProduct = () => {
               <>
                 <Button
                   variant="secondary"
-                  onClick={() => submitProduct(true)}
+                  onClick={() => updateProduct(true)}
                   disabled={isSubmitting || isUploading}
                   className="gap-2"
                 >
@@ -421,7 +359,7 @@ const AddProduct = () => {
                   {isRTL ? 'ذخیره پیش‌نویس' : 'Save as Draft'}
                 </Button>
                 <Button
-                  onClick={() => submitProduct(false)}
+                  onClick={() => updateProduct(false)}
                   disabled={isSubmitting || isUploading || !canProceed}
                   className="gap-2"
                 >
@@ -430,7 +368,7 @@ const AddProduct = () => {
                     ? (isRTL ? 'در حال ارسال...' : 'Submitting...')
                     : isVerifiedSeller
                       ? (isRTL ? 'ارسال برای بررسی' : 'Submit for Review')
-                      : (isRTL ? 'ذخیره (نیاز به تأیید)' : 'Save (Needs Verification)')}
+                      : (isRTL ? 'ذخیره' : 'Save')}
                 </Button>
               </>
             )}
@@ -441,4 +379,4 @@ const AddProduct = () => {
   );
 };
 
-export default AddProduct;
+export default EditProduct;
