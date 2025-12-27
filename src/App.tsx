@@ -29,6 +29,7 @@ import AdminBanners from "./pages/admin/AdminBanners";
 import AdminPromotions from "./pages/admin/AdminPromotions";
 import AdminCMS from "./pages/admin/AdminCMS";
 import AdminSettings from "./pages/admin/AdminSettings";
+import AdminProductView from "./pages/admin/AdminProductView";
 import BuyerProfile from "./pages/dashboard/BuyerProfile";
 import DashboardIndex from "./pages/dashboard/DashboardIndex";
 import BuyerDashboard from "./pages/dashboard/BuyerDashboard";
@@ -77,6 +78,7 @@ const App = () => (
                     <Route path="/dashboard/admin" element={<AdminDashboard />} />
                     <Route path="/dashboard/users" element={<AdminUsers />} />
                     <Route path="/dashboard/products" element={<AdminProducts />} />
+                    <Route path="/admin/products/:id" element={<AdminProductView />} />
                     <Route path="/dashboard/orders" element={<AdminOrders />} />
                     <Route path="/dashboard/sellers" element={<AdminSellers />} />
                     <Route path="/dashboard/banners" element={<AdminBanners />} />
