@@ -132,6 +132,7 @@ export type Database = {
           image_url: string | null
           is_active: boolean
           name: string
+          name_fa: string | null
           parent_id: string | null
           slug: string
           sort_order: number
@@ -144,6 +145,7 @@ export type Database = {
           image_url?: string | null
           is_active?: boolean
           name: string
+          name_fa?: string | null
           parent_id?: string | null
           slug: string
           sort_order?: number
@@ -156,6 +158,7 @@ export type Database = {
           image_url?: string | null
           is_active?: boolean
           name?: string
+          name_fa?: string | null
           parent_id?: string | null
           slug?: string
           sort_order?: number
@@ -568,6 +571,56 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      subcategories: {
+        Row: {
+          category_id: string
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          name: string
+          name_fa: string | null
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          category_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          name: string
+          name_fa?: string | null
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          category_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          name?: string
+          name_fa?: string | null
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subcategories_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
