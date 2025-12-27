@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useLanguage } from '@/lib/i18n';
+import { useCategories } from '@/hooks/useCategories';
 import { Slider } from '@/components/ui/slider';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Star, ChevronDown, ChevronUp } from 'lucide-react';
-import { categories, brands } from '@/data/mockData';
+import { brands } from '@/data/mockData';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface ProductFiltersProps {
   onFilterChange: (filters: FilterState) => void;
@@ -21,7 +23,8 @@ export interface FilterState {
 }
 
 const ProductFilters = ({ onFilterChange, className = '' }: ProductFiltersProps) => {
-  const { t, language, isRTL } = useLanguage();
+  const { t, isRTL } = useLanguage();
+  const { getRootCategories, loading: categoriesLoading } = useCategories();
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 150000]);
   const [selectedRating, setSelectedRating] = useState(0);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
@@ -34,6 +37,8 @@ const ProductFilters = ({ onFilterChange, className = '' }: ProductFiltersProps)
     brand: true,
     category: true,
   });
+
+  const rootCategories = getRootCategories();
 
   const toggleSection = (section: keyof typeof expandedSections) => {
     setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
@@ -183,15 +188,25 @@ const ProductFilters = ({ onFilterChange, className = '' }: ProductFiltersProps)
         </button>
         {expandedSections.category && (
           <div className="mt-3 space-y-2 max-h-48 overflow-y-auto">
-            {categories.map((cat) => (
-              <label key={cat.id} className="flex items-center gap-2 cursor-pointer p-1">
-                <Checkbox
-                  checked={selectedCategories.includes(cat.slug)}
-                  onCheckedChange={() => handleCategoryChange(cat.slug)}
-                />
-                <span className="text-sm">{cat.name[language]}</span>
-              </label>
-            ))}
+            {categoriesLoading ? (
+              [...Array(4)].map((_, i) => (
+                <Skeleton key={i} className="h-6 w-full" />
+              ))
+            ) : rootCategories.length > 0 ? (
+              rootCategories.map((cat) => (
+                <label key={cat.id} className="flex items-center gap-2 cursor-pointer p-1">
+                  <Checkbox
+                    checked={selectedCategories.includes(cat.slug)}
+                    onCheckedChange={() => handleCategoryChange(cat.slug)}
+                  />
+                  <span className="text-sm">{cat.name}</span>
+                </label>
+              ))
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                {isRTL ? 'دسته‌بندی موجود نیست' : 'No categories available'}
+              </p>
+            )}
           </div>
         )}
       </div>
