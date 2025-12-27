@@ -87,23 +87,41 @@ const ProductDetail = () => {
       
       setLoading(true);
       try {
-        const { data, error } = await supabase
+        // Check if slug is a UUID (product ID) or actual slug
+        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
+        
+        let query = supabase
           .from('products')
           .select(`
             *,
             category:categories(id, name, slug),
-            seller:seller_verifications!products_seller_id_fkey(business_name, store_logo)
+            seller:seller_verifications(business_name, store_logo)
           `)
-          .eq('slug', slug)
-          .eq('status', 'active')
-          .single();
+          .eq('status', 'active');
+        
+        if (isUUID) {
+          query = query.eq('id', slug);
+        } else {
+          query = query.eq('slug', slug);
+        }
+        
+        const { data, error } = await query.maybeSingle();
 
         if (error) throw error;
+        if (!data) {
+          setProduct(null);
+          setLoading(false);
+          return;
+        }
         
-        // Transform the seller data
+        // Transform the seller data - need to match by seller_id
+        const sellerData = Array.isArray(data.seller) 
+          ? data.seller.find((s: any) => s) 
+          : data.seller;
+        
         const productData = {
           ...data,
-          seller: Array.isArray(data.seller) ? data.seller[0] : data.seller
+          seller: sellerData || null
         };
         
         setProduct(productData as Product);
