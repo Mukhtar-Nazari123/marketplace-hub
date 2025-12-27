@@ -35,6 +35,7 @@ import BuyerDashboard from "./pages/dashboard/BuyerDashboard";
 import SellerDashboard from "./pages/dashboard/SellerDashboard";
 import SellerPending from "./pages/dashboard/SellerPending";
 import AddProduct from "./pages/dashboard/AddProduct";
+import SellerProducts from "./pages/dashboard/SellerProducts";
 import SellerProfileChoice from "./pages/seller/SellerProfileChoice";
 import SellerProfileComplete from "./pages/seller/SellerProfileComplete";
 import Wishlist from "./pages/dashboard/Wishlist";
@@ -93,7 +94,7 @@ const App = () => (
 
               {/* Seller Routes */}
               <Route path="/dashboard/seller" element={<SellerDashboard />} />
-              <Route path="/dashboard/seller/products" element={<SellerDashboard />} />
+              <Route path="/dashboard/seller/products" element={<SellerProducts />} />
               <Route path="/dashboard/seller/orders" element={<SellerDashboard />} />
               <Route path="/dashboard/seller/analytics" element={<SellerDashboard />} />
               <Route path="/dashboard/seller/products/new" element={<AddProduct />} />
