@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -45,6 +46,7 @@ import {
   XCircle,
   Filter,
   RefreshCw,
+  Trash2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLanguage, formatDate, formatCurrency } from '@/lib/i18n';
@@ -64,6 +66,7 @@ interface Product {
 
 const AdminProducts = () => {
   const { t, direction } = useLanguage();
+  const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -294,7 +297,7 @@ const AdminProducts = () => {
                             <DropdownMenuContent align={isRTL ? 'start' : 'end'}>
                               <DropdownMenuLabel>{t.admin.products.actions}</DropdownMenuLabel>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => navigate(`/admin/products/${product.id}`)}>
                                 <Eye className={`h-4 w-4 ${iconMarginClass}`} />
                                 {t.admin.products.viewDetails}
                               </DropdownMenuItem>
