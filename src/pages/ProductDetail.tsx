@@ -68,13 +68,16 @@ interface Product {
 }
 
 const ProductDetail = () => {
-  const { slug } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
   const { t, language, isRTL } = useLanguage();
   const { user, role } = useAuth();
   const { addToCart, isInCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
-  
+
+  // Note: route param name is ":id" but it can contain either a UUID or a slug.
+  const productIdOrSlug = id;
+
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
@@ -83,48 +86,48 @@ const ProductDetail = () => {
 
   useEffect(() => {
     const fetchProduct = async () => {
-      if (!slug) return;
-      
+      if (!productIdOrSlug) {
+        setProduct(null);
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       try {
-        // Check if slug is a UUID (product ID) or actual slug
-        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
-        
+        // Check if URL param is a UUID (product ID) or an actual slug
+        const isUUID =
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+            productIdOrSlug
+          );
+
         let query = supabase
           .from('products')
-          .select(`
+          .select(
+            `
             *,
-            category:categories(id, name, slug),
-            seller:seller_verifications(business_name, store_logo)
-          `)
+            category:categories(id, name, slug)
+          `
+          )
           .eq('status', 'active');
-        
-        if (isUUID) {
-          query = query.eq('id', slug);
-        } else {
-          query = query.eq('slug', slug);
-        }
-        
+
+        query = isUUID ? query.eq('id', productIdOrSlug) : query.eq('slug', productIdOrSlug);
+
         const { data, error } = await query.maybeSingle();
 
         if (error) throw error;
         if (!data) {
           setProduct(null);
-          setLoading(false);
           return;
         }
-        
-        // Transform the seller data - need to match by seller_id
-        const sellerData = Array.isArray(data.seller) 
-          ? data.seller.find((s: any) => s) 
-          : data.seller;
-        
-        const productData = {
-          ...data,
-          seller: sellerData || null
-        };
-        
-        setProduct(productData as Product);
+
+        // Seller verification data is protected by RLS; for buyers/anon this will safely return null.
+        const { data: seller } = await supabase
+          .from('seller_verifications')
+          .select('business_name, store_logo')
+          .eq('seller_id', data.seller_id)
+          .maybeSingle();
+
+        setProduct({ ...(data as any), seller: seller ?? null } as Product);
 
         // Fetch related products
         if (data.category_id) {
@@ -149,11 +152,11 @@ const ProductDetail = () => {
     };
 
     fetchProduct();
-  }, [slug]);
+  }, [productIdOrSlug]);
 
   const handleAddToCart = async () => {
     if (!user) {
-      navigate('/login', { state: { from: `/products/${slug}` } });
+      navigate('/login', { state: { from: `/products/${productIdOrSlug}` } });
       return;
     }
     if (role !== 'buyer') {
@@ -169,7 +172,7 @@ const ProductDetail = () => {
 
   const handleToggleWishlist = async () => {
     if (!user) {
-      navigate('/login', { state: { from: `/products/${slug}` } });
+      navigate('/login', { state: { from: `/products/${productIdOrSlug}` } });
       return;
     }
     if (role !== 'buyer') {
