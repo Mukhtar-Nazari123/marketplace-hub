@@ -59,7 +59,11 @@ const Categories = () => {
 
   const currentCategory = selectedCategorySlug ? getCategoryBySlug(selectedCategorySlug) : undefined;
   const currentSubcategory = selectedSubcategorySlug ? getCategoryBySlug(selectedSubcategorySlug) : undefined;
-  const subcategories = currentCategory ? getSubcategories(currentCategory.id) : [];
+  
+  // Memoize subcategories to prevent infinite re-renders
+  const subcategories = useMemo(() => {
+    return currentCategory ? getSubcategories(currentCategory.id) : [];
+  }, [currentCategory?.id, getSubcategories]);
 
   // Fetch products from database
   useEffect(() => {
@@ -95,7 +99,7 @@ const Categories = () => {
     if (!categoriesLoading) {
       fetchProducts();
     }
-  }, [currentCategory, currentSubcategory, subcategories, categoriesLoading]);
+  }, [currentCategory?.id, currentSubcategory?.id, subcategories, categoriesLoading]);
 
   // Convert DB products to display format
   const displayProducts = useMemo(() => {
