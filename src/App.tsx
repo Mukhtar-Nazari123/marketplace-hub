@@ -35,6 +35,7 @@ import BuyerDashboard from "./pages/dashboard/BuyerDashboard";
 import SellerDashboard from "./pages/dashboard/SellerDashboard";
 import SellerPending from "./pages/dashboard/SellerPending";
 import AddProduct from "./pages/dashboard/AddProduct";
+import EditProduct from "./pages/dashboard/EditProduct";
 import SellerProducts from "./pages/dashboard/SellerProducts";
 import SellerProfileChoice from "./pages/seller/SellerProfileChoice";
 import SellerProfileComplete from "./pages/seller/SellerProfileComplete";
@@ -98,6 +99,7 @@ const App = () => (
               <Route path="/dashboard/seller/orders" element={<SellerDashboard />} />
               <Route path="/dashboard/seller/analytics" element={<SellerDashboard />} />
               <Route path="/dashboard/seller/products/new" element={<AddProduct />} />
+              <Route path="/dashboard/seller/products/edit/:id" element={<EditProduct />} />
               <Route path="/dashboard/seller/pending" element={<SellerPending />} />
               
               {/* Seller Onboarding Routes */}
