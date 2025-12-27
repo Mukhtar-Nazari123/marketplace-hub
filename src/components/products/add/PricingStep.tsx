@@ -1,10 +1,11 @@
 import { useLanguage } from '@/lib/i18n';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ProductFormData } from '@/pages/dashboard/AddProduct';
+import { ProductFormData, CurrencyType } from '@/pages/dashboard/AddProduct';
 import { cn } from '@/lib/utils';
-import { DollarSign, Tag, Package, Hash } from 'lucide-react';
+import { DollarSign, Tag, Package } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface PricingStepProps {
   formData: ProductFormData;
@@ -17,14 +18,22 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
   const { isRTL } = useLanguage();
   const isClothing = formData.categoryId === 'clothing';
 
-  const handlePriceChange = (value: string) => {
+  const handlePriceChange = (value: string, currency: CurrencyType) => {
     const numValue = parseFloat(value) || 0;
-    updateFormData({ price: numValue });
+    if (currency === 'AFN') {
+      updateFormData({ price: numValue });
+    } else {
+      updateFormData({ priceUSD: numValue });
+    }
   };
 
-  const handleDiscountChange = (value: string) => {
+  const handleDiscountChange = (value: string, currency: CurrencyType) => {
     const numValue = value ? parseFloat(value) : null;
-    updateFormData({ discountPrice: numValue });
+    if (currency === 'AFN') {
+      updateFormData({ discountPrice: numValue });
+    } else {
+      updateFormData({ discountPriceUSD: numValue });
+    }
   };
 
   const handleQuantityChange = (value: string) => {
@@ -42,13 +51,18 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
     });
   };
 
-  const calculateDiscount = () => {
-    if (!formData.discountPrice || formData.discountPrice >= formData.price) return null;
-    const discount = ((formData.price - formData.discountPrice) / formData.price) * 100;
+  const handleCurrencyChange = (currency: string) => {
+    updateFormData({ currency: currency as CurrencyType });
+  };
+
+  const calculateDiscount = (price: number, discountPrice: number | null) => {
+    if (!discountPrice || discountPrice >= price) return null;
+    const discount = ((price - discountPrice) / price) * 100;
     return Math.round(discount);
   };
 
-  const discountPercentage = calculateDiscount();
+  const discountPercentageAFN = calculateDiscount(formData.price, formData.discountPrice);
+  const discountPercentageUSD = calculateDiscount(formData.priceUSD, formData.discountPriceUSD);
 
   return (
     <div className="space-y-6">
@@ -63,21 +77,37 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
         </p>
       </div>
 
+      {/* Currency Selector */}
+      <Card className="p-4">
+        <Label className="text-sm font-medium mb-3 block">
+          {isRTL ? 'واحد پول اصلی' : 'Primary Currency'}
+        </Label>
+        <Tabs value={formData.currency} onValueChange={handleCurrencyChange}>
+          <TabsList className="grid w-full grid-cols-2 max-w-xs">
+            <TabsTrigger value="AFN">AFN (Afghani)</TabsTrigger>
+            <TabsTrigger value="USD">USD (Dollar)</TabsTrigger>
+          </TabsList>
+        </Tabs>
+        <p className="text-xs text-muted-foreground mt-2">
+          {isRTL ? 'می‌توانید قیمت را در هر دو واحد وارد کنید' : 'You can enter prices in both currencies'}
+        </p>
+      </Card>
+
+      {/* AFN Prices */}
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Price */}
         <Card className="p-4 space-y-3">
-          <Label htmlFor="price" className="text-sm font-medium flex items-center gap-2">
+          <Label htmlFor="price-afn" className="text-sm font-medium flex items-center gap-2">
             <DollarSign className="w-4 h-4 text-primary" />
-            {isRTL ? 'قیمت' : 'Price'} <span className="text-destructive">*</span>
+            {isRTL ? 'قیمت (افغانی)' : 'Price (AFN)'} <span className="text-destructive">*</span>
           </Label>
           <div className="relative">
             <Input
-              id="price"
+              id="price-afn"
               type="number"
               min="0"
               step="0.01"
               value={formData.price || ''}
-              onChange={(e) => handlePriceChange(e.target.value)}
+              onChange={(e) => handlePriceChange(e.target.value, 'AFN')}
               placeholder="0.00"
               className={cn("text-lg font-semibold", isRTL ? "text-right pr-16" : "pl-16")}
             />
@@ -95,20 +125,19 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
           )}
         </Card>
 
-        {/* Discount Price */}
         <Card className="p-4 space-y-3">
-          <Label htmlFor="discountPrice" className="text-sm font-medium flex items-center gap-2">
+          <Label htmlFor="discountPrice-afn" className="text-sm font-medium flex items-center gap-2">
             <Tag className="w-4 h-4 text-accent" />
-            {isRTL ? 'قیمت با تخفیف' : 'Discount Price'}
+            {isRTL ? 'قیمت با تخفیف (افغانی)' : 'Discount Price (AFN)'}
           </Label>
           <div className="relative">
             <Input
-              id="discountPrice"
+              id="discountPrice-afn"
               type="number"
               min="0"
               step="0.01"
               value={formData.discountPrice || ''}
-              onChange={(e) => handleDiscountChange(e.target.value)}
+              onChange={(e) => handleDiscountChange(e.target.value, 'AFN')}
               placeholder="0.00"
               className={cn("text-lg", isRTL ? "text-right pr-16" : "pl-16")}
             />
@@ -119,62 +148,99 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
               AFN
             </span>
           </div>
-          {discountPercentage && (
+          {discountPercentageAFN && (
             <div className="flex items-center gap-2">
               <span className="text-xs bg-success/10 text-success px-2 py-0.5 rounded">
-                {discountPercentage}% {isRTL ? 'تخفیف' : 'OFF'}
+                {discountPercentageAFN}% {isRTL ? 'تخفیف' : 'OFF'}
               </span>
             </div>
           )}
-          {formData.discountPrice && formData.discountPrice >= formData.price && (
-            <p className="text-xs text-destructive">
-              {isRTL ? 'قیمت تخفیف باید کمتر از قیمت اصلی باشد' : 'Discount price must be less than original price'}
+        </Card>
+      </div>
+
+      {/* USD Prices */}
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card className="p-4 space-y-3">
+          <Label htmlFor="price-usd" className="text-sm font-medium flex items-center gap-2">
+            <DollarSign className="w-4 h-4 text-green-600" />
+            {isRTL ? 'قیمت (دالر)' : 'Price (USD)'}
+          </Label>
+          <div className="relative">
+            <Input
+              id="price-usd"
+              type="number"
+              min="0"
+              step="0.01"
+              value={formData.priceUSD || ''}
+              onChange={(e) => handlePriceChange(e.target.value, 'USD')}
+              placeholder="0.00"
+              className={cn("text-lg font-semibold", isRTL ? "text-right pr-16" : "pl-16")}
+            />
+            <span className={cn(
+              "absolute top-1/2 -translate-y-1/2 text-muted-foreground font-medium",
+              isRTL ? "right-3" : "left-3"
+            )}>
+              USD
+            </span>
+          </div>
+        </Card>
+
+        <Card className="p-4 space-y-3">
+          <Label htmlFor="discountPrice-usd" className="text-sm font-medium flex items-center gap-2">
+            <Tag className="w-4 h-4 text-green-600" />
+            {isRTL ? 'قیمت با تخفیف (دالر)' : 'Discount Price (USD)'}
+          </Label>
+          <div className="relative">
+            <Input
+              id="discountPrice-usd"
+              type="number"
+              min="0"
+              step="0.01"
+              value={formData.discountPriceUSD || ''}
+              onChange={(e) => handleDiscountChange(e.target.value, 'USD')}
+              placeholder="0.00"
+              className={cn("text-lg", isRTL ? "text-right pr-16" : "pl-16")}
+            />
+            <span className={cn(
+              "absolute top-1/2 -translate-y-1/2 text-muted-foreground font-medium",
+              isRTL ? "right-3" : "left-3"
+            )}>
+              USD
+            </span>
+          </div>
+          {discountPercentageUSD && (
+            <div className="flex items-center gap-2">
+              <span className="text-xs bg-success/10 text-success px-2 py-0.5 rounded">
+                {discountPercentageUSD}% {isRTL ? 'تخفیف' : 'OFF'}
+              </span>
+            </div>
+          )}
+        </Card>
+      </div>
+
+      {/* Stock Quantity */}
+      {!isClothing && (
+        <Card className="p-4 space-y-3">
+          <Label htmlFor="quantity" className="text-sm font-medium flex items-center gap-2">
+            <Package className="w-4 h-4 text-primary" />
+            {isRTL ? 'تعداد موجودی' : 'Stock Quantity'}
+          </Label>
+          <Input
+            id="quantity"
+            type="number"
+            min="0"
+            value={formData.quantity || ''}
+            onChange={(e) => handleQuantityChange(e.target.value)}
+            placeholder="0"
+            className={cn("text-lg max-w-xs", isRTL && "text-right")}
+          />
+          {formData.quantity <= 0 && (
+            <p className="text-xs text-warning">
+              {isRTL ? 'محصول با موجودی ۰ قابل فروش نیست' : 'Product with 0 stock cannot be sold'}
             </p>
           )}
         </Card>
-
-        {/* Stock Quantity */}
-        {!isClothing && (
-          <Card className="p-4 space-y-3">
-            <Label htmlFor="quantity" className="text-sm font-medium flex items-center gap-2">
-              <Package className="w-4 h-4 text-primary" />
-              {isRTL ? 'تعداد موجودی' : 'Stock Quantity'}
-            </Label>
-            <Input
-              id="quantity"
-              type="number"
-              min="0"
-              value={formData.quantity || ''}
-              onChange={(e) => handleQuantityChange(e.target.value)}
-              placeholder="0"
-              className={cn("text-lg", isRTL && "text-right")}
-            />
-            {formData.quantity <= 0 && (
-              <p className="text-xs text-warning">
-                {isRTL ? 'محصول با موجودی ۰ قابل فروش نیست' : 'Product with 0 stock cannot be sold'}
-              </p>
-            )}
-          </Card>
-        )}
-
-        {/* SKU */}
-        <Card className="p-4 space-y-3">
-          <Label htmlFor="sku" className="text-sm font-medium flex items-center gap-2">
-            <Hash className="w-4 h-4 text-muted-foreground" />
-            {isRTL ? 'کد محصول (SKU)' : 'SKU (Stock Keeping Unit)'}
-          </Label>
-          <Input
-            id="sku"
-            value={formData.sku}
-            onChange={(e) => updateFormData({ sku: e.target.value })}
-            placeholder={isRTL ? 'اختیاری' : 'Optional'}
-            className={cn(isRTL && "text-right")}
-          />
-          <p className="text-xs text-muted-foreground">
-            {isRTL ? 'کد یکتا برای مدیریت انبار' : 'Unique code for inventory management'}
-          </p>
-        </Card>
-      </div>
+      )}
 
       {/* Stock per Size (for clothing) */}
       {isClothing && (
@@ -232,7 +298,7 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
                 </div>
                 <div className="flex justify-between text-accent">
                   <span>{isRTL ? 'صرفه‌جویی' : 'You Save'}</span>
-                  <span>AFN {(formData.price - formData.discountPrice).toLocaleString()} ({discountPercentage}%)</span>
+                  <span>AFN {(formData.price - formData.discountPrice).toLocaleString()} ({discountPercentageAFN}%)</span>
                 </div>
               </>
             )}

@@ -15,7 +15,10 @@ import { ReviewStep } from '@/components/products/add/ReviewStep';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ArrowLeft, ArrowRight, Save, Send, FileText } from 'lucide-react';
+import { generateSKU } from '@/lib/skuGenerator';
 import { cn } from '@/lib/utils';
+
+export type CurrencyType = 'AFN' | 'USD';
 
 export interface ProductFormData {
   // Category
@@ -41,9 +44,11 @@ export interface ProductFormData {
   
   // Pricing & Inventory
   price: number;
+  priceUSD: number;
   discountPrice: number | null;
+  discountPriceUSD: number | null;
+  currency: CurrencyType;
   quantity: number;
-  sku: string;
   stockPerSize?: Record<string, number>;
 }
 
@@ -62,9 +67,11 @@ const initialFormData: ProductFormData = {
   video: null,
   videoUrl: '',
   price: 0,
+  priceUSD: 0,
   discountPrice: null,
+  discountPriceUSD: null,
+  currency: 'AFN',
   quantity: 0,
-  sku: '',
   stockPerSize: {},
 };
 
@@ -193,6 +200,9 @@ const AddProduct = () => {
         ? await uploadMedia()
         : { imageUrls: formData.imageUrls, videoUrl: formData.videoUrl };
 
+      // Generate SKU automatically
+      const generatedSKU = generateSKU(formData.categoryId, formData.categoryName, formData.name || 'DRAFT');
+
       const productData = {
         seller_id: user.id,
         name: formData.name || 'Untitled Draft',
@@ -201,8 +211,8 @@ const AddProduct = () => {
         price: formData.price || 0,
         compare_at_price: formData.discountPrice,
         quantity: formData.quantity,
-        sku: formData.sku || null,
-        category_id: null, // Using null since categories table uses UUIDs, storing category info in metadata
+        sku: generatedSKU,
+        category_id: null,
         images: imageUrls,
         status: 'draft' as const,
         metadata: {
@@ -215,6 +225,9 @@ const AddProduct = () => {
           categoryName: formData.categoryName,
           subCategoryId: formData.subCategoryId,
           subCategoryName: formData.subCategoryName,
+          priceUSD: formData.priceUSD,
+          discountPriceUSD: formData.discountPriceUSD,
+          currency: formData.currency,
         },
       };
 
@@ -268,6 +281,9 @@ const AddProduct = () => {
         status = isVerifiedSeller ? 'pending' : 'draft';
       }
 
+      // Generate SKU automatically
+      const generatedSKU = generateSKU(formData.categoryId, formData.categoryName, formData.name);
+
       const productData = {
         seller_id: user.id,
         name: formData.name,
@@ -276,8 +292,8 @@ const AddProduct = () => {
         price: formData.price,
         compare_at_price: formData.discountPrice,
         quantity: formData.quantity,
-        sku: formData.sku || null,
-        category_id: null, // Using null since categories table uses UUIDs, storing category info in metadata
+        sku: generatedSKU,
+        category_id: null,
         images: imageUrls,
         status: status as 'draft' | 'pending' | 'active',
         metadata: {
@@ -290,6 +306,9 @@ const AddProduct = () => {
           categoryName: formData.categoryName,
           subCategoryId: formData.subCategoryId,
           subCategoryName: formData.subCategoryName,
+          priceUSD: formData.priceUSD,
+          discountPriceUSD: formData.discountPriceUSD,
+          currency: formData.currency,
         },
       };
 

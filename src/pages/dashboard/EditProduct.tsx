@@ -42,9 +42,11 @@ const initialFormData: ProductFormData = {
   video: null,
   videoUrl: '',
   price: 0,
+  priceUSD: 0,
   discountPrice: null,
+  discountPriceUSD: null,
+  currency: 'AFN',
   quantity: 0,
-  sku: '',
   stockPerSize: {},
 };
 
@@ -103,9 +105,11 @@ const EditProduct = () => {
         video: null,
         videoUrl: (metadata.videoUrl as string) || '',
         price: data.price,
+        priceUSD: (metadata.priceUSD as number) || 0,
         discountPrice: data.compare_at_price,
+        discountPriceUSD: (metadata.discountPriceUSD as number) || null,
+        currency: (metadata.currency as 'AFN' | 'USD') || 'AFN',
         quantity: data.quantity,
-        sku: data.sku || '',
         stockPerSize: (metadata.stockPerSize as Record<string, number>) || {},
       });
     } catch (error) {
@@ -225,7 +229,6 @@ const EditProduct = () => {
         price: formData.price,
         compare_at_price: formData.discountPrice,
         quantity: formData.quantity,
-        sku: formData.sku || null,
         category_id: null,
         images: imageUrls,
         status,
@@ -239,6 +242,9 @@ const EditProduct = () => {
           categoryName: formData.categoryName,
           subCategoryId: formData.subCategoryId,
           subCategoryName: formData.subCategoryName,
+          priceUSD: formData.priceUSD,
+          discountPriceUSD: formData.discountPriceUSD,
+          currency: formData.currency,
         },
       };
 

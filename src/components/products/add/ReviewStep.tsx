@@ -226,18 +226,31 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
               {formData.discountPrice && formData.discountPrice < formData.price ? (
                 <>
                   <span className="text-xl font-bold text-primary">
-                    AFN {formData.discountPrice.toLocaleString()}
+                    {formData.currency} {formData.discountPrice.toLocaleString()}
                   </span>
                   <span className="text-sm text-muted-foreground line-through">
-                    AFN {formData.price.toLocaleString()}
+                    {formData.currency} {formData.price.toLocaleString()}
                   </span>
                 </>
               ) : (
                 <span className="text-xl font-bold">
-                  AFN {formData.price.toLocaleString()}
+                  {formData.currency} {formData.price.toLocaleString()}
                 </span>
               )}
             </div>
+
+            {(formData.priceUSD > 0 || formData.discountPriceUSD) && (
+              <div className="flex items-baseline gap-2 text-sm text-muted-foreground">
+                {formData.discountPriceUSD && formData.discountPriceUSD < formData.priceUSD ? (
+                  <>
+                    <span>USD {formData.discountPriceUSD.toLocaleString()}</span>
+                    <span className="line-through">USD {formData.priceUSD.toLocaleString()}</span>
+                  </>
+                ) : formData.priceUSD > 0 ? (
+                  <span>USD {formData.priceUSD.toLocaleString()}</span>
+                ) : null}
+              </div>
+            )}
 
             <div className="flex items-center gap-2">
               <Package className="w-4 h-4 text-muted-foreground" />
@@ -247,12 +260,6 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
                   : `${formData.quantity} ${isRTL ? 'عدد در انبار' : 'in stock'}`}
               </span>
             </div>
-
-            {formData.sku && (
-              <div className="text-xs text-muted-foreground">
-                SKU: {formData.sku}
-              </div>
-            )}
           </CardContent>
         </Card>
       </div>

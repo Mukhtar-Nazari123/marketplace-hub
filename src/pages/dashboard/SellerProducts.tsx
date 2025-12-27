@@ -257,7 +257,7 @@ const SellerProducts = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align={isRTL ? "start" : "end"}>
-                        <DropdownMenuItem onClick={() => navigate(`/products/${product.slug}`)}>
+                        <DropdownMenuItem onClick={() => navigate(`/dashboard/seller/products/view/${product.id}`)}>
                           <Eye className={cn("h-4 w-4", isRTL ? "ml-2" : "mr-2")} />
                           {isRTL ? 'مشاهده' : 'View'}
                         </DropdownMenuItem>
@@ -329,7 +329,7 @@ const SellerProducts = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => navigate(`/products/${product.slug}`)}
+                    onClick={() => navigate(`/dashboard/seller/products/view/${product.id}`)}
                   >
                     <Eye className="h-4 w-4" />
                   </Button>
