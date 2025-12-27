@@ -2,7 +2,6 @@ import { useLanguage } from '@/lib/i18n';
 import { ProductFormData } from '@/pages/dashboard/AddProduct';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { 
   CheckCircle2, 
@@ -14,7 +13,6 @@ import {
   FileText,
   Video
 } from 'lucide-react';
-import { CATEGORIES } from './CategoryStep';
 
 interface ReviewStepProps {
   formData: ProductFormData;
@@ -22,9 +20,6 @@ interface ReviewStepProps {
 
 export const ReviewStep = ({ formData }: ReviewStepProps) => {
   const { isRTL } = useLanguage();
-
-  const category = CATEGORIES.find(c => c.id === formData.categoryId);
-  const subCategory = category?.subCategories.find(s => s.id === formData.subCategoryId);
 
   const allImages = [...formData.imageUrls];
   const hasImages = allImages.length > 0 || formData.images.length > 0;
@@ -199,14 +194,14 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
-              {category && (
+              {formData.categoryName && (
                 <Badge variant="secondary">
-                  {isRTL ? category.nameFa : category.name}
+                  {formData.categoryName}
                 </Badge>
               )}
-              {subCategory && (
+              {formData.subCategoryName && (
                 <Badge variant="outline">
-                  {isRTL ? subCategory.nameFa : subCategory.name}
+                  {formData.subCategoryName}
                 </Badge>
               )}
             </div>

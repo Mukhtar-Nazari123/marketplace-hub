@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLanguage } from '@/lib/i18n';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { cn } from '@/lib/utils';
 import { ProductFormData } from '@/pages/dashboard/AddProduct';
+import { supabase } from '@/integrations/supabase/client';
+import { Skeleton } from '@/components/ui/skeleton';
 import { 
   Smartphone, 
   Shirt, 
@@ -13,7 +15,8 @@ import {
   Dumbbell, 
   Baby,
   ChevronRight,
-  ChevronLeft
+  ChevronLeft,
+  Folder
 } from 'lucide-react';
 
 interface CategoryStepProps {
@@ -21,112 +24,118 @@ interface CategoryStepProps {
   updateFormData: (updates: Partial<ProductFormData>) => void;
 }
 
-export const CATEGORIES = [
-  {
-    id: 'electronics',
-    name: 'Electronics',
-    nameFa: 'الکترونیک',
-    icon: Smartphone,
-    subCategories: [
-      { id: 'phones', name: 'Phones & Tablets', nameFa: 'گوشی و تبلت' },
-      { id: 'computers', name: 'Computers & Laptops', nameFa: 'کامپیوتر و لپ‌تاپ' },
-      { id: 'accessories', name: 'Accessories', nameFa: 'لوازم جانبی' },
-      { id: 'cameras', name: 'Cameras', nameFa: 'دوربین' },
-      { id: 'audio', name: 'Audio & Headphones', nameFa: 'صوتی و هدفون' },
-    ],
-  },
-  {
-    id: 'clothing',
-    name: 'Clothing',
-    nameFa: 'پوشاک',
-    icon: Shirt,
-    subCategories: [
-      { id: 'men', name: "Men's Clothing", nameFa: 'لباس مردانه' },
-      { id: 'women', name: "Women's Clothing", nameFa: 'لباس زنانه' },
-      { id: 'kids', name: "Kids' Clothing", nameFa: 'لباس بچگانه' },
-      { id: 'shoes', name: 'Shoes', nameFa: 'کفش' },
-      { id: 'accessories', name: 'Fashion Accessories', nameFa: 'اکسسوری' },
-    ],
-  },
-  {
-    id: 'home',
-    name: 'Home & Living',
-    nameFa: 'خانه و زندگی',
-    icon: Home,
-    subCategories: [
-      { id: 'furniture', name: 'Furniture', nameFa: 'مبلمان' },
-      { id: 'decor', name: 'Home Decor', nameFa: 'دکوراسیون' },
-      { id: 'kitchen', name: 'Kitchen & Dining', nameFa: 'آشپزخانه' },
-      { id: 'bedding', name: 'Bedding', nameFa: 'ملحفه و تشک' },
-      { id: 'garden', name: 'Garden & Outdoor', nameFa: 'باغ و فضای باز' },
-    ],
-  },
-  {
-    id: 'beauty',
-    name: 'Beauty & Personal Care',
-    nameFa: 'زیبایی و بهداشت',
-    icon: Sparkles,
-    subCategories: [
-      { id: 'skincare', name: 'Skincare', nameFa: 'مراقبت پوست' },
-      { id: 'makeup', name: 'Makeup', nameFa: 'آرایش' },
-      { id: 'haircare', name: 'Hair Care', nameFa: 'مراقبت مو' },
-      { id: 'fragrance', name: 'Fragrance', nameFa: 'عطر' },
-      { id: 'personal', name: 'Personal Care', nameFa: 'بهداشت شخصی' },
-    ],
-  },
-  {
-    id: 'sports',
-    name: 'Sports & Outdoor',
-    nameFa: 'ورزش و فضای باز',
-    icon: Dumbbell,
-    subCategories: [
-      { id: 'fitness', name: 'Fitness Equipment', nameFa: 'تجهیزات ورزشی' },
-      { id: 'outdoor', name: 'Outdoor Recreation', nameFa: 'تفریحات فضای باز' },
-      { id: 'sportswear', name: 'Sportswear', nameFa: 'لباس ورزشی' },
-      { id: 'cycling', name: 'Cycling', nameFa: 'دوچرخه‌سواری' },
-      { id: 'camping', name: 'Camping & Hiking', nameFa: 'کمپینگ و کوهنوردی' },
-    ],
-  },
-  {
-    id: 'baby',
-    name: 'Baby & Kids',
-    nameFa: 'کودک و نوزاد',
-    icon: Baby,
-    subCategories: [
-      { id: 'toys', name: 'Toys', nameFa: 'اسباب‌بازی' },
-      { id: 'feeding', name: 'Feeding', nameFa: 'تغذیه' },
-      { id: 'nursery', name: 'Nursery', nameFa: 'اتاق کودک' },
-      { id: 'safety', name: 'Baby Safety', nameFa: 'ایمنی کودک' },
-      { id: 'strollers', name: 'Strollers & Carriers', nameFa: 'کالسکه و آغوشی' },
-    ],
-  },
-];
+interface Category {
+  id: string;
+  name: string;
+  name_fa: string | null;
+  slug: string;
+}
+
+interface Subcategory {
+  id: string;
+  name: string;
+  name_fa: string | null;
+  slug: string;
+  category_id: string;
+}
+
+// Icon mapping based on category slug
+const CATEGORY_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  'electronics': Smartphone,
+  'clothing': Shirt,
+  'home-living': Home,
+  'beauty-personal-care': Sparkles,
+  'sports-outdoor': Dumbbell,
+  'baby-kids': Baby,
+};
 
 export const CategoryStep = ({ formData, updateFormData }: CategoryStepProps) => {
   const { isRTL } = useLanguage();
   const [showSubCategories, setShowSubCategories] = useState(!!formData.categoryId);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const selectedCategory = CATEGORIES.find(c => c.id === formData.categoryId);
+  // Fetch categories on mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('categories')
+        .select('id, name, name_fa, slug')
+        .eq('is_active', true)
+        .is('parent_id', null)
+        .order('sort_order');
+
+      if (!error && data) {
+        setCategories(data);
+      }
+      setLoading(false);
+    };
+
+    fetchCategories();
+  }, []);
+
+  // Fetch subcategories when category is selected
+  useEffect(() => {
+    const fetchSubcategories = async () => {
+      if (!formData.categoryId) {
+        setSubcategories([]);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('subcategories')
+        .select('id, name, name_fa, slug, category_id')
+        .eq('category_id', formData.categoryId)
+        .eq('is_active', true)
+        .order('sort_order');
+
+      if (!error && data) {
+        setSubcategories(data);
+      }
+    };
+
+    fetchSubcategories();
+  }, [formData.categoryId]);
+
+  const selectedCategory = categories.find(c => c.id === formData.categoryId);
 
   const handleCategorySelect = (categoryId: string) => {
-    const category = CATEGORIES.find(c => c.id === categoryId);
+    const category = categories.find(c => c.id === categoryId);
     updateFormData({
       categoryId,
-      categoryName: category ? (isRTL ? category.nameFa : category.name) : '',
+      categoryName: category ? (isRTL && category.name_fa ? category.name_fa : category.name) : '',
       subCategoryId: '',
       subCategoryName: '',
-      attributes: {}, // Reset attributes when category changes
+      attributes: {},
     });
     setShowSubCategories(true);
   };
 
   const handleSubCategorySelect = (subCategoryId: string) => {
-    const subCategory = selectedCategory?.subCategories.find(s => s.id === subCategoryId);
+    const subCategory = subcategories.find(s => s.id === subCategoryId);
     updateFormData({
       subCategoryId,
-      subCategoryName: subCategory ? (isRTL ? subCategory.nameFa : subCategory.name) : '',
+      subCategoryName: subCategory ? (isRTL && subCategory.name_fa ? subCategory.name_fa : subCategory.name) : '',
     });
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <Skeleton className="h-6 w-48 mb-2" />
+          <Skeleton className="h-4 w-64 mb-6" />
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <Skeleton key={i} className="h-20" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -143,8 +152,8 @@ export const CategoryStep = ({ formData, updateFormData }: CategoryStepProps) =>
 
       {/* Main Categories */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        {CATEGORIES.map((category) => {
-          const Icon = category.icon;
+        {categories.map((category) => {
+          const Icon = CATEGORY_ICONS[category.slug] || Folder;
           const isSelected = formData.categoryId === category.id;
           
           return (
@@ -168,7 +177,7 @@ export const CategoryStep = ({ formData, updateFormData }: CategoryStepProps) =>
                     "font-medium text-sm truncate",
                     isSelected && "text-primary"
                   )}>
-                    {isRTL ? category.nameFa : category.name}
+                    {isRTL && category.name_fa ? category.name_fa : category.name}
                   </p>
                 </div>
                 {isRTL ? (
@@ -183,7 +192,7 @@ export const CategoryStep = ({ formData, updateFormData }: CategoryStepProps) =>
       </div>
 
       {/* Sub Categories */}
-      {showSubCategories && selectedCategory && (
+      {showSubCategories && selectedCategory && subcategories.length > 0 && (
         <div className="pt-6 border-t animate-fade-in">
           <Label className="text-base font-medium mb-4 block">
             {isRTL ? 'زیر دسته‌بندی' : 'Sub Category'}
@@ -194,7 +203,7 @@ export const CategoryStep = ({ formData, updateFormData }: CategoryStepProps) =>
             onValueChange={handleSubCategorySelect}
             className="grid grid-cols-2 md:grid-cols-3 gap-3"
           >
-            {selectedCategory.subCategories.map((subCategory) => (
+            {subcategories.map((subCategory) => (
               <Label
                 key={subCategory.id}
                 htmlFor={subCategory.id}
@@ -206,7 +215,7 @@ export const CategoryStep = ({ formData, updateFormData }: CategoryStepProps) =>
               >
                 <RadioGroupItem value={subCategory.id} id={subCategory.id} />
                 <span className="text-sm">
-                  {isRTL ? subCategory.nameFa : subCategory.name}
+                  {isRTL && subCategory.name_fa ? subCategory.name_fa : subCategory.name}
                 </span>
               </Label>
             ))}

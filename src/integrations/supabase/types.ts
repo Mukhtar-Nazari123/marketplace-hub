@@ -339,6 +339,7 @@ export type Database = {
           sku: string | null
           slug: string
           status: string
+          subcategory_id: string | null
           updated_at: string
           weight: number | null
         }
@@ -362,6 +363,7 @@ export type Database = {
           sku?: string | null
           slug: string
           status?: string
+          subcategory_id?: string | null
           updated_at?: string
           weight?: number | null
         }
@@ -385,6 +387,7 @@ export type Database = {
           sku?: string | null
           slug?: string
           status?: string
+          subcategory_id?: string | null
           updated_at?: string
           weight?: number | null
         }
@@ -394,6 +397,13 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_subcategory_id_fkey"
+            columns: ["subcategory_id"]
+            isOneToOne: false
+            referencedRelation: "subcategories"
             referencedColumns: ["id"]
           },
         ]
