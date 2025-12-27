@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { products as mockProducts } from '@/data/mockData';
+
 
 interface DbProduct {
   id: string;
@@ -100,8 +100,9 @@ const Categories = () => {
   // Convert DB products to display format
   const displayProducts = useMemo(() => {
     return dbProducts.map(p => {
-      const metadata = p.metadata as { currency?: 'AFN' | 'USD' } | null;
-      const discount = p.compare_at_price 
+      const metadata = p.metadata as { currency?: 'AFN' | 'USD'; brand?: string } | null;
+      const currency = metadata?.currency || 'AFN';
+      const discount = p.compare_at_price && p.compare_at_price > p.price
         ? Math.round(((p.compare_at_price - p.price) / p.compare_at_price) * 100)
         : undefined;
 
@@ -111,16 +112,18 @@ const Categories = () => {
         slug: p.slug,
         price: p.price,
         originalPrice: p.compare_at_price || undefined,
-        images: p.images || [],
+        images: p.images || ['/placeholder.svg'],
         category: currentCategory?.slug || '',
         subcategory: currentSubcategory?.slug,
-        brand: 'Unknown',
-        rating: 4,
+        brand: metadata?.brand || '',
+        rating: 0,
         reviewCount: 0,
         inStock: p.quantity > 0,
         isNew: p.is_featured,
         isHot: false,
         discount,
+        currency,
+        currencySymbol: currency === 'USD' ? '$' : 'AFN',
         seller: { id: '', name: '', rating: 0, productCount: 0, avatar: '' },
         description: { fa: '', en: '' },
         specifications: [],
@@ -128,8 +131,8 @@ const Categories = () => {
     });
   }, [dbProducts, currentCategory, currentSubcategory]);
 
-  // Use mock products as fallback if no DB products
-  const allProducts = displayProducts.length > 0 ? displayProducts : mockProducts;
+  // Only use DB products
+  const allProducts = displayProducts;
 
   const filteredProducts = useMemo(() => {
     let result = [...allProducts];

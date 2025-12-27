@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/lib/i18n';
-import { Product } from '@/data/mockData';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Star, Heart, ShoppingCart, Eye, Grid, List } from 'lucide-react';
@@ -10,8 +9,29 @@ import { useWishlist } from '@/hooks/useWishlist';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 
+// Support both mock data format and new DB format
+interface DisplayProduct {
+  id: string;
+  name: { fa: string; en: string } | string;
+  slug: string;
+  price: number;
+  originalPrice?: number;
+  images: string[];
+  category?: string;
+  brand?: string;
+  rating?: number;
+  reviewCount?: number;
+  inStock?: boolean;
+  isNew?: boolean;
+  isHot?: boolean;
+  discount?: number;
+  currency?: string;
+  currencySymbol?: string;
+  description?: { fa: string; en: string } | string;
+}
+
 interface ProductGridProps {
-  products: Product[];
+  products: DisplayProduct[];
   viewMode?: 'grid' | 'list';
   onViewModeChange?: (mode: 'grid' | 'list') => void;
 }
@@ -71,7 +91,18 @@ const ProductGrid = ({ products, viewMode = 'grid', onViewModeChange }: ProductG
   );
 };
 
-const ProductCard = ({ product }: { product: Product }) => {
+const getProductName = (name: { fa: string; en: string } | string, language: 'fa' | 'en'): string => {
+  if (typeof name === 'string') return name;
+  return name[language] || name.en;
+};
+
+const getProductDescription = (desc: { fa: string; en: string } | string | undefined, language: 'fa' | 'en'): string => {
+  if (!desc) return '';
+  if (typeof desc === 'string') return desc;
+  return desc[language] || desc.en;
+};
+
+const ProductCard = ({ product }: { product: DisplayProduct }) => {
   const { t, language, isRTL } = useLanguage();
   const [isHovered, setIsHovered] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
@@ -82,6 +113,7 @@ const ProductCard = ({ product }: { product: Product }) => {
 
   const isWishlisted = isInWishlist(product.id);
   const isBuyer = role === 'buyer';
+  const currencySymbol = product.currencySymbol || (product.currency === 'USD' ? '$' : 'AFN');
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -119,8 +151,8 @@ const ProductCard = ({ product }: { product: Product }) => {
       <div className="relative aspect-square overflow-hidden">
         <Link to={`/products/${product.slug}`}>
           <img
-            src={product.images[0]}
-            alt={product.name[language]}
+            src={product.images[0] || '/placeholder.svg'}
+            alt={getProductName(product.name, language)}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
         </Link>
@@ -129,7 +161,7 @@ const ProductCard = ({ product }: { product: Product }) => {
         <div className={`absolute top-2 ${isRTL ? 'right-2' : 'left-2'} flex flex-col gap-1`}>
           {product.isNew && <Badge variant="new">{t.product.new}</Badge>}
           {product.isHot && <Badge variant="hot">{t.product.hot}</Badge>}
-          {product.discount && <Badge variant="sale">-{product.discount}%</Badge>}
+          {product.discount && product.discount > 0 && <Badge variant="sale">-{product.discount}%</Badge>}
         </div>
 
         {/* Quick Actions */}
@@ -165,7 +197,7 @@ const ProductCard = ({ product }: { product: Product }) => {
       <div className="p-4">
         <Link to={`/products/${product.slug}`}>
           <h3 className="font-medium text-foreground hover:text-primary transition-colors line-clamp-2 mb-2">
-            {product.name[language]}
+            {getProductName(product.name, language)}
           </h3>
         </Link>
 
@@ -175,20 +207,20 @@ const ProductCard = ({ product }: { product: Product }) => {
             <Star
               key={i}
               size={14}
-              className={i < Math.floor(product.rating) ? 'fill-yellow-400 text-yellow-400' : 'text-muted'}
+              className={i < Math.floor(product.rating || 0) ? 'fill-yellow-400 text-yellow-400' : 'text-muted'}
             />
           ))}
-          <span className="text-xs text-muted-foreground">({product.reviewCount})</span>
+          <span className="text-xs text-muted-foreground">({product.reviewCount || 0})</span>
         </div>
 
         {/* Price */}
         <div className="flex items-center gap-2 mb-3">
           <span className="text-lg font-bold text-primary">
-            {product.price.toLocaleString()} {isRTL ? 'افغانی' : 'AFN'}
+            {product.currency === 'USD' ? '$' : ''}{product.price.toLocaleString()} {product.currency !== 'USD' ? currencySymbol : ''}
           </span>
-          {product.originalPrice && (
+          {product.originalPrice && product.originalPrice > product.price && (
             <span className="text-sm text-muted-foreground line-through">
-              {product.originalPrice.toLocaleString()}
+              {product.currency === 'USD' ? '$' : ''}{product.originalPrice.toLocaleString()}
             </span>
           )}
         </div>
@@ -212,7 +244,7 @@ const ProductCard = ({ product }: { product: Product }) => {
   );
 };
 
-const ProductListItem = ({ product }: { product: Product }) => {
+const ProductListItem = ({ product }: { product: DisplayProduct }) => {
   const { t, language, isRTL } = useLanguage();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const { addToCart } = useCart();
@@ -222,6 +254,7 @@ const ProductListItem = ({ product }: { product: Product }) => {
 
   const isWishlisted = isInWishlist(product.id);
   const isBuyer = role === 'buyer';
+  const currencySymbol = product.currencySymbol || (product.currency === 'USD' ? '$' : 'AFN');
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -255,15 +288,15 @@ const ProductListItem = ({ product }: { product: Product }) => {
       <div className="relative w-full md:w-64 aspect-square md:aspect-auto md:h-48 flex-shrink-0">
         <Link to={`/products/${product.slug}`}>
           <img
-            src={product.images[0]}
-            alt={product.name[language]}
+            src={product.images[0] || '/placeholder.svg'}
+            alt={getProductName(product.name, language)}
             className="w-full h-full object-cover"
           />
         </Link>
         <div className={`absolute top-2 ${isRTL ? 'right-2' : 'left-2'} flex gap-1`}>
           {product.isNew && <Badge variant="new">{t.product.new}</Badge>}
           {product.isHot && <Badge variant="hot">{t.product.hot}</Badge>}
-          {product.discount && <Badge variant="sale">-{product.discount}%</Badge>}
+          {product.discount && product.discount > 0 && <Badge variant="sale">-{product.discount}%</Badge>}
         </div>
       </div>
 
@@ -271,12 +304,12 @@ const ProductListItem = ({ product }: { product: Product }) => {
       <div className="flex-1 p-4 flex flex-col">
         <Link to={`/products/${product.slug}`}>
           <h3 className="font-medium text-lg text-foreground hover:text-primary transition-colors mb-2">
-            {product.name[language]}
+            {getProductName(product.name, language)}
           </h3>
         </Link>
 
         <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
-          {product.description[language]}
+          {getProductDescription(product.description, language)}
         </p>
 
         <div className="flex items-center gap-1 mb-2">
@@ -284,20 +317,20 @@ const ProductListItem = ({ product }: { product: Product }) => {
             <Star
               key={i}
               size={14}
-              className={i < Math.floor(product.rating) ? 'fill-yellow-400 text-yellow-400' : 'text-muted'}
+              className={i < Math.floor(product.rating || 0) ? 'fill-yellow-400 text-yellow-400' : 'text-muted'}
             />
           ))}
-          <span className="text-xs text-muted-foreground">({product.reviewCount} {t.product.reviews})</span>
+          <span className="text-xs text-muted-foreground">({product.reviewCount || 0} {t.product.reviews})</span>
         </div>
 
         <div className="mt-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-xl font-bold text-primary">
-              {product.price.toLocaleString()} {isRTL ? 'افغانی' : 'AFN'}
+              {product.currency === 'USD' ? '$' : ''}{product.price.toLocaleString()} {product.currency !== 'USD' ? currencySymbol : ''}
             </span>
-            {product.originalPrice && (
+            {product.originalPrice && product.originalPrice > product.price && (
               <span className="text-sm text-muted-foreground line-through">
-                {product.originalPrice.toLocaleString()}
+                {product.currency === 'USD' ? '$' : ''}{product.originalPrice.toLocaleString()}
               </span>
             )}
           </div>

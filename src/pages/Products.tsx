@@ -1,7 +1,8 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useLanguage } from '@/lib/i18n';
-import { products, sellers } from '@/data/mockData';
+import { useProducts, formatProductForDisplay } from '@/hooks/useProducts';
+import { useCategories } from '@/hooks/useCategories';
 import ProductFilters, { FilterState } from '@/components/ui/ProductFilters';
 import ProductGrid from '@/components/products/ProductGrid';
 import TopBar from '@/components/layout/TopBar';
@@ -9,7 +10,7 @@ import Header from '@/components/layout/Header';
 import Navigation from '@/components/layout/Navigation';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, SlidersHorizontal, X, Sparkles } from 'lucide-react';
+import { ChevronLeft, ChevronRight, SlidersHorizontal, X, Sparkles, Loader2 } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -18,19 +19,23 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const Products = () => {
   const { t, language, isRTL } = useLanguage();
   const [searchParams] = useSearchParams();
-  const filterType = searchParams.get('filter'); // 'new', 'sale', 'seller'
-  const sellerId = searchParams.get('seller');
+  const filterType = searchParams.get('filter'); // 'new', 'sale'
+  const categorySlug = searchParams.get('category');
+
+  const { products: dbProducts, loading } = useProducts({ status: 'active' });
+  const { getRootCategories, loading: categoriesLoading } = useCategories();
 
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState('latest');
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState<FilterState>({
-    priceRange: [0, 150000],
+    priceRange: [0, 500000],
     rating: 0,
     brands: [],
     categories: [],
@@ -40,18 +45,26 @@ const Products = () => {
 
   const ITEMS_PER_PAGE = 12;
 
-  const currentSeller = sellers.find(s => s.id === sellerId);
+  // Convert DB products to display format
+  const products = useMemo(() => {
+    return dbProducts.map((p) => formatProductForDisplay(p, language));
+  }, [dbProducts, language]);
+
+  const rootCategories = getRootCategories();
 
   const filteredProducts = useMemo(() => {
     let result = [...products];
+
+    // Filter by category slug
+    if (categorySlug) {
+      result = result.filter(p => p.category === categorySlug);
+    }
 
     // Filter by type
     if (filterType === 'new') {
       result = result.filter(p => p.isNew);
     } else if (filterType === 'sale') {
       result = result.filter(p => p.discount && p.discount > 0);
-    } else if (filterType === 'seller' && sellerId) {
-      result = result.filter(p => p.seller.id === sellerId);
     }
 
     // Apply price range filter
@@ -102,7 +115,12 @@ const Products = () => {
     }
 
     return result;
-  }, [filterType, sellerId, filters, sortBy]);
+  }, [categorySlug, filterType, filters, sortBy, products]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [categorySlug, filterType, filters, sortBy]);
 
   const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
   const paginatedProducts = filteredProducts.slice(
@@ -113,7 +131,10 @@ const Products = () => {
   const getTitle = () => {
     if (filterType === 'new') return t.product.newProducts;
     if (filterType === 'sale') return t.filters.discount;
-    if (currentSeller) return currentSeller.name;
+    if (categorySlug) {
+      const category = rootCategories.find(c => c.slug === categorySlug);
+      return category?.name || t.product.allProducts;
+    }
     return t.product.allProducts;
   };
 
@@ -154,29 +175,6 @@ const Products = () => {
         </div>
       )}
 
-      {/* Seller Info */}
-      {currentSeller && (
-        <div className="bg-card border-b border-border py-6">
-          <div className="container mx-auto px-4">
-            <div className="flex items-center gap-4">
-              <img
-                src={currentSeller.avatar}
-                alt={currentSeller.name}
-                className="w-16 h-16 rounded-full object-cover border-2 border-primary"
-              />
-              <div>
-                <h1 className="text-xl font-bold text-foreground">{currentSeller.name}</h1>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <span>⭐ {currentSeller.rating}</span>
-                  <span>•</span>
-                  <span>{currentSeller.productCount} {isRTL ? 'محصول' : 'products'}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Desktop Sidebar */}
@@ -188,7 +186,7 @@ const Products = () => {
                 <Link
                   to="/products"
                   className={`block p-2 rounded-lg transition-colors ${
-                    !filterType ? 'bg-primary/10 text-primary' : 'hover:bg-muted'
+                    !filterType && !categorySlug ? 'bg-primary/10 text-primary' : 'hover:bg-muted'
                   }`}
                 >
                   {t.product.allProducts}
@@ -214,27 +212,41 @@ const Products = () => {
               </div>
             </div>
 
-            {/* Sellers */}
+            {/* Categories */}
             <div className="bg-card rounded-xl p-4 shadow-sm border border-border mb-6">
-              <h3 className="font-bold text-foreground mb-4">{t.filters.seller}</h3>
-              <div className="space-y-2">
-                {sellers.map((seller) => (
-                  <Link
-                    key={seller.id}
-                    to={`/products?filter=seller&seller=${seller.id}`}
-                    className={`flex items-center gap-3 p-2 rounded-lg transition-colors ${
-                      sellerId === seller.id ? 'bg-primary/10 text-primary' : 'hover:bg-muted'
-                    }`}
-                  >
-                    <img
-                      src={seller.avatar}
-                      alt={seller.name}
-                      className="w-8 h-8 rounded-full object-cover"
-                    />
-                    <span className="text-sm">{seller.name}</span>
-                  </Link>
-                ))}
-              </div>
+              <h3 className="font-bold text-foreground mb-4">{t.filters.category}</h3>
+              {categoriesLoading ? (
+                <div className="space-y-2">
+                  {[1, 2, 3].map((i) => (
+                    <Skeleton key={i} className="h-10 w-full" />
+                  ))}
+                </div>
+              ) : rootCategories.length > 0 ? (
+                <div className="space-y-2">
+                  {rootCategories.map((category) => (
+                    <Link
+                      key={category.id}
+                      to={`/products?category=${category.slug}`}
+                      className={`flex items-center gap-3 p-2 rounded-lg transition-colors ${
+                        categorySlug === category.slug ? 'bg-primary/10 text-primary' : 'hover:bg-muted'
+                      }`}
+                    >
+                      {category.image_url && (
+                        <img
+                          src={category.image_url}
+                          alt={category.name}
+                          className="w-8 h-8 rounded-full object-cover"
+                        />
+                      )}
+                      <span className="text-sm">{category.name}</span>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-muted-foreground text-sm">
+                  {isRTL ? 'دسته‌بندی موجود نیست' : 'No categories available'}
+                </p>
+              )}
             </div>
 
             <ProductFilters onFilterChange={setFilters} />
@@ -247,7 +259,11 @@ const Products = () => {
               <div>
                 <h1 className="text-2xl font-bold text-foreground">{getTitle()}</h1>
                 <p className="text-muted-foreground">
-                  {filteredProducts.length} {isRTL ? 'محصول' : 'products'}
+                  {loading ? (
+                    <Skeleton className="h-4 w-24 inline-block" />
+                  ) : (
+                    `${filteredProducts.length} ${isRTL ? 'محصول' : 'products'}`
+                  )}
                 </p>
               </div>
 
@@ -278,14 +294,29 @@ const Products = () => {
             </div>
 
             {/* Products Grid */}
-            <ProductGrid
-              products={paginatedProducts}
-              viewMode={viewMode}
-              onViewModeChange={setViewMode}
-            />
+            {loading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                  <div key={i} className="bg-card rounded-xl border border-border overflow-hidden">
+                    <Skeleton className="aspect-square w-full" />
+                    <div className="p-4 space-y-2">
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-4 w-1/2" />
+                      <Skeleton className="h-8 w-full" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <ProductGrid
+                products={paginatedProducts}
+                viewMode={viewMode}
+                onViewModeChange={setViewMode}
+              />
+            )}
 
             {/* Pagination */}
-            {totalPages > 1 && (
+            {!loading && totalPages > 1 && (
               <div className="flex justify-center gap-2 mt-8">
                 <Button
                   variant="outline"
