@@ -33,6 +33,7 @@ import AdminCMS from "./pages/admin/AdminCMS";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminProductView from "./pages/admin/AdminProductView";
 import BuyerProfile from "./pages/dashboard/BuyerProfile";
+import BuyerOrders from "./pages/dashboard/BuyerOrders";
 import DashboardIndex from "./pages/dashboard/DashboardIndex";
 import BuyerDashboard from "./pages/dashboard/BuyerDashboard";
 import SellerDashboard from "./pages/dashboard/SellerDashboard";
@@ -95,7 +96,7 @@ const App = () => (
 
                     {/* Buyer Routes */}
                     <Route path="/dashboard/buyer" element={<BuyerDashboard />} />
-                    <Route path="/dashboard/buyer/orders" element={<BuyerProfile />} />
+                    <Route path="/dashboard/buyer/orders" element={<BuyerOrders />} />
                     <Route path="/dashboard/buyer/addresses" element={<BuyerProfile />} />
                     <Route path="/dashboard/buyer/wishlist" element={<Wishlist />} />
                     <Route path="/dashboard/buyer/payments" element={<BuyerProfile />} />

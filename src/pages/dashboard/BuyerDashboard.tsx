@@ -42,10 +42,16 @@ const BuyerDashboard = () => {
               <ShoppingBag className="h-4 w-4 text-primary" />
               {isRTL ? "سفارشات" : "Orders"}
             </CardTitle>
-            <CardDescription>{isRTL ? "به‌زودی" : "Coming soon"}</CardDescription>
+            <CardDescription>
+              {isRTL ? "مشاهده و پیگیری سفارشات" : "View and track orders"}
+            </CardDescription>
           </CardHeader>
-          <CardContent className="text-sm text-muted-foreground">
-            {isRTL ? "پیگیری وضعیت سفارش" : "Track order status"}
+          <CardContent>
+            <Link to="/dashboard/buyer/orders">
+              <Button variant="secondary" className="w-full">
+                {isRTL ? "مشاهده سفارشات" : "View Orders"}
+              </Button>
+            </Link>
           </CardContent>
         </Card>
 
