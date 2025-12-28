@@ -272,6 +272,7 @@ export type Database = {
           order_number: string
           payment_method: string | null
           payment_status: string
+          seller_policies: Json | null
           shipping_address: Json | null
           shipping_cost: number
           status: string
@@ -290,6 +291,7 @@ export type Database = {
           order_number: string
           payment_method?: string | null
           payment_status?: string
+          seller_policies?: Json | null
           shipping_address?: Json | null
           shipping_cost?: number
           status?: string
@@ -308,6 +310,7 @@ export type Database = {
           order_number?: string
           payment_method?: string | null
           payment_status?: string
+          seller_policies?: Json | null
           shipping_address?: Json | null
           shipping_cost?: number
           status?: string

@@ -457,12 +457,68 @@ export const translations = {
       resetLinkSent: "لینک بازیابی رمز عبور ارسال شد",
     },
     
+    // Checkout
+    checkout: {
+      title: "تکمیل خرید",
+      steps: {
+        address: "آدرس",
+        orderSummary: "خلاصه سفارش",
+        payment: "پرداخت",
+        confirm: "تأیید",
+      },
+      address: {
+        title: "آدرس تحویل",
+        name: "نام کامل",
+        phone: "شماره تلفن",
+        city: "شهر",
+        fullAddress: "آدرس کامل",
+        useProfileAddress: "استفاده از آدرس پروفایل",
+        editAddress: "ویرایش آدرس",
+      },
+      orderSummary: {
+        title: "خلاصه سفارش",
+        product: "محصول",
+        quantity: "تعداد",
+        price: "قیمت",
+        subtotal: "جمع کل",
+        deliveryFee: "هزینه ارسال",
+        total: "مجموع",
+        sellerPolicies: "سیاست‌های فروشنده",
+        returnPolicy: "سیاست بازگشت",
+        shippingPolicy: "سیاست ارسال",
+        noPolicyProvided: "سیاستی ارائه نشده",
+      },
+      payment: {
+        title: "روش پرداخت",
+        cashOnDelivery: "پرداخت در محل",
+        cashOnDeliveryDesc: "هنگام تحویل کالا پرداخت کنید",
+        onlinePaymentSoon: "پرداخت آنلاین به زودی",
+      },
+      confirm: {
+        title: "تأیید سفارش",
+        placeOrder: "ثبت سفارش",
+        processing: "در حال پردازش...",
+        reviewOrder: "لطفاً سفارش خود را بررسی کنید",
+        orderSuccess: "سفارش با موفقیت ثبت شد",
+        orderSuccessDesc: "سفارش شما ثبت شد و به زودی پردازش می‌شود",
+      },
+      errors: {
+        emptyCart: "سبد خرید خالی است",
+        fillAllFields: "لطفاً همه فیلدها را پر کنید",
+        orderFailed: "خطا در ثبت سفارش",
+      },
+      navigation: {
+        next: "بعدی",
+        previous: "قبلی",
+        backToCart: "بازگشت به سبد خرید",
+      },
+    },
+    
     // Validation messages
     validation: {
       required: "این فیلد الزامی است",
       invalidEmail: "ایمیل نامعتبر است",
-      passwordTooShort: "رمز عبور باید حداقل ۸ کاراکتر باشد",
-      passwordsDoNotMatch: "رمز عبور مطابقت ندارد",
+      passwordsDoNotMatch: "رمزهای عبور مطابقت ندارند",
       invalidPhone: "شماره تلفن نامعتبر است",
       minLength: "حداقل {min} کاراکتر وارد کنید",
       maxLength: "حداکثر {max} کاراکتر مجاز است",
@@ -942,11 +998,67 @@ export const translations = {
       resetLinkSent: "Password reset link sent",
     },
     
+    // Checkout
+    checkout: {
+      title: "Checkout",
+      steps: {
+        address: "Address",
+        orderSummary: "Order Summary",
+        payment: "Payment",
+        confirm: "Confirm",
+      },
+      address: {
+        title: "Delivery Address",
+        name: "Full Name",
+        phone: "Phone Number",
+        city: "City",
+        fullAddress: "Full Address",
+        useProfileAddress: "Use profile address",
+        editAddress: "Edit Address",
+      },
+      orderSummary: {
+        title: "Order Summary",
+        product: "Product",
+        quantity: "Quantity",
+        price: "Price",
+        subtotal: "Subtotal",
+        deliveryFee: "Delivery Fee",
+        total: "Total",
+        sellerPolicies: "Seller Policies",
+        returnPolicy: "Return Policy",
+        shippingPolicy: "Shipping Policy",
+        noPolicyProvided: "No policy provided",
+      },
+      payment: {
+        title: "Payment Method",
+        cashOnDelivery: "Cash on Delivery",
+        cashOnDeliveryDesc: "Pay when you receive your order",
+        onlinePaymentSoon: "Online payment coming soon",
+      },
+      confirm: {
+        title: "Confirm Order",
+        placeOrder: "Place Order",
+        processing: "Processing...",
+        reviewOrder: "Please review your order",
+        orderSuccess: "Order placed successfully",
+        orderSuccessDesc: "Your order has been placed and will be processed soon",
+      },
+      errors: {
+        emptyCart: "Your cart is empty",
+        fillAllFields: "Please fill all required fields",
+        orderFailed: "Failed to place order",
+      },
+      navigation: {
+        next: "Next",
+        previous: "Previous",
+        backToCart: "Back to Cart",
+      },
+    },
+    
     // Validation messages
     validation: {
       required: "This field is required",
-      invalidEmail: "Invalid email address",
-      passwordTooShort: "Password must be at least 8 characters",
+      invalidEmail: "Invalid email",
       passwordsDoNotMatch: "Passwords do not match",
       invalidPhone: "Invalid phone number",
       minLength: "Enter at least {min} characters",
