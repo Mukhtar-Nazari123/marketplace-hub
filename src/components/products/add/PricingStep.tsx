@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ProductFormData, CurrencyType } from '@/pages/dashboard/AddProduct';
 import { cn } from '@/lib/utils';
-import { DollarSign, Tag, Package, Banknote } from 'lucide-react';
+import { DollarSign, Tag, Package, Banknote, Truck } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -31,6 +31,11 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
   const handleQuantityChange = (value: string) => {
     const numValue = parseInt(value) || 0;
     updateFormData({ quantity: numValue });
+  };
+
+  const handleDeliveryFeeChange = (value: string) => {
+    const numValue = parseFloat(value) || 0;
+    updateFormData({ deliveryFee: numValue });
   };
 
   const handleStockPerSizeChange = (size: string, value: string) => {
@@ -160,6 +165,37 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
         </Card>
       </div>
 
+      {/* Delivery Fee */}
+      <Card className="p-4 space-y-3 border-primary/20 bg-primary/5">
+        <Label htmlFor="deliveryFee" className="text-sm font-medium flex items-center gap-2">
+          <Truck className="w-4 h-4 text-primary" />
+          {isRTL ? 'هزینه ارسال' : 'Delivery Fee'} ({currencyLabel}) <span className="text-destructive">*</span>
+        </Label>
+        <div className="relative">
+          <Input
+            id="deliveryFee"
+            type="number"
+            min="0"
+            step="0.01"
+            value={formData.deliveryFee || ''}
+            onChange={(e) => handleDeliveryFeeChange(e.target.value)}
+            placeholder="0.00"
+            className={cn("text-lg font-semibold", isRTL ? "text-right pr-16" : "pl-16")}
+          />
+          <span className={cn(
+            "absolute top-1/2 -translate-y-1/2 text-muted-foreground font-medium text-lg",
+            isRTL ? "right-3" : "left-3"
+          )}>
+            {currencySymbol}
+          </span>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          {isRTL 
+            ? 'هزینه ارسال برای این محصول. خریداران این هزینه را در سبد خرید خواهند دید.' 
+            : 'Delivery fee for this product. Buyers will see this fee in their cart.'}
+        </p>
+      </Card>
+
       {/* Stock Quantity */}
       {!isClothing && (
         <Card className="p-4 space-y-3">
@@ -244,6 +280,13 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
                 </div>
               </>
             )}
+            <div className="flex justify-between border-t pt-2 mt-2">
+              <span className="text-muted-foreground flex items-center gap-1">
+                <Truck className="w-3 h-3" />
+                {isRTL ? 'هزینه ارسال' : 'Delivery Fee'}
+              </span>
+              <span>{currencySymbol} {(formData.deliveryFee || 0).toLocaleString()}</span>
+            </div>
           </div>
         </Card>
       )}

@@ -48,6 +48,7 @@ const initialFormData: ProductFormData = {
   currency: 'AFN',
   quantity: 0,
   stockPerSize: {},
+  deliveryFee: 0,
 };
 
 const EditProduct = () => {
@@ -91,9 +92,9 @@ const EditProduct = () => {
       const metadata = (data.metadata as Record<string, unknown>) || {};
       
       setFormData({
-        categoryId: (metadata.categoryId as string) || '',
+        categoryId: (metadata.categoryId as string) || data.category_id || '',
         categoryName: (metadata.categoryName as string) || '',
-        subCategoryId: (metadata.subCategoryId as string) || '',
+        subCategoryId: (metadata.subCategoryId as string) || data.subcategory_id || '',
         subCategoryName: (metadata.subCategoryName as string) || '',
         name: data.name,
         shortDescription: (metadata.shortDescription as string) || '',
@@ -111,6 +112,7 @@ const EditProduct = () => {
         currency: (metadata.currency as 'AFN' | 'USD') || 'AFN',
         quantity: data.quantity,
         stockPerSize: (metadata.stockPerSize as Record<string, number>) || {},
+        deliveryFee: data.delivery_fee || 0,
       });
     } catch (error) {
       console.error('Error fetching product:', error);
@@ -134,7 +136,7 @@ const EditProduct = () => {
       case 3:
         return formData.images.length > 0 || formData.imageUrls.length > 0;
       case 4:
-        return formData.price > 0;
+        return formData.price > 0 && formData.deliveryFee >= 0;
       case 5:
         return true;
       default:
@@ -229,9 +231,11 @@ const EditProduct = () => {
         price: formData.price,
         compare_at_price: formData.discountPrice,
         quantity: formData.quantity,
-        category_id: null,
+        category_id: formData.categoryId || null,
+        subcategory_id: formData.subCategoryId || null,
         images: imageUrls,
         status,
+        delivery_fee: formData.deliveryFee || 0,
         metadata: {
           shortDescription: formData.shortDescription,
           brand: formData.brand,
