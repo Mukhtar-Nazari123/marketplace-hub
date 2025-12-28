@@ -62,6 +62,8 @@ interface OrderItem {
   unit_price: number;
   total_price: number;
   seller_id: string;
+  product_id: string | null;
+  product_sku?: string | null;
 }
 
 interface SellerOrder {
@@ -82,6 +84,20 @@ interface SellerOrder {
   updated_at: string;
   order_items?: OrderItem[];
 }
+
+// Helper to format SKUs for display
+const formatProductSKUs = (items: OrderItem[] | undefined, isRTL: boolean): string => {
+  if (!items || items.length === 0) return isRTL ? 'بدون SKU' : 'No SKU';
+  
+  const skus = items
+    .map(item => item.product_sku)
+    .filter((sku): sku is string => sku !== null && sku !== undefined && sku.trim() !== '');
+  
+  if (skus.length === 0) return isRTL ? 'بدون SKU' : 'No SKU';
+  if (skus.length === 1) return skus[0];
+  if (skus.length === 2) return skus.join(isRTL ? ' ، ' : ', ');
+  return `${skus[0]}${isRTL ? ' و ' : ', '}+${skus.length - 1}`;
+};
 
 const ORDER_STATUSES = [
   { value: 'pending', label: 'Pending', labelFa: 'در انتظار', color: 'secondary' as const },
@@ -134,18 +150,27 @@ const SellerOrders = () => {
         shipping_address: order.shipping_address as unknown as ShippingAddress | null,
       }));
 
-      // Fetch order items for each order
+      // Fetch order items for each order with product SKUs
       const ordersWithItems = await Promise.all(
         transformedOrders.map(async (order) => {
           const { data: items } = await supabase
             .from('order_items')
-            .select('*')
+            .select(`
+              *,
+              products:product_id (sku)
+            `)
             .eq('order_id', order.order_id)
             .eq('seller_id', user.id);
 
+          // Map items to include product_sku
+          const itemsWithSku = (items || []).map((item: any) => ({
+            ...item,
+            product_sku: item.products?.sku || null,
+          }));
+
           return {
             ...order,
-            order_items: items || [],
+            order_items: itemsWithSku,
           };
         })
       );
@@ -393,8 +418,8 @@ const SellerOrders = () => {
                   <div className="flex flex-col md:flex-row md:items-center gap-4 w-full text-left">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2 flex-wrap">
-                        <span className="font-mono text-sm bg-muted px-2 py-1 rounded">
-                          {order.order_number}
+                        <span className="font-mono text-sm bg-primary/10 text-primary px-2 py-1 rounded border border-primary/20">
+                          {formatProductSKUs(order.order_items, isRTL)}
                         </span>
                         {getStatusBadge(order.status)}
                         <Badge variant="outline" className="gap-1">
