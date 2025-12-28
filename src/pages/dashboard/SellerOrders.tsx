@@ -1,0 +1,580 @@
+import { useState, useEffect } from 'react';
+import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
+import { useLanguage } from '@/lib/i18n';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+import {
+  Package,
+  MapPin,
+  Clock,
+  Truck,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  Phone,
+  User,
+  DollarSign,
+  ShoppingBag,
+  Eye,
+  RefreshCw,
+} from 'lucide-react';
+import { format } from 'date-fns';
+import { useToast } from '@/hooks/use-toast';
+import type { Json } from '@/integrations/supabase/types';
+
+interface ShippingAddress {
+  name?: string;
+  phone?: string;
+  city?: string;
+  fullAddress?: string;
+}
+
+interface OrderItem {
+  id: string;
+  product_name: string;
+  product_image: string | null;
+  quantity: number;
+  unit_price: number;
+  total_price: number;
+  seller_id: string;
+}
+
+interface SellerOrder {
+  id: string;
+  order_id: string;
+  seller_id: string;
+  order_number: string;
+  status: string;
+  subtotal: number;
+  delivery_fee: number;
+  total: number;
+  currency: string;
+  shipping_address: ShippingAddress | null;
+  buyer_name: string | null;
+  buyer_phone: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+  order_items?: OrderItem[];
+}
+
+const ORDER_STATUSES = [
+  { value: 'pending', label: 'Pending', labelFa: 'در انتظار', color: 'secondary' as const },
+  { value: 'confirmed', label: 'Confirmed', labelFa: 'تایید شده', color: 'default' as const },
+  { value: 'processing', label: 'Processing', labelFa: 'در حال پردازش', color: 'default' as const },
+  { value: 'shipped', label: 'Shipped', labelFa: 'ارسال شده', color: 'default' as const },
+  { value: 'delivered', label: 'Delivered', labelFa: 'تحویل شده', color: 'default' as const },
+  { value: 'cancelled', label: 'Cancelled', labelFa: 'لغو شده', color: 'destructive' as const },
+];
+
+const SellerOrders = () => {
+  const { isRTL } = useLanguage();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [orders, setOrders] = useState<SellerOrder[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedOrder, setSelectedOrder] = useState<SellerOrder | null>(null);
+  const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
+  const [filterStatus, setFilterStatus] = useState<string>('all');
+
+  const fetchOrders = async () => {
+    if (!user) return;
+
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('seller_orders')
+        .select('*')
+        .eq('seller_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      // Transform data
+      const transformedOrders = (data || []).map((order) => ({
+        ...order,
+        shipping_address: order.shipping_address as unknown as ShippingAddress | null,
+      }));
+
+      // Fetch order items for each order
+      const ordersWithItems = await Promise.all(
+        transformedOrders.map(async (order) => {
+          const { data: items } = await supabase
+            .from('order_items')
+            .select('*')
+            .eq('order_id', order.order_id)
+            .eq('seller_id', user.id);
+
+          return {
+            ...order,
+            order_items: items || [],
+          };
+        })
+      );
+
+      setOrders(ordersWithItems);
+    } catch (error) {
+      console.error('Error fetching seller orders:', error);
+      toast({
+        title: isRTL ? 'خطا' : 'Error',
+        description: isRTL ? 'خطا در دریافت سفارشات' : 'Failed to fetch orders',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders();
+  }, [user]);
+
+  const handleStatusUpdate = async (orderId: string, newStatus: string) => {
+    setUpdatingStatus(orderId);
+    try {
+      const { error } = await supabase
+        .from('seller_orders')
+        .update({ status: newStatus })
+        .eq('id', orderId);
+
+      if (error) throw error;
+
+      setOrders((prev) =>
+        prev.map((order) =>
+          order.id === orderId ? { ...order, status: newStatus } : order
+        )
+      );
+
+      toast({
+        title: isRTL ? 'موفق' : 'Success',
+        description: isRTL ? 'وضعیت سفارش بروزرسانی شد' : 'Order status updated successfully',
+      });
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      toast({
+        title: isRTL ? 'خطا' : 'Error',
+        description: isRTL ? 'خطا در بروزرسانی وضعیت' : 'Failed to update order status',
+        variant: 'destructive',
+      });
+    } finally {
+      setUpdatingStatus(null);
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    const config = ORDER_STATUSES.find((s) => s.value === status) || ORDER_STATUSES[0];
+    const icons: Record<string, typeof CheckCircle> = {
+      pending: Clock,
+      confirmed: CheckCircle,
+      processing: Package,
+      shipped: Truck,
+      delivered: CheckCircle,
+      cancelled: XCircle,
+    };
+    const Icon = icons[status] || AlertCircle;
+
+    return (
+      <Badge variant={config.color} className="flex items-center gap-1">
+        <Icon className="w-3 h-3" />
+        {isRTL ? config.labelFa : config.label}
+      </Badge>
+    );
+  };
+
+  const getCurrencySymbol = (currency: string) => {
+    return currency === 'USD' ? '$' : '؋';
+  };
+
+  const filteredOrders = filterStatus === 'all'
+    ? orders
+    : orders.filter((o) => o.status === filterStatus);
+
+  if (loading) {
+    return (
+      <DashboardLayout
+        title={isRTL ? 'سفارشات' : 'Orders'}
+        description={isRTL ? 'مدیریت سفارشات مشتریان' : 'Manage customer orders'}
+        allowedRoles={['seller']}
+      >
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <Card key={i}>
+              <CardHeader>
+                <Skeleton className="h-6 w-48" />
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-3/4" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  return (
+    <DashboardLayout
+      title={isRTL ? 'سفارشات' : 'Orders'}
+      description={isRTL ? 'مدیریت سفارشات مشتریان' : 'Manage customer orders'}
+      allowedRoles={['seller']}
+    >
+      <div className="space-y-6">
+        {/* Stats Cards */}
+        <div className="grid gap-4 md:grid-cols-4">
+          <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+                  <Package className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">{orders.length}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {isRTL ? 'کل سفارشات' : 'Total Orders'}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-amber-500/10 to-amber-500/5 border-amber-500/20">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center">
+                  <Clock className="w-6 h-6 text-amber-600" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">
+                    {orders.filter((o) => o.status === 'pending').length}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {isRTL ? 'در انتظار' : 'Pending'}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 border-blue-500/20">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center">
+                  <Truck className="w-6 h-6 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">
+                    {orders.filter((o) => o.status === 'shipped').length}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {isRTL ? 'ارسال شده' : 'Shipped'}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-green-500/10 to-green-500/5 border-green-500/20">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center">
+                  <CheckCircle className="w-6 h-6 text-green-600" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">
+                    {orders.filter((o) => o.status === 'delivered').length}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {isRTL ? 'تحویل شده' : 'Delivered'}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Filter & Actions Bar */}
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Select value={filterStatus} onValueChange={setFilterStatus}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder={isRTL ? 'فیلتر وضعیت' : 'Filter by status'} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{isRTL ? 'همه سفارشات' : 'All Orders'}</SelectItem>
+                    {ORDER_STATUSES.map((status) => (
+                      <SelectItem key={status.value} value={status.value}>
+                        {isRTL ? status.labelFa : status.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button variant="outline" onClick={fetchOrders} className="gap-2">
+                <RefreshCw className="w-4 h-4" />
+                {isRTL ? 'بروزرسانی' : 'Refresh'}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Orders List */}
+        {filteredOrders.length === 0 ? (
+          <Card className="border-dashed">
+            <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+              <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-6">
+                <ShoppingBag className="w-10 h-10 text-muted-foreground" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">
+                {isRTL ? 'سفارشی یافت نشد' : 'No orders found'}
+              </h3>
+              <p className="text-muted-foreground max-w-sm">
+                {filterStatus !== 'all'
+                  ? isRTL
+                    ? 'سفارشی با این وضعیت وجود ندارد'
+                    : 'No orders with this status'
+                  : isRTL
+                  ? 'هنوز سفارشی دریافت نکرده‌اید'
+                  : "You haven't received any orders yet"}
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          <Accordion type="single" collapsible className="space-y-4">
+            {filteredOrders.map((order) => (
+              <AccordionItem
+                key={order.id}
+                value={order.id}
+                className="border rounded-lg bg-card shadow-sm hover:shadow-md transition-shadow"
+              >
+                <AccordionTrigger className="px-6 py-4 hover:no-underline">
+                  <div className="flex flex-col md:flex-row md:items-center gap-4 w-full text-left">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2 flex-wrap">
+                        <span className="font-mono text-sm bg-muted px-2 py-1 rounded">
+                          {order.order_number}
+                        </span>
+                        {getStatusBadge(order.status)}
+                        <Badge variant="outline" className="gap-1">
+                          <DollarSign className="w-3 h-3" />
+                          {order.currency}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          {format(new Date(order.created_at), 'PPP')}
+                        </span>
+                        {order.buyer_name && (
+                          <span className="flex items-center gap-1">
+                            <User className="w-3 h-3" />
+                            {order.buyer_name}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-lg font-bold text-primary">
+                        {getCurrencySymbol(order.currency)}{order.total.toLocaleString()}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {order.order_items?.length || 0} {isRTL ? 'محصول' : 'items'}
+                      </p>
+                    </div>
+                  </div>
+                </AccordionTrigger>
+
+                <AccordionContent className="px-6 pb-6">
+                  <div className="space-y-6">
+                    {/* Status Update */}
+                    <Card className="bg-muted/30">
+                      <CardContent className="pt-6">
+                        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                          <div>
+                            <h4 className="font-medium mb-1">
+                              {isRTL ? 'بروزرسانی وضعیت' : 'Update Status'}
+                            </h4>
+                            <p className="text-sm text-muted-foreground">
+                              {isRTL
+                                ? 'وضعیت سفارش را تغییر دهید'
+                                : 'Change the order status'}
+                            </p>
+                          </div>
+                          <Select
+                            value={order.status}
+                            onValueChange={(value) => handleStatusUpdate(order.id, value)}
+                            disabled={updatingStatus === order.id}
+                          >
+                            <SelectTrigger className="w-[180px]">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {ORDER_STATUSES.map((status) => (
+                                <SelectItem key={status.value} value={status.value}>
+                                  {isRTL ? status.labelFa : status.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Order Items */}
+                    {order.order_items && order.order_items.length > 0 && (
+                      <div className="space-y-4">
+                        <h4 className="font-semibold flex items-center gap-2">
+                          <Package className="w-4 h-4" />
+                          {isRTL ? 'محصولات' : 'Products'}
+                        </h4>
+                        <div className="space-y-3">
+                          {order.order_items.map((item) => (
+                            <div
+                              key={item.id}
+                              className="flex items-center gap-4 p-3 bg-muted/50 rounded-lg"
+                            >
+                              <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+                                {item.product_image ? (
+                                  <img
+                                    src={item.product_image}
+                                    alt={item.product_name}
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center">
+                                    <Package className="w-6 h-6 text-muted-foreground" />
+                                  </div>
+                                )}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium truncate">{item.product_name}</p>
+                                <p className="text-sm text-muted-foreground">
+                                  {item.quantity} × {getCurrencySymbol(order.currency)}
+                                  {item.unit_price.toLocaleString()}
+                                </p>
+                              </div>
+                              <div className="text-right">
+                                <p className="font-semibold">
+                                  {getCurrencySymbol(order.currency)}
+                                  {item.total_price.toLocaleString()}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <Separator />
+
+                    {/* Order Summary */}
+                    <div className="grid gap-6 md:grid-cols-2">
+                      {/* Shipping Address */}
+                      {order.shipping_address && (
+                        <div className="space-y-3">
+                          <h4 className="font-semibold flex items-center gap-2">
+                            <MapPin className="w-4 h-4" />
+                            {isRTL ? 'آدرس ارسال' : 'Shipping Address'}
+                          </h4>
+                          <div className="p-4 bg-muted/50 rounded-lg text-sm space-y-2">
+                            <div className="flex items-center gap-2">
+                              <User className="w-4 h-4 text-muted-foreground" />
+                              <span className="font-medium">
+                                {order.buyer_name || order.shipping_address.name}
+                              </span>
+                            </div>
+                            {(order.buyer_phone || order.shipping_address.phone) && (
+                              <div className="flex items-center gap-2">
+                                <Phone className="w-4 h-4 text-muted-foreground" />
+                                <span>{order.buyer_phone || order.shipping_address.phone}</span>
+                              </div>
+                            )}
+                            <div className="flex items-start gap-2">
+                              <MapPin className="w-4 h-4 text-muted-foreground mt-0.5" />
+                              <span>
+                                {order.shipping_address.city}
+                                {order.shipping_address.fullAddress && `, ${order.shipping_address.fullAddress}`}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Order Total */}
+                      <div className="space-y-3">
+                        <h4 className="font-semibold flex items-center gap-2">
+                          <DollarSign className="w-4 h-4" />
+                          {isRTL ? 'خلاصه سفارش' : 'Order Summary'}
+                        </h4>
+                        <div className="p-4 bg-muted/50 rounded-lg text-sm space-y-2">
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">
+                              {isRTL ? 'جمع محصولات' : 'Subtotal'}
+                            </span>
+                            <span>
+                              {getCurrencySymbol(order.currency)}
+                              {order.subtotal.toLocaleString()}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground flex items-center gap-1">
+                              <Truck className="w-3 h-3" />
+                              {isRTL ? 'هزینه ارسال' : 'Delivery Fee'}
+                            </span>
+                            <span>
+                              {getCurrencySymbol(order.currency)}
+                              {order.delivery_fee.toLocaleString()}
+                            </span>
+                          </div>
+                          <Separator />
+                          <div className="flex justify-between font-bold text-base">
+                            <span>{isRTL ? 'مجموع' : 'Total'}</span>
+                            <span className="text-primary">
+                              {getCurrencySymbol(order.currency)}
+                              {order.total.toLocaleString()}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        )}
+      </div>
+    </DashboardLayout>
+  );
+};
+
+export default SellerOrders;

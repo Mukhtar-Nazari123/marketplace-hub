@@ -299,13 +299,12 @@ const Checkout = () => {
         shipping_policy: p.shippingPolicy,
       }));
 
-      // Calculate totals for order (using first currency as primary for now)
-      // In a real multi-currency scenario, you'd create separate orders per currency
+      // Calculate totals for order
       const totalProductAmount = currencyBreakdowns.reduce((sum, cb) => sum + cb.productSubtotal, 0);
       const totalDeliveryFees = currencyBreakdowns.reduce((sum, cb) => sum + cb.deliveryTotal, 0);
       const grandTotal = currencyBreakdowns.reduce((sum, cb) => sum + cb.total, 0);
 
-      // Create order
+      // Create main order
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert([{
@@ -343,6 +342,65 @@ const Checkout = () => {
       const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
 
       if (itemsError) throw itemsError;
+
+      // Create seller sub-orders for each seller in the cart
+      // Group items by seller and currency
+      const sellerOrdersMap = new Map<string, {
+        sellerId: string;
+        sellerName: string;
+        currency: string;
+        subtotal: number;
+        deliveryFee: number;
+        items: typeof cartItems;
+      }>();
+
+      cartItems.forEach((item) => {
+        if (!item.product) return;
+        const sellerId = item.product.seller_id;
+        const currency = item.product.currency || 'AFN';
+        const key = `${sellerId}-${currency}`;
+
+        if (!sellerOrdersMap.has(key)) {
+          const sellerPolicy = sellerPolicies.find(p => p.sellerId === sellerId);
+          sellerOrdersMap.set(key, {
+            sellerId,
+            sellerName: sellerPolicy?.sellerName || 'Seller',
+            currency,
+            subtotal: 0,
+            deliveryFee: 0,
+            items: [],
+          });
+        }
+
+        const sellerOrder = sellerOrdersMap.get(key)!;
+        sellerOrder.subtotal += item.product.price * item.quantity;
+        sellerOrder.deliveryFee = Math.max(sellerOrder.deliveryFee, item.product.delivery_fee || 0);
+        sellerOrder.items.push(item);
+      });
+
+      // Insert seller orders
+      const sellerOrdersToInsert = Array.from(sellerOrdersMap.values()).map((so, index) => ({
+        order_id: order.id,
+        seller_id: so.sellerId,
+        order_number: `${orderNumber}-S${index + 1}`,
+        status: 'pending',
+        subtotal: so.subtotal,
+        delivery_fee: so.deliveryFee,
+        total: so.subtotal + so.deliveryFee,
+        currency: so.currency,
+        shipping_address: { ...addressForm } as unknown as Json,
+        buyer_name: addressForm.name,
+        buyer_phone: addressForm.phone,
+      }));
+
+      const { error: sellerOrdersError } = await supabase
+        .from('seller_orders')
+        .insert(sellerOrdersToInsert);
+
+      if (sellerOrdersError) {
+        console.error('Error creating seller orders:', sellerOrdersError);
+        // Don't throw - main order is created, just log the error
+      }
 
       // Clear cart
       await clearCart();
