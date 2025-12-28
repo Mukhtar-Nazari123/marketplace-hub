@@ -601,35 +601,39 @@ const Checkout = () => {
                   <Separator />
 
                   {/* Seller Policies */}
-                  <div className="space-y-4">
-                    <h3 className="font-semibold flex items-center gap-2">
-                      <RotateCcw className="w-4 h-4" />
-                      {t.checkout.orderSummary.sellerPolicies}
-                    </h3>
-                    {sellerPolicies.map((policy) => (
-                      <div key={policy.sellerId} className="p-4 border rounded-lg space-y-3">
-                        <Badge variant="secondary">{policy.sellerName}</Badge>
-                        <div className="grid gap-3 md:grid-cols-2">
-                          <div>
-                            <p className="text-sm font-medium text-muted-foreground">
-                              {t.checkout.orderSummary.returnPolicy}
-                            </p>
-                            <p className="text-sm mt-1">
-                              {policy.returnPolicy || t.checkout.orderSummary.noPolicyProvided}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium text-muted-foreground">
-                              {t.checkout.orderSummary.shippingPolicy}
-                            </p>
-                            <p className="text-sm mt-1">
-                              {policy.shippingPolicy || t.checkout.orderSummary.noPolicyProvided}
-                            </p>
+                  {sellerPolicies.length > 0 && (
+                    <div className="space-y-4">
+                      <h3 className="font-semibold flex items-center gap-2">
+                        <RotateCcw className="w-4 h-4" />
+                        {t.checkout.orderSummary.sellerPolicies}
+                      </h3>
+                      {sellerPolicies.map((policy) => (
+                        <div key={policy.sellerId} className="p-4 border rounded-lg space-y-3 bg-muted/30">
+                          <Badge variant="secondary" className="text-sm">{policy.sellerName}</Badge>
+                          <div className="grid gap-4 md:grid-cols-2">
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                                <RotateCcw className="w-3 h-3" />
+                                {t.checkout.orderSummary.returnPolicy}
+                              </div>
+                              <p className="text-sm p-3 bg-background rounded-md border">
+                                {policy.returnPolicy || t.checkout.orderSummary.noPolicyProvided}
+                              </p>
+                            </div>
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                                <Truck className="w-3 h-3" />
+                                {t.checkout.orderSummary.shippingPolicy}
+                              </div>
+                              <p className="text-sm p-3 bg-background rounded-md border">
+                                {policy.shippingPolicy || t.checkout.orderSummary.noPolicyProvided}
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
