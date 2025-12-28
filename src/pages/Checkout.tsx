@@ -57,8 +57,27 @@ interface CartItemWithDetails {
     images: string[] | null;
     seller_id: string;
     delivery_fee: number;
+    metadata?: {
+      currency?: string;
+      [key: string]: unknown;
+    } | null;
   };
 }
+
+interface SellerBreakdown {
+  sellerId: string;
+  sellerName: string;
+  products: {
+    name: string;
+    quantity: number;
+    price: number;
+  }[];
+  productSubtotal: number;
+  deliveryFee: number;
+  sellerTotal: number;
+}
+
+type Currency = 'AFN' | 'USD';
 
 const STEPS = [
   { id: 1, key: 'address', icon: MapPin },
@@ -77,6 +96,7 @@ const Checkout = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(true);
   const [placingOrder, setPlacingOrder] = useState(false);
+  const [currency, setCurrency] = useState<Currency>('AFN');
 
   const [addressForm, setAddressForm] = useState<AddressForm>({
     name: '',
@@ -86,6 +106,7 @@ const Checkout = () => {
   });
 
   const [sellerPolicies, setSellerPolicies] = useState<SellerPolicy[]>([]);
+  const [savedAddresses, setSavedAddresses] = useState<{ id: string; title: string; fullAddress: string; city: string; isDefault: boolean }[]>([]);
 
   // Redirect checks
   useEffect(() => {
@@ -110,17 +131,26 @@ const Checkout = () => {
       if (!user || cartItems.length === 0) return;
 
       try {
-        // Load profile
+        // Load profile with phone and addresses
         const { data: profile } = await supabase
           .from('profiles')
-          .select('full_name')
+          .select('full_name, phone, addresses')
           .eq('user_id', user.id)
           .maybeSingle();
 
         if (profile) {
+          const addresses = (profile.addresses as unknown as { id: string; title: string; fullAddress: string; city: string; isDefault: boolean }[]) || [];
+          setSavedAddresses(addresses);
+          
+          // Find default address or first address
+          const defaultAddress = addresses.find(a => a.isDefault) || addresses[0];
+          
           setAddressForm((prev) => ({
             ...prev,
             name: profile.full_name || '',
+            phone: profile.phone || '',
+            city: defaultAddress?.city || '',
+            fullAddress: defaultAddress?.fullAddress || '',
           }));
         }
 
@@ -158,37 +188,66 @@ const Checkout = () => {
     }
   }, [user, cartItems, cartLoading]);
 
-  // Calculate totals
-  const { subtotal, deliveryFees, total, sellerDeliveryBreakdown } = useMemo(() => {
-    const itemsSubtotal = cartItems.reduce((sum, item) => {
-      const price = item.product?.price || 0;
-      return sum + price * item.quantity;
-    }, 0);
+  // Currency symbol helper
+  const getCurrencySymbol = (curr: Currency) => {
+    if (curr === 'USD') return '$';
+    return isRTL ? '؋' : 'AFN ';
+  };
 
-    // Calculate delivery fee per seller (charge once per seller)
-    const sellerFees: Record<string, { fee: number; name: string }> = {};
+  const currencySymbol = getCurrencySymbol(currency);
+
+  // Calculate totals grouped by seller with currency support
+  const { subtotal, deliveryFees, total, sellerBreakdowns } = useMemo(() => {
+    // Group items by seller
+    const sellerGroups: Record<string, {
+      items: typeof cartItems;
+      policy: SellerPolicy | undefined;
+    }> = {};
+
     cartItems.forEach((item) => {
-      const sellerId = item.product?.seller_id;
-      const fee = item.product?.delivery_fee || 0;
-      if (sellerId && !sellerFees[sellerId]) {
-        const policy = sellerPolicies.find((p) => p.sellerId === sellerId);
-        sellerFees[sellerId] = { fee, name: policy?.sellerName || 'Seller' };
+      const sellerId = item.product?.seller_id || 'unknown';
+      if (!sellerGroups[sellerId]) {
+        sellerGroups[sellerId] = {
+          items: [],
+          policy: sellerPolicies.find((p) => p.sellerId === sellerId),
+        };
       }
+      sellerGroups[sellerId].items.push(item);
     });
 
-    const totalDeliveryFees = Object.values(sellerFees).reduce((sum, s) => sum + s.fee, 0);
+    // Calculate breakdown per seller
+    const breakdowns: SellerBreakdown[] = Object.entries(sellerGroups).map(([sellerId, group]) => {
+      const products = group.items.map((item) => ({
+        name: item.product?.name || 'Product',
+        quantity: item.quantity,
+        price: (item.product?.price || 0) * item.quantity,
+      }));
+
+      const productSubtotal = products.reduce((sum, p) => sum + p.price, 0);
+      
+      // Use the delivery fee from the first item of this seller (they share the same delivery fee)
+      const deliveryFee = group.items[0]?.product?.delivery_fee || 0;
+
+      return {
+        sellerId,
+        sellerName: group.policy?.sellerName || (isRTL ? 'فروشنده' : 'Seller'),
+        products,
+        productSubtotal,
+        deliveryFee,
+        sellerTotal: productSubtotal + deliveryFee,
+      };
+    });
+
+    const totalProductAmount = breakdowns.reduce((sum, s) => sum + s.productSubtotal, 0);
+    const totalDeliveryFees = breakdowns.reduce((sum, s) => sum + s.deliveryFee, 0);
 
     return {
-      subtotal: itemsSubtotal,
+      subtotal: totalProductAmount,
       deliveryFees: totalDeliveryFees,
-      total: itemsSubtotal + totalDeliveryFees,
-      sellerDeliveryBreakdown: Object.entries(sellerFees).map(([id, data]) => ({
-        sellerId: id,
-        sellerName: data.name,
-        fee: data.fee,
-      })),
+      total: totalProductAmount + totalDeliveryFees,
+      sellerBreakdowns: breakdowns,
     };
-  }, [cartItems, sellerPolicies]);
+  }, [cartItems, sellerPolicies, isRTL]);
 
   const validateAddress = () => {
     return addressForm.name && addressForm.phone && addressForm.city && addressForm.fullAddress;
@@ -416,37 +475,87 @@ const Checkout = () => {
               {currentStep === 2 && (
                 <div className="space-y-6">
                   <CardHeader className="px-0 pt-0">
-                    <CardTitle className="flex items-center gap-2">
-                      <Package className="w-5 h-5 text-primary" />
-                      {t.checkout.orderSummary.title}
-                    </CardTitle>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="flex items-center gap-2">
+                        <Package className="w-5 h-5 text-primary" />
+                        {t.checkout.orderSummary.title}
+                      </CardTitle>
+                      {/* Currency Switcher */}
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">
+                          {isRTL ? 'ارز:' : 'Currency:'}
+                        </span>
+                        <div className="flex border rounded-lg overflow-hidden">
+                          <button
+                            onClick={() => setCurrency('AFN')}
+                            className={cn(
+                              'px-3 py-1 text-sm transition-colors',
+                              currency === 'AFN' 
+                                ? 'bg-primary text-primary-foreground' 
+                                : 'bg-background hover:bg-muted'
+                            )}
+                          >
+                            {isRTL ? '؋ AFN' : 'AFN ؋'}
+                          </button>
+                          <button
+                            onClick={() => setCurrency('USD')}
+                            className={cn(
+                              'px-3 py-1 text-sm transition-colors',
+                              currency === 'USD' 
+                                ? 'bg-primary text-primary-foreground' 
+                                : 'bg-background hover:bg-muted'
+                            )}
+                          >
+                            $ USD
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </CardHeader>
 
-                  {/* Products */}
-                  <div className="space-y-4">
-                    {cartItems.map((item) => (
-                      <div key={item.id} className="flex items-center gap-4 p-4 border rounded-lg">
-                        <div className="w-16 h-16 bg-muted rounded-md overflow-hidden flex-shrink-0">
-                          {item.product?.images?.[0] ? (
-                            <img
-                              src={item.product.images[0]}
-                              alt={item.product?.name}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <ShoppingBag className="w-6 h-6 text-muted-foreground" />
+                  {/* Products grouped by seller */}
+                  <div className="space-y-6">
+                    {sellerBreakdowns.map((seller) => (
+                      <div key={seller.sellerId} className="border rounded-lg p-4 space-y-4">
+                        <div className="flex items-center justify-between">
+                          <Badge variant="secondary" className="text-sm">
+                            {seller.sellerName}
+                          </Badge>
+                        </div>
+
+                        {/* Seller's Products */}
+                        <div className="space-y-3">
+                          {seller.products.map((product, idx) => (
+                            <div key={idx} className="flex items-center justify-between text-sm">
+                              <span className="text-muted-foreground">
+                                {product.name} × {product.quantity}
+                              </span>
+                              <span>{product.price.toLocaleString()} {currencySymbol}</span>
                             </div>
-                          )}
+                          ))}
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-medium truncate">{item.product?.name}</h4>
-                          <p className="text-sm text-muted-foreground">
-                            {t.checkout.orderSummary.quantity}: {item.quantity}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-medium">${(item.product?.price || 0) * item.quantity}</p>
+
+                        <Separator />
+
+                        {/* Seller Subtotals */}
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">
+                              {isRTL ? 'جمع محصولات' : 'Products Subtotal'}
+                            </span>
+                            <span>{seller.productSubtotal.toLocaleString()} {currencySymbol}</span>
+                          </div>
+                          <div className="flex justify-between text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <Truck className="w-3 h-3" />
+                              {t.checkout.orderSummary.deliveryFee}
+                            </span>
+                            <span>{seller.deliveryFee.toLocaleString()} {currencySymbol}</span>
+                          </div>
+                          <div className="flex justify-between font-medium">
+                            <span>{isRTL ? 'جمع فروشنده' : 'Seller Total'}</span>
+                            <span>{seller.sellerTotal.toLocaleString()} {currencySymbol}</span>
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -454,25 +563,25 @@ const Checkout = () => {
 
                   <Separator />
 
-                  {/* Totals */}
-                  <div className="space-y-2">
+                  {/* Grand Totals */}
+                  <div className="space-y-2 bg-muted/30 p-4 rounded-lg">
                     <div className="flex justify-between text-sm">
-                      <span>{t.checkout.orderSummary.subtotal}</span>
-                      <span>${subtotal.toFixed(2)}</span>
+                      <span className="text-muted-foreground">
+                        {isRTL ? 'جمع کل محصولات' : 'Total Products'}
+                      </span>
+                      <span>{subtotal.toLocaleString()} {currencySymbol}</span>
                     </div>
-                    {sellerDeliveryBreakdown.map((seller) => (
-                      <div key={seller.sellerId} className="flex justify-between text-sm text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Truck className="w-3 h-3" />
-                          {t.checkout.orderSummary.deliveryFee} ({seller.sellerName})
-                        </span>
-                        <span>${seller.fee.toFixed(2)}</span>
-                      </div>
-                    ))}
+                    <div className="flex justify-between text-sm text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <Truck className="w-3 h-3" />
+                        {isRTL ? 'جمع هزینه ارسال' : 'Total Delivery Fees'}
+                      </span>
+                      <span>{deliveryFees.toLocaleString()} {currencySymbol}</span>
+                    </div>
                     <Separator />
                     <div className="flex justify-between font-bold text-lg">
                       <span>{t.checkout.orderSummary.total}</span>
-                      <span className="text-primary">${total.toFixed(2)}</span>
+                      <span className="text-primary">{total.toLocaleString()} {currencySymbol}</span>
                     </div>
                   </div>
 

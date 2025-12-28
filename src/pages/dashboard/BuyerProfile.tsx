@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/lib/i18n';
+import type { Json } from '@/integrations/supabase/types';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -79,13 +80,11 @@ const BuyerProfile = () => {
   const [isChangingEmail, setIsChangingEmail] = useState(false);
 
   // Address State
-  const [addresses, setAddresses] = useState<Address[]>([
-    { id: '1', title: isRTL ? 'خانه' : 'Home', fullAddress: isRTL ? 'کابل، افغانستان، خیابان اصلی' : '123 Main St, Kabul', city: isRTL ? 'کابل' : 'Kabul', postalCode: '1001', isDefault: true },
-    { id: '2', title: isRTL ? 'محل کار' : 'Work', fullAddress: isRTL ? 'هرات، شرکت ABC' : '456 Business Ave, Herat', city: isRTL ? 'هرات' : 'Herat', postalCode: '3001', isDefault: false },
-  ]);
+  const [addresses, setAddresses] = useState<Address[]>([]);
   const [isAddingAddress, setIsAddingAddress] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [newAddress, setNewAddress] = useState<Partial<Address>>({});
+  const [isSavingAddresses, setIsSavingAddresses] = useState(false);
 
   // Preferences State
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -114,6 +113,11 @@ const BuyerProfile = () => {
     if (data) {
       setFullName(data.full_name || '');
       setAvatarUrl(data.avatar_url || '');
+      setPhone(data.phone || '');
+      const savedAddresses = data.addresses as unknown as Address[] | null;
+      if (savedAddresses && Array.isArray(savedAddresses)) {
+        setAddresses(savedAddresses);
+      }
     }
   };
 
@@ -124,7 +128,10 @@ const BuyerProfile = () => {
     try {
       const { error } = await supabase
         .from('profiles')
-        .update({ full_name: fullName })
+        .update({ 
+          full_name: fullName,
+          phone: phone,
+        })
         .eq('user_id', user.id);
 
       if (error) throw error;
@@ -206,7 +213,28 @@ const BuyerProfile = () => {
     localStorage.setItem('theme', checked ? 'dark' : 'light');
   };
 
-  const handleAddAddress = () => {
+  const saveAddressesToDb = async (updatedAddresses: Address[]) => {
+    if (!user) return;
+    setIsSavingAddresses(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ addresses: updatedAddresses as unknown as Json })
+        .eq('user_id', user.id);
+      if (error) throw error;
+    } catch (err) {
+      console.error('Error saving addresses:', err);
+      toast({
+        title: isRTL ? 'خطا' : 'Error',
+        description: isRTL ? 'خطا در ذخیره آدرس' : 'Failed to save address',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSavingAddresses(false);
+    }
+  };
+
+  const handleAddAddress = async () => {
     if (!newAddress.title || !newAddress.fullAddress) return;
     
     const address: Address = {
@@ -215,28 +243,34 @@ const BuyerProfile = () => {
       fullAddress: newAddress.fullAddress,
       city: newAddress.city || '',
       postalCode: newAddress.postalCode || '',
-      isDefault: false,
+      isDefault: addresses.length === 0,
     };
     
-    setAddresses([...addresses, address]);
+    const updatedAddresses = [...addresses, address];
+    setAddresses(updatedAddresses);
     setNewAddress({});
     setIsAddingAddress(false);
+    await saveAddressesToDb(updatedAddresses);
     toast({
       title: isRTL ? 'موفقیت' : 'Success',
       description: isRTL ? 'آدرس اضافه شد' : 'Address added',
     });
   };
 
-  const handleDeleteAddress = (id: string) => {
-    setAddresses(addresses.filter(a => a.id !== id));
+  const handleDeleteAddress = async (id: string) => {
+    const updatedAddresses = addresses.filter(a => a.id !== id);
+    setAddresses(updatedAddresses);
+    await saveAddressesToDb(updatedAddresses);
     toast({
       title: isRTL ? 'حذف شد' : 'Deleted',
       description: isRTL ? 'آدرس حذف شد' : 'Address removed',
     });
   };
 
-  const handleSetDefaultAddress = (id: string) => {
-    setAddresses(addresses.map(a => ({ ...a, isDefault: a.id === id })));
+  const handleSetDefaultAddress = async (id: string) => {
+    const updatedAddresses = addresses.map(a => ({ ...a, isDefault: a.id === id }));
+    setAddresses(updatedAddresses);
+    await saveAddressesToDb(updatedAddresses);
   };
 
   const personalInfoText = isRTL ? 'اطلاعات شخصی' : 'Personal Information';

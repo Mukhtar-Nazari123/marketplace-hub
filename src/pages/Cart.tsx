@@ -62,6 +62,29 @@ const Cart = () => {
     };
   });
 
+  // Group items by seller for breakdown
+  const sellerGroups: Record<string, {
+    name: string;
+    items: typeof itemsWithCurrency;
+    productSubtotal: number;
+    deliveryFee: number;
+    currency: string;
+  }> = {};
+
+  itemsWithCurrency.forEach(item => {
+    if (!sellerGroups[item.sellerId]) {
+      sellerGroups[item.sellerId] = {
+        name: isRTL ? 'فروشنده' : 'Seller',
+        items: [],
+        productSubtotal: 0,
+        deliveryFee: item.deliveryFee,
+        currency: item.currency,
+      };
+    }
+    sellerGroups[item.sellerId].items.push(item);
+    sellerGroups[item.sellerId].productSubtotal += item.itemTotal;
+  });
+
   // Group totals by currency
   const totalsByCurrency: Record<string, number> = {};
   itemsWithCurrency.forEach(item => {
@@ -69,25 +92,17 @@ const Cart = () => {
     totalsByCurrency[key] = (totalsByCurrency[key] || 0) + item.itemTotal;
   });
 
-  // Calculate delivery fees per seller (only charge once per seller)
-  const deliveryFeesBySeller: Record<string, { fee: number; currency: string }> = {};
-  itemsWithCurrency.forEach(item => {
-    if (!deliveryFeesBySeller[item.sellerId]) {
-      deliveryFeesBySeller[item.sellerId] = { fee: item.deliveryFee, currency: item.currency };
-    }
-  });
-
-  // Total delivery fee (sum of unique seller fees, grouped by currency)
+  // Total delivery fee per currency (sum of unique seller fees)
   const deliveryFeesByCurrency: Record<string, number> = {};
-  Object.values(deliveryFeesBySeller).forEach(({ fee, currency }) => {
-    deliveryFeesByCurrency[currency] = (deliveryFeesByCurrency[currency] || 0) + fee;
+  Object.values(sellerGroups).forEach(({ deliveryFee, currency }) => {
+    deliveryFeesByCurrency[currency] = (deliveryFeesByCurrency[currency] || 0) + deliveryFee;
   });
 
   const primaryCurrency = Object.keys(totalsByCurrency)[0] || 'AFN';
   const subtotal = totalsByCurrency[primaryCurrency] || 0;
   const deliveryTotal = deliveryFeesByCurrency[primaryCurrency] || 0;
   const total = subtotal + deliveryTotal;
-  const primarySymbol = primaryCurrency === 'USD' ? '$' : (isRTL ? '؋' : 'AFN');
+  const primarySymbol = primaryCurrency === 'USD' ? '$' : (isRTL ? '؋' : 'AFN ');
 
   const texts = {
     title: isRTL ? 'سبد خرید' : 'Shopping Cart',
@@ -295,7 +310,7 @@ const Cart = () => {
                   {Object.keys(totalsByCurrency).length > 1 ? (
                     <>
                       {Object.entries(totalsByCurrency).map(([currency, amount]) => {
-                        const symbol = currency === 'USD' ? '$' : (isRTL ? '؋' : 'AFN');
+                        const symbol = currency === 'USD' ? '$' : (isRTL ? '؋' : 'AFN ');
                         return (
                           <div key={currency} className="flex justify-between">
                             <span className="text-muted-foreground">
@@ -317,10 +332,15 @@ const Cart = () => {
                         <span className="text-muted-foreground">{texts.subtotal}</span>
                         <span className="font-medium">{subtotal.toLocaleString()} {primarySymbol}</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">{texts.shipping}</span>
-                        <span className="font-medium">{deliveryTotal.toLocaleString()} {primarySymbol}</span>
-                      </div>
+                      
+                      {/* Delivery fee breakdown per seller */}
+                      {Object.entries(sellerGroups).map(([sellerId, group]) => (
+                        <div key={sellerId} className="flex justify-between text-sm text-muted-foreground">
+                          <span>{texts.shipping} ({group.name})</span>
+                          <span>{group.deliveryFee.toLocaleString()} {primarySymbol}</span>
+                        </div>
+                      ))}
+                      
                       <Separator />
                       <div className="flex justify-between text-lg font-bold">
                         <span>{texts.orderTotal}</span>

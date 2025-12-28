@@ -416,29 +416,35 @@ export type Database = {
       }
       profiles: {
         Row: {
+          addresses: Json | null
           avatar_url: string | null
           created_at: string
           email: string
           full_name: string
           id: string
+          phone: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          addresses?: Json | null
           avatar_url?: string | null
           created_at?: string
           email: string
           full_name: string
           id?: string
+          phone?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          addresses?: Json | null
           avatar_url?: string | null
           created_at?: string
           email?: string
           full_name?: string
           id?: string
+          phone?: string | null
           updated_at?: string
           user_id?: string
         }
