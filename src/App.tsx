@@ -45,6 +45,7 @@ import SellerProfileChoice from "./pages/seller/SellerProfileChoice";
 import SellerProfileComplete from "./pages/seller/SellerProfileComplete";
 import SellerProductView from "./pages/dashboard/SellerProductView";
 import SellerOrders from "./pages/dashboard/SellerOrders";
+import SellerAnalytics from "./pages/dashboard/SellerAnalytics";
 import Wishlist from "./pages/dashboard/Wishlist";
 
 const queryClient = new QueryClient();
@@ -106,7 +107,7 @@ const App = () => (
                     <Route path="/dashboard/seller" element={<SellerDashboard />} />
                     <Route path="/dashboard/seller/products" element={<SellerProducts />} />
                     <Route path="/dashboard/seller/orders" element={<SellerOrders />} />
-                    <Route path="/dashboard/seller/analytics" element={<SellerDashboard />} />
+                    <Route path="/dashboard/seller/analytics" element={<SellerAnalytics />} />
                     <Route path="/dashboard/seller/products/new" element={<AddProduct />} />
                     <Route path="/dashboard/seller/products/edit/:id" element={<EditProduct />} />
                     <Route path="/dashboard/seller/pending" element={<SellerPending />} />
