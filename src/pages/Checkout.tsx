@@ -57,10 +57,7 @@ interface CartItemWithDetails {
     images: string[] | null;
     seller_id: string;
     delivery_fee: number;
-    metadata?: {
-      currency?: string;
-      [key: string]: unknown;
-    } | null;
+    currency?: string;
   };
 }
 
@@ -77,7 +74,14 @@ interface SellerBreakdown {
   sellerTotal: number;
 }
 
-type Currency = 'AFN' | 'USD';
+interface CurrencyBreakdown {
+  currency: string;
+  symbol: string;
+  sellers: SellerBreakdown[];
+  productSubtotal: number;
+  deliveryTotal: number;
+  total: number;
+}
 
 const STEPS = [
   { id: 1, key: 'address', icon: MapPin },
@@ -96,7 +100,6 @@ const Checkout = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(true);
   const [placingOrder, setPlacingOrder] = useState(false);
-  const [currency, setCurrency] = useState<Currency>('AFN');
 
   const [addressForm, setAddressForm] = useState<AddressForm>({
     name: '',
@@ -189,64 +192,75 @@ const Checkout = () => {
   }, [user, cartItems, cartLoading]);
 
   // Currency symbol helper
-  const getCurrencySymbol = (curr: Currency) => {
+  const getCurrencySymbol = (curr: string) => {
     if (curr === 'USD') return '$';
     return isRTL ? '؋' : 'AFN ';
   };
 
-  const currencySymbol = getCurrencySymbol(currency);
-
-  // Calculate totals grouped by seller with currency support
-  const { subtotal, deliveryFees, total, sellerBreakdowns } = useMemo(() => {
-    // Group items by seller
-    const sellerGroups: Record<string, {
-      items: typeof cartItems;
-      policy: SellerPolicy | undefined;
-    }> = {};
-
+  // Calculate totals grouped by currency, then by seller within each currency
+  const currencyBreakdowns = useMemo((): CurrencyBreakdown[] => {
+    // First, group items by currency
+    const itemsByCurrency: Record<string, typeof cartItems> = {};
+    
     cartItems.forEach((item) => {
-      const sellerId = item.product?.seller_id || 'unknown';
-      if (!sellerGroups[sellerId]) {
-        sellerGroups[sellerId] = {
-          items: [],
-          policy: sellerPolicies.find((p) => p.sellerId === sellerId),
-        };
+      const currency = item.product?.currency || 'AFN';
+      if (!itemsByCurrency[currency]) {
+        itemsByCurrency[currency] = [];
       }
-      sellerGroups[sellerId].items.push(item);
+      itemsByCurrency[currency].push(item);
     });
 
-    // Calculate breakdown per seller
-    const breakdowns: SellerBreakdown[] = Object.entries(sellerGroups).map(([sellerId, group]) => {
-      const products = group.items.map((item) => ({
-        name: item.product?.name || 'Product',
-        quantity: item.quantity,
-        price: (item.product?.price || 0) * item.quantity,
-      }));
+    // For each currency, group by seller
+    return Object.entries(itemsByCurrency).map(([currency, currencyItems]) => {
+      const sellerGroups: Record<string, {
+        items: typeof currencyItems;
+        policy: SellerPolicy | undefined;
+      }> = {};
 
-      const productSubtotal = products.reduce((sum, p) => sum + p.price, 0);
-      
-      // Use the delivery fee from the first item of this seller (they share the same delivery fee)
-      const deliveryFee = group.items[0]?.product?.delivery_fee || 0;
+      currencyItems.forEach((item) => {
+        const sellerId = item.product?.seller_id || 'unknown';
+        if (!sellerGroups[sellerId]) {
+          sellerGroups[sellerId] = {
+            items: [],
+            policy: sellerPolicies.find((p) => p.sellerId === sellerId),
+          };
+        }
+        sellerGroups[sellerId].items.push(item);
+      });
+
+      // Calculate breakdown per seller
+      const sellers: SellerBreakdown[] = Object.entries(sellerGroups).map(([sellerId, group]) => {
+        const products = group.items.map((item) => ({
+          name: item.product?.name || 'Product',
+          quantity: item.quantity,
+          price: (item.product?.price || 0) * item.quantity,
+        }));
+
+        const productSubtotal = products.reduce((sum, p) => sum + p.price, 0);
+        const deliveryFee = group.items[0]?.product?.delivery_fee || 0;
+
+        return {
+          sellerId,
+          sellerName: group.policy?.sellerName || (isRTL ? 'فروشنده' : 'Seller'),
+          products,
+          productSubtotal,
+          deliveryFee,
+          sellerTotal: productSubtotal + deliveryFee,
+        };
+      });
+
+      const productSubtotal = sellers.reduce((sum, s) => sum + s.productSubtotal, 0);
+      const deliveryTotal = sellers.reduce((sum, s) => sum + s.deliveryFee, 0);
 
       return {
-        sellerId,
-        sellerName: group.policy?.sellerName || (isRTL ? 'فروشنده' : 'Seller'),
-        products,
+        currency,
+        symbol: getCurrencySymbol(currency),
+        sellers,
         productSubtotal,
-        deliveryFee,
-        sellerTotal: productSubtotal + deliveryFee,
+        deliveryTotal,
+        total: productSubtotal + deliveryTotal,
       };
     });
-
-    const totalProductAmount = breakdowns.reduce((sum, s) => sum + s.productSubtotal, 0);
-    const totalDeliveryFees = breakdowns.reduce((sum, s) => sum + s.deliveryFee, 0);
-
-    return {
-      subtotal: totalProductAmount,
-      deliveryFees: totalDeliveryFees,
-      total: totalProductAmount + totalDeliveryFees,
-      sellerBreakdowns: breakdowns,
-    };
   }, [cartItems, sellerPolicies, isRTL]);
 
   const validateAddress = () => {
@@ -285,6 +299,12 @@ const Checkout = () => {
         shipping_policy: p.shippingPolicy,
       }));
 
+      // Calculate totals for order (using first currency as primary for now)
+      // In a real multi-currency scenario, you'd create separate orders per currency
+      const totalProductAmount = currencyBreakdowns.reduce((sum, cb) => sum + cb.productSubtotal, 0);
+      const totalDeliveryFees = currencyBreakdowns.reduce((sum, cb) => sum + cb.deliveryTotal, 0);
+      const grandTotal = currencyBreakdowns.reduce((sum, cb) => sum + cb.total, 0);
+
       // Create order
       const { data: order, error: orderError } = await supabase
         .from('orders')
@@ -294,11 +314,11 @@ const Checkout = () => {
           status: 'pending',
           payment_status: 'pending',
           payment_method: 'cash_on_delivery',
-          subtotal,
-          shipping_cost: deliveryFees,
+          subtotal: totalProductAmount,
+          shipping_cost: totalDeliveryFees,
           discount: 0,
           tax: 0,
-          total,
+          total: grandTotal,
           shipping_address: { ...addressForm } as unknown as Json,
           billing_address: { ...addressForm } as unknown as Json,
           seller_policies: [...policiesSnapshot] as unknown as Json,
@@ -475,115 +495,108 @@ const Checkout = () => {
               {currentStep === 2 && (
                 <div className="space-y-6">
                   <CardHeader className="px-0 pt-0">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="flex items-center gap-2">
-                        <Package className="w-5 h-5 text-primary" />
-                        {t.checkout.orderSummary.title}
-                      </CardTitle>
-                      {/* Currency Switcher */}
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground">
-                          {isRTL ? 'ارز:' : 'Currency:'}
-                        </span>
-                        <div className="flex border rounded-lg overflow-hidden">
-                          <button
-                            onClick={() => setCurrency('AFN')}
-                            className={cn(
-                              'px-3 py-1 text-sm transition-colors',
-                              currency === 'AFN' 
-                                ? 'bg-primary text-primary-foreground' 
-                                : 'bg-background hover:bg-muted'
-                            )}
-                          >
-                            {isRTL ? '؋ AFN' : 'AFN ؋'}
-                          </button>
-                          <button
-                            onClick={() => setCurrency('USD')}
-                            className={cn(
-                              'px-3 py-1 text-sm transition-colors',
-                              currency === 'USD' 
-                                ? 'bg-primary text-primary-foreground' 
-                                : 'bg-background hover:bg-muted'
-                            )}
-                          >
-                            $ USD
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Package className="w-5 h-5 text-primary" />
+                      {t.checkout.orderSummary.title}
+                    </CardTitle>
                   </CardHeader>
 
-                  {/* Products grouped by seller */}
-                  <div className="space-y-6">
-                    {sellerBreakdowns.map((seller) => (
-                      <div key={seller.sellerId} className="border rounded-lg p-4 space-y-4">
-                        <div className="flex items-center justify-between">
-                          <Badge variant="secondary" className="text-sm">
-                            {seller.sellerName}
-                          </Badge>
-                        </div>
+                  {/* Products grouped by currency, then by seller */}
+                  {currencyBreakdowns.map((currencyData) => (
+                    <div key={currencyData.currency} className="space-y-4">
+                      {/* Currency Header */}
+                      <div className="flex items-center gap-2 bg-muted/50 p-3 rounded-lg">
+                        <Badge variant="outline" className="text-base font-semibold">
+                          {currencyData.currency}
+                        </Badge>
+                        <span className="text-muted-foreground text-sm">
+                          {isRTL ? 'محصولات' : 'Products'}
+                        </span>
+                      </div>
 
-                        {/* Seller's Products */}
-                        <div className="space-y-3">
-                          {seller.products.map((product, idx) => (
-                            <div key={idx} className="flex items-center justify-between text-sm">
-                              <span className="text-muted-foreground">
-                                {product.name} × {product.quantity}
-                              </span>
-                              <span>{product.price.toLocaleString()} {currencySymbol}</span>
+                      {/* Sellers within this currency */}
+                      <div className="space-y-4 pl-2">
+                        {currencyData.sellers.map((seller) => (
+                          <div key={seller.sellerId} className="border rounded-lg p-4 space-y-4">
+                            <div className="flex items-center justify-between">
+                              <Badge variant="secondary" className="text-sm">
+                                {seller.sellerName}
+                              </Badge>
                             </div>
-                          ))}
+
+                            {/* Seller's Products */}
+                            <div className="space-y-3">
+                              {seller.products.map((product, idx) => (
+                                <div key={idx} className="flex items-center justify-between text-sm">
+                                  <span className="text-muted-foreground">
+                                    {product.name} × {product.quantity}
+                                  </span>
+                                  <span>{product.price.toLocaleString()} {currencyData.symbol}</span>
+                                </div>
+                              ))}
+                            </div>
+
+                            <Separator />
+
+                            {/* Seller Subtotals */}
+                            <div className="space-y-2 text-sm">
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">
+                                  {isRTL ? 'جمع محصولات' : 'Products Subtotal'}
+                                </span>
+                                <span>{seller.productSubtotal.toLocaleString()} {currencyData.symbol}</span>
+                              </div>
+                              <div className="flex justify-between text-muted-foreground">
+                                <span className="flex items-center gap-1">
+                                  <Truck className="w-3 h-3" />
+                                  {t.checkout.orderSummary.deliveryFee}
+                                </span>
+                                <span>{seller.deliveryFee.toLocaleString()} {currencyData.symbol}</span>
+                              </div>
+                              <div className="flex justify-between font-medium">
+                                <span>{isRTL ? 'جمع فروشنده' : 'Seller Total'}</span>
+                                <span>{seller.sellerTotal.toLocaleString()} {currencyData.symbol}</span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Currency Total */}
+                      <div className="space-y-2 bg-muted/30 p-4 rounded-lg">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">
+                            {isRTL ? 'جمع محصولات' : 'Products'} ({currencyData.currency})
+                          </span>
+                          <span>{currencyData.productSubtotal.toLocaleString()} {currencyData.symbol}</span>
                         </div>
-
+                        <div className="flex justify-between text-sm text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Truck className="w-3 h-3" />
+                            {isRTL ? 'هزینه ارسال' : 'Delivery'} ({currencyData.currency})
+                          </span>
+                          <span>{currencyData.deliveryTotal.toLocaleString()} {currencyData.symbol}</span>
+                        </div>
                         <Separator />
-
-                        {/* Seller Subtotals */}
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">
-                              {isRTL ? 'جمع محصولات' : 'Products Subtotal'}
-                            </span>
-                            <span>{seller.productSubtotal.toLocaleString()} {currencySymbol}</span>
-                          </div>
-                          <div className="flex justify-between text-muted-foreground">
-                            <span className="flex items-center gap-1">
-                              <Truck className="w-3 h-3" />
-                              {t.checkout.orderSummary.deliveryFee}
-                            </span>
-                            <span>{seller.deliveryFee.toLocaleString()} {currencySymbol}</span>
-                          </div>
-                          <div className="flex justify-between font-medium">
-                            <span>{isRTL ? 'جمع فروشنده' : 'Seller Total'}</span>
-                            <span>{seller.sellerTotal.toLocaleString()} {currencySymbol}</span>
-                          </div>
+                        <div className="flex justify-between font-bold text-lg">
+                          <span>{t.checkout.orderSummary.total} ({currencyData.currency})</span>
+                          <span className="text-primary">{currencyData.total.toLocaleString()} {currencyData.symbol}</span>
                         </div>
                       </div>
-                    ))}
-                  </div>
 
-                  <Separator />
+                      {currencyBreakdowns.length > 1 && <Separator className="my-6" />}
+                    </div>
+                  ))}
 
-                  {/* Grand Totals */}
-                  <div className="space-y-2 bg-muted/30 p-4 rounded-lg">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">
-                        {isRTL ? 'جمع کل محصولات' : 'Total Products'}
-                      </span>
-                      <span>{subtotal.toLocaleString()} {currencySymbol}</span>
+                  {currencyBreakdowns.length > 1 && (
+                    <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+                      <p className="text-sm text-amber-700 dark:text-amber-400">
+                        {isRTL 
+                          ? 'توجه: سفارش شما شامل محصولات با ارز متفاوت است. مبالغ به صورت جداگانه محاسبه شده‌اند.' 
+                          : 'Note: Your order contains products in different currencies. Amounts are calculated separately.'}
+                      </p>
                     </div>
-                    <div className="flex justify-between text-sm text-muted-foreground">
-                      <span className="flex items-center gap-1">
-                        <Truck className="w-3 h-3" />
-                        {isRTL ? 'جمع هزینه ارسال' : 'Total Delivery Fees'}
-                      </span>
-                      <span>{deliveryFees.toLocaleString()} {currencySymbol}</span>
-                    </div>
-                    <Separator />
-                    <div className="flex justify-between font-bold text-lg">
-                      <span>{t.checkout.orderSummary.total}</span>
-                      <span className="text-primary">{total.toLocaleString()} {currencySymbol}</span>
-                    </div>
-                  </div>
+                  )}
 
                   <Separator />
 
@@ -699,19 +712,24 @@ const Checkout = () => {
                         <span className="text-muted-foreground">{t.checkout.payment.title}:</span>
                         <span className="font-medium">{t.checkout.payment.cashOnDelivery}</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">{t.checkout.orderSummary.subtotal}:</span>
-                        <span className="font-medium">${subtotal.toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">{t.checkout.orderSummary.deliveryFee}:</span>
-                        <span className="font-medium">${deliveryFees.toFixed(2)}</span>
-                      </div>
-                      <Separator />
-                      <div className="flex justify-between text-lg font-bold">
-                        <span>{t.checkout.orderSummary.total}:</span>
-                        <span className="text-primary">${total.toFixed(2)}</span>
-                      </div>
+                      {/* Show totals per currency */}
+                      {currencyBreakdowns.map((cb) => (
+                        <div key={cb.currency} className="space-y-2">
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">{t.checkout.orderSummary.subtotal} ({cb.currency}):</span>
+                            <span className="font-medium">{cb.productSubtotal.toLocaleString()} {cb.symbol}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">{t.checkout.orderSummary.deliveryFee} ({cb.currency}):</span>
+                            <span className="font-medium">{cb.deliveryTotal.toLocaleString()} {cb.symbol}</span>
+                          </div>
+                          <div className="flex justify-between text-lg font-bold">
+                            <span>{t.checkout.orderSummary.total} ({cb.currency}):</span>
+                            <span className="text-primary">{cb.total.toLocaleString()} {cb.symbol}</span>
+                          </div>
+                          {currencyBreakdowns.length > 1 && <Separator />}
+                        </div>
+                      ))}
                     </div>
                   </div>
 

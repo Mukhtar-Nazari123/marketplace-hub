@@ -17,8 +17,8 @@ interface CartItem {
     slug?: string;
     seller_id?: string;
     delivery_fee?: number;
+    currency?: string;
     metadata?: {
-      currency?: string;
       videoUrl?: string;
       [key: string]: unknown;
     } | null;
@@ -67,6 +67,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
             quantity,
             seller_id,
             delivery_fee,
+            currency,
             metadata
           )
         `)

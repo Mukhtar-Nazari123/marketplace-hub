@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import { ShoppingCart, Trash2, Plus, Minus, ChevronLeft, ChevronRight, ShoppingBag, Eye } from 'lucide-react';
 import { useEffect } from 'react';
 
@@ -22,10 +23,7 @@ interface CartItemProduct {
   slug?: string;
   seller_id?: string;
   delivery_fee?: number;
-  metadata?: {
-    currency?: string;
-    [key: string]: unknown;
-  } | null;
+  currency?: string;
 }
 
 const Cart = () => {
@@ -42,67 +40,67 @@ const Cart = () => {
     }
   }, [user, role, authLoading, navigate]);
 
-  const getCurrencySymbol = (product: CartItemProduct | undefined) => {
-    const currency = product?.metadata?.currency || 'AFN';
+  const getCurrencySymbol = (currency: string) => {
     if (currency === 'USD') return '$';
-    return isRTL ? '؋' : 'AFN';
+    return isRTL ? '؋' : 'AFN ';
   };
 
-  // Calculate totals - group by currency and seller
-  const itemsWithCurrency = items.map(item => {
+  // Group items by currency first, then by seller within each currency
+  const itemsWithDetails = items.map(item => {
     const product = item.product as CartItemProduct | undefined;
-    const currency = product?.metadata?.currency || 'AFN';
+    const currency = product?.currency || 'AFN';
     return {
       ...item,
       currency,
-      currencySymbol: getCurrencySymbol(product),
+      currencySymbol: getCurrencySymbol(currency),
       itemTotal: (product?.price || 0) * item.quantity,
       sellerId: product?.seller_id || 'unknown',
       deliveryFee: product?.delivery_fee || 0,
     };
   });
 
-  // Group items by seller for breakdown
-  const sellerGroups: Record<string, {
-    name: string;
-    items: typeof itemsWithCurrency;
-    productSubtotal: number;
-    deliveryFee: number;
-    currency: string;
-  }> = {};
-
-  itemsWithCurrency.forEach(item => {
-    if (!sellerGroups[item.sellerId]) {
-      sellerGroups[item.sellerId] = {
-        name: isRTL ? 'فروشنده' : 'Seller',
-        items: [],
-        productSubtotal: 0,
-        deliveryFee: item.deliveryFee,
-        currency: item.currency,
-      };
+  // Group items by currency
+  const itemsByCurrency: Record<string, typeof itemsWithDetails> = {};
+  itemsWithDetails.forEach(item => {
+    if (!itemsByCurrency[item.currency]) {
+      itemsByCurrency[item.currency] = [];
     }
-    sellerGroups[item.sellerId].items.push(item);
-    sellerGroups[item.sellerId].productSubtotal += item.itemTotal;
+    itemsByCurrency[item.currency].push(item);
   });
 
-  // Group totals by currency
-  const totalsByCurrency: Record<string, number> = {};
-  itemsWithCurrency.forEach(item => {
-    const key = item.currency;
-    totalsByCurrency[key] = (totalsByCurrency[key] || 0) + item.itemTotal;
-  });
+  // Calculate totals per currency (grouped by seller within each currency)
+  const currencyTotals = Object.entries(itemsByCurrency).map(([currency, currencyItems]) => {
+    // Group by seller within this currency
+    const sellerGroups: Record<string, {
+      items: typeof currencyItems;
+      productSubtotal: number;
+      deliveryFee: number;
+    }> = {};
 
-  // Total delivery fee per currency (sum of unique seller fees)
-  const deliveryFeesByCurrency: Record<string, number> = {};
-  Object.values(sellerGroups).forEach(({ deliveryFee, currency }) => {
-    deliveryFeesByCurrency[currency] = (deliveryFeesByCurrency[currency] || 0) + deliveryFee;
-  });
+    currencyItems.forEach(item => {
+      if (!sellerGroups[item.sellerId]) {
+        sellerGroups[item.sellerId] = {
+          items: [],
+          productSubtotal: 0,
+          deliveryFee: item.deliveryFee,
+        };
+      }
+      sellerGroups[item.sellerId].items.push(item);
+      sellerGroups[item.sellerId].productSubtotal += item.itemTotal;
+    });
 
-  const primaryCurrency = Object.keys(totalsByCurrency)[0] || 'AFN';
-  const subtotal = totalsByCurrency[primaryCurrency] || 0;
-  const deliveryTotal = deliveryFeesByCurrency[primaryCurrency] || 0;
-  const total = subtotal + deliveryTotal;
-  const primarySymbol = primaryCurrency === 'USD' ? '$' : (isRTL ? '؋' : 'AFN ');
+    const productSubtotal = currencyItems.reduce((sum, item) => sum + item.itemTotal, 0);
+    const deliveryTotal = Object.values(sellerGroups).reduce((sum, group) => sum + group.deliveryFee, 0);
+
+    return {
+      currency,
+      symbol: getCurrencySymbol(currency),
+      productSubtotal,
+      deliveryTotal,
+      total: productSubtotal + deliveryTotal,
+      sellerGroups,
+    };
+  });
 
   const texts = {
     title: isRTL ? 'سبد خرید' : 'Shopping Cart',
@@ -180,7 +178,7 @@ const Cart = () => {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Cart Items */}
             <div className="lg:col-span-2 space-y-4">
-              {itemsWithCurrency.map((item) => {
+              {itemsWithDetails.map((item) => {
                 const product = item.product as CartItemProduct | undefined;
                 const productSlug = product?.slug || product?.id || item.product_id;
                 
@@ -214,9 +212,14 @@ const Cart = () => {
                           >
                             {product?.name || 'Product'}
                           </Link>
-                          <p className="text-primary font-bold">
-                            {product?.price?.toLocaleString() || 0} {item.currencySymbol}
-                          </p>
+                          <div className="flex items-center gap-2">
+                            <p className="text-primary font-bold">
+                              {product?.price?.toLocaleString() || 0} {item.currencySymbol}
+                            </p>
+                            <Badge variant="outline" className="text-xs">
+                              {item.currency}
+                            </Badge>
+                          </div>
 
                           {/* Quantity Controls */}
                           <div className="flex items-center gap-2 mt-3">
@@ -299,54 +302,51 @@ const Cart = () => {
               </div>
             </div>
 
-            {/* Order Summary */}
+            {/* Order Summary - Separate totals per currency */}
             <div>
               <Card className="sticky top-4">
                 <CardHeader>
                   <CardTitle>{isRTL ? 'خلاصه سفارش' : 'Order Summary'}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {/* Show totals per currency if mixed */}
-                  {Object.keys(totalsByCurrency).length > 1 ? (
-                    <>
-                      {Object.entries(totalsByCurrency).map(([currency, amount]) => {
-                        const symbol = currency === 'USD' ? '$' : (isRTL ? '؋' : 'AFN ');
-                        return (
-                          <div key={currency} className="flex justify-between">
-                            <span className="text-muted-foreground">
-                              {texts.subtotal} ({currency})
-                            </span>
-                            <span className="font-medium">{amount.toLocaleString()} {symbol}</span>
-                          </div>
-                        );
-                      })}
-                      <p className="text-xs text-muted-foreground">
-                        {isRTL 
-                          ? 'توجه: سبد خرید شامل محصولات با ارز متفاوت است' 
-                          : 'Note: Cart contains items in different currencies'}
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <div className="flex justify-between">
+                  {currencyTotals.map((currencyData) => (
+                    <div key={currencyData.currency} className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary">{currencyData.currency}</Badge>
+                      </div>
+                      
+                      <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">{texts.subtotal}</span>
-                        <span className="font-medium">{subtotal.toLocaleString()} {primarySymbol}</span>
+                        <span className="font-medium">
+                          {currencyData.productSubtotal.toLocaleString()} {currencyData.symbol}
+                        </span>
                       </div>
                       
                       {/* Delivery fee breakdown per seller */}
-                      {Object.entries(sellerGroups).map(([sellerId, group]) => (
-                        <div key={sellerId} className="flex justify-between text-sm text-muted-foreground">
-                          <span>{texts.shipping} ({group.name})</span>
-                          <span>{group.deliveryFee.toLocaleString()} {primarySymbol}</span>
+                      {Object.entries(currencyData.sellerGroups).map(([sellerId, group]) => (
+                        <div key={sellerId} className="flex justify-between text-xs text-muted-foreground">
+                          <span>{texts.shipping}</span>
+                          <span>{group.deliveryFee.toLocaleString()} {currencyData.symbol}</span>
                         </div>
                       ))}
                       
-                      <Separator />
-                      <div className="flex justify-between text-lg font-bold">
+                      <div className="flex justify-between font-bold">
                         <span>{texts.orderTotal}</span>
-                        <span className="text-primary">{total.toLocaleString()} {primarySymbol}</span>
+                        <span className="text-primary">
+                          {currencyData.total.toLocaleString()} {currencyData.symbol}
+                        </span>
                       </div>
-                    </>
+                      
+                      {currencyTotals.length > 1 && <Separator />}
+                    </div>
+                  ))}
+                  
+                  {currencyTotals.length > 1 && (
+                    <p className="text-xs text-muted-foreground text-center">
+                      {isRTL 
+                        ? 'توجه: سبد خرید شامل محصولات با ارز متفاوت است' 
+                        : 'Note: Cart contains items in different currencies'}
+                    </p>
                   )}
                 </CardContent>
                 <CardFooter>
