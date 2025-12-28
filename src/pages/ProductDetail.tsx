@@ -31,6 +31,7 @@ import {
   Store,
   Calendar,
   Tag,
+  Play,
 } from 'lucide-react';
 
 interface Product {
@@ -55,6 +56,7 @@ interface Product {
     shortDescription?: string;
     specifications?: Record<string, string>;
     stockPerSize?: Record<string, number>;
+    videoUrl?: string;
     [key: string]: unknown;
   } | null;
   category?: {
@@ -248,6 +250,7 @@ const ProductDetail = () => {
   const isNew = new Date(product.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
   const specifications = product.metadata?.specifications || {};
   const stockPerSize = product.metadata?.stockPerSize || {};
+  const videoUrl = product.metadata?.videoUrl;
 
   return (
     <div className="min-h-screen bg-background">
@@ -322,6 +325,26 @@ const ProductDetail = () => {
                     <img src={img} alt="" className="w-full h-full object-cover" />
                   </button>
                 ))}
+              </div>
+            )}
+
+            {/* Product Video */}
+            {videoUrl && (
+              <div className="space-y-2">
+                <h4 className="font-medium flex items-center gap-2">
+                  <Play size={18} className="text-primary" />
+                  {isRTL ? 'ویدیو محصول' : 'Product Video'}
+                </h4>
+                <div className="rounded-xl overflow-hidden border border-border bg-muted">
+                  <video
+                    controls
+                    className="w-full max-h-[300px] object-contain"
+                    poster={images[0]}
+                  >
+                    <source src={videoUrl} type="video/mp4" />
+                    {isRTL ? 'مرورگر شما از ویدیو پشتیبانی نمی‌کند.' : 'Your browser does not support the video tag.'}
+                  </video>
+                </div>
               </div>
             )}
           </div>

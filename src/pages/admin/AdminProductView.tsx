@@ -33,6 +33,8 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
+  Video,
+  Play,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLanguage, formatDate, formatCurrency } from '@/lib/i18n';
@@ -313,6 +315,30 @@ const AdminProductView = () => {
               )}
             </CardContent>
           </Card>
+
+          {/* Video Section */}
+          {metadata?.videoUrl && (
+            <Card className="lg:col-span-2">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Play className="h-5 w-5 text-primary" />
+                  {isRTL ? 'ویدیوی محصول' : 'Product Video'}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="rounded-xl overflow-hidden border bg-muted max-w-2xl mx-auto">
+                  <video
+                    controls
+                    className="w-full max-h-[400px] object-contain"
+                    poster={product.images?.[0]}
+                  >
+                    <source src={metadata.videoUrl} type="video/mp4" />
+                    {isRTL ? 'مرورگر شما از ویدیو پشتیبانی نمی‌کند.' : 'Your browser does not support the video tag.'}
+                  </video>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Product Info */}
           <div className="space-y-6">
