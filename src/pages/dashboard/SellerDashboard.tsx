@@ -3,13 +3,15 @@ import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { useLanguage } from "@/lib/i18n";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Package, ShoppingCart, BarChart3, Settings, Store } from "lucide-react";
+import { Package, ShoppingCart, BarChart3, Settings, Store, ArrowRight, ChevronLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSellerStatus } from "@/hooks/useSellerStatus";
 
 const SellerDashboard = () => {
   const { isRTL } = useLanguage();
   const { profileCompleted } = useSellerStatus();
+
+  const ArrowIcon = isRTL ? ChevronLeft : ArrowRight;
 
   return (
     <DashboardLayout
@@ -46,30 +48,38 @@ const SellerDashboard = () => {
       </Card>
 
       <section className="grid gap-4 md:grid-cols-3">
-        <Card className="border-border/50">
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Package className="h-4 w-4 text-primary" />
-              {isRTL ? "محصولات" : "Products"}
-            </CardTitle>
-            <CardDescription>{isRTL ? "به‌زودی" : "Coming soon"}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Badge variant="secondary">{isRTL ? "فروشنده" : "Seller"}</Badge>
-          </CardContent>
+        <Card className="border-border/50 hover:border-primary/50 transition-colors group">
+          <Link to="/dashboard/seller/products">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Package className="h-4 w-4 text-primary" />
+                {isRTL ? "محصولات" : "Products"}
+              </CardTitle>
+              <CardDescription>{isRTL ? "مدیریت محصولات" : "Manage products"}</CardDescription>
+            </CardHeader>
+            <CardContent className="flex items-center justify-between">
+              <Badge variant="secondary">{isRTL ? "فروشنده" : "Seller"}</Badge>
+              <ArrowIcon className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+            </CardContent>
+          </Link>
         </Card>
 
-        <Card className="border-border/50">
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <ShoppingCart className="h-4 w-4 text-primary" />
-              {isRTL ? "سفارشات" : "Orders"}
-            </CardTitle>
-            <CardDescription>{isRTL ? "به‌زودی" : "Coming soon"}</CardDescription>
-          </CardHeader>
-          <CardContent className="text-sm text-muted-foreground">
-            {isRTL ? "نمایش و مدیریت سفارشات" : "View and manage orders"}
-          </CardContent>
+        <Card className="border-border/50 hover:border-primary/50 transition-colors group">
+          <Link to="/dashboard/seller/orders">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <ShoppingCart className="h-4 w-4 text-primary" />
+                {isRTL ? "سفارشات" : "Orders"}
+              </CardTitle>
+              <CardDescription>{isRTL ? "مدیریت سفارشات" : "Manage orders"}</CardDescription>
+            </CardHeader>
+            <CardContent className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">
+                {isRTL ? "نمایش و مدیریت سفارشات" : "View and manage orders"}
+              </span>
+              <ArrowIcon className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+            </CardContent>
+          </Link>
         </Card>
 
         <Card className="border-border/50">

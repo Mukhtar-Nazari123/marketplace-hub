@@ -513,6 +513,68 @@ export type Database = {
         }
         Relationships: []
       }
+      seller_orders: {
+        Row: {
+          buyer_name: string | null
+          buyer_phone: string | null
+          created_at: string
+          currency: string
+          delivery_fee: number
+          id: string
+          notes: string | null
+          order_id: string
+          order_number: string
+          seller_id: string
+          shipping_address: Json | null
+          status: string
+          subtotal: number
+          total: number
+          updated_at: string
+        }
+        Insert: {
+          buyer_name?: string | null
+          buyer_phone?: string | null
+          created_at?: string
+          currency?: string
+          delivery_fee?: number
+          id?: string
+          notes?: string | null
+          order_id: string
+          order_number: string
+          seller_id: string
+          shipping_address?: Json | null
+          status?: string
+          subtotal?: number
+          total?: number
+          updated_at?: string
+        }
+        Update: {
+          buyer_name?: string | null
+          buyer_phone?: string | null
+          created_at?: string
+          currency?: string
+          delivery_fee?: number
+          id?: string
+          notes?: string | null
+          order_id?: string
+          order_number?: string
+          seller_id?: string
+          shipping_address?: Json | null
+          status?: string
+          subtotal?: number
+          total?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_orders_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       seller_verifications: {
         Row: {
           address: Json | null

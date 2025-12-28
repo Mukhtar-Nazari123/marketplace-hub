@@ -25,10 +25,10 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
-  Loader2,
+  Store,
+  DollarSign,
 } from 'lucide-react';
 import { format } from 'date-fns';
-import type { Json } from '@/integrations/supabase/types';
 
 interface OrderItem {
   id: string;
@@ -54,6 +54,17 @@ interface ShippingAddress {
   fullAddress: string;
 }
 
+interface SellerSubOrder {
+  id: string;
+  order_number: string;
+  seller_id: string;
+  status: string;
+  subtotal: number;
+  delivery_fee: number;
+  total: number;
+  currency: string;
+}
+
 interface Order {
   id: string;
   order_number: string;
@@ -70,6 +81,7 @@ interface Order {
   created_at: string;
   updated_at: string;
   order_items: OrderItem[];
+  seller_orders?: SellerSubOrder[];
 }
 
 const BuyerOrders = () => {
@@ -94,15 +106,25 @@ const BuyerOrders = () => {
 
         if (error) throw error;
 
-        // Transform the data
-        const transformedOrders = (data || []).map((order) => ({
-          ...order,
-          shipping_address: order.shipping_address as unknown as ShippingAddress | null,
-          seller_policies: order.seller_policies as unknown as SellerPolicy[] | null,
-          order_items: (order.order_items || []) as OrderItem[],
-        }));
+        // Fetch seller sub-orders for each order
+        const ordersWithSellerOrders = await Promise.all(
+          (data || []).map(async (order) => {
+            const { data: sellerOrders } = await supabase
+              .from('seller_orders')
+              .select('*')
+              .eq('order_id', order.id);
 
-        setOrders(transformedOrders);
+            return {
+              ...order,
+              shipping_address: order.shipping_address as unknown as ShippingAddress | null,
+              seller_policies: order.seller_policies as unknown as SellerPolicy[] | null,
+              order_items: (order.order_items || []) as OrderItem[],
+              seller_orders: sellerOrders || [],
+            };
+          })
+        );
+
+        setOrders(ordersWithSellerOrders);
       } catch (error) {
         console.error('Error fetching orders:', error);
       } finally {
@@ -116,6 +138,7 @@ const BuyerOrders = () => {
   const getStatusBadge = (status: string) => {
     const statusConfig: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: typeof CheckCircle; label: string; labelFa: string }> = {
       pending: { variant: 'secondary', icon: Clock, label: 'Pending', labelFa: 'در انتظار' },
+      confirmed: { variant: 'default', icon: CheckCircle, label: 'Confirmed', labelFa: 'تایید شده' },
       processing: { variant: 'default', icon: Package, label: 'Processing', labelFa: 'در حال پردازش' },
       shipped: { variant: 'default', icon: Truck, label: 'Shipped', labelFa: 'ارسال شده' },
       delivered: { variant: 'default', icon: CheckCircle, label: 'Delivered', labelFa: 'تحویل داده شده' },
@@ -147,6 +170,32 @@ const BuyerOrders = () => {
         {isRTL ? statusConfig.labelFa : statusConfig.label}
       </Badge>
     );
+  };
+
+  const getCurrencySymbol = (currency: string) => {
+    return currency === 'USD' ? '$' : '؋';
+  };
+
+  const getSellerName = (sellerId: string, sellerPolicies: SellerPolicy[] | null) => {
+    const policy = sellerPolicies?.find(p => p.seller_id === sellerId);
+    return policy?.seller_name || (isRTL ? 'فروشنده' : 'Seller');
+  };
+
+  // Group order items by seller
+  const groupItemsBySeller = (items: OrderItem[], sellerPolicies: SellerPolicy[] | null) => {
+    const groups = new Map<string, { sellerName: string; items: OrderItem[] }>();
+    
+    items.forEach((item) => {
+      if (!groups.has(item.seller_id)) {
+        groups.set(item.seller_id, {
+          sellerName: getSellerName(item.seller_id, sellerPolicies),
+          items: [],
+        });
+      }
+      groups.get(item.seller_id)!.items.push(item);
+    });
+
+    return Array.from(groups.entries());
   };
 
   if (loading) {
@@ -269,190 +318,252 @@ const BuyerOrders = () => {
 
         {/* Orders List */}
         <Accordion type="single" collapsible className="space-y-4">
-          {orders.map((order) => (
-            <AccordionItem
-              key={order.id}
-              value={order.id}
-              className="border rounded-lg px-0 bg-card shadow-sm hover:shadow-md transition-shadow"
-            >
-              <AccordionTrigger className="px-6 py-4 hover:no-underline">
-                <div className="flex flex-col md:flex-row md:items-center gap-4 w-full text-left">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="font-mono text-sm bg-muted px-2 py-1 rounded">
-                        {order.order_number}
-                      </span>
-                      {getStatusBadge(order.status)}
-                      {getPaymentStatusBadge(order.payment_status)}
-                    </div>
-                    <p className="text-sm text-muted-foreground flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      {format(new Date(order.created_at), 'PPP')}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-lg font-bold text-primary">
-                      {order.total.toLocaleString()} {isRTL ? '؋' : 'AFN'}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {order.order_items.length} {isRTL ? 'محصول' : 'items'}
-                    </p>
-                  </div>
-                </div>
-              </AccordionTrigger>
+          {orders.map((order) => {
+            const sellerGroups = groupItemsBySeller(order.order_items, order.seller_policies);
 
-              <AccordionContent className="px-6 pb-6">
-                <div className="space-y-6">
-                  {/* Order Items */}
-                  <div className="space-y-4">
-                    <h4 className="font-semibold flex items-center gap-2">
-                      <Package className="w-4 h-4" />
-                      {isRTL ? 'محصولات' : 'Products'}
-                    </h4>
-                    <div className="space-y-3">
-                      {order.order_items.map((item) => (
-                        <div
-                          key={item.id}
-                          className="flex items-center gap-4 p-3 bg-muted/50 rounded-lg"
-                        >
-                          <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted flex-shrink-0">
-                            {item.product_image ? (
-                              <img
-                                src={item.product_image}
-                                alt={item.product_name}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center">
-                                <Package className="w-6 h-6 text-muted-foreground" />
-                              </div>
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium truncate">{item.product_name}</p>
-                            <p className="text-sm text-muted-foreground">
-                              {item.quantity} × {item.unit_price.toLocaleString()} {isRTL ? '؋' : 'AFN'}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-semibold">
-                              {item.total_price.toLocaleString()} {isRTL ? '؋' : 'AFN'}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
+            return (
+              <AccordionItem
+                key={order.id}
+                value={order.id}
+                className="border rounded-lg px-0 bg-card shadow-sm hover:shadow-md transition-shadow"
+              >
+                <AccordionTrigger className="px-6 py-4 hover:no-underline">
+                  <div className="flex flex-col md:flex-row md:items-center gap-4 w-full text-left">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2 flex-wrap">
+                        <span className="font-mono text-sm bg-muted px-2 py-1 rounded">
+                          {order.order_number}
+                        </span>
+                        {getStatusBadge(order.status)}
+                        {getPaymentStatusBadge(order.payment_status)}
+                        {sellerGroups.length > 1 && (
+                          <Badge variant="outline" className="gap-1">
+                            <Store className="w-3 h-3" />
+                            {sellerGroups.length} {isRTL ? 'فروشنده' : 'sellers'}
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {format(new Date(order.created_at), 'PPP')}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-lg font-bold text-primary">
+                        {order.total.toLocaleString()} {isRTL ? '؋' : 'AFN'}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {order.order_items.length} {isRTL ? 'محصول' : 'items'}
+                      </p>
                     </div>
                   </div>
+                </AccordionTrigger>
 
-                  <Separator />
-
-                  {/* Order Summary */}
-                  <div className="grid gap-6 md:grid-cols-2">
-                    {/* Shipping Address */}
-                    {order.shipping_address && (
-                      <div className="space-y-3">
+                <AccordionContent className="px-6 pb-6">
+                  <div className="space-y-6">
+                    {/* Seller Sub-Orders Status */}
+                    {order.seller_orders && order.seller_orders.length > 0 && (
+                      <div className="space-y-4">
                         <h4 className="font-semibold flex items-center gap-2">
-                          <MapPin className="w-4 h-4" />
-                          {isRTL ? 'آدرس ارسال' : 'Shipping Address'}
+                          <Store className="w-4 h-4" />
+                          {isRTL ? 'وضعیت سفارش به تفکیک فروشنده' : 'Order Status by Seller'}
                         </h4>
-                        <div className="p-4 bg-muted/50 rounded-lg text-sm space-y-1">
-                          <p className="font-medium">{order.shipping_address.name}</p>
-                          <p className="text-muted-foreground">{order.shipping_address.phone}</p>
-                          <p className="text-muted-foreground">
-                            {order.shipping_address.city}, {order.shipping_address.fullAddress}
-                          </p>
+                        <div className="grid gap-3 md:grid-cols-2">
+                          {order.seller_orders.map((sellerOrder) => (
+                            <Card key={sellerOrder.id} className="bg-muted/30">
+                              <CardContent className="p-4">
+                                <div className="flex items-center justify-between mb-2">
+                                  <span className="font-mono text-xs bg-background px-2 py-1 rounded">
+                                    {sellerOrder.order_number}
+                                  </span>
+                                  {getStatusBadge(sellerOrder.status)}
+                                </div>
+                                <div className="flex items-center justify-between text-sm">
+                                  <span className="text-muted-foreground flex items-center gap-1">
+                                    <DollarSign className="w-3 h-3" />
+                                    {sellerOrder.currency}
+                                  </span>
+                                  <span className="font-semibold">
+                                    {getCurrencySymbol(sellerOrder.currency)}
+                                    {sellerOrder.total.toLocaleString()}
+                                  </span>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))}
                         </div>
                       </div>
                     )}
 
-                    {/* Payment Summary */}
-                    <div className="space-y-3">
+                    <Separator />
+
+                    {/* Order Items Grouped by Seller */}
+                    <div className="space-y-6">
                       <h4 className="font-semibold flex items-center gap-2">
-                        <CreditCard className="w-4 h-4" />
-                        {isRTL ? 'خلاصه پرداخت' : 'Payment Summary'}
+                        <Package className="w-4 h-4" />
+                        {isRTL ? 'محصولات' : 'Products'}
                       </h4>
-                      <div className="p-4 bg-muted/50 rounded-lg text-sm space-y-2">
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">
-                            {isRTL ? 'جمع محصولات' : 'Subtotal'}
-                          </span>
-                          <span>{order.subtotal.toLocaleString()} {isRTL ? '؋' : 'AFN'}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground flex items-center gap-1">
-                            <Truck className="w-3 h-3" />
-                            {isRTL ? 'هزینه ارسال' : 'Shipping'}
-                          </span>
-                          <span>{order.shipping_cost.toLocaleString()} {isRTL ? '؋' : 'AFN'}</span>
-                        </div>
-                        {order.discount > 0 && (
-                          <div className="flex justify-between text-green-600">
-                            <span>{isRTL ? 'تخفیف' : 'Discount'}</span>
-                            <span>-{order.discount.toLocaleString()} {isRTL ? '؋' : 'AFN'}</span>
+                      
+                      {sellerGroups.map(([sellerId, group]) => {
+                        const sellerOrder = order.seller_orders?.find(so => so.seller_id === sellerId);
+                        
+                        return (
+                          <div key={sellerId} className="space-y-3">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Store className="w-4 h-4 text-muted-foreground" />
+                                <span className="font-medium">{group.sellerName}</span>
+                              </div>
+                              {sellerOrder && getStatusBadge(sellerOrder.status)}
+                            </div>
+                            <div className="space-y-2 pl-6">
+                              {group.items.map((item) => (
+                                <div
+                                  key={item.id}
+                                  className="flex items-center gap-4 p-3 bg-muted/50 rounded-lg"
+                                >
+                                  <div className="w-14 h-14 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+                                    {item.product_image ? (
+                                      <img
+                                        src={item.product_image}
+                                        alt={item.product_name}
+                                        className="w-full h-full object-cover"
+                                      />
+                                    ) : (
+                                      <div className="w-full h-full flex items-center justify-center">
+                                        <Package className="w-5 h-5 text-muted-foreground" />
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="font-medium truncate text-sm">{item.product_name}</p>
+                                    <p className="text-xs text-muted-foreground">
+                                      {item.quantity} × {item.unit_price.toLocaleString()} {isRTL ? '؋' : 'AFN'}
+                                    </p>
+                                  </div>
+                                  <div className="text-right">
+                                    <p className="font-semibold text-sm">
+                                      {item.total_price.toLocaleString()} {isRTL ? '؋' : 'AFN'}
+                                    </p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
                           </div>
-                        )}
-                        <Separator />
-                        <div className="flex justify-between font-bold text-base">
-                          <span>{isRTL ? 'مجموع' : 'Total'}</span>
-                          <span className="text-primary">
-                            {order.total.toLocaleString()} {isRTL ? '؋' : 'AFN'}
-                          </span>
+                        );
+                      })}
+                    </div>
+
+                    <Separator />
+
+                    {/* Order Summary */}
+                    <div className="grid gap-6 md:grid-cols-2">
+                      {/* Shipping Address */}
+                      {order.shipping_address && (
+                        <div className="space-y-3">
+                          <h4 className="font-semibold flex items-center gap-2">
+                            <MapPin className="w-4 h-4" />
+                            {isRTL ? 'آدرس ارسال' : 'Shipping Address'}
+                          </h4>
+                          <div className="p-4 bg-muted/50 rounded-lg text-sm space-y-1">
+                            <p className="font-medium">{order.shipping_address.name}</p>
+                            <p className="text-muted-foreground">{order.shipping_address.phone}</p>
+                            <p className="text-muted-foreground">
+                              {order.shipping_address.city}, {order.shipping_address.fullAddress}
+                            </p>
+                          </div>
                         </div>
-                        <div className="flex justify-between text-xs text-muted-foreground pt-2">
-                          <span>{isRTL ? 'روش پرداخت' : 'Payment Method'}</span>
-                          <span>
-                            {order.payment_method === 'cash_on_delivery'
-                              ? isRTL
-                                ? 'پرداخت در محل'
-                                : 'Cash on Delivery'
-                              : order.payment_method}
-                          </span>
+                      )}
+
+                      {/* Payment Summary */}
+                      <div className="space-y-3">
+                        <h4 className="font-semibold flex items-center gap-2">
+                          <CreditCard className="w-4 h-4" />
+                          {isRTL ? 'خلاصه پرداخت' : 'Payment Summary'}
+                        </h4>
+                        <div className="p-4 bg-muted/50 rounded-lg text-sm space-y-2">
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">
+                              {isRTL ? 'جمع محصولات' : 'Subtotal'}
+                            </span>
+                            <span>{order.subtotal.toLocaleString()} {isRTL ? '؋' : 'AFN'}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground flex items-center gap-1">
+                              <Truck className="w-3 h-3" />
+                              {isRTL ? 'هزینه ارسال' : 'Shipping'}
+                            </span>
+                            <span>{order.shipping_cost.toLocaleString()} {isRTL ? '؋' : 'AFN'}</span>
+                          </div>
+                          {order.discount > 0 && (
+                            <div className="flex justify-between text-green-600">
+                              <span>{isRTL ? 'تخفیف' : 'Discount'}</span>
+                              <span>-{order.discount.toLocaleString()} {isRTL ? '؋' : 'AFN'}</span>
+                            </div>
+                          )}
+                          <Separator />
+                          <div className="flex justify-between font-bold text-base">
+                            <span>{isRTL ? 'مجموع' : 'Total'}</span>
+                            <span className="text-primary">
+                              {order.total.toLocaleString()} {isRTL ? '؋' : 'AFN'}
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-xs text-muted-foreground pt-2">
+                            <span>{isRTL ? 'روش پرداخت' : 'Payment Method'}</span>
+                            <span>
+                              {order.payment_method === 'cash_on_delivery'
+                                ? isRTL
+                                  ? 'پرداخت در محل'
+                                  : 'Cash on Delivery'
+                                : order.payment_method}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Seller Policies */}
-                  {order.seller_policies && order.seller_policies.length > 0 && (
-                    <>
-                      <Separator />
-                      <div className="space-y-4">
-                        <h4 className="font-semibold flex items-center gap-2">
-                          <RotateCcw className="w-4 h-4" />
-                          {isRTL ? 'سیاست‌های فروشنده' : 'Seller Policies'}
-                        </h4>
-                        {order.seller_policies.map((policy, idx) => (
-                          <div key={idx} className="p-4 border rounded-lg space-y-3">
-                            <Badge variant="secondary">{policy.seller_name}</Badge>
-                            <div className="grid gap-4 md:grid-cols-2 text-sm">
-                              <div>
-                                <p className="font-medium text-muted-foreground mb-1">
-                                  {isRTL ? 'سیاست بازگشت' : 'Return Policy'}
-                                </p>
-                                <p>
-                                  {policy.return_policy ||
-                                    (isRTL ? 'سیاستی ارائه نشده' : 'No policy provided')}
-                                </p>
-                              </div>
-                              <div>
-                                <p className="font-medium text-muted-foreground mb-1">
-                                  {isRTL ? 'سیاست ارسال' : 'Shipping Policy'}
-                                </p>
-                                <p>
-                                  {policy.shipping_policy ||
-                                    (isRTL ? 'سیاستی ارائه نشده' : 'No policy provided')}
-                                </p>
+                    {/* Seller Policies */}
+                    {order.seller_policies && order.seller_policies.length > 0 && (
+                      <>
+                        <Separator />
+                        <div className="space-y-4">
+                          <h4 className="font-semibold flex items-center gap-2">
+                            <RotateCcw className="w-4 h-4" />
+                            {isRTL ? 'سیاست‌های فروشنده' : 'Seller Policies'}
+                          </h4>
+                          {order.seller_policies.map((policy, idx) => (
+                            <div key={idx} className="p-4 border rounded-lg space-y-3">
+                              <Badge variant="secondary">{policy.seller_name}</Badge>
+                              <div className="grid gap-4 md:grid-cols-2">
+                                <div>
+                                  <p className="text-sm font-medium text-muted-foreground flex items-center gap-1 mb-1">
+                                    <RotateCcw className="w-3 h-3" />
+                                    {isRTL ? 'سیاست بازگشت' : 'Return Policy'}
+                                  </p>
+                                  <p className="text-sm p-2 bg-muted/50 rounded">
+                                    {policy.return_policy || (isRTL ? 'ارائه نشده' : 'Not provided')}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-sm font-medium text-muted-foreground flex items-center gap-1 mb-1">
+                                    <Truck className="w-3 h-3" />
+                                    {isRTL ? 'سیاست ارسال' : 'Shipping Policy'}
+                                  </p>
+                                  <p className="text-sm p-2 bg-muted/50 rounded">
+                                    {policy.shipping_policy || (isRTL ? 'ارائه نشده' : 'Not provided')}
+                                  </p>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        ))}
-                      </div>
-                    </>
-                  )}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          ))}
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            );
+          })}
         </Accordion>
       </div>
     </DashboardLayout>
