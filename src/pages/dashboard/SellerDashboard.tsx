@@ -82,17 +82,22 @@ const SellerDashboard = () => {
           </Link>
         </Card>
 
-        <Card className="border-border/50">
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <BarChart3 className="h-4 w-4 text-primary" />
-              {isRTL ? "آمار" : "Analytics"}
-            </CardTitle>
-            <CardDescription>{isRTL ? "به‌زودی" : "Coming soon"}</CardDescription>
-          </CardHeader>
-          <CardContent className="text-sm text-muted-foreground">
-            {isRTL ? "گزارش فروش و روندها" : "Sales reports and trends"}
-          </CardContent>
+        <Card className="border-border/50 hover:border-primary/50 transition-colors group">
+          <Link to="/dashboard/seller/analytics">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <BarChart3 className="h-4 w-4 text-primary" />
+                {isRTL ? "آنالیتیکس" : "Analytics"}
+              </CardTitle>
+              <CardDescription>{isRTL ? "آمار و گزارش‌ها" : "Stats & reports"}</CardDescription>
+            </CardHeader>
+            <CardContent className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">
+                {isRTL ? "گزارش فروش و روندها" : "Sales reports and trends"}
+              </span>
+              <ArrowIcon className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+            </CardContent>
+          </Link>
         </Card>
       </section>
     </DashboardLayout>

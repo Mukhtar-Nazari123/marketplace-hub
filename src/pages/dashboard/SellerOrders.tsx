@@ -86,11 +86,24 @@ interface SellerOrder {
 const ORDER_STATUSES = [
   { value: 'pending', label: 'Pending', labelFa: 'در انتظار', color: 'secondary' as const },
   { value: 'confirmed', label: 'Confirmed', labelFa: 'تایید شده', color: 'default' as const },
-  { value: 'processing', label: 'Processing', labelFa: 'در حال پردازش', color: 'default' as const },
   { value: 'shipped', label: 'Shipped', labelFa: 'ارسال شده', color: 'default' as const },
   { value: 'delivered', label: 'Delivered', labelFa: 'تحویل شده', color: 'default' as const },
-  { value: 'cancelled', label: 'Cancelled', labelFa: 'لغو شده', color: 'destructive' as const },
 ];
+
+const STATUS_SEQUENCE = ['pending', 'confirmed', 'shipped', 'delivered'];
+
+const getNextStatus = (currentStatus: string): string | null => {
+  const currentIndex = STATUS_SEQUENCE.indexOf(currentStatus);
+  if (currentIndex >= 0 && currentIndex < STATUS_SEQUENCE.length - 1) {
+    return STATUS_SEQUENCE[currentIndex + 1];
+  }
+  return null;
+};
+
+const getStatusLabel = (status: string, isRTL: boolean) => {
+  const statusConfig = ORDER_STATUSES.find(s => s.value === status);
+  return statusConfig ? (isRTL ? statusConfig.labelFa : statusConfig.label) : status;
+};
 
 const SellerOrders = () => {
   const { isRTL } = useLanguage();
@@ -416,35 +429,90 @@ const SellerOrders = () => {
                 <AccordionContent className="px-6 pb-6">
                   <div className="space-y-6">
                     {/* Status Update */}
-                    <Card className="bg-muted/30">
+                    <Card className="bg-muted/30 border-primary/10">
                       <CardContent className="pt-6">
-                        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-                          <div>
-                            <h4 className="font-medium mb-1">
-                              {isRTL ? 'بروزرسانی وضعیت' : 'Update Status'}
-                            </h4>
-                            <p className="text-sm text-muted-foreground">
-                              {isRTL
-                                ? 'وضعیت سفارش را تغییر دهید'
-                                : 'Change the order status'}
-                            </p>
+                        <div className="space-y-4">
+                          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                            <div>
+                              <h4 className="font-medium mb-1">
+                                {isRTL ? 'وضعیت سفارش' : 'Order Status'}
+                              </h4>
+                              <p className="text-sm text-muted-foreground">
+                                {isRTL
+                                  ? 'مرحله بعد: '
+                                  : 'Next step: '}
+                                <span className="font-medium text-primary">
+                                  {getNextStatus(order.status)
+                                    ? getStatusLabel(getNextStatus(order.status)!, isRTL)
+                                    : (isRTL ? 'تکمیل شده' : 'Completed')}
+                                </span>
+                              </p>
+                            </div>
+                            {getNextStatus(order.status) && (
+                              <Button
+                                onClick={() => handleStatusUpdate(order.id, getNextStatus(order.status)!)}
+                                disabled={updatingStatus === order.id}
+                                className="gap-2"
+                              >
+                                {updatingStatus === order.id ? (
+                                  <RefreshCw className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  <CheckCircle className="w-4 h-4" />
+                                )}
+                                {isRTL ? 'تایید و ادامه' : 'Confirm & Continue'}
+                              </Button>
+                            )}
                           </div>
-                          <Select
-                            value={order.status}
-                            onValueChange={(value) => handleStatusUpdate(order.id, value)}
-                            disabled={updatingStatus === order.id}
-                          >
-                            <SelectTrigger className="w-[180px]">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {ORDER_STATUSES.map((status) => (
-                                <SelectItem key={status.value} value={status.value}>
-                                  {isRTL ? status.labelFa : status.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                          
+                          {/* Progress Steps */}
+                          <div className="pt-4">
+                            <div className="relative flex items-center justify-between">
+                              {/* Progress Line Background */}
+                              <div className="absolute top-5 start-0 end-0 h-0.5 bg-muted" />
+                              
+                              {/* Progress Line Fill */}
+                              <div
+                                className="absolute top-5 start-0 h-0.5 bg-primary transition-all duration-500"
+                                style={{
+                                  width: `${(STATUS_SEQUENCE.indexOf(order.status) / (STATUS_SEQUENCE.length - 1)) * 100}%`,
+                                }}
+                              />
+
+                              {/* Steps */}
+                              {ORDER_STATUSES.map((step, index) => {
+                                const isCompleted = STATUS_SEQUENCE.indexOf(order.status) >= index;
+                                const isCurrent = order.status === step.value;
+                                const icons: Record<string, typeof CheckCircle> = {
+                                  pending: Clock,
+                                  confirmed: CheckCircle,
+                                  shipped: Truck,
+                                  delivered: CheckCircle,
+                                };
+                                const Icon = icons[step.value] || Clock;
+
+                                return (
+                                  <div key={step.value} className="relative flex flex-col items-center z-10">
+                                    <div
+                                      className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 border-2 ${
+                                        isCompleted
+                                          ? 'bg-primary text-primary-foreground border-primary'
+                                          : 'bg-background text-muted-foreground border-muted'
+                                      } ${isCurrent ? 'ring-4 ring-primary/20 scale-110' : ''}`}
+                                    >
+                                      <Icon className="w-5 h-5" />
+                                    </div>
+                                    <span
+                                      className={`mt-2 text-xs font-medium text-center transition-colors ${
+                                        isCompleted ? 'text-primary' : 'text-muted-foreground'
+                                      }`}
+                                    >
+                                      {isRTL ? step.labelFa : step.label}
+                                    </span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>

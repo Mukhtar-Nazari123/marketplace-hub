@@ -361,36 +361,91 @@ const BuyerOrders = () => {
 
                 <AccordionContent className="px-6 pb-6">
                   <div className="space-y-6">
-                    {/* Seller Sub-Orders Status */}
+                    {/* Seller Sub-Orders Status with Progress */}
                     {order.seller_orders && order.seller_orders.length > 0 && (
                       <div className="space-y-4">
                         <h4 className="font-semibold flex items-center gap-2">
                           <Store className="w-4 h-4" />
                           {isRTL ? 'وضعیت سفارش به تفکیک فروشنده' : 'Order Status by Seller'}
                         </h4>
-                        <div className="grid gap-3 md:grid-cols-2">
-                          {order.seller_orders.map((sellerOrder) => (
-                            <Card key={sellerOrder.id} className="bg-muted/30">
-                              <CardContent className="p-4">
-                                <div className="flex items-center justify-between mb-2">
-                                  <span className="font-mono text-xs bg-background px-2 py-1 rounded">
-                                    {sellerOrder.order_number}
-                                  </span>
-                                  {getStatusBadge(sellerOrder.status)}
-                                </div>
-                                <div className="flex items-center justify-between text-sm">
-                                  <span className="text-muted-foreground flex items-center gap-1">
-                                    <DollarSign className="w-3 h-3" />
-                                    {sellerOrder.currency}
-                                  </span>
-                                  <span className="font-semibold">
-                                    {getCurrencySymbol(sellerOrder.currency)}
-                                    {sellerOrder.total.toLocaleString()}
-                                  </span>
-                                </div>
-                              </CardContent>
-                            </Card>
-                          ))}
+                        <div className="space-y-4">
+                          {order.seller_orders.map((sellerOrder) => {
+                            const statusSteps = ['pending', 'confirmed', 'shipped', 'delivered'];
+                            const currentIndex = statusSteps.indexOf(sellerOrder.status);
+                            const statusLabels: Record<string, { en: string; fa: string }> = {
+                              pending: { en: 'Pending', fa: 'در انتظار' },
+                              confirmed: { en: 'Confirmed', fa: 'تایید شده' },
+                              shipped: { en: 'Shipped', fa: 'ارسال شده' },
+                              delivered: { en: 'Delivered', fa: 'تحویل شده' },
+                            };
+
+                            return (
+                              <Card key={sellerOrder.id} className="bg-muted/30 border-primary/10">
+                                <CardContent className="p-4">
+                                  <div className="flex items-center justify-between mb-4">
+                                    <span className="font-mono text-xs bg-background px-2 py-1 rounded">
+                                      {sellerOrder.order_number}
+                                    </span>
+                                    <div className="flex items-center gap-2">
+                                      {getStatusBadge(sellerOrder.status)}
+                                      <span className="font-semibold">
+                                        {getCurrencySymbol(sellerOrder.currency)}
+                                        {sellerOrder.total.toLocaleString()}
+                                      </span>
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Progress Steps */}
+                                  <div className="relative flex items-center justify-between pt-2">
+                                    {/* Progress Line Background */}
+                                    <div className="absolute top-5 start-0 end-0 h-0.5 bg-muted" />
+                                    
+                                    {/* Progress Line Fill */}
+                                    <div
+                                      className="absolute top-5 start-0 h-0.5 bg-primary transition-all duration-500"
+                                      style={{
+                                        width: `${(currentIndex / (statusSteps.length - 1)) * 100}%`,
+                                      }}
+                                    />
+
+                                    {/* Steps */}
+                                    {statusSteps.map((step, index) => {
+                                      const isCompleted = currentIndex >= index;
+                                      const isCurrent = sellerOrder.status === step;
+                                      const icons: Record<string, typeof CheckCircle> = {
+                                        pending: Clock,
+                                        confirmed: CheckCircle,
+                                        shipped: Truck,
+                                        delivered: CheckCircle,
+                                      };
+                                      const Icon = icons[step] || Clock;
+
+                                      return (
+                                        <div key={step} className="relative flex flex-col items-center z-10">
+                                          <div
+                                            className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 border-2 ${
+                                              isCompleted
+                                                ? 'bg-primary text-primary-foreground border-primary'
+                                                : 'bg-background text-muted-foreground border-muted'
+                                            } ${isCurrent ? 'ring-2 ring-primary/20 scale-110' : ''}`}
+                                          >
+                                            <Icon className="w-4 h-4" />
+                                          </div>
+                                          <span
+                                            className={`mt-1.5 text-[10px] font-medium text-center transition-colors ${
+                                              isCompleted ? 'text-primary' : 'text-muted-foreground'
+                                            }`}
+                                          >
+                                            {isRTL ? statusLabels[step]?.fa : statusLabels[step]?.en}
+                                          </span>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            );
+                          })}
                         </div>
                       </div>
                     )}
