@@ -38,6 +38,8 @@ interface OrderItem {
   unit_price: number;
   total_price: number;
   seller_id: string;
+  product_id: string | null;
+  product_sku?: string | null;
 }
 
 interface SellerPolicy {
@@ -63,7 +65,22 @@ interface SellerSubOrder {
   delivery_fee: number;
   total: number;
   currency: string;
+  items?: OrderItem[];
 }
+
+// Helper to format SKUs for display
+const formatProductSKUs = (items: OrderItem[] | undefined, isRTL: boolean): string => {
+  if (!items || items.length === 0) return isRTL ? 'بدون SKU' : 'No SKU';
+  
+  const skus = items
+    .map(item => item.product_sku)
+    .filter((sku): sku is string => sku !== null && sku !== undefined && sku.trim() !== '');
+  
+  if (skus.length === 0) return isRTL ? 'بدون SKU' : 'No SKU';
+  if (skus.length === 1) return skus[0];
+  if (skus.length === 2) return skus.join(isRTL ? ' ، ' : ', ');
+  return `${skus[0]}${isRTL ? ' و ' : ', '}+${skus.length - 1}`;
+};
 
 interface Order {
   id: string;
@@ -99,7 +116,10 @@ const BuyerOrders = () => {
           .from('orders')
           .select(`
             *,
-            order_items (*)
+            order_items (
+              *,
+              products:product_id (sku)
+            )
           `)
           .eq('buyer_id', user.id)
           .order('created_at', { ascending: false });
@@ -114,12 +134,24 @@ const BuyerOrders = () => {
               .select('*')
               .eq('order_id', order.id);
 
+            // Map order items to include product_sku
+            const orderItemsWithSku = (order.order_items || []).map((item: any) => ({
+              ...item,
+              product_sku: item.products?.sku || null,
+            }));
+
+            // Group items by seller for seller sub-orders
+            const sellerOrdersWithItems = (sellerOrders || []).map((so: any) => ({
+              ...so,
+              items: orderItemsWithSku.filter((item: OrderItem) => item.seller_id === so.seller_id),
+            }));
+
             return {
               ...order,
               shipping_address: order.shipping_address as unknown as ShippingAddress | null,
               seller_policies: order.seller_policies as unknown as SellerPolicy[] | null,
-              order_items: (order.order_items || []) as OrderItem[],
-              seller_orders: sellerOrders || [],
+              order_items: orderItemsWithSku as OrderItem[],
+              seller_orders: sellerOrdersWithItems,
             };
           })
         );
@@ -383,8 +415,8 @@ const BuyerOrders = () => {
                               <Card key={sellerOrder.id} className="bg-muted/30 border-primary/10">
                                 <CardContent className="p-4">
                                   <div className="flex items-center justify-between mb-4">
-                                    <span className="font-mono text-xs bg-background px-2 py-1 rounded">
-                                      {sellerOrder.order_number}
+                                    <span className="font-mono text-xs bg-primary/10 text-primary px-2 py-1 rounded border border-primary/20">
+                                      {formatProductSKUs(sellerOrder.items, isRTL)}
                                     </span>
                                     <div className="flex items-center gap-2">
                                       {getStatusBadge(sellerOrder.status)}

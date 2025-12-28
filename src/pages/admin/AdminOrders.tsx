@@ -24,6 +24,12 @@ import { Search, Filter, RefreshCw, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLanguage, formatDate, formatCurrency } from '@/lib/i18n';
 
+interface OrderItem {
+  id: string;
+  product_id: string | null;
+  product_sku?: string | null;
+}
+
 interface Order {
   id: string;
   order_number: string;
@@ -32,7 +38,22 @@ interface Order {
   payment_status: string;
   total: number;
   created_at: string;
+  order_items?: OrderItem[];
 }
+
+// Helper to format SKUs for display
+const formatProductSKUs = (items: OrderItem[] | undefined, isRTL: boolean): string => {
+  if (!items || items.length === 0) return isRTL ? 'بدون SKU' : 'No SKU';
+  
+  const skus = items
+    .map(item => item.product_sku)
+    .filter((sku): sku is string => sku !== null && sku !== undefined && sku.trim() !== '');
+  
+  if (skus.length === 0) return isRTL ? 'بدون SKU' : 'No SKU';
+  if (skus.length === 1) return skus[0];
+  if (skus.length === 2) return skus.join(isRTL ? ' ، ' : ', ');
+  return `${skus[0]}${isRTL ? ' و ' : ', '}+${skus.length - 1}`;
+};
 
 const AdminOrders = () => {
   const { t, direction } = useLanguage();
@@ -47,13 +68,29 @@ const AdminOrders = () => {
     try {
       const { data, error } = await supabase
         .from('orders')
-        .select('*')
+        .select(`
+          *,
+          order_items (
+            id,
+            product_id,
+            products:product_id (sku)
+          )
+        `)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      setOrders(data || []);
-      setFilteredOrders(data || []);
+      // Map orders to include product SKUs
+      const ordersWithSku = (data || []).map((order: any) => ({
+        ...order,
+        order_items: (order.order_items || []).map((item: any) => ({
+          ...item,
+          product_sku: item.products?.sku || null,
+        })),
+      }));
+
+      setOrders(ordersWithSku);
+      setFilteredOrders(ordersWithSku);
     } catch (error) {
       console.error('Error fetching orders:', error);
       toast.error(t.admin.orders.loadError);
@@ -194,8 +231,10 @@ const AdminOrders = () => {
                   ) : (
                     filteredOrders.map((order) => (
                       <TableRow key={order.id} className="hover:bg-muted/50 transition-colors">
-                        <TableCell className="font-medium">
-                          {order.order_number}
+                        <TableCell className="font-mono text-sm">
+                          <span className="bg-primary/10 text-primary px-2 py-1 rounded border border-primary/20">
+                            {formatProductSKUs(order.order_items, isRTL)}
+                          </span>
                         </TableCell>
                         <TableCell>{getStatusBadge(order.status)}</TableCell>
                         <TableCell>{getPaymentBadge(order.payment_status)}</TableCell>
