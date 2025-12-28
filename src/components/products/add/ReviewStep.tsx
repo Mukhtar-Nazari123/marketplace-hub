@@ -11,7 +11,8 @@ import {
   Package,
   Folder,
   FileText,
-  Video
+  Video,
+  Truck
 } from 'lucide-react';
 
 interface ReviewStepProps {
@@ -253,6 +254,16 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
                 {formData.categoryId === 'clothing' 
                   ? `${Object.values(formData.stockPerSize || {}).reduce((a, b) => a + (Number(b) || 0), 0)} ${isRTL ? 'عدد در انبار' : 'in stock'}`
                   : `${formData.quantity} ${isRTL ? 'عدد در انبار' : 'in stock'}`}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2 pt-2 border-t mt-2">
+              <Truck className="w-4 h-4 text-primary" />
+              <span className="text-sm">
+                {isRTL ? 'هزینه ارسال:' : 'Delivery Fee:'}{' '}
+                <span className="font-medium">
+                  {formData.currency} {(formData.deliveryFee || 0).toLocaleString()}
+                </span>
               </span>
             </div>
           </CardContent>

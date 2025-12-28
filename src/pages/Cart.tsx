@@ -20,6 +20,8 @@ interface CartItemProduct {
   images: string[] | null;
   quantity: number;
   slug?: string;
+  seller_id?: string;
+  delivery_fee?: number;
   metadata?: {
     currency?: string;
     [key: string]: unknown;
@@ -46,7 +48,7 @@ const Cart = () => {
     return isRTL ? '؋' : 'AFN';
   };
 
-  // Calculate totals - group by currency
+  // Calculate totals - group by currency and seller
   const itemsWithCurrency = items.map(item => {
     const product = item.product as CartItemProduct | undefined;
     const currency = product?.metadata?.currency || 'AFN';
@@ -54,7 +56,9 @@ const Cart = () => {
       ...item,
       currency,
       currencySymbol: getCurrencySymbol(product),
-      itemTotal: (product?.price || 0) * item.quantity
+      itemTotal: (product?.price || 0) * item.quantity,
+      sellerId: product?.seller_id || 'unknown',
+      deliveryFee: product?.delivery_fee || 0,
     };
   });
 
@@ -65,10 +69,24 @@ const Cart = () => {
     totalsByCurrency[key] = (totalsByCurrency[key] || 0) + item.itemTotal;
   });
 
+  // Calculate delivery fees per seller (only charge once per seller)
+  const deliveryFeesBySeller: Record<string, { fee: number; currency: string }> = {};
+  itemsWithCurrency.forEach(item => {
+    if (!deliveryFeesBySeller[item.sellerId]) {
+      deliveryFeesBySeller[item.sellerId] = { fee: item.deliveryFee, currency: item.currency };
+    }
+  });
+
+  // Total delivery fee (sum of unique seller fees, grouped by currency)
+  const deliveryFeesByCurrency: Record<string, number> = {};
+  Object.values(deliveryFeesBySeller).forEach(({ fee, currency }) => {
+    deliveryFeesByCurrency[currency] = (deliveryFeesByCurrency[currency] || 0) + fee;
+  });
+
   const primaryCurrency = Object.keys(totalsByCurrency)[0] || 'AFN';
   const subtotal = totalsByCurrency[primaryCurrency] || 0;
-  const shippingCost = subtotal > 0 ? 50 : 0;
-  const total = subtotal + shippingCost;
+  const deliveryTotal = deliveryFeesByCurrency[primaryCurrency] || 0;
+  const total = subtotal + deliveryTotal;
   const primarySymbol = primaryCurrency === 'USD' ? '$' : (isRTL ? '؋' : 'AFN');
 
   const texts = {
@@ -80,7 +98,7 @@ const Cart = () => {
     quantity: isRTL ? 'تعداد' : 'Quantity',
     total: isRTL ? 'جمع' : 'Total',
     subtotal: isRTL ? 'جمع جزئی' : 'Subtotal',
-    shipping: isRTL ? 'هزینه ارسال' : 'Shipping',
+    shipping: isRTL ? 'هزینه ارسال' : 'Delivery Fee',
     orderTotal: isRTL ? 'جمع کل' : 'Order Total',
     checkout: isRTL ? 'تکمیل خرید' : 'Checkout',
     clearCart: isRTL ? 'پاک کردن سبد' : 'Clear Cart',
@@ -301,7 +319,7 @@ const Cart = () => {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">{texts.shipping}</span>
-                        <span className="font-medium">{shippingCost.toLocaleString()} {primarySymbol}</span>
+                        <span className="font-medium">{deliveryTotal.toLocaleString()} {primarySymbol}</span>
                       </div>
                       <Separator />
                       <div className="flex justify-between text-lg font-bold">

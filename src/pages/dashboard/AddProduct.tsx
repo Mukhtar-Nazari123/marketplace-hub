@@ -50,6 +50,7 @@ export interface ProductFormData {
   currency: CurrencyType;
   quantity: number;
   stockPerSize?: Record<string, number>;
+  deliveryFee: number;
 }
 
 const initialFormData: ProductFormData = {
@@ -73,6 +74,7 @@ const initialFormData: ProductFormData = {
   currency: 'AFN',
   quantity: 0,
   stockPerSize: {},
+  deliveryFee: 0,
 };
 
 const STEPS = [
@@ -120,7 +122,7 @@ const AddProduct = () => {
       case 3:
         return formData.images.length > 0 || formData.imageUrls.length > 0;
       case 4:
-        return formData.price > 0;
+        return formData.price > 0 && formData.deliveryFee >= 0;
       case 5:
         return true;
       default:
@@ -216,6 +218,7 @@ const AddProduct = () => {
         subcategory_id: formData.subCategoryId || null,
         images: imageUrls,
         status: 'draft' as const,
+        delivery_fee: formData.deliveryFee || 0,
         metadata: {
           shortDescription: formData.shortDescription,
           brand: formData.brand,
@@ -296,6 +299,7 @@ const AddProduct = () => {
         subcategory_id: formData.subCategoryId || null,
         images: imageUrls,
         status: status as 'draft' | 'pending' | 'active',
+        delivery_fee: formData.deliveryFee || 0,
         metadata: {
           shortDescription: formData.shortDescription,
           brand: formData.brand,

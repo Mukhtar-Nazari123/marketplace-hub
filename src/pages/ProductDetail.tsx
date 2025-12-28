@@ -48,6 +48,7 @@ interface Product {
   sku: string | null;
   is_featured: boolean;
   created_at: string;
+  delivery_fee: number;
   metadata: {
     currency?: string;
     brand?: string;
@@ -354,6 +355,19 @@ const ProductDetail = () => {
                   {isRTL ? `${discount}% تخفیف` : `${discount}% OFF`}
                 </Badge>
               )}
+            </div>
+
+            {/* Delivery Fee */}
+            <div className="flex items-center gap-2 p-3 bg-primary/5 rounded-lg border border-primary/20">
+              <Truck className="text-primary" size={20} />
+              <div>
+                <span className="text-sm text-muted-foreground">
+                  {isRTL ? 'هزینه ارسال:' : 'Delivery Fee:'}
+                </span>
+                <span className="font-semibold text-foreground ml-2">
+                  {(product.delivery_fee || 0).toLocaleString()} {currencySymbol}
+                </span>
+              </div>
             </div>
 
             {/* Availability */}
