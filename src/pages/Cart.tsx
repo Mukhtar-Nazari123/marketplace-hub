@@ -330,7 +330,7 @@ const Cart = () => {
                   )}
                 </CardContent>
                 <CardFooter>
-                  <Button className="w-full" variant="cyan" size="lg">
+                  <Button className="w-full" variant="cyan" size="lg" onClick={() => navigate('/checkout')}>
                     {texts.checkout}
                   </Button>
                 </CardFooter>
