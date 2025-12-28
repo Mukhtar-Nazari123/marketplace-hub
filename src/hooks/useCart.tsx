@@ -14,6 +14,14 @@ interface CartItem {
     price: number;
     images: string[] | null;
     quantity: number;
+    slug?: string;
+    seller_id?: string;
+    delivery_fee?: number;
+    metadata?: {
+      currency?: string;
+      videoUrl?: string;
+      [key: string]: unknown;
+    } | null;
   };
 }
 
@@ -57,6 +65,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
             price,
             images,
             quantity,
+            seller_id,
+            delivery_fee,
             metadata
           )
         `)

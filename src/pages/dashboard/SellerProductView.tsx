@@ -257,9 +257,19 @@ const SellerProductView = () => {
             {/* Video */}
             {metadata.videoUrl && (
               <Card className="p-4">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
                   <Video className="h-4 w-4" />
-                  <span>{isRTL ? 'ویدیوی محصول موجود است' : 'Product video available'}</span>
+                  <span>{isRTL ? 'ویدیوی محصول' : 'Product Video'}</span>
+                </div>
+                <div className="rounded-lg overflow-hidden border border-border bg-muted">
+                  <video
+                    controls
+                    className="w-full max-h-[250px] object-contain"
+                    poster={images[0]}
+                  >
+                    <source src={metadata.videoUrl as string} type="video/mp4" />
+                    {isRTL ? 'مرورگر شما از ویدیو پشتیبانی نمی‌کند.' : 'Your browser does not support the video tag.'}
+                  </video>
                 </div>
               </Card>
             )}
