@@ -1,10 +1,12 @@
 import { useLanguage } from '@/lib/i18n';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { ProductFormData } from '@/pages/dashboard/AddProduct';
 import { CategorySpecificFields } from './CategorySpecificFields';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
+import { CheckCircle2, AlertCircle, Info } from 'lucide-react';
 
 interface BasicInfoStepProps {
   formData: ProductFormData;
@@ -13,6 +15,11 @@ interface BasicInfoStepProps {
 
 export const BasicInfoStep = ({ formData, updateFormData }: BasicInfoStepProps) => {
   const { isRTL } = useLanguage();
+
+  const nameValidation = {
+    isValid: formData.name.length >= 3,
+    message: isRTL ? 'نام محصول باید حداقل ۳ کاراکتر باشد' : 'Product name must be at least 3 characters',
+  };
 
   return (
     <div className="space-y-6">
@@ -30,21 +37,39 @@ export const BasicInfoStep = ({ formData, updateFormData }: BasicInfoStepProps) 
       <div className="grid gap-6">
         {/* Product Name */}
         <div className="space-y-2">
-          <Label htmlFor="name" className="text-sm font-medium">
-            {isRTL ? 'نام محصول' : 'Product Name'} <span className="text-destructive">*</span>
+          <Label htmlFor="name" className="text-sm font-medium flex items-center gap-2">
+            {isRTL ? 'نام محصول' : 'Product Name'} 
+            <span className="text-destructive">*</span>
+            {formData.name && (
+              nameValidation.isValid ? (
+                <CheckCircle2 className="w-4 h-4 text-success" />
+              ) : (
+                <AlertCircle className="w-4 h-4 text-warning" />
+              )
+            )}
           </Label>
           <Input
             id="name"
             value={formData.name}
             onChange={(e) => updateFormData({ name: e.target.value })}
             placeholder={isRTL ? 'مثال: گوشی هوشمند سامسونگ گلکسی' : 'e.g., Samsung Galaxy Smartphone'}
-            className={cn(isRTL && "text-right")}
+            className={cn(
+              isRTL && "text-right",
+              formData.name && !nameValidation.isValid && "border-warning focus-visible:ring-warning"
+            )}
           />
-          {formData.name && formData.name.length < 3 && (
-            <p className="text-xs text-destructive">
-              {isRTL ? 'نام محصول باید حداقل ۳ کاراکتر باشد' : 'Product name must be at least 3 characters'}
+          {formData.name && !nameValidation.isValid && (
+            <p className="text-xs text-warning flex items-center gap-1">
+              <AlertCircle className="w-3 h-3" />
+              {nameValidation.message}
             </p>
           )}
+          <p className="text-xs text-muted-foreground flex items-center gap-1">
+            <Info className="w-3 h-3" />
+            {isRTL 
+              ? 'نام محصول در صفحه جستجو و نتایج نمایش داده می‌شود'
+              : 'Product name appears in search and listing pages'}
+          </p>
         </div>
 
         {/* Short Description */}
@@ -60,26 +85,37 @@ export const BasicInfoStep = ({ formData, updateFormData }: BasicInfoStepProps) 
             maxLength={160}
             className={cn(isRTL && "text-right")}
           />
-          <p className="text-xs text-muted-foreground">
-            {formData.shortDescription.length}/160
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-muted-foreground">
+              {isRTL 
+                ? 'این توضیح در لیست محصولات نمایش داده می‌شود'
+                : 'This description appears in product listings'}
+            </p>
+            <Badge variant={formData.shortDescription.length > 140 ? 'secondary' : 'outline'} className="text-xs">
+              {formData.shortDescription.length}/160
+            </Badge>
+          </div>
         </div>
 
-        {/* Detailed Description */}
+        {/* Detailed Description with Rich Text Editor */}
         <div className="space-y-2">
           <Label htmlFor="description" className="text-sm font-medium">
             {isRTL ? 'توضیحات کامل' : 'Detailed Description'}
           </Label>
-          <Textarea
-            id="description"
+          <RichTextEditor
             value={formData.description}
-            onChange={(e) => updateFormData({ description: e.target.value })}
+            onChange={(value) => updateFormData({ description: value })}
             placeholder={isRTL 
               ? 'توضیحات کامل محصول را بنویسید. ویژگی‌ها، مزایا و اطلاعات مهم را ذکر کنید...'
               : 'Write a detailed description of your product. Include features, benefits, and important information...'}
-            rows={5}
-            className={cn("resize-none", isRTL && "text-right")}
+            minRows={6}
+            maxLength={5000}
           />
+          <p className="text-xs text-muted-foreground">
+            {isRTL 
+              ? 'از فرمت‌بندی برای خوانایی بهتر استفاده کنید. از عناوین، لیست‌ها و نقل قول پشتیبانی می‌شود.'
+              : 'Use formatting for better readability. Supports headings, lists, and quotes.'}
+          </p>
         </div>
 
         {/* Brand */}
@@ -94,13 +130,21 @@ export const BasicInfoStep = ({ formData, updateFormData }: BasicInfoStepProps) 
             placeholder={isRTL ? 'نام برند (در صورت وجود)' : 'Brand name (if applicable)'}
             className={cn(isRTL && "text-right")}
           />
+          <p className="text-xs text-muted-foreground">
+            {isRTL 
+              ? 'برند محصول به خریداران در تصمیم‌گیری کمک می‌کند'
+              : 'Brand helps buyers make informed decisions'}
+          </p>
         </div>
 
         {/* Category-Specific Fields */}
         {formData.categoryId && (
           <div className="pt-6 border-t">
-            <h4 className="text-base font-medium mb-4">
+            <h4 className="text-base font-medium mb-4 flex items-center gap-2">
               {isRTL ? 'مشخصات اختصاصی دسته‌بندی' : 'Category-Specific Details'}
+              <Badge variant="secondary" className="text-xs font-normal">
+                {formData.categoryName}
+              </Badge>
             </h4>
             <CategorySpecificFields
               categoryId={formData.categoryId}
