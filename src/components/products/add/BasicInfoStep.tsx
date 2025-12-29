@@ -148,6 +148,7 @@ export const BasicInfoStep = ({ formData, updateFormData }: BasicInfoStepProps) 
             </h4>
             <CategorySpecificFields
               categoryId={formData.categoryId}
+              categoryName={formData.categoryName}
               attributes={formData.attributes}
               updateAttributes={(attributes) => updateFormData({ attributes })}
             />
