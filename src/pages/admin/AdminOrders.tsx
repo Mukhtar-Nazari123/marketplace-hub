@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -56,6 +57,7 @@ const formatProductSKUs = (items: OrderItem[] | undefined, isRTL: boolean): stri
 };
 
 const AdminOrders = () => {
+  const navigate = useNavigate();
   const { t, direction } = useLanguage();
   const [orders, setOrders] = useState<Order[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
@@ -276,8 +278,13 @@ const AdminOrders = () => {
                         <TableCell>
                           {formatDate(new Date(order.created_at), direction === 'rtl' ? 'fa' : 'en')}
                         </TableCell>
-                        <TableCell>
-                          <Button variant="ghost" size="icon">
+                        <TableCell className={isRTL ? 'text-left' : 'text-right'}>
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => navigate(`/dashboard/orders/${order.id}`)}
+                            title={isRTL ? 'مشاهده جزئیات' : 'View Details'}
+                          >
                             <Eye className="h-4 w-4" />
                           </Button>
                         </TableCell>
