@@ -12,37 +12,41 @@ const HeroSection = () => {
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Main Hero */}
           <div className="lg:col-span-2 relative rounded-2xl overflow-hidden gradient-hero min-h-[400px] lg:min-h-[500px] animate-fade-in">
-            <div className="absolute inset-0 bg-gradient-to-l from-foreground via-foreground/90 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-foreground via-foreground/95 to-foreground/70" />
             
             {/* Decorative Elements */}
             <div className="absolute top-10 left-10 w-64 h-64 bg-cyan/20 rounded-full blur-3xl" />
             <div className="absolute bottom-10 left-20 w-48 h-48 bg-orange/20 rounded-full blur-3xl" />
             
-            <div className={`relative z-10 p-8 lg:p-12 lg:pr-4 h-full flex flex-col justify-center max-w-lg ${isRTL ? 'mr-auto' : 'ml-auto'}`}>
-              <Badge variant="sale" className="w-fit mb-4 text-sm px-4 py-1">
-                {t.hero.sale}
-              </Badge>
-              
-              <h2 className="font-display text-4xl lg:text-5xl font-bold text-background mb-4 leading-tight">
-                {t.hero.modernStyle}
-                <span className="block text-cyan">{t.hero.headphones}</span>
-                {t.hero.model}
-              </h2>
-              
-              <p className="text-background/70 mb-6 text-lg">
-                {t.hero.quickSale}
-              </p>
-              
-              <Button variant="orange" size="xl" className="w-fit group">
-                {t.hero.shopNow}
-                <ArrowLeft className={`h-5 w-5 transition-transform ${isRTL ? 'group-hover:-translate-x-1' : 'group-hover:translate-x-1 rotate-180'}`} />
-              </Button>
-            </div>
+            {/* Content Container */}
+            <div className="relative z-10 h-full flex items-center">
+              {/* Text Content - Left Side */}
+              <div className={`p-8 lg:p-12 flex flex-col justify-center max-w-md ${isRTL ? 'mr-auto order-2' : 'ml-0 order-1'}`}>
+                <Badge variant="sale" className="w-fit mb-4 text-sm px-4 py-1">
+                  {t.hero.sale}
+                </Badge>
+                
+                <h2 className="font-display text-4xl lg:text-5xl font-bold text-background mb-4 leading-tight">
+                  {t.hero.modernStyle}
+                  <span className="block text-cyan">{t.hero.headphones}</span>
+                  {t.hero.model}
+                </h2>
+                
+                <p className="text-background/70 mb-6 text-lg">
+                  {t.hero.quickSale}
+                </p>
+                
+                <Button variant="orange" size="xl" className="w-fit group">
+                  {t.hero.shopNow}
+                  <ArrowLeft className={`h-5 w-5 transition-transform ${isRTL ? 'group-hover:-translate-x-1' : 'group-hover:translate-x-1 rotate-180'}`} />
+                </Button>
+              </div>
 
-            {/* Floating Product Image Placeholder */}
-            <div className={`absolute bottom-8 lg:bottom-16 opacity-80 ${isRTL ? 'left-8 lg:left-16' : 'right-8 lg:right-16'}`}>
-              <div className="w-48 h-48 lg:w-64 lg:h-64 rounded-full bg-gradient-to-br from-cyan/30 to-orange/30 flex items-center justify-center animate-float">
-                <Headphones className="w-24 h-24 lg:w-32 lg:h-32 text-background/50" />
+              {/* Floating Product Image - Right Side */}
+              <div className={`flex-1 flex items-center justify-center ${isRTL ? 'order-1' : 'order-2'}`}>
+                <div className="w-48 h-48 lg:w-72 lg:h-72 rounded-full bg-gradient-to-br from-cyan/30 to-orange/30 flex items-center justify-center animate-float opacity-80">
+                  <Headphones className="w-24 h-24 lg:w-36 lg:h-36 text-background/50" />
+                </div>
               </div>
             </div>
           </div>
