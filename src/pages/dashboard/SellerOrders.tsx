@@ -133,7 +133,7 @@ const SellerOrders = () => {
   const [orders, setOrders] = useState<SellerOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<SellerOrder | null>(null);
-  const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
+  const [updatingStatus, setUpdatingStatus] = useState<{ orderId: string; action: 'confirm' | 'reject' } | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>('all');
 
   const fetchOrders = async () => {
@@ -198,7 +198,7 @@ const SellerOrders = () => {
   }, [user]);
 
   const handleStatusUpdate = async (orderId: string, newStatus: string) => {
-    setUpdatingStatus(orderId);
+    setUpdatingStatus({ orderId, action: 'confirm' });
     try {
       const { error } = await supabase
         .from('seller_orders')
@@ -230,7 +230,7 @@ const SellerOrders = () => {
   };
 
   const handleRejectOrder = async (orderId: string) => {
-    setUpdatingStatus(orderId);
+    setUpdatingStatus({ orderId, action: 'reject' });
     try {
       const { error } = await supabase
         .from('seller_orders')
@@ -516,10 +516,10 @@ const SellerOrders = () => {
                                 <Button
                                   variant="destructive"
                                   onClick={() => handleRejectOrder(order.id)}
-                                  disabled={updatingStatus === order.id}
+                                  disabled={updatingStatus?.orderId === order.id}
                                   className="gap-2"
                                 >
-                                  {updatingStatus === order.id ? (
+                                  {updatingStatus?.orderId === order.id && updatingStatus?.action === 'reject' ? (
                                     <RefreshCw className="w-4 h-4 animate-spin" />
                                   ) : (
                                     <XCircle className="w-4 h-4" />
@@ -530,10 +530,10 @@ const SellerOrders = () => {
                               {getNextStatus(order.status) && order.status !== 'rejected' && (
                                 <Button
                                   onClick={() => handleStatusUpdate(order.id, getNextStatus(order.status)!)}
-                                  disabled={updatingStatus === order.id}
+                                  disabled={updatingStatus?.orderId === order.id}
                                   className="gap-2"
                                 >
-                                  {updatingStatus === order.id ? (
+                                  {updatingStatus?.orderId === order.id && updatingStatus?.action === 'confirm' ? (
                                     <RefreshCw className="w-4 h-4 animate-spin" />
                                   ) : (
                                     <CheckCircle className="w-4 h-4" />

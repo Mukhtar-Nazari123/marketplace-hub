@@ -16,6 +16,7 @@ interface PricingStepProps {
 }
 
 const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+const OTHER_SIZE_KEY = 'other';
 
 export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
   const { isRTL } = useLanguage();
@@ -84,11 +85,14 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
     ? Object.values(formData.stockPerSize || {}).some(v => (Number(v) || 0) > 0)
     : formData.quantity > 0;
 
-  // Total stock for clothing
+  // Total stock for clothing (including custom sizes)
   const totalClothingStock = Object.values(formData.stockPerSize || {}).reduce(
     (a, b) => a + (Number(b) || 0), 
     0
   );
+
+  // Get custom size stock
+  const customSizeStock = formData.stockPerSize?.[OTHER_SIZE_KEY] || 0;
 
   // Currency icon component
   const CurrencyIcon = formData.currency === 'AFN' ? Banknote : DollarSign;
@@ -329,6 +333,27 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
                 />
               </div>
             ))}
+          </div>
+
+          {/* Custom/Other Size Stock */}
+          <div className="pt-4 border-t space-y-3">
+            <Label className="text-sm font-medium">
+              {isRTL ? 'موجودی سایز سفارشی' : 'Custom Size Stock'}
+            </Label>
+            <div className="flex items-center gap-4">
+              <Input
+                id="custom-size-stock"
+                type="number"
+                min="0"
+                value={formData.stockPerSize?.[OTHER_SIZE_KEY] || ''}
+                onChange={(e) => handleStockPerSizeChange(OTHER_SIZE_KEY, e.target.value)}
+                placeholder="0"
+                className="w-24 text-center h-10"
+              />
+              <span className="text-sm text-muted-foreground">
+                {isRTL ? 'عدد برای سایزهای سفارشی (مانند 38، 40، 42)' : 'items for custom sizes (e.g., 38, 40, 42)'}
+              </span>
+            </div>
           </div>
 
           <div className="flex items-center justify-between pt-2 border-t">
