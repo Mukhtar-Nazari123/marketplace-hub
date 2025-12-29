@@ -107,64 +107,96 @@ const BuyerOrders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      if (!user) return;
+  const fetchOrders = async () => {
+    if (!user) return;
 
-      try {
-        const { data, error } = await supabase
-          .from('orders')
-          .select(`
+    try {
+      const { data, error } = await supabase
+        .from('orders')
+        .select(`
+          *,
+          order_items (
             *,
-            order_items (
-              *,
-              products:product_id (sku)
-            )
-          `)
-          .eq('buyer_id', user.id)
-          .order('created_at', { ascending: false });
+            products:product_id (sku)
+          )
+        `)
+        .eq('buyer_id', user.id)
+        .order('created_at', { ascending: false });
 
-        if (error) throw error;
+      if (error) throw error;
 
-        // Fetch seller sub-orders for each order
-        const ordersWithSellerOrders = await Promise.all(
-          (data || []).map(async (order) => {
-            const { data: sellerOrders } = await supabase
-              .from('seller_orders')
-              .select('*')
-              .eq('order_id', order.id);
+      // Fetch seller sub-orders for each order
+      const ordersWithSellerOrders = await Promise.all(
+        (data || []).map(async (order) => {
+          const { data: sellerOrders } = await supabase
+            .from('seller_orders')
+            .select('*')
+            .eq('order_id', order.id);
 
-            // Map order items to include product_sku
-            const orderItemsWithSku = (order.order_items || []).map((item: any) => ({
-              ...item,
-              product_sku: item.products?.sku || null,
-            }));
+          // Map order items to include product_sku
+          const orderItemsWithSku = (order.order_items || []).map((item: any) => ({
+            ...item,
+            product_sku: item.products?.sku || null,
+          }));
 
-            // Group items by seller for seller sub-orders
-            const sellerOrdersWithItems = (sellerOrders || []).map((so: any) => ({
-              ...so,
-              items: orderItemsWithSku.filter((item: OrderItem) => item.seller_id === so.seller_id),
-            }));
+          // Group items by seller for seller sub-orders
+          const sellerOrdersWithItems = (sellerOrders || []).map((so: any) => ({
+            ...so,
+            items: orderItemsWithSku.filter((item: OrderItem) => item.seller_id === so.seller_id),
+          }));
 
-            return {
-              ...order,
-              shipping_address: order.shipping_address as unknown as ShippingAddress | null,
-              seller_policies: order.seller_policies as unknown as SellerPolicy[] | null,
-              order_items: orderItemsWithSku as OrderItem[],
-              seller_orders: sellerOrdersWithItems,
-            };
-          })
-        );
+          return {
+            ...order,
+            shipping_address: order.shipping_address as unknown as ShippingAddress | null,
+            seller_policies: order.seller_policies as unknown as SellerPolicy[] | null,
+            order_items: orderItemsWithSku as OrderItem[],
+            seller_orders: sellerOrdersWithItems,
+          };
+        })
+      );
 
-        setOrders(ordersWithSellerOrders);
-      } catch (error) {
-        console.error('Error fetching orders:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+      setOrders(ordersWithSellerOrders);
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchOrders();
+
+    // Subscribe to real-time updates for seller_orders
+    if (user) {
+      const channel = supabase
+        .channel('buyer-seller-orders-updates')
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'seller_orders',
+          },
+          (payload) => {
+            // Update the local state when a seller order status changes
+            setOrders((prevOrders) =>
+              prevOrders.map((order) => ({
+                ...order,
+                seller_orders: order.seller_orders?.map((so) =>
+                  so.id === payload.new.id
+                    ? { ...so, status: payload.new.status }
+                    : so
+                ),
+              }))
+            );
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
   }, [user]);
 
   const getStatusBadge = (status: string) => {
@@ -175,6 +207,7 @@ const BuyerOrders = () => {
       shipped: { variant: 'default', icon: Truck, label: 'Shipped', labelFa: 'ارسال شده' },
       delivered: { variant: 'default', icon: CheckCircle, label: 'Delivered', labelFa: 'تحویل داده شده' },
       cancelled: { variant: 'destructive', icon: XCircle, label: 'Cancelled', labelFa: 'لغو شده' },
+      rejected: { variant: 'destructive', icon: XCircle, label: 'Rejected', labelFa: 'رد شده' },
     };
 
     const config = statusConfig[status] || { variant: 'outline' as const, icon: AlertCircle, label: status, labelFa: status };
@@ -403,12 +436,14 @@ const BuyerOrders = () => {
                         <div className="space-y-4">
                           {order.seller_orders.map((sellerOrder) => {
                             const statusSteps = ['pending', 'confirmed', 'shipped', 'delivered'];
-                            const currentIndex = statusSteps.indexOf(sellerOrder.status);
+                            const isRejected = sellerOrder.status === 'rejected';
+                            const currentIndex = isRejected ? -1 : statusSteps.indexOf(sellerOrder.status);
                             const statusLabels: Record<string, { en: string; fa: string }> = {
                               pending: { en: 'Pending', fa: 'در انتظار' },
                               confirmed: { en: 'Confirmed', fa: 'تایید شده' },
                               shipped: { en: 'Shipped', fa: 'ارسال شده' },
                               delivered: { en: 'Delivered', fa: 'تحویل شده' },
+                              rejected: { en: 'Rejected', fa: 'رد شده' },
                             };
 
                             return (
@@ -428,6 +463,23 @@ const BuyerOrders = () => {
                                   </div>
                                   
                                   {/* Progress Steps */}
+                                  {isRejected ? (
+                                    <div className="flex items-center justify-center gap-2 py-4">
+                                      <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-destructive/10 border border-destructive/20">
+                                        <div className="w-10 h-10 rounded-full bg-destructive flex items-center justify-center">
+                                          <XCircle className="w-5 h-5 text-destructive-foreground" />
+                                        </div>
+                                        <div>
+                                          <p className="font-medium text-destructive">
+                                            {isRTL ? 'رد شده' : 'Rejected'}
+                                          </p>
+                                          <p className="text-xs text-muted-foreground">
+                                            {isRTL ? 'این سفارش توسط فروشنده رد شده است' : 'This order has been rejected by the seller'}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ) : (
                                   <div className="relative flex items-center justify-between pt-2">
                                     {/* Progress Line Background */}
                                     <div className="absolute top-5 start-0 end-0 h-0.5 bg-muted" />
@@ -474,6 +526,7 @@ const BuyerOrders = () => {
                                       );
                                     })}
                                   </div>
+                                  )}
                                 </CardContent>
                               </Card>
                             );

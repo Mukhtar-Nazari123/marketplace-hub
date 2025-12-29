@@ -104,9 +104,14 @@ const ORDER_STATUSES = [
   { value: 'confirmed', label: 'Confirmed', labelFa: 'تایید شده', color: 'default' as const },
   { value: 'shipped', label: 'Shipped', labelFa: 'ارسال شده', color: 'default' as const },
   { value: 'delivered', label: 'Delivered', labelFa: 'تحویل شده', color: 'default' as const },
+  { value: 'rejected', label: 'Rejected', labelFa: 'رد شده', color: 'destructive' as const },
 ];
 
 const STATUS_SEQUENCE = ['pending', 'confirmed', 'shipped', 'delivered'];
+
+const canRejectOrder = (status: string): boolean => {
+  return status === 'pending';
+};
 
 const getNextStatus = (currentStatus: string): string | null => {
   const currentIndex = STATUS_SEQUENCE.indexOf(currentStatus);
@@ -224,6 +229,38 @@ const SellerOrders = () => {
     }
   };
 
+  const handleRejectOrder = async (orderId: string) => {
+    setUpdatingStatus(orderId);
+    try {
+      const { error } = await supabase
+        .from('seller_orders')
+        .update({ status: 'rejected' })
+        .eq('id', orderId);
+
+      if (error) throw error;
+
+      setOrders((prev) =>
+        prev.map((order) =>
+          order.id === orderId ? { ...order, status: 'rejected' } : order
+        )
+      );
+
+      toast({
+        title: isRTL ? 'موفق' : 'Success',
+        description: isRTL ? 'سفارش رد شد' : 'Order has been rejected',
+      });
+    } catch (error) {
+      console.error('Error rejecting order:', error);
+      toast({
+        title: isRTL ? 'خطا' : 'Error',
+        description: isRTL ? 'خطا در رد سفارش' : 'Failed to reject order',
+        variant: 'destructive',
+      });
+    } finally {
+      setUpdatingStatus(null);
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     const config = ORDER_STATUSES.find((s) => s.value === status) || ORDER_STATUSES[0];
     const icons: Record<string, typeof CheckCircle> = {
@@ -233,6 +270,7 @@ const SellerOrders = () => {
       shipped: Truck,
       delivered: CheckCircle,
       cancelled: XCircle,
+      rejected: XCircle,
     };
     const Icon = icons[status] || AlertCircle;
 
@@ -473,24 +511,58 @@ const SellerOrders = () => {
                                 </span>
                               </p>
                             </div>
-                            {getNextStatus(order.status) && (
-                              <Button
-                                onClick={() => handleStatusUpdate(order.id, getNextStatus(order.status)!)}
-                                disabled={updatingStatus === order.id}
-                                className="gap-2"
-                              >
-                                {updatingStatus === order.id ? (
-                                  <RefreshCw className="w-4 h-4 animate-spin" />
-                                ) : (
-                                  <CheckCircle className="w-4 h-4" />
-                                )}
-                                {isRTL ? 'تایید و ادامه' : 'Confirm & Continue'}
-                              </Button>
-                            )}
+                            <div className="flex gap-2">
+                              {canRejectOrder(order.status) && (
+                                <Button
+                                  variant="destructive"
+                                  onClick={() => handleRejectOrder(order.id)}
+                                  disabled={updatingStatus === order.id}
+                                  className="gap-2"
+                                >
+                                  {updatingStatus === order.id ? (
+                                    <RefreshCw className="w-4 h-4 animate-spin" />
+                                  ) : (
+                                    <XCircle className="w-4 h-4" />
+                                  )}
+                                  {isRTL ? 'رد سفارش' : 'Reject Order'}
+                                </Button>
+                              )}
+                              {getNextStatus(order.status) && order.status !== 'rejected' && (
+                                <Button
+                                  onClick={() => handleStatusUpdate(order.id, getNextStatus(order.status)!)}
+                                  disabled={updatingStatus === order.id}
+                                  className="gap-2"
+                                >
+                                  {updatingStatus === order.id ? (
+                                    <RefreshCw className="w-4 h-4 animate-spin" />
+                                  ) : (
+                                    <CheckCircle className="w-4 h-4" />
+                                  )}
+                                  {isRTL ? 'تایید و ادامه' : 'Confirm & Continue'}
+                                </Button>
+                              )}
+                            </div>
                           </div>
                           
                           {/* Progress Steps */}
                           <div className="pt-4">
+                            {order.status === 'rejected' ? (
+                              <div className="flex items-center justify-center gap-2 py-4">
+                                <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-destructive/10 border border-destructive/20">
+                                  <div className="w-10 h-10 rounded-full bg-destructive flex items-center justify-center">
+                                    <XCircle className="w-5 h-5 text-destructive-foreground" />
+                                  </div>
+                                  <div>
+                                    <p className="font-medium text-destructive">
+                                      {isRTL ? 'رد شده' : 'Rejected'}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground">
+                                      {isRTL ? 'این سفارش رد شده است' : 'This order has been rejected'}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            ) : (
                             <div className="relative flex items-center justify-between">
                               {/* Progress Line Background */}
                               <div className="absolute top-5 start-0 end-0 h-0.5 bg-muted" />
@@ -504,7 +576,7 @@ const SellerOrders = () => {
                               />
 
                               {/* Steps */}
-                              {ORDER_STATUSES.map((step, index) => {
+                              {ORDER_STATUSES.filter(s => s.value !== 'rejected').map((step, index) => {
                                 const isCompleted = STATUS_SEQUENCE.indexOf(order.status) >= index;
                                 const isCurrent = order.status === step.value;
                                 const icons: Record<string, typeof CheckCircle> = {
@@ -537,6 +609,7 @@ const SellerOrders = () => {
                                 );
                               })}
                             </div>
+                            )}
                           </div>
                         </div>
                       </CardContent>

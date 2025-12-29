@@ -1,4 +1,4 @@
-import { Check, Clock, Package, Truck, CheckCircle } from 'lucide-react';
+import { Check, Clock, Package, Truck, CheckCircle, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/lib/i18n';
 
@@ -16,6 +16,7 @@ const ORDER_STEPS = [
 ];
 
 const getStepIndex = (status: string) => {
+  if (status === 'rejected') return -1; // Special case for rejected
   const index = ORDER_STEPS.findIndex(s => s.key === status);
   return index >= 0 ? index : 0;
 };
@@ -26,7 +27,29 @@ export const OrderStatusProgress = ({
   compact = false,
 }: OrderStatusProgressProps) => {
   const { isRTL } = useLanguage();
+  const isRejected = currentStatus === 'rejected';
   const currentIndex = getStepIndex(currentStatus);
+
+  // Show rejected status separately
+  if (isRejected) {
+    return (
+      <div className={cn('flex items-center justify-center gap-2 py-4', className)}>
+        <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-destructive/10 border border-destructive/20">
+          <div className="w-10 h-10 rounded-full bg-destructive flex items-center justify-center">
+            <XCircle className="w-5 h-5 text-destructive-foreground" />
+          </div>
+          <div>
+            <p className="font-medium text-destructive">
+              {isRTL ? 'رد شده' : 'Rejected'}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {isRTL ? 'این سفارش رد شده است' : 'This order has been rejected'}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (compact) {
     return (
@@ -113,6 +136,7 @@ export const OrderStatusProgress = ({
 };
 
 export const getNextStatus = (currentStatus: string): string | null => {
+  if (currentStatus === 'rejected') return null;
   const currentIndex = getStepIndex(currentStatus);
   if (currentIndex < ORDER_STEPS.length - 1) {
     return ORDER_STEPS[currentIndex + 1].key;
@@ -121,7 +145,12 @@ export const getNextStatus = (currentStatus: string): string | null => {
 };
 
 export const canUpdateStatus = (currentStatus: string): boolean => {
-  return getNextStatus(currentStatus) !== null;
+  return currentStatus !== 'rejected' && getNextStatus(currentStatus) !== null;
+};
+
+export const canRejectOrder = (currentStatus: string): boolean => {
+  // Can only reject if order is still pending
+  return currentStatus === 'pending';
 };
 
 export { ORDER_STEPS, getStepIndex };
