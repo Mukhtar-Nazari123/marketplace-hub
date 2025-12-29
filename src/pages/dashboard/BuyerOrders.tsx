@@ -165,38 +165,46 @@ const BuyerOrders = () => {
 
   useEffect(() => {
     fetchOrders();
+  }, [user]);
 
-    // Subscribe to real-time updates for seller_orders
-    if (user) {
-      const channel = supabase
-        .channel('buyer-seller-orders-updates')
-        .on(
-          'postgres_changes',
-          {
-            event: 'UPDATE',
-            schema: 'public',
-            table: 'seller_orders',
-          },
-          (payload) => {
-            // Update the local state when a seller order status changes
+  // Separate effect for real-time subscription
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('buyer-seller-orders-realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'seller_orders',
+        },
+        (payload) => {
+          console.log('Real-time update received:', payload);
+          // Update the local state when a seller order status changes
+          if (payload.eventType === 'UPDATE') {
+            const updatedOrder = payload.new as any;
             setOrders((prevOrders) =>
               prevOrders.map((order) => ({
                 ...order,
                 seller_orders: order.seller_orders?.map((so) =>
-                  so.id === payload.new.id
-                    ? { ...so, status: payload.new.status }
+                  so.id === updatedOrder.id
+                    ? { ...so, status: updatedOrder.status }
                     : so
                 ),
               }))
             );
           }
-        )
-        .subscribe();
+        }
+      )
+      .subscribe((status) => {
+        console.log('Realtime subscription status:', status);
+      });
 
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    }
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user]);
 
   const getStatusBadge = (status: string) => {
