@@ -101,6 +101,40 @@ const AdminOrders = () => {
 
   useEffect(() => {
     fetchOrders();
+
+    // Real-time subscription for order updates
+    const channel = supabase
+      .channel('admin-orders-realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'orders',
+        },
+        (payload) => {
+          console.log('Admin orders real-time update:', payload);
+          if (payload.eventType === 'UPDATE') {
+            const updatedOrder = payload.new as any;
+            setOrders((prevOrders) =>
+              prevOrders.map((order) =>
+                order.id === updatedOrder.id
+                  ? { ...order, status: updatedOrder.status, payment_status: updatedOrder.payment_status }
+                  : order
+              )
+            );
+          } else if (payload.eventType === 'INSERT') {
+            fetchOrders(); // Refetch for new orders
+          }
+        }
+      )
+      .subscribe((status) => {
+        console.log('Admin orders realtime subscription:', status);
+      });
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   useEffect(() => {
