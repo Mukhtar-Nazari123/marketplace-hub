@@ -459,7 +459,7 @@ const ProductDetail = () => {
             </div>
 
             {/* Quantity & Add to Cart */}
-            {product.quantity > 0 && (
+            {(product.quantity > 0 || Object.values(stockPerSize).some(v => Number(v) > 0)) && (
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex items-center border border-border rounded-lg">
                   <button
