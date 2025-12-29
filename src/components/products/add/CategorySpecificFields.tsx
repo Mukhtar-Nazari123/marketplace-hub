@@ -154,29 +154,68 @@ export const CategorySpecificFields = ({
           </Select>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-3">
           <Label className="flex items-center gap-2">
             <Ruler className="w-4 h-4" />
             {isRTL ? 'سایزهای موجود' : 'Available Sizes'}
           </Label>
-          <Select
-            value={(attributes.size as string) || ''}
-            onValueChange={(value) => updateAttribute('size', value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder={isRTL ? 'انتخاب کنید' : 'Select'} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="XS">XS</SelectItem>
-              <SelectItem value="S">S</SelectItem>
-              <SelectItem value="M">M</SelectItem>
-              <SelectItem value="L">L</SelectItem>
-              <SelectItem value="XL">XL</SelectItem>
-              <SelectItem value="XXL">XXL</SelectItem>
-              <SelectItem value="XXXL">XXXL</SelectItem>
-              <SelectItem value="freesize">{isRTL ? 'فری سایز' : 'Free Size'}</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="grid grid-cols-4 gap-2 sm:grid-cols-8">
+            {['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'].map((size) => {
+              const selectedSizes = (attributes.sizes as string[]) || [];
+              const isSelected = selectedSizes.includes(size);
+              return (
+                <button
+                  key={size}
+                  type="button"
+                  onClick={() => {
+                    const newSizes = isSelected
+                      ? selectedSizes.filter((s) => s !== size)
+                      : [...selectedSizes, size];
+                    updateAttribute('sizes', newSizes);
+                  }}
+                  className={cn(
+                    "px-3 py-2 text-sm font-medium rounded-md border transition-all duration-200",
+                    isSelected
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-background text-foreground border-border hover:border-primary/50"
+                  )}
+                >
+                  {size}
+                </button>
+              );
+            })}
+            <button
+              type="button"
+              onClick={() => {
+                const selectedSizes = (attributes.sizes as string[]) || [];
+                const isSelected = selectedSizes.includes('freesize');
+                const newSizes = isSelected
+                  ? selectedSizes.filter((s) => s !== 'freesize')
+                  : [...selectedSizes, 'freesize'];
+                updateAttribute('sizes', newSizes);
+              }}
+              className={cn(
+                "col-span-2 sm:col-span-1 px-3 py-2 text-sm font-medium rounded-md border transition-all duration-200",
+                ((attributes.sizes as string[]) || []).includes('freesize')
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-background text-foreground border-border hover:border-primary/50"
+              )}
+            >
+              {isRTL ? 'فری سایز' : 'Free'}
+            </button>
+          </div>
+          
+          <div className="space-y-2 pt-2">
+            <Label className="text-sm text-muted-foreground">
+              {isRTL ? 'سایز دیگر (اختیاری)' : 'Custom Size (optional)'}
+            </Label>
+            <Input
+              value={(attributes.customSize as string) || ''}
+              onChange={(e) => updateAttribute('customSize', e.target.value)}
+              placeholder={isRTL ? 'مثال: 38، 40، 42 یا XXS' : 'e.g., 38, 40, 42 or XXS'}
+              className={cn(isRTL && "text-right")}
+            />
+          </div>
         </div>
 
         <div className="space-y-2">
