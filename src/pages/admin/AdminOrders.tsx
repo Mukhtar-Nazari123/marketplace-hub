@@ -40,7 +40,22 @@ interface Order {
   total: number;
   created_at: string;
   order_items?: OrderItem[];
+  seller_orders?: { currency: string }[];
 }
+
+const getCurrencySymbol = (currency: string): string => {
+  switch (currency) {
+    case 'AFN': return '؋';
+    case 'USD': return '$';
+    default: return currency;
+  }
+};
+
+const formatPriceWithCurrency = (price: number, currency: string, isRTL: boolean): string => {
+  const symbol = getCurrencySymbol(currency);
+  const formattedPrice = price.toLocaleString(isRTL ? 'fa-IR' : 'en-US');
+  return isRTL ? `${formattedPrice} ${symbol}` : `${symbol}${formattedPrice}`;
+};
 
 // Helper to format SKUs for display
 const formatProductSKUs = (items: OrderItem[] | undefined, isRTL: boolean): string => {
@@ -76,6 +91,9 @@ const AdminOrders = () => {
             id,
             product_id,
             products:product_id (sku)
+          ),
+          seller_orders (
+            currency
           )
         `)
         .order('created_at', { ascending: false });
@@ -274,7 +292,7 @@ const AdminOrders = () => {
                         </TableCell>
                         <TableCell>{getStatusBadge(order.status)}</TableCell>
                         <TableCell>{getPaymentBadge(order.payment_status)}</TableCell>
-                        <TableCell>{formatCurrency(Number(order.total), direction === 'rtl' ? 'fa' : 'en')}</TableCell>
+                        <TableCell>{formatPriceWithCurrency(Number(order.total), order.seller_orders?.[0]?.currency || 'AFN', isRTL)}</TableCell>
                         <TableCell>
                           {formatDate(new Date(order.created_at), direction === 'rtl' ? 'fa' : 'en')}
                         </TableCell>

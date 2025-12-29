@@ -56,6 +56,7 @@ interface Product {
   name: string;
   slug: string;
   price: number;
+  currency: string;
   status: string;
   seller_id: string;
   category_id: string | null;
@@ -63,6 +64,20 @@ interface Product {
   created_at: string;
   rejection_reason: string | null;
 }
+
+const getCurrencySymbol = (currency: string): string => {
+  switch (currency) {
+    case 'AFN': return '؋';
+    case 'USD': return '$';
+    default: return currency;
+  }
+};
+
+const formatPriceWithCurrency = (price: number, currency: string, isRTL: boolean): string => {
+  const symbol = getCurrencySymbol(currency);
+  const formattedPrice = price.toLocaleString(isRTL ? 'fa-IR' : 'en-US');
+  return isRTL ? `${formattedPrice} ${symbol}` : `${symbol}${formattedPrice}`;
+};
 
 const AdminProducts = () => {
   const { t, direction } = useLanguage();
@@ -74,6 +89,7 @@ const AdminProducts = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -186,6 +202,30 @@ const AdminProducts = () => {
     }
   };
 
+  const handleDelete = async () => {
+    if (!selectedProduct) return;
+
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', selectedProduct.id);
+
+      if (error) throw error;
+
+      toast.success(isRTL ? 'محصول با موفقیت حذف شد' : 'Product deleted successfully');
+      setIsDeleteDialogOpen(false);
+      setSelectedProduct(null);
+      fetchProducts();
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      toast.error(isRTL ? 'خطا در حذف محصول' : 'Error deleting product');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const isRTL = direction === 'rtl';
   const searchIconClass = isRTL ? 'right-3' : 'left-3';
   const inputPaddingClass = isRTL ? 'pr-9' : 'pl-9';
@@ -282,7 +322,7 @@ const AdminProducts = () => {
                         <TableCell>
                           <div className="font-medium">{product.name}</div>
                         </TableCell>
-                        <TableCell>{formatCurrency(Number(product.price), direction === 'rtl' ? 'fa' : 'en')}</TableCell>
+                        <TableCell>{formatPriceWithCurrency(Number(product.price), product.currency || 'AFN', isRTL)}</TableCell>
                         <TableCell>{getStatusBadge(product.status)}</TableCell>
                         <TableCell>
                           {formatDate(new Date(product.created_at), direction === 'rtl' ? 'fa' : 'en')}
@@ -322,6 +362,17 @@ const AdminProducts = () => {
                                   </DropdownMenuItem>
                                 </>
                               )}
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setSelectedProduct(product);
+                                  setIsDeleteDialogOpen(true);
+                                }}
+                                className="text-destructive"
+                              >
+                                <Trash2 className={`h-4 w-4 ${iconMarginClass}`} />
+                                {isRTL ? 'حذف' : 'Delete'}
+                              </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
@@ -367,6 +418,38 @@ const AdminProducts = () => {
                 disabled={isSubmitting || !rejectionReason.trim()}
               >
                 {isSubmitting ? t.admin.products.rejecting : t.admin.products.rejectProduct}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Confirmation Dialog */}
+        <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{isRTL ? 'حذف محصول' : 'Delete Product'}</DialogTitle>
+              <DialogDescription>
+                {isRTL
+                  ? `آیا مطمئن هستید که می‌خواهید "${selectedProduct?.name}" را حذف کنید؟ این عمل قابل بازگشت نیست.`
+                  : `Are you sure you want to delete "${selectedProduct?.name}"? This action cannot be undone.`}
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsDeleteDialogOpen(false);
+                  setSelectedProduct(null);
+                }}
+              >
+                {isRTL ? 'انصراف' : 'Cancel'}
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleDelete}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (isRTL ? 'در حال حذف...' : 'Deleting...') : (isRTL ? 'حذف' : 'Delete')}
               </Button>
             </DialogFooter>
           </DialogContent>

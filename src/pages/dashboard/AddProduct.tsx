@@ -99,16 +99,6 @@ const AddProduct = () => {
 
   const isVerifiedSeller = sellerStatus === 'approved';
 
-  // Auto-save draft every 30 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (formData.name && user) {
-        saveDraft(true);
-      }
-    }, 30000);
-    return () => clearInterval(interval);
-  }, [formData, user]);
-
   const updateFormData = (updates: Partial<ProductFormData>) => {
     setFormData(prev => ({ ...prev, ...updates }));
   };
