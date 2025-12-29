@@ -395,21 +395,30 @@ const ProductDetail = () => {
 
             {/* Availability */}
             <div className="flex items-center gap-4 flex-wrap">
-              {product.quantity > 0 ? (
-                <div className="flex items-center gap-2 text-green-600">
-                  <Check size={20} />
-                  <span className="font-medium">
-                    {isRTL ? `موجود (${product.quantity} عدد)` : `In Stock (${product.quantity} items)`}
-                  </span>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2 text-destructive">
-                  <Package size={20} />
-                  <span className="font-medium">
-                    {isRTL ? 'ناموجود' : 'Out of Stock'}
-                  </span>
-                </div>
-              )}
+              {(() => {
+                // Calculate total stock including size-based stock
+                const sizeStockTotal = Object.values(stockPerSize).reduce((sum, v) => sum + Number(v), 0);
+                const totalStock = product.quantity + sizeStockTotal;
+                
+                if (totalStock > 0) {
+                  return (
+                    <div className="flex items-center gap-2 text-green-600">
+                      <Check size={20} />
+                      <span className="font-medium">
+                        {isRTL ? `موجود (${totalStock} عدد)` : `In Stock (${totalStock} items)`}
+                      </span>
+                    </div>
+                  );
+                }
+                return (
+                  <div className="flex items-center gap-2 text-destructive">
+                    <Package size={20} />
+                    <span className="font-medium">
+                      {isRTL ? 'ناموجود' : 'Out of Stock'}
+                    </span>
+                  </div>
+                );
+              })()}
               {product.sku && (
                 <span className="text-muted-foreground text-sm">
                   SKU: {product.sku}
