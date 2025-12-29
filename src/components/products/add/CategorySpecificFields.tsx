@@ -23,12 +23,14 @@ import {
 
 interface CategorySpecificFieldsProps {
   categoryId: string;
+  categoryName: string;
   attributes: Record<string, string | boolean | string[]>;
   updateAttributes: (attributes: Record<string, string | boolean | string[]>) => void;
 }
 
 export const CategorySpecificFields = ({ 
   categoryId, 
+  categoryName,
   attributes, 
   updateAttributes 
 }: CategorySpecificFieldsProps) => {
@@ -563,29 +565,29 @@ export const CategorySpecificFields = ({
     </div>
   );
 
-  // Match category by slug or ID
-  const getCategoryType = (id: string): string => {
+  // Match category by name - works with both English names and Persian names
+  const getCategoryType = (name: string): string => {
     const categoryMap: Record<string, string[]> = {
-      'electronics': ['electronics', 'الکترونیک'],
-      'clothing': ['clothing', 'پوشاک', 'fashion'],
-      'home': ['home', 'home-living', 'خانه', 'home & living'],
-      'beauty': ['beauty', 'beauty-personal-care', 'زیبایی', 'beauty & personal care'],
-      'sports': ['sports', 'sports-outdoor', 'ورزش', 'sports & outdoor'],
-      'baby': ['baby', 'baby-kids', 'کودک', 'baby & kids'],
+      'electronics': ['electronics', 'الکترونیک', 'electronic'],
+      'clothing': ['clothing', 'پوشاک', 'fashion', 'clothes'],
+      'home': ['home', 'home-living', 'خانه', 'home & living', 'living', 'خانگی'],
+      'beauty': ['beauty', 'beauty-personal-care', 'زیبایی', 'beauty & personal care', 'personal care', 'آرایشی', 'بهداشتی'],
+      'sports': ['sports', 'sports-outdoor', 'ورزش', 'sports & outdoor', 'outdoor', 'ورزشی'],
+      'baby': ['baby', 'baby-kids', 'کودک', 'baby & kids', 'kids', 'نوزاد', 'بچه'],
     };
 
-    const normalizedId = id.toLowerCase();
+    const normalizedName = name.toLowerCase();
     
     for (const [type, matches] of Object.entries(categoryMap)) {
-      if (matches.some(m => normalizedId.includes(m) || m.includes(normalizedId))) {
+      if (matches.some(m => normalizedName.includes(m) || m.includes(normalizedName))) {
         return type;
       }
     }
     
-    return id;
+    return '';
   };
 
-  const categoryType = getCategoryType(categoryId);
+  const categoryType = getCategoryType(categoryName);
 
   switch (categoryType) {
     case 'electronics':
