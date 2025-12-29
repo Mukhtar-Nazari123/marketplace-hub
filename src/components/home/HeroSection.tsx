@@ -12,16 +12,16 @@ const HeroSection = () => {
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Main Hero */}
           <div className="lg:col-span-2 relative rounded-2xl overflow-hidden gradient-hero min-h-[400px] lg:min-h-[500px] animate-fade-in">
-            <div className="absolute inset-0 bg-gradient-to-r from-foreground via-foreground/95 to-foreground/70" />
+            <div className={`absolute inset-0 ${isRTL ? 'bg-gradient-to-l from-foreground via-foreground/95 to-foreground/70' : 'bg-gradient-to-r from-foreground via-foreground/95 to-foreground/70'}`} />
             
             {/* Decorative Elements */}
-            <div className="absolute top-10 left-10 w-64 h-64 bg-cyan/20 rounded-full blur-3xl" />
-            <div className="absolute bottom-10 left-20 w-48 h-48 bg-orange/20 rounded-full blur-3xl" />
+            <div className={`absolute top-10 w-64 h-64 bg-cyan/20 rounded-full blur-3xl ${isRTL ? 'right-10' : 'left-10'}`} />
+            <div className={`absolute bottom-10 w-48 h-48 bg-orange/20 rounded-full blur-3xl ${isRTL ? 'right-20' : 'left-20'}`} />
             
             {/* Content Container */}
-            <div className="relative z-10 h-full flex items-center">
-              {/* Text Content - Left Side */}
-              <div className={`p-8 lg:p-12 flex flex-col justify-center max-w-md ${isRTL ? 'mr-auto order-2' : 'ml-0 order-1'}`}>
+            <div className={`relative z-10 h-full flex items-center ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
+              {/* Text Content */}
+              <div className={`p-8 lg:p-12 flex flex-col justify-center max-w-md ${isRTL ? 'items-end text-right' : 'items-start text-left'}`}>
                 <Badge variant="sale" className="w-fit mb-4 text-sm px-4 py-1">
                   {t.hero.sale}
                 </Badge>
@@ -42,8 +42,8 @@ const HeroSection = () => {
                 </Button>
               </div>
 
-              {/* Floating Product Image - Right Side */}
-              <div className={`flex-1 flex items-center justify-center ${isRTL ? 'order-1' : 'order-2'}`}>
+              {/* Floating Product Image */}
+              <div className="flex-1 flex items-center justify-center">
                 <div className="w-48 h-48 lg:w-72 lg:h-72 rounded-full bg-gradient-to-br from-cyan/30 to-orange/30 flex items-center justify-center animate-float opacity-80">
                   <Headphones className="w-24 h-24 lg:w-36 lg:h-36 text-background/50" />
                 </div>

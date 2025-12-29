@@ -1,4 +1,4 @@
-import { Search, ShoppingCart, User, Menu, LayoutDashboard, LogOut, Moon, Sun } from "lucide-react";
+import { Search, ShoppingCart, User, Menu, LayoutDashboard, LogOut, Moon, Sun, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/hooks/useCart";
+import { useWishlist } from "@/hooks/useWishlist";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   AlertDialog,
@@ -31,6 +32,7 @@ const Header = () => {
   };
   const { user, role, signOut } = useAuth();
   const { itemCount } = useCart();
+  const { itemCount: wishlistCount } = useWishlist();
   const navigate = useNavigate();
 
   // Get dashboard link based on role
@@ -124,6 +126,27 @@ const Header = () => {
                 </TooltipTrigger>
                 <TooltipContent>
                   {theme === 'dark' ? (isRTL ? 'حالت روشن' : 'Light mode') : (isRTL ? 'حالت تاریک' : 'Dark mode')}
+                </TooltipContent>
+              </Tooltip>
+
+              {/* Wishlist */}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link to="/dashboard/wishlist">
+                    <Button variant="ghost" size="icon" className="relative">
+                      <Heart className="h-5 w-5" />
+                      {wishlistCount > 0 && (
+                        <span
+                          className={`absolute -top-1 h-5 w-5 rounded-full bg-destructive text-destructive-foreground text-xs flex items-center justify-center font-bold ${isRTL ? "-right-1" : "-left-1"}`}
+                        >
+                          {formatCount(wishlistCount > 99 ? 99 : wishlistCount)}
+                        </span>
+                      )}
+                    </Button>
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {isRTL ? 'لیست علاقه‌مندی' : 'Wishlist'}
                 </TooltipContent>
               </Tooltip>
 

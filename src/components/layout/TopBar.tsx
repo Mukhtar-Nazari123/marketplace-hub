@@ -1,9 +1,19 @@
 import { Phone, Globe, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/lib/i18n";
+import { useWishlist } from "@/hooks/useWishlist";
 
 const TopBar = () => {
   const { t, language, setLanguage, isRTL } = useLanguage();
+  const { itemCount: wishlistCount } = useWishlist();
+  
+  // Format count for RTL
+  const formatCount = (count: number) => {
+    if (isRTL) {
+      return count.toString().replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]);
+    }
+    return count.toString();
+  };
 
   const toggleLanguage = () => {
     setLanguage(language === 'fa' ? 'en' : 'fa');
@@ -31,7 +41,7 @@ const TopBar = () => {
         <div className="flex items-center gap-4">
           <Link to="/auth" className="hover:text-cyan transition-colors">{t.topBar.myAccount}</Link>
           <span className="text-muted-foreground">|</span>
-          <Link to="/wishlist" className="hover:text-cyan transition-colors">{t.topBar.wishlist} ({isRTL ? '۰' : '0'})</Link>
+          <Link to="/dashboard/wishlist" className="hover:text-cyan transition-colors">{t.topBar.wishlist} ({formatCount(wishlistCount)})</Link>
           <span className="text-muted-foreground hidden sm:inline">|</span>
           <Link to="/checkout" className="hidden sm:inline hover:text-cyan transition-colors">{t.topBar.checkout}</Link>
         </div>
