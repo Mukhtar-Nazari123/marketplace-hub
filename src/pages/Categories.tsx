@@ -34,6 +34,11 @@ interface DbProduct {
   metadata: Record<string, unknown> | null;
 }
 
+interface CategoryImage {
+  category_id: string;
+  image_url: string;
+}
+
 const Categories = () => {
   const { t, isRTL } = useLanguage();
   const [searchParams] = useSearchParams();
@@ -56,6 +61,7 @@ const Categories = () => {
   });
   const [dbProducts, setDbProducts] = useState<DbProduct[]>([]);
   const [productsLoading, setProductsLoading] = useState(true);
+  const [categoryImages, setCategoryImages] = useState<Map<string, string>>(new Map());
 
   const currentCategory = selectedCategorySlug ? getCategoryBySlug(selectedCategorySlug) : undefined;
   const currentSubcategory = selectedSubcategorySlug ? getSubcategoryBySlug(selectedSubcategorySlug) : undefined;
@@ -64,6 +70,41 @@ const Categories = () => {
   const subcategories = useMemo(() => {
     return currentCategory ? getSubcategories(currentCategory.id) : [];
   }, [currentCategory?.id, getSubcategories]);
+
+  // Fetch one product image per category for display
+  useEffect(() => {
+    const fetchCategoryImages = async () => {
+      if (rootCategories.length === 0) return;
+      
+      try {
+        const imageMap = new Map<string, string>();
+        
+        // Fetch one product per category
+        for (const cat of rootCategories) {
+          const { data } = await supabase
+            .from('products')
+            .select('images')
+            .eq('category_id', cat.id)
+            .eq('status', 'active')
+            .not('images', 'is', null)
+            .limit(1)
+            .maybeSingle();
+          
+          if (data?.images && data.images.length > 0) {
+            imageMap.set(cat.id, data.images[0]);
+          }
+        }
+        
+        setCategoryImages(imageMap);
+      } catch (error) {
+        console.error('Error fetching category images:', error);
+      }
+    };
+
+    if (!categoriesLoading) {
+      fetchCategoryImages();
+    }
+  }, [rootCategories, categoriesLoading]);
 
   // Fetch products from database
   useEffect(() => {
@@ -324,32 +365,37 @@ const Categories = () => {
                   </div>
                 ) : rootCategories.length > 0 ? (
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {rootCategories.map((cat) => (
-                      <Link
-                        key={cat.id}
-                        to={`/categories?category=${cat.slug}`}
-                        className="group relative aspect-square rounded-xl overflow-hidden bg-gradient-to-br from-primary/10 to-primary/5 border border-border"
-                      >
-                        {cat.image_url ? (
-                          <img
-                            src={cat.image_url}
-                            alt={cat.name}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <Package className="h-16 w-16 text-muted-foreground" />
+                    {rootCategories.map((cat) => {
+                      const productImage = categoryImages.get(cat.id);
+                      const displayImage = cat.image_url || productImage;
+                      
+                      return (
+                        <Link
+                          key={cat.id}
+                          to={`/categories?category=${cat.slug}`}
+                          className="group relative aspect-square rounded-xl overflow-hidden bg-gradient-to-br from-primary/10 to-primary/5 border border-border"
+                        >
+                          {displayImage ? (
+                            <img
+                              src={displayImage}
+                              alt={cat.name}
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Package className="h-16 w-16 text-muted-foreground" />
+                            </div>
+                          )}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                          <div className="absolute bottom-0 left-0 right-0 p-4">
+                            <h3 className="text-white font-bold text-lg">{cat.name}</h3>
+                            <p className="text-white/70 text-sm">
+                              {cat.subcategories?.length || 0} {t.categories.subcategories}
+                            </p>
                           </div>
-                        )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                        <div className="absolute bottom-0 left-0 right-0 p-4">
-                          <h3 className="text-white font-bold text-lg">{cat.name}</h3>
-                          <p className="text-white/70 text-sm">
-                            {cat.subcategories?.length || 0} {t.categories.subcategories}
-                          </p>
-                        </div>
-                      </Link>
-                    ))}
+                        </Link>
+                      );
+                    })}
                   </div>
                 ) : (
                   <div className="text-center py-12">
