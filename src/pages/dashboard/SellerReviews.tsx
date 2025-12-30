@@ -75,21 +75,26 @@ const SellerReviews = () => {
       // Get all reviews for seller's products
       const { data: reviewsData, error } = await supabase
         .from('reviews')
-        .select(`
-          id, rating, comment, created_at, product_id,
-          profiles:buyer_id (full_name, avatar_url)
-        `)
+        .select('id, rating, comment, created_at, product_id, buyer_id')
         .in('product_id', productIds)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      // Map reviews with product info
+      // Fetch buyer profiles separately
+      const buyerIds = [...new Set((reviewsData || []).map(r => r.buyer_id))];
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id, full_name, avatar_url')
+        .in('user_id', buyerIds);
+
+      // Map reviews with product and buyer info
       const formattedReviews = (reviewsData || []).map((review: any) => {
         const product = products.find(p => p.id === review.product_id);
+        const buyer = profiles?.find(p => p.user_id === review.buyer_id);
         return {
           ...review,
-          buyer: review.profiles,
+          buyer: buyer ? { full_name: buyer.full_name, avatar_url: buyer.avatar_url } : undefined,
           product: product ? {
             name: product.name,
             slug: product.slug,
