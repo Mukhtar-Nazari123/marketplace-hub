@@ -40,7 +40,7 @@ const Categories = () => {
   const selectedCategorySlug = searchParams.get('category');
   const selectedSubcategorySlug = searchParams.get('subcategory');
 
-  const { getRootCategories, getCategoryBySlug, getSubcategories, loading: categoriesLoading } = useCategories();
+  const { getRootCategories, getCategoryBySlug, getSubcategoryBySlug, getSubcategories, loading: categoriesLoading } = useCategories();
   const rootCategories = getRootCategories();
   
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -58,7 +58,7 @@ const Categories = () => {
   const [productsLoading, setProductsLoading] = useState(true);
 
   const currentCategory = selectedCategorySlug ? getCategoryBySlug(selectedCategorySlug) : undefined;
-  const currentSubcategory = selectedSubcategorySlug ? getCategoryBySlug(selectedSubcategorySlug) : undefined;
+  const currentSubcategory = selectedSubcategorySlug ? getSubcategoryBySlug(selectedSubcategorySlug) : undefined;
   
   // Memoize subcategories to prevent infinite re-renders
   const subcategories = useMemo(() => {
@@ -76,12 +76,12 @@ const Categories = () => {
           .eq('status', 'active');
 
         if (currentCategory) {
-          // Get all category IDs including subcategories
-          const categoryIds = [currentCategory.id, ...subcategories.map(s => s.id)];
           if (currentSubcategory) {
-            query = query.eq('category_id', currentSubcategory.id);
+            // Filter by subcategory_id when a subcategory is selected
+            query = query.eq('subcategory_id', currentSubcategory.id);
           } else {
-            query = query.in('category_id', categoryIds);
+            // Filter by category_id when only category is selected
+            query = query.eq('category_id', currentCategory.id);
           }
         }
 

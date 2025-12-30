@@ -1,9 +1,23 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
+export interface Subcategory {
+  id: string;
+  name: string;
+  name_fa: string | null;
+  slug: string;
+  description: string | null;
+  image_url: string | null;
+  category_id: string;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+}
+
 export interface Category {
   id: string;
   name: string;
+  name_fa?: string | null;
   slug: string;
   description: string | null;
   image_url: string | null;
@@ -11,16 +25,18 @@ export interface Category {
   is_active: boolean;
   sort_order: number;
   created_at: string;
-  subcategories?: Category[];
+  subcategories?: Subcategory[];
 }
 
 interface CategoriesContextType {
   categories: Category[];
+  subcategories: Subcategory[];
   loading: boolean;
   error: string | null;
   refetch: () => Promise<void>;
   getCategoryBySlug: (slug: string) => Category | undefined;
-  getSubcategories: (parentId: string) => Category[];
+  getSubcategoryBySlug: (slug: string) => Subcategory | undefined;
+  getSubcategories: (categoryId: string) => Subcategory[];
   getRootCategories: () => Category[];
 }
 
@@ -28,6 +44,7 @@ const CategoriesContext = createContext<CategoriesContextType | undefined>(undef
 
 export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
   const [categories, setCategories] = useState<Category[]>([]);
+  const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,34 +53,42 @@ export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
     setError(null);
     
     try {
-      const { data, error: fetchError } = await supabase
-        .from('categories')
-        .select('*')
-        .eq('is_active', true)
-        .order('sort_order', { ascending: true });
+      // Fetch categories and subcategories in parallel
+      const [categoriesResult, subcategoriesResult] = await Promise.all([
+        supabase
+          .from('categories')
+          .select('*')
+          .eq('is_active', true)
+          .is('parent_id', null)
+          .order('sort_order', { ascending: true }),
+        supabase
+          .from('subcategories')
+          .select('*')
+          .eq('is_active', true)
+          .order('sort_order', { ascending: true })
+      ]);
 
-      if (fetchError) throw fetchError;
+      if (categoriesResult.error) throw categoriesResult.error;
+      if (subcategoriesResult.error) throw subcategoriesResult.error;
 
-      // Build hierarchy
-      const rootCategories: Category[] = [];
-      const childrenMap = new Map<string, Category[]>();
+      const cats = (categoriesResult.data || []) as Category[];
+      const subs = (subcategoriesResult.data || []) as Subcategory[];
 
-      (data || []).forEach((cat) => {
-        if (cat.parent_id) {
-          const children = childrenMap.get(cat.parent_id) || [];
-          children.push(cat);
-          childrenMap.set(cat.parent_id, children);
-        } else {
-          rootCategories.push(cat);
-        }
+      // Map subcategories to their parent categories
+      const subsByCategory = new Map<string, Subcategory[]>();
+      subs.forEach((sub) => {
+        const existing = subsByCategory.get(sub.category_id) || [];
+        existing.push(sub);
+        subsByCategory.set(sub.category_id, existing);
       });
 
-      // Attach subcategories to root categories
-      rootCategories.forEach((cat) => {
-        cat.subcategories = childrenMap.get(cat.id) || [];
+      // Attach subcategories to categories
+      cats.forEach((cat) => {
+        cat.subcategories = subsByCategory.get(cat.id) || [];
       });
 
-      setCategories(data || []);
+      setCategories(cats);
+      setSubcategories(subs);
     } catch (err) {
       console.error('Error fetching categories:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch categories');
@@ -80,26 +105,27 @@ export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
     return categories.find(cat => cat.slug === slug);
   };
 
-  const getSubcategories = (parentId: string) => {
-    return categories.filter(cat => cat.parent_id === parentId);
+  const getSubcategoryBySlug = (slug: string) => {
+    return subcategories.find(sub => sub.slug === slug);
+  };
+
+  const getSubcategories = (categoryId: string) => {
+    return subcategories.filter(sub => sub.category_id === categoryId);
   };
 
   const getRootCategories = () => {
-    const rootCats = categories.filter(cat => !cat.parent_id);
-    // Attach subcategories
-    return rootCats.map(cat => ({
-      ...cat,
-      subcategories: categories.filter(c => c.parent_id === cat.id)
-    }));
+    return categories;
   };
 
   return (
     <CategoriesContext.Provider value={{
       categories,
+      subcategories,
       loading,
       error,
       refetch: fetchCategories,
       getCategoryBySlug,
+      getSubcategoryBySlug,
       getSubcategories,
       getRootCategories,
     }}>
