@@ -5,6 +5,7 @@ import { useLanguage } from "@/lib/i18n";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useProductRatings } from "@/hooks/useProductRatings";
 
 interface Product {
   id: string;
@@ -19,6 +20,9 @@ const TodayDeals = () => {
   const { t, isRTL } = useLanguage();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const productIds = products.map(p => p.id);
+  const { getRating, loading: ratingsLoading } = useProductRatings(productIds);
 
   useEffect(() => {
     fetchActiveProducts();
@@ -49,13 +53,15 @@ const TodayDeals = () => {
       ? Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)
       : undefined;
 
+    const { averageRating, reviewCount } = getRating(product.id);
+
     return {
       id: product.id,
       name: product.name,
       price: product.price,
       originalPrice: product.compare_at_price || undefined,
-      rating: 4,
-      reviews: 0,
+      rating: averageRating,
+      reviews: reviewCount,
       badge: discount ? 'sale' as const : undefined,
       discount,
       image: product.images?.[0],

@@ -6,6 +6,7 @@ import { useLanguage } from "@/lib/i18n";
 import { useCategories } from "@/hooks/useCategories";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useProductRatings } from "@/hooks/useProductRatings";
 
 interface Product {
   id: string;
@@ -25,6 +26,9 @@ const BestSellers = () => {
   
   const rootCategories = getRootCategories().slice(0, 5);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+
+  const productIds = products.map(p => p.id);
+  const { getRating } = useProductRatings(productIds);
 
   // Set first category as active when categories load
   useEffect(() => {
@@ -63,13 +67,15 @@ const BestSellers = () => {
       ? Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)
       : undefined;
 
+    const { averageRating, reviewCount } = getRating(product.id);
+
     return {
       id: product.id,
       name: product.name,
       price: product.price,
       originalPrice: product.compare_at_price || undefined,
-      rating: 4,
-      reviews: 0,
+      rating: averageRating,
+      reviews: reviewCount,
       badge: discount ? 'sale' as const : product.is_featured ? 'new' as const : undefined,
       discount,
       image: product.images?.[0],

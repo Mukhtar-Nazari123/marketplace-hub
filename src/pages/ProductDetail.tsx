@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useCart } from '@/hooks/useCart';
 import { useWishlist } from '@/hooks/useWishlist';
+import { useProductRating, useProductRatings } from '@/hooks/useProductRatings';
 import TopBar from '@/components/layout/TopBar';
 import Header from '@/components/layout/Header';
 import Navigation from '@/components/layout/Navigation';
@@ -15,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/hooks/use-toast';
 import { ProductReviews } from '@/components/reviews/ProductReviews';
+import CompactRating from '@/components/ui/CompactRating';
 import {
   Heart,
   ShoppingCart,
@@ -86,6 +88,13 @@ const ProductDetail = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+
+  // Fetch product rating
+  const { averageRating, reviewCount, refetch: refetchRating } = useProductRating(product?.id || '');
+  
+  // Fetch related products ratings
+  const relatedProductIds = useMemo(() => relatedProducts.map(p => p.id), [relatedProducts]);
+  const { getRating: getRelatedRating } = useProductRatings(relatedProductIds);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -363,6 +372,11 @@ const ProductDetail = () => {
               </p>
             )}
 
+            {/* Rating */}
+            <div className="flex items-center gap-3">
+              <CompactRating rating={averageRating} reviewCount={reviewCount} size="md" />
+            </div>
+
             {/* Price */}
             <div className="flex items-center gap-4 flex-wrap">
               <span className="text-3xl font-bold text-primary">
@@ -639,6 +653,12 @@ const ProductDetail = () => {
                     </div>
                     <div className="p-4">
                       <h3 className="font-medium text-foreground line-clamp-2 mb-2">{p.name}</h3>
+                      <CompactRating 
+                        rating={getRelatedRating(p.id).averageRating} 
+                        reviewCount={getRelatedRating(p.id).reviewCount} 
+                        size="sm" 
+                        className="mb-2"
+                      />
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-bold text-primary">
                           {p.price.toLocaleString()} {pSymbol}

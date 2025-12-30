@@ -1,4 +1,4 @@
-import { Star, Heart, ShoppingCart, Eye } from "lucide-react";
+import { Heart, ShoppingCart, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -8,6 +8,7 @@ import { useCart } from "@/hooks/useCart";
 import { useWishlist } from "@/hooks/useWishlist";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
+import CompactRating from "@/components/ui/CompactRating";
 
 interface ProductCardProps {
   id: string;
@@ -165,16 +166,8 @@ const ProductCard = ({
       {/* Content */}
       <div className="p-4">
         {/* Rating */}
-        <div className="flex items-center gap-1 mb-2">
-          <div className="flex items-center">
-            {[...Array(5)].map((_, i) => (
-              <Star
-                key={i}
-                className={`h-3 w-3 ${i < rating ? "fill-orange text-orange" : "text-muted"}`}
-              />
-            ))}
-          </div>
-          <span className="text-xs text-muted-foreground">({reviews} {t.product.reviews})</span>
+        <div className="mb-2">
+          <CompactRating rating={rating} reviewCount={reviews} size="sm" />
         </div>
 
         {/* Name */}
