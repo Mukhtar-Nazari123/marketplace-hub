@@ -47,7 +47,10 @@ import SellerProfileComplete from "./pages/seller/SellerProfileComplete";
 import SellerProductView from "./pages/dashboard/SellerProductView";
 import SellerOrders from "./pages/dashboard/SellerOrders";
 import SellerAnalytics from "./pages/dashboard/SellerAnalytics";
+import SellerReviews from "./pages/dashboard/SellerReviews";
 import Wishlist from "./pages/dashboard/Wishlist";
+import BuyerReviews from "./pages/dashboard/BuyerReviews";
+import AdminReviews from "./pages/admin/AdminReviews";
 
 const queryClient = new QueryClient();
 
@@ -94,6 +97,7 @@ const App = () => (
                     <Route path="/dashboard/promotions" element={<AdminPromotions />} />
                     <Route path="/dashboard/cms" element={<AdminCMS />} />
                     <Route path="/dashboard/settings" element={<AdminSettings />} />
+                    <Route path="/dashboard/reviews" element={<AdminReviews />} />
 
                     {/* Shared Profile Route (keep existing) */}
                     <Route path="/dashboard/profile" element={<BuyerProfile />} />
@@ -101,6 +105,7 @@ const App = () => (
                     {/* Buyer Routes */}
                     <Route path="/dashboard/buyer" element={<BuyerDashboard />} />
                     <Route path="/dashboard/buyer/orders" element={<BuyerOrders />} />
+                    <Route path="/dashboard/buyer/reviews" element={<BuyerReviews />} />
                     <Route path="/dashboard/buyer/addresses" element={<BuyerProfile />} />
                     <Route path="/dashboard/buyer/wishlist" element={<Wishlist />} />
                     <Route path="/dashboard/buyer/payments" element={<BuyerProfile />} />
@@ -109,6 +114,7 @@ const App = () => (
                     <Route path="/dashboard/seller" element={<SellerDashboard />} />
                     <Route path="/dashboard/seller/products" element={<SellerProducts />} />
                     <Route path="/dashboard/seller/orders" element={<SellerOrders />} />
+                    <Route path="/dashboard/seller/reviews" element={<SellerReviews />} />
                     <Route path="/dashboard/seller/analytics" element={<SellerAnalytics />} />
                     <Route path="/dashboard/seller/products/new" element={<AddProduct />} />
                     <Route path="/dashboard/seller/products/edit/:id" element={<EditProduct />} />
