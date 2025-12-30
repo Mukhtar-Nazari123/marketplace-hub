@@ -14,8 +14,8 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from '@/hooks/use-toast';
+import { ProductReviews } from '@/components/reviews/ProductReviews';
 import {
-  Star,
   Heart,
   ShoppingCart,
   Share2,
@@ -578,6 +578,12 @@ const ProductDetail = () => {
                 {isRTL ? 'مشخصات' : 'Specifications'}
               </TabsTrigger>
             )}
+            <TabsTrigger
+              value="reviews"
+              className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
+            >
+              {isRTL ? 'نظرات' : 'Reviews'}
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="description" className="pt-6">
@@ -602,6 +608,10 @@ const ProductDetail = () => {
               </div>
             </TabsContent>
           )}
+
+          <TabsContent value="reviews" className="pt-6">
+            <ProductReviews productId={product.id} />
+          </TabsContent>
         </Tabs>
 
         {/* Related Products */}

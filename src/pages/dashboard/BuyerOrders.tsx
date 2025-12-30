@@ -14,6 +14,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { OrderItemReview } from '@/components/reviews/OrderItemReview';
 import {
   Package,
   MapPin,
@@ -589,10 +590,21 @@ const BuyerOrders = () => {
                                       {item.quantity} × {item.unit_price.toLocaleString()} {isRTL ? '؋' : 'AFN'}
                                     </p>
                                   </div>
-                                  <div className="text-right">
-                                    <p className="font-semibold text-sm">
-                                      {item.total_price.toLocaleString()} {isRTL ? '؋' : 'AFN'}
-                                    </p>
+                                  <div className="flex items-center gap-3">
+                                    {item.product_id && (
+                                      <OrderItemReview
+                                        orderId={order.id}
+                                        productId={item.product_id}
+                                        productName={item.product_name}
+                                        productImage={item.product_image}
+                                        orderStatus={order.status}
+                                      />
+                                    )}
+                                    <div className="text-right">
+                                      <p className="font-semibold text-sm">
+                                        {item.total_price.toLocaleString()} {isRTL ? '؋' : 'AFN'}
+                                      </p>
+                                    </div>
                                   </div>
                                 </div>
                               ))}
