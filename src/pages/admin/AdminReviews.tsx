@@ -70,22 +70,43 @@ const AdminReviews = () => {
 
   const fetchReviews = async () => {
     try {
-      const { data, error } = await supabase
+      // Fetch reviews
+      const { data: reviewsData, error } = await supabase
         .from('reviews')
-        .select(`
-          id, rating, comment, created_at, product_id, buyer_id,
-          profiles:buyer_id (full_name, avatar_url, email),
-          products:product_id (name, seller_id)
-        `)
+        .select('id, rating, comment, created_at, product_id, buyer_id')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      const formattedReviews = (data || []).map((review: any) => ({
-        ...review,
-        buyer: review.profiles,
-        product: review.products,
-      }));
+      if (!reviewsData || reviewsData.length === 0) {
+        setReviews([]);
+        setLoading(false);
+        return;
+      }
+
+      // Fetch buyer profiles
+      const buyerIds = [...new Set(reviewsData.map(r => r.buyer_id))];
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id, full_name, avatar_url, email')
+        .in('user_id', buyerIds);
+
+      // Fetch products
+      const productIds = [...new Set(reviewsData.map(r => r.product_id))];
+      const { data: products } = await supabase
+        .from('products')
+        .select('id, name, seller_id')
+        .in('id', productIds);
+
+      const formattedReviews = reviewsData.map((review: any) => {
+        const buyer = profiles?.find(p => p.user_id === review.buyer_id);
+        const product = products?.find(p => p.id === review.product_id);
+        return {
+          ...review,
+          buyer: buyer ? { full_name: buyer.full_name, avatar_url: buyer.avatar_url, email: buyer.email } : undefined,
+          product: product ? { name: product.name, seller_id: product.seller_id } : undefined,
+        };
+      });
 
       setReviews(formattedReviews);
     } catch (error) {
