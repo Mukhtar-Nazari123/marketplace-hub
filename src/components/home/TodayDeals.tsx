@@ -14,6 +14,7 @@ interface Product {
   compare_at_price: number | null;
   images: string[];
   currency: string;
+  created_at: string;
 }
 
 const TodayDeals = () => {
@@ -32,7 +33,7 @@ const TodayDeals = () => {
     try {
       const { data, error } = await supabase
         .from('products')
-        .select('id, name, price, compare_at_price, images, currency')
+        .select('id, name, price, compare_at_price, images, currency, created_at')
         .eq('status', 'active')
         .order('created_at', { ascending: false })
         .limit(5);
@@ -48,21 +49,40 @@ const TodayDeals = () => {
 
   const getProductCardData = (product: Product) => {
     const currency = (product.currency as 'AFN' | 'USD') || 'AFN';
-    // Calculate discount percentage (absolute value to handle both directions)
-    const discount = product.compare_at_price && product.compare_at_price !== product.price
-      ? Math.abs(Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100))
-      : undefined;
+    
+    // Handle inverted price scenario: if compare_at_price exists and differs from price
+    // The original price is the higher value, current price is the lower value
+    const hasDiscount = product.compare_at_price && product.compare_at_price !== product.price;
+    let originalPrice: number | undefined;
+    let currentPrice = product.price;
+    let discount: number | undefined;
+
+    if (hasDiscount) {
+      // If compare_at_price > price, normal scenario
+      // If compare_at_price < price, data is inverted - use compare_at_price as current
+      if (product.compare_at_price! > product.price) {
+        originalPrice = product.compare_at_price!;
+        currentPrice = product.price;
+      } else {
+        originalPrice = product.price;
+        currentPrice = product.compare_at_price!;
+      }
+      discount = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
+    }
+    
+    // Check if product is new (created within last 7 days)
+    const isNew = new Date(product.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
     const { averageRating, reviewCount } = getRating(product.id);
 
     return {
       id: product.id,
       name: product.name,
-      price: product.price,
-      originalPrice: product.compare_at_price || undefined,
+      price: currentPrice,
+      originalPrice,
       rating: averageRating,
       reviews: reviewCount,
-      badge: discount ? 'sale' as const : undefined,
+      isNew,
       discount,
       image: product.images?.[0],
       currency,
