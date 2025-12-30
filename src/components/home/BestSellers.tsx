@@ -15,7 +15,7 @@ interface Product {
   compare_at_price: number | null;
   images: string[];
   is_featured: boolean;
-  metadata: Record<string, unknown> | null;
+  currency: string;
 }
 
 const BestSellers = () => {
@@ -45,7 +45,7 @@ const BestSellers = () => {
     try {
       const { data, error } = await supabase
         .from('products')
-        .select('id, name, price, compare_at_price, images, is_featured, metadata')
+        .select('id, name, price, compare_at_price, images, is_featured, currency')
         .eq('status', 'active')
         .order('is_featured', { ascending: false })
         .order('created_at', { ascending: false })
@@ -61,10 +61,10 @@ const BestSellers = () => {
   };
 
   const getProductCardData = (product: Product) => {
-    const metadata = product.metadata as { currency?: 'AFN' | 'USD' } | null;
-    const currency = metadata?.currency || 'AFN';
-    const discount = product.compare_at_price 
-      ? Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)
+    const currency = (product.currency as 'AFN' | 'USD') || 'AFN';
+    // Calculate discount percentage (absolute value to handle both directions)
+    const discount = product.compare_at_price && product.compare_at_price !== product.price
+      ? Math.abs(Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100))
       : undefined;
 
     const { averageRating, reviewCount } = getRating(product.id);

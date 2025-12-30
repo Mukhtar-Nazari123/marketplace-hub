@@ -13,7 +13,7 @@ interface Product {
   price: number;
   compare_at_price: number | null;
   images: string[];
-  metadata: Record<string, unknown> | null;
+  currency: string;
 }
 
 const TodayDeals = () => {
@@ -32,7 +32,7 @@ const TodayDeals = () => {
     try {
       const { data, error } = await supabase
         .from('products')
-        .select('id, name, price, compare_at_price, images, metadata')
+        .select('id, name, price, compare_at_price, images, currency')
         .eq('status', 'active')
         .order('created_at', { ascending: false })
         .limit(5);
@@ -47,10 +47,10 @@ const TodayDeals = () => {
   };
 
   const getProductCardData = (product: Product) => {
-    const metadata = product.metadata as { currency?: 'AFN' | 'USD' } | null;
-    const currency = metadata?.currency || 'AFN';
-    const discount = product.compare_at_price 
-      ? Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)
+    const currency = (product.currency as 'AFN' | 'USD') || 'AFN';
+    // Calculate discount percentage (absolute value to handle both directions)
+    const discount = product.compare_at_price && product.compare_at_price !== product.price
+      ? Math.abs(Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100))
       : undefined;
 
     const { averageRating, reviewCount } = getRating(product.id);

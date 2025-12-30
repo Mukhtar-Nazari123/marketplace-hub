@@ -220,14 +220,14 @@ const ProductCard = ({ product, getRating }: ProductCardInternalProps) => {
 
         {/* Price */}
         <div className="flex items-center gap-2 mb-3">
-          <span className="text-lg font-bold text-primary">
-            {product.currency === 'USD' ? '$' : ''}{product.price.toLocaleString()} {product.currency !== 'USD' ? currencySymbol : ''}
-          </span>
-          {product.originalPrice && product.originalPrice > product.price && (
+          {product.originalPrice && product.originalPrice !== product.price && (
             <span className="text-sm text-muted-foreground line-through">
-              {product.currency === 'USD' ? '$' : ''}{product.originalPrice.toLocaleString()}
+              {product.currency === 'USD' ? '$' : ''}{product.originalPrice.toLocaleString()} {product.currency !== 'USD' ? currencySymbol : ''}
             </span>
           )}
+          <span className="text-lg font-bold text-orange">
+            {product.currency === 'USD' ? '$' : ''}{product.price.toLocaleString()} {product.currency !== 'USD' ? currencySymbol : ''}
+          </span>
         </div>
 
         {/* Add to Cart */}
@@ -325,14 +325,14 @@ const ProductListItem = ({ product, getRating }: ProductCardInternalProps) => {
 
         <div className="mt-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-xl font-bold text-primary">
-              {product.currency === 'USD' ? '$' : ''}{product.price.toLocaleString()} {product.currency !== 'USD' ? currencySymbol : ''}
-            </span>
-            {product.originalPrice && product.originalPrice > product.price && (
+            {product.originalPrice && product.originalPrice !== product.price && (
               <span className="text-sm text-muted-foreground line-through">
-                {product.currency === 'USD' ? '$' : ''}{product.originalPrice.toLocaleString()}
+                {product.currency === 'USD' ? '$' : ''}{product.originalPrice.toLocaleString()} {product.currency !== 'USD' ? currencySymbol : ''}
               </span>
             )}
+            <span className="text-xl font-bold text-orange">
+              {product.currency === 'USD' ? '$' : ''}{product.price.toLocaleString()} {product.currency !== 'USD' ? currencySymbol : ''}
+            </span>
           </div>
           <div className="flex gap-2">
             {(!user || isBuyer) && (
