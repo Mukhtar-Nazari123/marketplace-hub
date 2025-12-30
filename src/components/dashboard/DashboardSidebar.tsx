@@ -34,6 +34,7 @@ import {
   BarChart3,
   Plus,
   Home,
+  Star,
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -81,6 +82,7 @@ export const DashboardSidebar = () => {
     { title: isRTL ? 'داشبورد' : 'Dashboard', icon: LayoutDashboard, url: '/dashboard/seller' },
     { title: isRTL ? 'محصولات من' : 'My Products', icon: Package, url: '/dashboard/seller/products' },
     { title: isRTL ? 'سفارشات' : 'Orders', icon: ShoppingCart, url: '/dashboard/seller/orders' },
+    { title: isRTL ? 'نظرات' : 'Reviews', icon: Star, url: '/dashboard/seller/reviews' },
     { title: isRTL ? 'آمار فروش' : 'Analytics', icon: BarChart3, url: '/dashboard/seller/analytics' },
     { title: isRTL ? 'پروفایل' : 'Profile', icon: User, url: '/dashboard/profile' },
     { title: isRTL ? 'افزودن محصول' : 'Add Product', icon: Plus, url: '/dashboard/seller/products/new' },
@@ -91,6 +93,7 @@ export const DashboardSidebar = () => {
     { title: isRTL ? 'داشبورد' : 'Dashboard', icon: LayoutDashboard, url: '/dashboard/buyer' },
     { title: isRTL ? 'پروفایل' : 'Profile', icon: User, url: '/dashboard/profile' },
     { title: isRTL ? 'سفارشات من' : 'My Orders', icon: ShoppingCart, url: '/dashboard/buyer/orders' },
+    { title: isRTL ? 'نظرات من' : 'My Reviews', icon: Star, url: '/dashboard/buyer/reviews' },
     { title: isRTL ? 'آدرس‌ها' : 'Addresses', icon: MapPin, url: '/dashboard/buyer/addresses' },
     { title: isRTL ? 'علاقه‌مندی‌ها' : 'Wishlist', icon: Heart, url: '/dashboard/buyer/wishlist' },
     { title: isRTL ? 'روش‌های پرداخت' : 'Payment Methods', icon: CreditCard, url: '/dashboard/buyer/payments' },

@@ -28,6 +28,7 @@ import {
   Store,
   ChevronDown,
   Globe,
+  Star,
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -51,6 +52,7 @@ export const AdminSidebar = () => {
     { title: t.admin.products.title, icon: Package, url: '/dashboard/products' },
     { title: t.admin.orders.title, icon: ShoppingCart, url: '/dashboard/orders' },
     { title: t.admin.sellers.title, icon: BadgeCheck, url: '/dashboard/sellers' },
+    { title: isRTL ? 'نظرات' : 'Reviews', icon: Star, url: '/dashboard/reviews' },
   ];
 
   const contentNavItems = [
