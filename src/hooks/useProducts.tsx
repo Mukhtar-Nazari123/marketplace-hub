@@ -108,17 +108,29 @@ export const formatProductForDisplay = (product: DBProduct, language: 'fa' | 'en
   const currency = product.currency || 'AFN';
   const currencySymbol = currency === 'USD' ? '$' : 'AFN';
   
-  // Calculate discount percentage (absolute value to handle both directions)
-  const discount = product.compare_at_price && product.compare_at_price !== product.price
-    ? Math.abs(Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100))
-    : 0;
+  // Handle inverted price scenario
+  const hasDiscount = product.compare_at_price && product.compare_at_price !== product.price;
+  let originalPrice: number | undefined;
+  let currentPrice = product.price;
+  let discount = 0;
+
+  if (hasDiscount) {
+    if (product.compare_at_price! > product.price) {
+      originalPrice = product.compare_at_price!;
+      currentPrice = product.price;
+    } else {
+      originalPrice = product.price;
+      currentPrice = product.compare_at_price!;
+    }
+    discount = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
+  }
 
   return {
     id: product.id,
     name: { fa: product.name, en: product.name },
     slug: product.slug,
-    price: product.price,
-    originalPrice: product.compare_at_price || undefined,
+    price: currentPrice,
+    originalPrice,
     images: product.images || ['/placeholder.svg'],
     category: product.category?.slug || '',
     categoryName: product.category?.name || '',

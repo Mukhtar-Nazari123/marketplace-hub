@@ -18,7 +18,9 @@ interface ProductCardProps {
   rating: number;
   reviews: number;
   image?: string;
-  badge?: "sale" | "new" | "hot";
+  badge?: "sale" | "new" | "hot"; // Legacy support
+  isNew?: boolean;
+  isHot?: boolean;
   discount?: number;
   countdown?: {
     hours: number;
@@ -37,6 +39,8 @@ const ProductCard = ({
   reviews,
   image,
   badge,
+  isNew,
+  isHot,
   discount,
   countdown,
   currency = 'AFN',
@@ -92,19 +96,22 @@ const ProductCard = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Badges */}
+      {/* Badges - Show multiple badges */}
       <div className={`absolute top-3 z-10 flex flex-col gap-1 ${isRTL ? 'right-3' : 'left-3'}`}>
-        {badge === "sale" && (
-          <Badge variant="sale" className="text-xs">
-            -{discount}{isRTL ? '٪' : '%'}
-          </Badge>
-        )}
-        {badge === "new" && (
+        {/* New badge - based on isNew prop or legacy badge prop */}
+        {(isNew || badge === "new") && (
           <Badge variant="new" className="text-xs">
             {t.product.new}
           </Badge>
         )}
-        {badge === "hot" && (
+        {/* Discount badge - show if discount exists */}
+        {discount && discount > 0 && (
+          <Badge variant="sale" className="text-xs">
+            -{discount}{isRTL ? '٪' : '%'}
+          </Badge>
+        )}
+        {/* Hot badge */}
+        {(isHot || badge === "hot") && !isNew && (
           <Badge variant="hot" className="text-xs">
             {t.product.hot}
           </Badge>
@@ -128,16 +135,14 @@ const ProductCard = ({
 
       {/* Image */}
       <Link to={`/products/${id}`}>
-        <div className="relative aspect-square bg-secondary/50 p-4 overflow-hidden">
-          <div className="w-full h-full flex items-center justify-center">
-            {image ? (
-              <img src={image} alt={name} className="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-110" />
-            ) : (
-              <div className="w-24 h-24 rounded-lg bg-muted flex items-center justify-center">
-                <ShoppingCart className="h-10 w-10 text-muted-foreground" />
-              </div>
-            )}
-          </div>
+        <div className="relative aspect-square overflow-hidden">
+          {image ? (
+            <img src={image} alt={name} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
+          ) : (
+            <div className="w-full h-full bg-secondary/50 flex items-center justify-center">
+              <ShoppingCart className="h-10 w-10 text-muted-foreground" />
+            </div>
+          )}
 
           {/* Quick Actions */}
           <div
