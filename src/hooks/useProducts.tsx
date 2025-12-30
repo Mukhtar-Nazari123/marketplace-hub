@@ -15,8 +15,8 @@ export interface DBProduct {
   quantity: number;
   is_featured: boolean;
   created_at: string;
+  currency: string;
   metadata: {
-    currency?: string;
     brand?: string;
     [key: string]: unknown;
   } | null;
@@ -105,11 +105,12 @@ export const useProducts = (options: UseProductsOptions = {}) => {
 // Helper to convert DB product to display format
 export const formatProductForDisplay = (product: DBProduct, language: 'fa' | 'en' = 'en') => {
   const metadata = product.metadata || {};
-  const currency = metadata.currency || 'AFN';
+  const currency = product.currency || 'AFN';
   const currencySymbol = currency === 'USD' ? '$' : 'AFN';
   
-  const discount = product.compare_at_price && product.compare_at_price > product.price
-    ? Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)
+  // Calculate discount percentage (absolute value to handle both directions)
+  const discount = product.compare_at_price && product.compare_at_price !== product.price
+    ? Math.abs(Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100))
     : 0;
 
   return {
