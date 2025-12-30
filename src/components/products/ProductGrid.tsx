@@ -1,13 +1,15 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/lib/i18n';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Star, Heart, ShoppingCart, Eye, Grid, List } from 'lucide-react';
+import { Heart, ShoppingCart, Eye, Grid, List } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { useWishlist } from '@/hooks/useWishlist';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
+import { useProductRatings } from '@/hooks/useProductRatings';
+import CompactRating from '@/components/ui/CompactRating';
 
 // Support both mock data format and new DB format
 interface DisplayProduct {
@@ -38,6 +40,9 @@ interface ProductGridProps {
 
 const ProductGrid = ({ products, viewMode = 'grid', onViewModeChange }: ProductGridProps) => {
   const { t, isRTL } = useLanguage();
+  
+  const productIds = useMemo(() => products.map(p => p.id), [products]);
+  const { getRating } = useProductRatings(productIds);
 
   return (
     <div>
@@ -68,7 +73,7 @@ const ProductGrid = ({ products, viewMode = 'grid', onViewModeChange }: ProductG
       {viewMode === 'grid' && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard key={product.id} product={product} getRating={getRating} />
           ))}
         </div>
       )}
@@ -77,7 +82,7 @@ const ProductGrid = ({ products, viewMode = 'grid', onViewModeChange }: ProductG
       {viewMode === 'list' && (
         <div className="space-y-4">
           {products.map((product) => (
-            <ProductListItem key={product.id} product={product} />
+            <ProductListItem key={product.id} product={product} getRating={getRating} />
           ))}
         </div>
       )}
@@ -102,7 +107,12 @@ const getProductDescription = (desc: { fa: string; en: string } | string | undef
   return desc[language] || desc.en;
 };
 
-const ProductCard = ({ product }: { product: DisplayProduct }) => {
+interface ProductCardInternalProps {
+  product: DisplayProduct;
+  getRating: (id: string) => { averageRating: number; reviewCount: number };
+}
+
+const ProductCard = ({ product, getRating }: ProductCardInternalProps) => {
   const { t, language, isRTL } = useLanguage();
   const [isHovered, setIsHovered] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
@@ -114,6 +124,8 @@ const ProductCard = ({ product }: { product: DisplayProduct }) => {
   const isWishlisted = isInWishlist(product.id);
   const isBuyer = role === 'buyer';
   const currencySymbol = product.currencySymbol || (product.currency === 'USD' ? '$' : 'AFN');
+  
+  const { averageRating, reviewCount } = getRating(product.id);
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -202,15 +214,8 @@ const ProductCard = ({ product }: { product: DisplayProduct }) => {
         </Link>
 
         {/* Rating */}
-        <div className="flex items-center gap-1 mb-2">
-          {[...Array(5)].map((_, i) => (
-            <Star
-              key={i}
-              size={14}
-              className={i < Math.floor(product.rating || 0) ? 'fill-yellow-400 text-yellow-400' : 'text-muted'}
-            />
-          ))}
-          <span className="text-xs text-muted-foreground">({product.reviewCount || 0})</span>
+        <div className="mb-2">
+          <CompactRating rating={averageRating} reviewCount={reviewCount} size="sm" />
         </div>
 
         {/* Price */}
@@ -244,7 +249,7 @@ const ProductCard = ({ product }: { product: DisplayProduct }) => {
   );
 };
 
-const ProductListItem = ({ product }: { product: DisplayProduct }) => {
+const ProductListItem = ({ product, getRating }: ProductCardInternalProps) => {
   const { t, language, isRTL } = useLanguage();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const { addToCart } = useCart();
@@ -255,6 +260,8 @@ const ProductListItem = ({ product }: { product: DisplayProduct }) => {
   const isWishlisted = isInWishlist(product.id);
   const isBuyer = role === 'buyer';
   const currencySymbol = product.currencySymbol || (product.currency === 'USD' ? '$' : 'AFN');
+  
+  const { averageRating, reviewCount } = getRating(product.id);
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -312,15 +319,8 @@ const ProductListItem = ({ product }: { product: DisplayProduct }) => {
           {getProductDescription(product.description, language)}
         </p>
 
-        <div className="flex items-center gap-1 mb-2">
-          {[...Array(5)].map((_, i) => (
-            <Star
-              key={i}
-              size={14}
-              className={i < Math.floor(product.rating || 0) ? 'fill-yellow-400 text-yellow-400' : 'text-muted'}
-            />
-          ))}
-          <span className="text-xs text-muted-foreground">({product.reviewCount || 0} {t.product.reviews})</span>
+        <div className="mb-2">
+          <CompactRating rating={averageRating} reviewCount={reviewCount} size="sm" />
         </div>
 
         <div className="mt-auto flex items-center justify-between">
