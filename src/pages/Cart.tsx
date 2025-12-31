@@ -54,15 +54,14 @@ const Cart = () => {
     const product = item.product as CartItemProduct | undefined;
     const currency = product?.currency || 'AFN';
     
-    // Use discount price (compare_at_price as original, price as discounted) if available
-    // If compare_at_price > price, use price (discounted)
-    // Otherwise just use price
-    const originalPrice = product?.price || 0;
+    // Use the lower price for cart calculation (handles both scenarios)
+    // Scenario 1: compare_at_price > price (standard discount)
+    // Scenario 2: price > compare_at_price (inverted in database)
+    const priceValue = product?.price || 0;
     const comparePrice = product?.compare_at_price || null;
-    const effectivePrice = comparePrice && comparePrice > originalPrice 
-      ? originalPrice  // price is the discounted price
-      : originalPrice;
-    const hasDiscount = comparePrice && comparePrice > originalPrice;
+    const hasDiscount = comparePrice && comparePrice !== priceValue;
+    const effectivePrice = hasDiscount ? Math.min(priceValue, comparePrice) : priceValue;
+    const originalPrice = hasDiscount ? Math.max(priceValue, comparePrice) : null;
     
     return {
       ...item,
