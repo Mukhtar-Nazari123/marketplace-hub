@@ -54,12 +54,21 @@ interface CartItemWithDetails {
     id: string;
     name: string;
     price: number;
+    compare_at_price?: number | null;
     images: string[] | null;
     seller_id: string;
     delivery_fee: number;
     currency?: string;
   };
 }
+
+// Helper to get effective price (lower of price and compare_at_price)
+const getEffectivePrice = (price: number, compareAtPrice?: number | null): number => {
+  if (compareAtPrice && compareAtPrice !== price) {
+    return Math.min(price, compareAtPrice);
+  }
+  return price;
+};
 
 interface SellerBreakdown {
   sellerId: string;
@@ -248,11 +257,14 @@ const Checkout = () => {
 
       // Calculate breakdown per seller
       const sellers: SellerBreakdown[] = Object.entries(sellerGroups).map(([sellerId, group]) => {
-        const products = group.items.map((item) => ({
-          name: item.product?.name || 'Product',
-          quantity: item.quantity,
-          price: (item.product?.price || 0) * item.quantity,
-        }));
+        const products = group.items.map((item) => {
+          const effectivePrice = getEffectivePrice(item.product?.price || 0, item.product?.compare_at_price);
+          return {
+            name: item.product?.name || 'Product',
+            quantity: item.quantity,
+            price: effectivePrice * item.quantity,
+          };
+        });
 
         const productSubtotal = products.reduce((sum, p) => sum + p.price, 0);
         const deliveryFee = group.items[0]?.product?.delivery_fee || 0;
@@ -352,16 +364,19 @@ const Checkout = () => {
       if (orderError) throw orderError;
 
       // Create order items
-      const orderItems = cartItems.map((item) => ({
-        order_id: order.id,
-        product_id: item.product_id,
-        product_name: item.product?.name || 'Product',
-        product_image: item.product?.images?.[0] || null,
-        quantity: item.quantity,
-        unit_price: item.product?.price || 0,
-        total_price: (item.product?.price || 0) * item.quantity,
-        seller_id: item.product?.seller_id,
-      }));
+      const orderItems = cartItems.map((item) => {
+        const effectivePrice = getEffectivePrice(item.product?.price || 0, item.product?.compare_at_price);
+        return {
+          order_id: order.id,
+          product_id: item.product_id,
+          product_name: item.product?.name || 'Product',
+          product_image: item.product?.images?.[0] || null,
+          quantity: item.quantity,
+          unit_price: effectivePrice,
+          total_price: effectivePrice * item.quantity,
+          seller_id: item.product?.seller_id,
+        };
+      });
 
       const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
 
@@ -397,7 +412,8 @@ const Checkout = () => {
         }
 
         const sellerOrder = sellerOrdersMap.get(key)!;
-        sellerOrder.subtotal += item.product.price * item.quantity;
+        const effectivePrice = getEffectivePrice(item.product.price, item.product.compare_at_price);
+        sellerOrder.subtotal += effectivePrice * item.quantity;
         sellerOrder.deliveryFee = Math.max(sellerOrder.deliveryFee, item.product.delivery_fee || 0);
         sellerOrder.items.push(item);
       });
