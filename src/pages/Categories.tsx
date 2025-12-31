@@ -32,6 +32,7 @@ interface DbProduct {
   quantity: number;
   is_featured: boolean;
   metadata: Record<string, unknown> | null;
+  currency: string;
 }
 
 interface CategoryImage {
@@ -113,7 +114,7 @@ const Categories = () => {
       try {
         let query = supabase
           .from('products')
-          .select('id, name, slug, price, compare_at_price, images, category_id, quantity, is_featured, metadata')
+          .select('id, name, slug, price, compare_at_price, images, category_id, quantity, is_featured, metadata, currency')
           .eq('status', 'active');
 
         if (currentCategory) {
@@ -145,8 +146,9 @@ const Categories = () => {
   // Convert DB products to display format
   const displayProducts = useMemo(() => {
     return dbProducts.map(p => {
-      const metadata = p.metadata as { currency?: 'AFN' | 'USD'; brand?: string } | null;
-      const currency = metadata?.currency || 'AFN';
+      const metadata = p.metadata as { brand?: string } | null;
+      // Use currency from database column (primary source)
+      const currency = p.currency || 'AFN';
       const discount = p.compare_at_price && p.compare_at_price > p.price
         ? Math.round(((p.compare_at_price - p.price) / p.compare_at_price) * 100)
         : undefined;
