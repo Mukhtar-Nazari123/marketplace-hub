@@ -149,16 +149,28 @@ const Categories = () => {
       const metadata = p.metadata as { brand?: string } | null;
       // Use currency from database column (primary source)
       const currency = p.currency || 'AFN';
-      const discount = p.compare_at_price && p.compare_at_price > p.price
-        ? Math.round(((p.compare_at_price - p.price) / p.compare_at_price) * 100)
+      
+      // Determine effective prices: lower price is the sale price, higher is original
+      const hasComparePrice = p.compare_at_price && p.compare_at_price !== p.price;
+      let effectivePrice = p.price;
+      let effectiveOriginalPrice: number | undefined = undefined;
+      
+      if (hasComparePrice) {
+        // Always use the lower value as the sale price, higher as original (strikethrough)
+        effectivePrice = Math.min(p.price, p.compare_at_price!);
+        effectiveOriginalPrice = Math.max(p.price, p.compare_at_price!);
+      }
+      
+      const discount = effectiveOriginalPrice
+        ? Math.round(((effectiveOriginalPrice - effectivePrice) / effectiveOriginalPrice) * 100)
         : undefined;
 
       return {
         id: p.id,
         name: { fa: p.name, en: p.name },
         slug: p.slug,
-        price: p.price,
-        originalPrice: p.compare_at_price || undefined,
+        price: effectivePrice,
+        originalPrice: effectiveOriginalPrice,
         images: p.images || ['/placeholder.svg'],
         category: currentCategory?.slug || '',
         subcategory: currentSubcategory?.slug,
