@@ -45,6 +45,9 @@ const Cart = () => {
     return isRTL ? '؋' : 'AFN ';
   };
 
+  // AFN symbol for delivery (always AFN)
+  const afnSymbol = isRTL ? '؋' : 'AFN ';
+
   // Group items by currency first, then by seller within each currency
   const itemsWithDetails = items.map(item => {
     const product = item.product as CartItemProduct | undefined;
@@ -55,7 +58,7 @@ const Cart = () => {
       currencySymbol: getCurrencySymbol(currency),
       itemTotal: (product?.price || 0) * item.quantity,
       sellerId: product?.seller_id || 'unknown',
-      deliveryFee: product?.delivery_fee || 0,
+      deliveryFee: product?.delivery_fee || 0, // Always in AFN
     };
   });
 
@@ -69,12 +72,13 @@ const Cart = () => {
   });
 
   // Calculate totals per currency (grouped by seller within each currency)
+  // Delivery fees are always in AFN and calculated separately
   const currencyTotals = Object.entries(itemsByCurrency).map(([currency, currencyItems]) => {
     // Group by seller within this currency
     const sellerGroups: Record<string, {
       items: typeof currencyItems;
       productSubtotal: number;
-      deliveryFee: number;
+      deliveryFee: number; // in AFN
     }> = {};
 
     currencyItems.forEach(item => {
@@ -82,7 +86,7 @@ const Cart = () => {
         sellerGroups[item.sellerId] = {
           items: [],
           productSubtotal: 0,
-          deliveryFee: item.deliveryFee,
+          deliveryFee: item.deliveryFee, // AFN
         };
       }
       sellerGroups[item.sellerId].items.push(item);
@@ -90,17 +94,25 @@ const Cart = () => {
     });
 
     const productSubtotal = currencyItems.reduce((sum, item) => sum + item.itemTotal, 0);
-    const deliveryTotal = Object.values(sellerGroups).reduce((sum, group) => sum + group.deliveryFee, 0);
 
     return {
       currency,
       symbol: getCurrencySymbol(currency),
       productSubtotal,
-      deliveryTotal,
-      total: productSubtotal + deliveryTotal,
       sellerGroups,
     };
   });
+
+  // Calculate total delivery fees across all sellers (always in AFN)
+  const totalDeliveryFeeAFN = (() => {
+    const sellerDeliveryFees = new Map<string, number>();
+    itemsWithDetails.forEach(item => {
+      if (!sellerDeliveryFees.has(item.sellerId)) {
+        sellerDeliveryFees.set(item.sellerId, item.deliveryFee);
+      }
+    });
+    return Array.from(sellerDeliveryFees.values()).reduce((sum, fee) => sum + fee, 0);
+  })();
 
   const texts = {
     title: isRTL ? 'سبد خرید' : 'Shopping Cart',
@@ -309,10 +321,14 @@ const Cart = () => {
                   <CardTitle>{isRTL ? 'خلاصه سفارش' : 'Order Summary'}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  {/* Product totals per currency */}
                   {currencyTotals.map((currencyData) => (
                     <div key={currencyData.currency} className="space-y-3">
                       <div className="flex items-center gap-2">
                         <Badge variant="secondary">{currencyData.currency}</Badge>
+                        <span className="text-xs text-muted-foreground">
+                          {isRTL ? 'محصولات' : 'Products'}
+                        </span>
                       </div>
                       
                       <div className="flex justify-between text-sm">
@@ -322,27 +338,53 @@ const Cart = () => {
                         </span>
                       </div>
                       
-                      {/* Delivery fee breakdown per seller */}
-                      {Object.entries(currencyData.sellerGroups).map(([sellerId, group]) => (
-                        <div key={sellerId} className="flex justify-between text-xs text-muted-foreground">
-                          <span>{texts.shipping}</span>
-                          <span>{group.deliveryFee.toLocaleString()} {currencyData.symbol}</span>
-                        </div>
-                      ))}
-                      
-                      <div className="flex justify-between font-bold">
-                        <span>{texts.orderTotal}</span>
-                        <span className="text-primary">
-                          {currencyData.total.toLocaleString()} {currencyData.symbol}
-                        </span>
-                      </div>
-                      
                       {currencyTotals.length > 1 && <Separator />}
                     </div>
                   ))}
                   
+                  {/* Delivery fees - always in AFN */}
+                  <div className="space-y-2 pt-2 border-t">
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="bg-primary/10">AFN</Badge>
+                      <span className="text-xs text-muted-foreground">
+                        {texts.shipping}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">{texts.shipping}</span>
+                      <span className="font-medium">
+                        {totalDeliveryFeeAFN === 0 ? (
+                          <Badge variant="outline" className="text-success">{isRTL ? 'رایگان' : 'Free'}</Badge>
+                        ) : (
+                          `${totalDeliveryFeeAFN.toLocaleString()} ${afnSymbol}`
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <Separator />
+                  
+                  {/* Order totals */}
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">{texts.orderTotal}</p>
+                    {currencyTotals.map((currencyData) => (
+                      <div key={currencyData.currency} className="flex justify-between font-bold">
+                        <span>{currencyData.currency}</span>
+                        <span className="text-primary">
+                          {currencyData.productSubtotal.toLocaleString()} {currencyData.symbol}
+                        </span>
+                      </div>
+                    ))}
+                    {totalDeliveryFeeAFN > 0 && (
+                      <div className="flex justify-between text-sm text-muted-foreground">
+                        <span>+ {texts.shipping}</span>
+                        <span>{totalDeliveryFeeAFN.toLocaleString()} {afnSymbol}</span>
+                      </div>
+                    )}
+                  </div>
+                  
                   {currencyTotals.length > 1 && (
-                    <p className="text-xs text-muted-foreground text-center">
+                    <p className="text-xs text-muted-foreground text-center pt-2">
                       {isRTL 
                         ? 'توجه: سبد خرید شامل محصولات با ارز متفاوت است' 
                         : 'Note: Cart contains items in different currencies'}

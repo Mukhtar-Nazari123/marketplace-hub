@@ -208,7 +208,8 @@ const AddProduct = () => {
         subcategory_id: formData.subCategoryId || null,
         images: imageUrls,
         status: 'draft' as const,
-        delivery_fee: formData.deliveryFee || 0,
+        currency: formData.currency, // Store selected currency for product price
+        delivery_fee: formData.deliveryFee || 0, // Always in AFN
         metadata: {
           shortDescription: formData.shortDescription,
           brand: formData.brand,
@@ -219,7 +220,7 @@ const AddProduct = () => {
           subCategoryName: formData.subCategoryName,
           priceUSD: formData.priceUSD,
           discountPriceUSD: formData.discountPriceUSD,
-          currency: formData.currency,
+          deliveryFeeCurrency: 'AFN', // Explicitly mark delivery fee as AFN
         },
       };
 
@@ -289,7 +290,8 @@ const AddProduct = () => {
         subcategory_id: formData.subCategoryId || null,
         images: imageUrls,
         status: status as 'draft' | 'pending' | 'active',
-        delivery_fee: formData.deliveryFee || 0,
+        currency: formData.currency, // Store selected currency for product price
+        delivery_fee: formData.deliveryFee || 0, // Always in AFN
         metadata: {
           shortDescription: formData.shortDescription,
           brand: formData.brand,
@@ -300,7 +302,7 @@ const AddProduct = () => {
           subCategoryName: formData.subCategoryName,
           priceUSD: formData.priceUSD,
           discountPriceUSD: formData.discountPriceUSD,
-          currency: formData.currency,
+          deliveryFeeCurrency: 'AFN', // Explicitly mark delivery fee as AFN
         },
       };
 

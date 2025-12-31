@@ -132,7 +132,7 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
         </p>
       </Card>
 
-      {/* Currency Selector */}
+      {/* Currency Selector - Only for Product Price */}
       <Card className="p-4">
         <Label className="text-sm font-medium mb-3 block">
           {isRTL ? 'واحد پول' : 'Currency'}
@@ -245,28 +245,31 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
         </Card>
       </div>
 
-      {/* Delivery Fee */}
+      {/* Delivery Fee - Always AFN */}
       <Card className="p-4 space-y-3 border-primary/20 bg-primary/5">
         <Label htmlFor="deliveryFee" className="text-sm font-medium flex items-center gap-2">
           <Truck className="w-4 h-4 text-primary" />
-          {isRTL ? 'هزینه ارسال' : 'Delivery Fee'} ({currencyLabel})
+          {isRTL ? 'هزینه ارسال' : 'Delivery Fee'} (AFN)
+          <Badge variant="secondary" className="text-xs font-normal">
+            {isRTL ? 'همیشه افغانی' : 'Always AFN'}
+          </Badge>
         </Label>
         <div className="relative">
           <Input
             id="deliveryFee"
             type="number"
             min="0"
-            step="0.01"
+            step="1"
             value={formData.deliveryFee || ''}
             onChange={(e) => handleDeliveryFeeChange(e.target.value)}
-            placeholder="0.00"
-            className={cn("text-lg font-semibold max-w-xs", isRTL ? "text-right pr-16" : "pl-16")}
+            placeholder="0"
+            className={cn("text-lg font-semibold max-w-xs bg-muted/50", isRTL ? "text-right pr-16" : "pl-16")}
           />
           <span className={cn(
             "absolute top-1/2 -translate-y-1/2 text-muted-foreground font-medium text-lg",
             isRTL ? "right-3" : "left-3"
           )}>
-            {currencySymbol}
+            ؋
           </span>
         </div>
         <p className="text-xs text-muted-foreground flex items-start gap-2">
@@ -403,12 +406,12 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
             <div className="flex justify-between border-t pt-2 mt-2">
               <span className="text-muted-foreground flex items-center gap-1">
                 <Truck className="w-3 h-3" />
-                {isRTL ? 'هزینه ارسال' : 'Delivery Fee'}
+                {isRTL ? 'هزینه ارسال' : 'Delivery Fee'} (AFN)
               </span>
               <span>
                 {formData.deliveryFee === 0 
                   ? <Badge variant="outline" className="text-success">{isRTL ? 'رایگان' : 'Free'}</Badge>
-                  : `${currencySymbol} ${(formData.deliveryFee || 0).toLocaleString()}`
+                  : `؋ ${(formData.deliveryFee || 0).toLocaleString()}`
                 }
               </span>
             </div>
