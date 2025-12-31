@@ -70,7 +70,7 @@ interface SellerBreakdown {
     price: number;
   }[];
   productSubtotal: number;
-  deliveryFee: number;
+  deliveryFee: number; // Always in AFN
   sellerTotal: number;
 }
 
@@ -79,8 +79,12 @@ interface CurrencyBreakdown {
   symbol: string;
   sellers: SellerBreakdown[];
   productSubtotal: number;
-  deliveryTotal: number;
-  total: number;
+}
+
+// Total delivery in AFN (separate from product currency)
+interface DeliveryBreakdown {
+  totalDeliveryAFN: number;
+  perSeller: { sellerId: string; sellerName: string; deliveryFee: number }[];
 }
 
 const STEPS = [
@@ -197,8 +201,12 @@ const Checkout = () => {
     return isRTL ? '؋' : 'AFN ';
   };
 
+  // AFN symbol for delivery (always AFN)
+  const afnSymbol = isRTL ? '؋' : 'AFN ';
+
   // Calculate totals grouped by currency, then by seller within each currency
-  const currencyBreakdowns = useMemo((): CurrencyBreakdown[] => {
+  // Delivery fees are always in AFN and tracked separately
+  const { currencyBreakdowns, deliveryBreakdown } = useMemo((): { currencyBreakdowns: CurrencyBreakdown[]; deliveryBreakdown: DeliveryBreakdown } => {
     // First, group items by currency
     const itemsByCurrency: Record<string, typeof cartItems> = {};
     
@@ -210,8 +218,11 @@ const Checkout = () => {
       itemsByCurrency[currency].push(item);
     });
 
+    // Track delivery fees per seller (always AFN)
+    const sellerDeliveryFees = new Map<string, { sellerId: string; sellerName: string; deliveryFee: number }>();
+
     // For each currency, group by seller
-    return Object.entries(itemsByCurrency).map(([currency, currencyItems]) => {
+    const breakdowns = Object.entries(itemsByCurrency).map(([currency, currencyItems]) => {
       const sellerGroups: Record<string, {
         items: typeof currencyItems;
         policy: SellerPolicy | undefined;
@@ -226,6 +237,13 @@ const Checkout = () => {
           };
         }
         sellerGroups[sellerId].items.push(item);
+
+        // Track delivery fee per seller (only once per seller, always AFN)
+        if (!sellerDeliveryFees.has(sellerId)) {
+          const deliveryFee = item.product?.delivery_fee || 0;
+          const sellerName = sellerGroups[sellerId].policy?.sellerName || (isRTL ? 'فروشنده' : 'Seller');
+          sellerDeliveryFees.set(sellerId, { sellerId, sellerName, deliveryFee });
+        }
       });
 
       // Calculate breakdown per seller
@@ -244,23 +262,29 @@ const Checkout = () => {
           sellerName: group.policy?.sellerName || (isRTL ? 'فروشنده' : 'Seller'),
           products,
           productSubtotal,
-          deliveryFee,
-          sellerTotal: productSubtotal + deliveryFee,
+          deliveryFee, // in AFN
+          sellerTotal: productSubtotal, // Only product total in this currency
         };
       });
 
       const productSubtotal = sellers.reduce((sum, s) => sum + s.productSubtotal, 0);
-      const deliveryTotal = sellers.reduce((sum, s) => sum + s.deliveryFee, 0);
 
       return {
         currency,
         symbol: getCurrencySymbol(currency),
         sellers,
         productSubtotal,
-        deliveryTotal,
-        total: productSubtotal + deliveryTotal,
       };
     });
+
+    // Calculate total delivery in AFN
+    const perSeller = Array.from(sellerDeliveryFees.values());
+    const totalDeliveryAFN = perSeller.reduce((sum, s) => sum + s.deliveryFee, 0);
+
+    return {
+      currencyBreakdowns: breakdowns,
+      deliveryBreakdown: { totalDeliveryAFN, perSeller },
+    };
   }, [cartItems, sellerPolicies, isRTL]);
 
   const validateAddress = () => {
@@ -301,8 +325,8 @@ const Checkout = () => {
 
       // Calculate totals for order
       const totalProductAmount = currencyBreakdowns.reduce((sum, cb) => sum + cb.productSubtotal, 0);
-      const totalDeliveryFees = currencyBreakdowns.reduce((sum, cb) => sum + cb.deliveryTotal, 0);
-      const grandTotal = currencyBreakdowns.reduce((sum, cb) => sum + cb.total, 0);
+      const totalDeliveryFees = deliveryBreakdown.totalDeliveryAFN;
+      const grandTotal = totalProductAmount + totalDeliveryFees;
 
       // Create main order
       const { data: order, error: orderError } = await supabase
@@ -598,22 +622,9 @@ const Checkout = () => {
 
                             {/* Seller Subtotals */}
                             <div className="space-y-2 text-sm">
-                              <div className="flex justify-between">
-                                <span className="text-muted-foreground">
-                                  {isRTL ? 'جمع محصولات' : 'Products Subtotal'}
-                                </span>
-                                <span>{seller.productSubtotal.toLocaleString()} {currencyData.symbol}</span>
-                              </div>
-                              <div className="flex justify-between text-muted-foreground">
-                                <span className="flex items-center gap-1">
-                                  <Truck className="w-3 h-3" />
-                                  {t.checkout.orderSummary.deliveryFee}
-                                </span>
-                                <span>{seller.deliveryFee.toLocaleString()} {currencyData.symbol}</span>
-                              </div>
                               <div className="flex justify-between font-medium">
-                                <span>{isRTL ? 'جمع فروشنده' : 'Seller Total'}</span>
-                                <span>{seller.sellerTotal.toLocaleString()} {currencyData.symbol}</span>
+                                <span>{isRTL ? 'جمع محصولات' : 'Products Subtotal'}</span>
+                                <span>{seller.productSubtotal.toLocaleString()} {currencyData.symbol}</span>
                               </div>
                             </div>
                           </div>
@@ -622,29 +633,54 @@ const Checkout = () => {
 
                       {/* Currency Total */}
                       <div className="space-y-2 bg-muted/30 p-4 rounded-lg">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">
-                            {isRTL ? 'جمع محصولات' : 'Products'} ({currencyData.currency})
-                          </span>
-                          <span>{currencyData.productSubtotal.toLocaleString()} {currencyData.symbol}</span>
-                        </div>
-                        <div className="flex justify-between text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <Truck className="w-3 h-3" />
-                            {isRTL ? 'هزینه ارسال' : 'Delivery'} ({currencyData.currency})
-                          </span>
-                          <span>{currencyData.deliveryTotal.toLocaleString()} {currencyData.symbol}</span>
-                        </div>
-                        <Separator />
                         <div className="flex justify-between font-bold text-lg">
-                          <span>{t.checkout.orderSummary.total} ({currencyData.currency})</span>
-                          <span className="text-primary">{currencyData.total.toLocaleString()} {currencyData.symbol}</span>
+                          <span>{isRTL ? 'جمع محصولات' : 'Products Total'} ({currencyData.currency})</span>
+                          <span className="text-primary">{currencyData.productSubtotal.toLocaleString()} {currencyData.symbol}</span>
                         </div>
                       </div>
 
                       {currencyBreakdowns.length > 1 && <Separator className="my-6" />}
                     </div>
                   ))}
+
+                  {/* Delivery Fees Section - Always AFN */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2 bg-primary/10 p-3 rounded-lg">
+                      <Badge variant="outline" className="text-base font-semibold bg-primary/20">
+                        AFN
+                      </Badge>
+                      <span className="text-muted-foreground text-sm flex items-center gap-1">
+                        <Truck className="w-4 h-4" />
+                        {isRTL ? 'هزینه ارسال' : 'Delivery Fees'}
+                      </span>
+                    </div>
+
+                    <div className="border rounded-lg p-4 space-y-3">
+                      {deliveryBreakdown.perSeller.map((seller) => (
+                        <div key={seller.sellerId} className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">{seller.sellerName}</span>
+                          <span>
+                            {seller.deliveryFee === 0 ? (
+                              <Badge variant="outline" className="text-success">{isRTL ? 'رایگان' : 'Free'}</Badge>
+                            ) : (
+                              `${seller.deliveryFee.toLocaleString()} ${afnSymbol}`
+                            )}
+                          </span>
+                        </div>
+                      ))}
+                      <Separator />
+                      <div className="flex justify-between font-bold">
+                        <span>{isRTL ? 'جمع هزینه ارسال' : 'Total Delivery'}</span>
+                        <span className="text-primary">
+                          {deliveryBreakdown.totalDeliveryAFN === 0 ? (
+                            <Badge variant="outline" className="text-success">{isRTL ? 'رایگان' : 'Free'}</Badge>
+                          ) : (
+                            `${deliveryBreakdown.totalDeliveryAFN.toLocaleString()} ${afnSymbol}`
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
 
                   {currencyBreakdowns.length > 1 && (
                     <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg">
@@ -776,22 +812,33 @@ const Checkout = () => {
                       </div>
                       {/* Show totals per currency */}
                       {currencyBreakdowns.map((cb) => (
-                        <div key={cb.currency} className="space-y-2">
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">{t.checkout.orderSummary.subtotal} ({cb.currency}):</span>
-                            <span className="font-medium">{cb.productSubtotal.toLocaleString()} {cb.symbol}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">{t.checkout.orderSummary.deliveryFee} ({cb.currency}):</span>
-                            <span className="font-medium">{cb.deliveryTotal.toLocaleString()} {cb.symbol}</span>
-                          </div>
-                          <div className="flex justify-between text-lg font-bold">
-                            <span>{t.checkout.orderSummary.total} ({cb.currency}):</span>
-                            <span className="text-primary">{cb.total.toLocaleString()} {cb.symbol}</span>
-                          </div>
-                          {currencyBreakdowns.length > 1 && <Separator />}
+                        <div key={cb.currency} className="flex justify-between">
+                          <span className="text-muted-foreground">{isRTL ? 'محصولات' : 'Products'} ({cb.currency}):</span>
+                          <span className="font-medium">{cb.productSubtotal.toLocaleString()} {cb.symbol}</span>
                         </div>
                       ))}
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">{t.checkout.orderSummary.deliveryFee} (AFN):</span>
+                        <span className="font-medium">
+                          {deliveryBreakdown.totalDeliveryAFN === 0 
+                            ? (isRTL ? 'رایگان' : 'Free') 
+                            : `${deliveryBreakdown.totalDeliveryAFN.toLocaleString()} ${afnSymbol}`
+                          }
+                        </span>
+                      </div>
+                      <Separator />
+                      {currencyBreakdowns.map((cb) => (
+                        <div key={cb.currency} className="flex justify-between text-lg font-bold">
+                          <span>{isRTL ? 'جمع' : 'Total'} ({cb.currency}):</span>
+                          <span className="text-primary">{cb.productSubtotal.toLocaleString()} {cb.symbol}</span>
+                        </div>
+                      ))}
+                      {deliveryBreakdown.totalDeliveryAFN > 0 && (
+                        <div className="flex justify-between text-sm text-muted-foreground">
+                          <span>+ {t.checkout.orderSummary.deliveryFee}:</span>
+                          <span>{deliveryBreakdown.totalDeliveryAFN.toLocaleString()} {afnSymbol}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
 
