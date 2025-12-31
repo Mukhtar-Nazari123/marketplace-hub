@@ -109,7 +109,7 @@ const EditProduct = () => {
         priceUSD: (metadata.priceUSD as number) || 0,
         discountPrice: data.compare_at_price,
         discountPriceUSD: (metadata.discountPriceUSD as number) || null,
-        currency: (metadata.currency as 'AFN' | 'USD') || 'AFN',
+        currency: (data.currency as 'AFN' | 'USD') || 'AFN', // Read currency from database column
         quantity: data.quantity,
         stockPerSize: (metadata.stockPerSize as Record<string, number>) || {},
         deliveryFee: data.delivery_fee || 0,
@@ -235,7 +235,8 @@ const EditProduct = () => {
         subcategory_id: formData.subCategoryId || null,
         images: imageUrls,
         status,
-        delivery_fee: formData.deliveryFee || 0,
+        currency: formData.currency, // Save selected currency (AFN or USD) to database
+        delivery_fee: formData.deliveryFee || 0, // Always in AFN
         metadata: {
           shortDescription: formData.shortDescription,
           brand: formData.brand,
@@ -248,7 +249,7 @@ const EditProduct = () => {
           subCategoryName: formData.subCategoryName,
           priceUSD: formData.priceUSD,
           discountPriceUSD: formData.discountPriceUSD,
-          currency: formData.currency,
+          deliveryFeeCurrency: 'AFN', // Delivery fee is always AFN
         },
       };
 
