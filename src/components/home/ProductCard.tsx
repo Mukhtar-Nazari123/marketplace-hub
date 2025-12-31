@@ -183,13 +183,14 @@ const ProductCard = ({
         </Link>
 
         {/* Price */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {originalPrice && (
             <span className="text-sm text-muted-foreground line-through">
               {formatPrice(originalPrice)} {currencySymbol}
             </span>
           )}
           <span className="text-lg font-bold text-orange">{formatPrice(price)} {currencySymbol}</span>
+          <Badge variant="outline" className="text-xs ml-auto">{currency}</Badge>
         </div>
 
         {/* Countdown */}

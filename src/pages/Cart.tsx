@@ -18,6 +18,7 @@ interface CartItemProduct {
   id: string;
   name: string;
   price: number;
+  compare_at_price: number | null;
   images: string[] | null;
   quantity: number;
   slug?: string;
@@ -52,13 +53,27 @@ const Cart = () => {
   const itemsWithDetails = items.map(item => {
     const product = item.product as CartItemProduct | undefined;
     const currency = product?.currency || 'AFN';
+    
+    // Use discount price (compare_at_price as original, price as discounted) if available
+    // If compare_at_price > price, use price (discounted)
+    // Otherwise just use price
+    const originalPrice = product?.price || 0;
+    const comparePrice = product?.compare_at_price || null;
+    const effectivePrice = comparePrice && comparePrice > originalPrice 
+      ? originalPrice  // price is the discounted price
+      : originalPrice;
+    const hasDiscount = comparePrice && comparePrice > originalPrice;
+    
     return {
       ...item,
       currency,
       currencySymbol: getCurrencySymbol(currency),
-      itemTotal: (product?.price || 0) * item.quantity,
+      originalPrice: hasDiscount ? comparePrice : null,
+      effectivePrice,
+      itemTotal: effectivePrice * item.quantity,
       sellerId: product?.seller_id || 'unknown',
       deliveryFee: product?.delivery_fee || 0, // Always in AFN
+      hasDiscount,
     };
   });
 
@@ -224,10 +239,15 @@ const Cart = () => {
                           >
                             {product?.name || 'Product'}
                           </Link>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <p className="text-primary font-bold">
-                              {product?.price?.toLocaleString() || 0} {item.currencySymbol}
+                              {item.effectivePrice?.toLocaleString() || 0} {item.currencySymbol}
                             </p>
+                            {item.hasDiscount && item.originalPrice && (
+                              <p className="text-muted-foreground text-sm line-through">
+                                {item.originalPrice.toLocaleString()} {item.currencySymbol}
+                              </p>
+                            )}
                             <Badge variant="outline" className="text-xs">
                               {item.currency}
                             </Badge>
