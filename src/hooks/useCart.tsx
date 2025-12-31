@@ -12,6 +12,7 @@ interface CartItem {
     id: string;
     name: string;
     price: number;
+    compare_at_price: number | null;
     images: string[] | null;
     quantity: number;
     slug?: string;
@@ -63,6 +64,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
             name,
             slug,
             price,
+            compare_at_price,
             images,
             quantity,
             seller_id,

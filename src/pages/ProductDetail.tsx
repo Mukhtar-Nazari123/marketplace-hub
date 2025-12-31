@@ -52,6 +52,7 @@ interface Product {
   is_featured: boolean;
   created_at: string;
   delivery_fee: number;
+  currency: string;
   metadata: {
     currency?: string;
     brand?: string;
@@ -199,9 +200,14 @@ const ProductDetail = () => {
   };
 
   const getCurrencySymbol = () => {
-    const currency = product?.metadata?.currency || 'AFN';
+    // Read from database currency column (not metadata)
+    const currency = product?.currency || product?.metadata?.currency || 'AFN';
     if (currency === 'USD') return '$';
     return isRTL ? '؋' : 'AFN';
+  };
+
+  const getProductCurrency = () => {
+    return product?.currency || product?.metadata?.currency || 'AFN';
   };
 
   const getDiscount = () => {
@@ -394,7 +400,7 @@ const ProductDetail = () => {
               )}
             </div>
 
-            {/* Delivery Fee */}
+            {/* Delivery Fee - Always in AFN */}
             <div className="flex items-center gap-2 p-3 bg-primary/5 rounded-lg border border-primary/20">
               <Truck className="text-primary" size={20} />
               <div>
@@ -402,7 +408,10 @@ const ProductDetail = () => {
                   {isRTL ? 'هزینه ارسال:' : 'Delivery Fee:'}
                 </span>
                 <span className="font-semibold text-foreground ml-2">
-                  {(product.delivery_fee || 0).toLocaleString()} {currencySymbol}
+                  {(product.delivery_fee || 0) === 0 
+                    ? (isRTL ? 'رایگان' : 'Free')
+                    : `${(product.delivery_fee || 0).toLocaleString()} ${isRTL ? '؋' : 'AFN'}`
+                  }
                 </span>
               </div>
             </div>
@@ -636,7 +645,8 @@ const ProductDetail = () => {
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {relatedProducts.map((p) => {
-                const pCurrency = p.metadata?.currency || 'AFN';
+                // Read currency from database column first, then fallback to metadata
+                const pCurrency = p.currency || p.metadata?.currency || 'AFN';
                 const pSymbol = pCurrency === 'USD' ? '$' : (isRTL ? '؋' : 'AFN');
                 return (
                   <Link
@@ -665,9 +675,10 @@ const ProductDetail = () => {
                         </span>
                         {p.compare_at_price && p.compare_at_price > p.price && (
                           <span className="text-sm text-muted-foreground line-through">
-                            {p.compare_at_price.toLocaleString()}
+                            {p.compare_at_price.toLocaleString()} {pSymbol}
                           </span>
                         )}
+                        <Badge variant="outline" className="text-xs">{pCurrency}</Badge>
                       </div>
                     </div>
                   </Link>
