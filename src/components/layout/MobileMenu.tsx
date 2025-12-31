@@ -4,6 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/lib/i18n";
+import { useCategories } from "@/hooks/useCategories";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -13,17 +15,9 @@ interface MobileMenuProps {
 const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const { t, isRTL } = useLanguage();
+  const { getRootCategories, loading } = useCategories();
 
-  const categories = [
-    t.categories.electronics,
-    t.categories.fashion,
-    t.categories.homeGarden,
-    t.categories.sports,
-    t.categories.healthBeauty,
-    t.categories.toysGames,
-    t.categories.automotive,
-    t.categories.booksMedia,
-  ];
+  const rootCategories = getRootCategories();
 
   const navLinks = [
     { label: t.nav.products, icon: Package, href: "/products" },
@@ -76,16 +70,28 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
             
             {isCategoryOpen && (
               <div className="mt-2 bg-secondary rounded-lg overflow-hidden">
-                {categories.map((category) => (
-                  <Link
-                    key={category}
-                    to={`/categories/${encodeURIComponent(category)}`}
-                    className="block px-4 py-3 hover:bg-orange/10 hover:text-orange transition-colors border-b border-border last:border-b-0"
-                    onClick={onClose}
-                  >
-                    {category}
-                  </Link>
-                ))}
+                {loading ? (
+                  <div className="p-4 space-y-2">
+                    {[...Array(4)].map((_, i) => (
+                      <Skeleton key={i} className="h-8 w-full" />
+                    ))}
+                  </div>
+                ) : rootCategories.length > 0 ? (
+                  rootCategories.map((category) => (
+                    <Link
+                      key={category.id}
+                      to={`/categories?category=${category.slug}`}
+                      className="block px-4 py-3 hover:bg-orange/10 hover:text-orange transition-colors border-b border-border last:border-b-0"
+                      onClick={onClose}
+                    >
+                      {category.name}
+                    </Link>
+                  ))
+                ) : (
+                  <div className="px-4 py-3 text-muted-foreground text-sm">
+                    {isRTL ? 'دسته‌بندی موجود نیست' : 'No categories available'}
+                  </div>
+                )}
               </div>
             )}
           </div>
