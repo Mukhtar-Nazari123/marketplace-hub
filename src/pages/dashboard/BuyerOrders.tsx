@@ -601,6 +601,13 @@ const BuyerOrders = () => {
                                       />
                                     )}
                                     <div className="text-right">
+                                      <p className="text-xs text-muted-foreground flex items-center gap-1 justify-end mb-1">
+                                        <Truck className="w-3 h-3" />
+                                        {isRTL ? 'هزینه ارسال' : 'Delivery required'}
+                                        <span className="font-medium text-foreground">
+                                          {sellerOrder?.delivery_fee?.toLocaleString() || 0} {sellerOrder?.currency === 'USD' ? '$' : 'AFN'}
+                                        </span>
+                                      </p>
                                       <p className="font-semibold text-sm">
                                         {item.total_price.toLocaleString()} {isRTL ? '؋' : 'AFN'}
                                       </p>
