@@ -41,7 +41,7 @@ const Navigation = () => {
 
             {/* Category Dropdown Menu */}
             {isCategoryOpen && (
-              <div className={`absolute top-full w-64 bg-card border border-border shadow-xl rounded-b-lg z-50 animate-fade-in ${isRTL ? 'left-0' : 'right-0'}`}>
+              <div className={`absolute top-full w-64 bg-card border border-border shadow-xl rounded-b-lg z-50 animate-fade-in ${isRTL ? 'right-0' : 'left-0'}`}>
                 {loading ? (
                   <div className="p-4 space-y-2">
                     {[...Array(4)].map((_, i) => (
