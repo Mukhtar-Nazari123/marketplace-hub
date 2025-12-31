@@ -385,14 +385,17 @@ const ProductDetail = () => {
 
             {/* Price */}
             <div className="flex items-center gap-4 flex-wrap">
-              <span className="text-3xl font-bold text-primary">
-                {product.price.toLocaleString()} {currencySymbol}
-              </span>
               {product.compare_at_price && product.compare_at_price > product.price && (
                 <span className="text-xl text-muted-foreground line-through">
-                  {product.compare_at_price.toLocaleString()} {currencySymbol}
+                  {product.compare_at_price.toLocaleString()} {getProductCurrency()}
                 </span>
               )}
+              <span className="text-3xl font-bold text-primary">
+                {product.price.toLocaleString()} {getProductCurrency()}
+              </span>
+              <Badge variant="outline" className="text-sm">
+                {getProductCurrency()}
+              </Badge>
               {discount > 0 && (
                 <Badge variant="destructive" className="text-sm">
                   {isRTL ? `${discount}% تخفیف` : `${discount}% OFF`}
