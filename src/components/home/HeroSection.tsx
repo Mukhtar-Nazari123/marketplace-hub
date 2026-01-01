@@ -25,7 +25,7 @@ const HeroSection = () => {
             />
 
             {/* Content Container */}
-            <div className={`relative z-10 h-full flex items-center ${isRTL ? "justify-start" : "justify-end"}`}>
+            <div className={`relative z-10 h-full flex items-center ${isRTL ? "justify-end" : "justify-start"}`}>
               {/* Floating Product Image - positioned absolutely */}
               <div
                 className={`absolute top-1/2 -translate-y-1/2 ${isRTL ? "left-8 lg:left-16" : "right-8 lg:right-16"}`}
