@@ -63,74 +63,74 @@ const App = () => (
             <CartProvider>
               <WishlistProvider>
                 <TooltipProvider>
-                <Toaster />
-                <Sonner />
-                <BrowserRouter>
-                  <Routes>
-                    {/* Public Routes */}
-                    <Route path="/" element={<Index />} />
-                    <Route path="/products" element={<Products />} />
-                    <Route path="/products/:id" element={<ProductDetail />} />
-                    <Route path="/categories" element={<Categories />} />
-                    <Route path="/categories/:id" element={<Categories />} />
-                    <Route path="/about" element={<About />} />
-                    <Route path="/contact" element={<Contact />} />
-                    <Route path="/blog" element={<Blog />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
-                    <Route path="/forgot-password" element={<ForgotPassword />} />
-                    <Route path="/cart" element={<Cart />} />
-                    <Route path="/checkout" element={<Checkout />} />
+                  <Toaster />
+                  <Sonner />
+                  <BrowserRouter>
+                    <Routes>
+                      {/* Public Routes */}
+                      <Route path="/" element={<Index />} />
+                      <Route path="/products" element={<Products />} />
+                      <Route path="/products/:id" element={<ProductDetail />} />
+                      <Route path="/categories" element={<Categories />} />
+                      <Route path="/categories/:id" element={<Categories />} />
+                      <Route path="/about" element={<About />} />
+                      <Route path="/contact" element={<Contact />} />
+                      <Route path="/blog" element={<Blog />} />
+                      <Route path="/login" element={<Login />} />
+                      <Route path="/register" element={<Register />} />
+                      <Route path="/forgot-password" element={<ForgotPassword />} />
+                      <Route path="/cart" element={<Cart />} />
+                      <Route path="/checkout" element={<Checkout />} />
 
-                    {/* Dashboard Routes - All nested under /dashboard */}
-                    <Route path="/dashboard" element={<DashboardIndex />} />
+                      {/* Dashboard Routes - All nested under /dashboard */}
+                      <Route path="/dashboard" element={<DashboardIndex />} />
 
-                    {/* Admin Routes */}
-                    <Route path="/dashboard/admin" element={<AdminDashboard />} />
-                    <Route path="/dashboard/users" element={<AdminUsers />} />
-                    <Route path="/dashboard/products" element={<AdminProducts />} />
-                    <Route path="/admin/products/:id" element={<AdminProductView />} />
-                    <Route path="/dashboard/orders" element={<AdminOrders />} />
-                    <Route path="/dashboard/orders/:id" element={<AdminOrderDetail />} />
-                    <Route path="/dashboard/sellers" element={<AdminSellers />} />
-                    <Route path="/dashboard/banners" element={<AdminBanners />} />
-                    <Route path="/dashboard/promotions" element={<AdminPromotions />} />
-                    <Route path="/dashboard/cms" element={<AdminCMS />} />
-                    <Route path="/dashboard/settings" element={<AdminSettings />} />
-                    <Route path="/dashboard/reviews" element={<AdminReviews />} />
+                      {/* Admin Routes */}
+                      <Route path="/dashboard/admin" element={<AdminDashboard />} />
+                      <Route path="/dashboard/users" element={<AdminUsers />} />
+                      <Route path="/dashboard/products" element={<AdminProducts />} />
+                      <Route path="/admin/products/:id" element={<AdminProductView />} />
+                      <Route path="/dashboard/orders" element={<AdminOrders />} />
+                      <Route path="/dashboard/orders/:id" element={<AdminOrderDetail />} />
+                      <Route path="/dashboard/sellers" element={<AdminSellers />} />
+                      <Route path="/dashboard/banners" element={<AdminBanners />} />
+                      <Route path="/dashboard/promotions" element={<AdminPromotions />} />
+                      <Route path="/dashboard/cms" element={<AdminCMS />} />
+                      <Route path="/dashboard/settings" element={<AdminSettings />} />
+                      <Route path="/dashboard/reviews" element={<AdminReviews />} />
 
-                    {/* Shared Profile Route (keep existing) */}
-                    <Route path="/dashboard/profile" element={<BuyerProfile />} />
+                      {/* Shared Profile Route (keep existing) */}
+                      <Route path="/dashboard/profile" element={<BuyerProfile />} />
 
-                    {/* Buyer Routes */}
-                    <Route path="/dashboard/buyer" element={<BuyerDashboard />} />
-                    <Route path="/dashboard/buyer/orders" element={<BuyerOrders />} />
-                    <Route path="/dashboard/buyer/reviews" element={<BuyerReviews />} />
-                    <Route path="/dashboard/buyer/addresses" element={<BuyerProfile />} />
-                    <Route path="/dashboard/buyer/wishlist" element={<Wishlist />} />
-                    <Route path="/dashboard/buyer/payments" element={<BuyerProfile />} />
+                      {/* Buyer Routes */}
+                      <Route path="/dashboard/buyer" element={<BuyerDashboard />} />
+                      <Route path="/dashboard/buyer/orders" element={<BuyerOrders />} />
+                      <Route path="/dashboard/buyer/reviews" element={<BuyerReviews />} />
+                      <Route path="/dashboard/buyer/addresses" element={<BuyerProfile />} />
+                      <Route path="/wishlist" element={<Wishlist />} />
+                      <Route path="/dashboard/buyer/payments" element={<BuyerProfile />} />
 
-                    {/* Seller Routes */}
-                    <Route path="/dashboard/seller" element={<SellerDashboard />} />
-                    <Route path="/dashboard/seller/products" element={<SellerProducts />} />
-                    <Route path="/dashboard/seller/orders" element={<SellerOrders />} />
-                    <Route path="/dashboard/seller/reviews" element={<SellerReviews />} />
-                    <Route path="/dashboard/seller/analytics" element={<SellerAnalytics />} />
-                    <Route path="/dashboard/seller/products/new" element={<AddProduct />} />
-                    <Route path="/dashboard/seller/products/edit/:id" element={<EditProduct />} />
-                    <Route path="/dashboard/seller/pending" element={<SellerPending />} />
-                    <Route path="/dashboard/seller/products/view/:id" element={<SellerProductView />} />
-                    {/* Seller Onboarding Routes */}
-                    <Route path="/seller/profile-choice" element={<SellerProfileChoice />} />
-                    <Route path="/seller/complete-profile" element={<SellerProfileComplete />} />
+                      {/* Seller Routes */}
+                      <Route path="/dashboard/seller" element={<SellerDashboard />} />
+                      <Route path="/dashboard/seller/products" element={<SellerProducts />} />
+                      <Route path="/dashboard/seller/orders" element={<SellerOrders />} />
+                      <Route path="/dashboard/seller/reviews" element={<SellerReviews />} />
+                      <Route path="/dashboard/seller/analytics" element={<SellerAnalytics />} />
+                      <Route path="/dashboard/seller/products/new" element={<AddProduct />} />
+                      <Route path="/dashboard/seller/products/edit/:id" element={<EditProduct />} />
+                      <Route path="/dashboard/seller/pending" element={<SellerPending />} />
+                      <Route path="/dashboard/seller/products/view/:id" element={<SellerProductView />} />
+                      {/* Seller Onboarding Routes */}
+                      <Route path="/seller/profile-choice" element={<SellerProfileChoice />} />
+                      <Route path="/seller/complete-profile" element={<SellerProfileComplete />} />
 
-                    {/* Legacy Admin Routes - Redirect to new paths */}
-                    <Route path="/admin" element={<Navigate to="/dashboard" replace />} />
-                    <Route path="/admin/*" element={<Navigate to="/dashboard" replace />} />
+                      {/* Legacy Admin Routes - Redirect to new paths */}
+                      <Route path="/admin" element={<Navigate to="/dashboard" replace />} />
+                      <Route path="/admin/*" element={<Navigate to="/dashboard" replace />} />
 
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </BrowserRouter>
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </BrowserRouter>
                 </TooltipProvider>
               </WishlistProvider>
             </CartProvider>
