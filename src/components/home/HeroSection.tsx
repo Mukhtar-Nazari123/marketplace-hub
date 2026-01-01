@@ -25,9 +25,11 @@ const HeroSection = () => {
             />
 
             {/* Content Container */}
-            <div className={`relative z-10 h-full flex items-center ${isRTL ? "justify-end" : "justify-start"}`}>
-              {/* Floating Product Image - positioned absolutely */}
-              <div className={`absolute top-1/2 -translate-y-1/2 ${isRTL ? "left-8 lg:left-16" : "right-8 lg:right-16"}`}>
+            <div className={`relative z-10 h-full flex ${isRTL ? "flex-row-reverse" : "flex-row"} items-center`}>
+              {/* Floating Product Image */}
+              <div
+                className={`absolute top-1/2 -translate-y-1/2 ${isRTL ? "right-8 lg:right-16" : "left-8 lg:left-16"}`}
+              >
                 <div className="w-48 h-48 lg:w-72 lg:h-72 rounded-full bg-gradient-to-br from-cyan/30 to-orange/30 flex items-center justify-center animate-float opacity-80">
                   <Headphones className="w-24 h-24 lg:w-36 lg:h-36 text-background/50" />
                 </div>
