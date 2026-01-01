@@ -25,7 +25,7 @@ const HeroSection = () => {
             />
 
             {/* Content Container */}
-            <div className="relative z-10 h-full flex items-center">
+            <div className={`relative z-10 h-full flex items-center ${isRTL ? "flex-row-reverse" : ""}`}>
               {/* Text Content */}
               <div
                 className={`p-8 lg:p-12 flex flex-col justify-center max-w-md ${isRTL ? "items-end text-right" : "items-start text-left"}`}
