@@ -107,7 +107,7 @@ const App = () => (
                       <Route path="/dashboard/buyer/orders" element={<BuyerOrders />} />
                       <Route path="/dashboard/buyer/reviews" element={<BuyerReviews />} />
                       <Route path="/dashboard/buyer/addresses" element={<BuyerProfile />} />
-                      <Route path="/wishlist" element={<Wishlist />} />
+                      <Route path="/dashboard/buyer/wishlist" element={<Wishlist />} />
                       <Route path="/dashboard/buyer/payments" element={<BuyerProfile />} />
 
                       {/* Seller Routes */}
