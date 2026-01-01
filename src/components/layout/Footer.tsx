@@ -1,4 +1,16 @@
-import { Facebook, Twitter, Instagram, Youtube, Mail, Phone, MapPin, CreditCard, Truck, Shield, Headphones } from "lucide-react";
+import {
+  Facebook,
+  Twitter,
+  Instagram,
+  Youtube,
+  Mail,
+  Phone,
+  MapPin,
+  CreditCard,
+  Truck,
+  Shield,
+  Headphones,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -6,7 +18,7 @@ import { useLanguage } from "@/lib/i18n";
 
 const Footer = () => {
   const { t, isRTL } = useLanguage();
-  
+
   const quickLinks = [
     { label: t.footer.aboutUs, href: "/about" },
     { label: t.footer.contactUs, href: "/contact" },
@@ -17,11 +29,11 @@ const Footer = () => {
   ];
 
   const customerLinks = [
-    { label: t.footer.myAccount, href: "/account" },
-    { label: t.footer.orderTracking, href: "/orders" },
-    { label: t.footer.wishlist, href: "/wishlist" },
+    { label: t.footer.myAccount, href: "/dashboard/profile" },
+    { label: t.footer.orderTracking, href: "/dashboard/buyer/orders" },
+    { label: t.footer.wishlist, href: "/dashboard/buyer/wishlist" },
     { label: t.footer.returns, href: "/returns" },
-    { label: t.footer.shippingInfo, href: "/shipping" },
+    { label: t.footer.shippingInfo, href: "/dashboard/buyer/orders" },
     { label: t.footer.giftCards, href: "/gift-cards" },
   ];
 
@@ -81,24 +93,34 @@ const Footer = () => {
                 <span className="text-accent-foreground font-bold text-xl">M</span>
               </div>
               <div>
-                <h3 className="font-display text-xl font-bold">{isRTL ? 'مارکت' : 'Market'}</h3>
+                <h3 className="font-display text-xl font-bold">{isRTL ? "مارکت" : "Market"}</h3>
                 <p className="text-xs text-muted-foreground -mt-1">{t.footer.onlineStore}</p>
               </div>
             </Link>
-            <p className="text-muted-foreground text-sm mb-4">
-              {t.footer.description}
-            </p>
+            <p className="text-muted-foreground text-sm mb-4">{t.footer.description}</p>
             <div className="flex gap-3">
-              <a href="#" className="w-10 h-10 rounded-full bg-background/10 flex items-center justify-center hover:bg-cyan transition-colors">
+              <a
+                href="#"
+                className="w-10 h-10 rounded-full bg-background/10 flex items-center justify-center hover:bg-cyan transition-colors"
+              >
                 <Facebook className="h-5 w-5" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-background/10 flex items-center justify-center hover:bg-cyan transition-colors">
+              <a
+                href="#"
+                className="w-10 h-10 rounded-full bg-background/10 flex items-center justify-center hover:bg-cyan transition-colors"
+              >
                 <Twitter className="h-5 w-5" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-background/10 flex items-center justify-center hover:bg-cyan transition-colors">
+              <a
+                href="#"
+                className="w-10 h-10 rounded-full bg-background/10 flex items-center justify-center hover:bg-cyan transition-colors"
+              >
                 <Instagram className="h-5 w-5" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-background/10 flex items-center justify-center hover:bg-cyan transition-colors">
+              <a
+                href="#"
+                className="w-10 h-10 rounded-full bg-background/10 flex items-center justify-center hover:bg-cyan transition-colors"
+              >
                 <Youtube className="h-5 w-5" />
               </a>
             </div>
@@ -135,15 +157,13 @@ const Footer = () => {
           {/* Newsletter */}
           <div>
             <h4 className="font-display font-bold text-lg mb-4">{t.footer.newsletter}</h4>
-            <p className="text-muted-foreground text-sm mb-4">
-              {t.footer.subscribeText}
-            </p>
+            <p className="text-muted-foreground text-sm mb-4">{t.footer.subscribeText}</p>
             <div className="flex gap-2">
               <Input
                 type="email"
                 placeholder={t.footer.enterEmail}
                 className="bg-background/10 border-background/20 text-background placeholder:text-muted-foreground"
-                dir={isRTL ? 'rtl' : 'ltr'}
+                dir={isRTL ? "rtl" : "ltr"}
               />
               <Button variant="orange" size="icon">
                 <Mail className="h-4 w-4" />
@@ -152,7 +172,7 @@ const Footer = () => {
             <div className="mt-6 space-y-2">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Phone className="h-4 w-4 text-cyan" />
-                <span>{isRTL ? '+۹۳ ۱۲۳-۴۵۶-۷۸۹' : '+93 123-456-789'}</span>
+                <span>{isRTL ? "+۹۳ ۱۲۳-۴۵۶-۷۸۹" : "+93 123-456-789"}</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Mail className="h-4 w-4 text-cyan" />
@@ -172,12 +192,24 @@ const Footer = () => {
         <div className="container py-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">
-              © {isRTL ? '۱۴۰۳' : '2024'} {isRTL ? 'مارکت' : 'Market'}. {t.footer.allRightsReserved}
+              © {isRTL ? "۱۴۰۳" : "2024"} {isRTL ? "مارکت" : "Market"}. {t.footer.allRightsReserved}
             </p>
             <div className="flex items-center gap-4">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-6 opacity-70 hover:opacity-100 transition-opacity" />
-              <img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Mastercard_2019_logo.svg" alt="Mastercard" className="h-6 opacity-70 hover:opacity-100 transition-opacity" />
-              <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg" alt="Visa" className="h-6 opacity-70 hover:opacity-100 transition-opacity" />
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg"
+                alt="PayPal"
+                className="h-6 opacity-70 hover:opacity-100 transition-opacity"
+              />
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Mastercard_2019_logo.svg"
+                alt="Mastercard"
+                className="h-6 opacity-70 hover:opacity-100 transition-opacity"
+              />
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg"
+                alt="Visa"
+                className="h-6 opacity-70 hover:opacity-100 transition-opacity"
+              />
             </div>
           </div>
         </div>
