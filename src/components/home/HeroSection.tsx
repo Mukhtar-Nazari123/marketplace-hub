@@ -25,8 +25,8 @@ const HeroSection = () => {
             />
 
             {/* Content Container */}
-            <div className={`relative z-10 h-full flex ${isRTL ? "flex-row" : "flex-row-reverse"} items-center`}>
-              {/* Floating Product Image */}
+            <div className={`relative z-10 h-full flex items-center ${isRTL ? "justify-end" : "justify-start"}`}>
+              {/* Floating Product Image - positioned absolutely */}
               <div
                 className={`absolute top-1/2 -translate-y-1/2 ${isRTL ? "left-8 lg:left-16" : "right-8 lg:right-16"}`}
               >
@@ -37,7 +37,7 @@ const HeroSection = () => {
 
               {/* Text Content */}
               <div
-                className={`p-8 lg:p-12 flex flex-col justify-center max-w-md ${isRTL ? "items-start text-left" : "items-end text-right"}`}
+                className={`p-8 lg:p-12 flex flex-col justify-center max-w-md ${isRTL ? "items-end text-right" : "items-start text-left"}`}
               >
                 <Badge variant="sale" className="w-fit mb-4 text-sm px-4 py-1">
                   {t.hero.sale}
@@ -54,7 +54,7 @@ const HeroSection = () => {
                 <Button variant="orange" size="xl" className="w-fit group">
                   {t.hero.shopNow}
                   <ArrowLeft
-                    className={`h-5 w-5 transition-transform ${isRTL ? "group-hover:translate-x-1" : "group-hover:-translate-x-1 rotate-180"}`}
+                    className={`h-5 w-5 transition-transform ${isRTL ? "group-hover:-translate-x-1" : "group-hover:translate-x-1 rotate-180"}`}
                   />
                 </Button>
               </div>
