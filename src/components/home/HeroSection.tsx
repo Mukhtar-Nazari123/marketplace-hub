@@ -19,7 +19,7 @@ const HeroSection = () => {
             <div className={`absolute bottom-10 w-48 h-48 bg-orange/20 rounded-full blur-3xl ${isRTL ? 'right-20' : 'left-20'}`} />
             
             {/* Content Container */}
-            <div className={`relative z-10 h-full flex items-center ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
+            <div className="relative z-10 h-full flex items-center">
               {/* Text Content */}
               <div className={`p-8 lg:p-12 flex flex-col justify-center max-w-md ${isRTL ? 'items-end text-right' : 'items-start text-left'}`}>
                 <Badge variant="sale" className="w-fit mb-4 text-sm px-4 py-1">
