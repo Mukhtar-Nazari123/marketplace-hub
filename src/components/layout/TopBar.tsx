@@ -42,7 +42,7 @@ const TopBar = () => {
             {t.topBar.myAccount}
           </Link>
           <span className="text-muted-foreground">|</span>
-          <Link to="/dashboard/buyer/wishlist" className="hover:text-cyan transition-colors">
+          <Link to="/pages/dashboard/Wishlist" className="hover:text-cyan transition-colors">
             {t.topBar.wishlist} ({formatCount(wishlistCount)})
           </Link>
           <span className="text-muted-foreground hidden sm:inline">|</span>
