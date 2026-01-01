@@ -414,7 +414,8 @@ const BuyerOrders = () => {
                     </div>
                     <div className="text-right">
                       <p className="text-lg font-bold text-primary">
-                        {order.total.toLocaleString()} {isRTL ? "؋" : "AFN"}
+                        {order.total.toLocaleString()}{" "}
+                        {order.seller_orders?.[0]?.currency === "USD" ? "$" : isRTL ? "؋" : "AFN"}
                       </p>
                       <p className="text-sm text-muted-foreground">
                         {order.order_items.length} {isRTL ? "محصول" : "items"}
@@ -576,7 +577,8 @@ const BuyerOrders = () => {
                                   <div className="flex-1 min-w-0">
                                     <p className="font-medium truncate text-sm">{item.product_name}</p>
                                     <p className="text-xs text-muted-foreground">
-                                      {item.quantity} × {item.unit_price.toLocaleString()} {isRTL ? "؋" : "AFN"}
+                                      {item.quantity} × {item.unit_price.toLocaleString()}{" "}
+                                      {sellerOrder?.currency === "USD" ? "$" : isRTL ? "؋" : "AFN"}
                                     </p>
                                   </div>
                                   <div className="flex items-center gap-3">
@@ -595,11 +597,12 @@ const BuyerOrders = () => {
                                         {isRTL ? "هزینه ارسال" : "Delivery fee"}
                                         <span className="font-medium text-foreground">
                                           {sellerOrder?.delivery_fee?.toLocaleString() || 0}{" "}
-                                          {sellerOrder?.currency === "USD" ? "$" : "AFN"}
+                                          {sellerOrder?.currency === "USD" ? "$" : isRTL ? "؋" : "AFN"}
                                         </span>
                                       </p>
                                       <p className="font-semibold text-sm">
-                                        {item.total_price.toLocaleString()} {isRTL ? "؋" : "AFN"}
+                                        {item.total_price.toLocaleString()}{" "}
+                                        {sellerOrder?.currency === "USD" ? "$" : isRTL ? "؋" : "AFN"}
                                       </p>
                                     </div>
                                   </div>
