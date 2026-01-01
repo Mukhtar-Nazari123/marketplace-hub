@@ -263,7 +263,40 @@ const ProductDetail = () => {
   const discount = getDiscount();
   const currencySymbol = getCurrencySymbol();
   const isNew = new Date(product.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-  const specifications = product.metadata?.specifications || {};
+  
+  // Get specifications from metadata - can be either an object or within attributes
+  const rawSpecifications = product.metadata?.specifications || {};
+  const attributes = (product.metadata?.attributes as Record<string, unknown>) || {};
+  
+  // Parse attributes.specifications if it's a string (Technical Specifications from text area)
+  const technicalSpecsString = typeof attributes.specifications === 'string' ? attributes.specifications : null;
+  
+  // Build specifications object from both sources
+  const specifications: Record<string, string> = {};
+  
+  // Add object-based specifications if available
+  if (typeof rawSpecifications === 'object' && rawSpecifications !== null) {
+    Object.entries(rawSpecifications).forEach(([key, value]) => {
+      if (value) specifications[key] = String(value);
+    });
+  }
+  
+  // Add key attributes as specifications
+  if (attributes.model) specifications[isRTL ? 'مدل' : 'Model'] = String(attributes.model);
+  if (attributes.productionYear) specifications[isRTL ? 'سال تولید' : 'Year'] = String(attributes.productionYear);
+  if (attributes.hasWarranty) specifications[isRTL ? 'گارانتی' : 'Warranty'] = attributes.warrantyDuration ? String(attributes.warrantyDuration) : (isRTL ? 'دارد' : 'Yes');
+  if (attributes.color) specifications[isRTL ? 'رنگ' : 'Color'] = String(attributes.color);
+  if (attributes.material) specifications[isRTL ? 'جنس' : 'Material'] = String(attributes.material);
+  if (attributes.fabric) specifications[isRTL ? 'پارچه' : 'Fabric'] = String(attributes.fabric);
+  if (attributes.gender) specifications[isRTL ? 'جنسیت' : 'Gender'] = String(attributes.gender);
+  if (attributes.dimensions) specifications[isRTL ? 'ابعاد' : 'Dimensions'] = String(attributes.dimensions);
+  if (attributes.weight) specifications[isRTL ? 'وزن' : 'Weight'] = String(attributes.weight);
+  if (attributes.volume) specifications[isRTL ? 'حجم' : 'Volume'] = String(attributes.volume);
+  if (attributes.skinType) specifications[isRTL ? 'نوع پوست' : 'Skin Type'] = String(attributes.skinType);
+  if (attributes.sportType) specifications[isRTL ? 'نوع ورزش' : 'Sport Type'] = String(attributes.sportType);
+  if (attributes.ageRange) specifications[isRTL ? 'رده سنی' : 'Age Range'] = String(attributes.ageRange);
+  if (attributes.countryOfOrigin) specifications[isRTL ? 'کشور سازنده' : 'Country of Origin'] = String(attributes.countryOfOrigin);
+  
   const stockPerSize = product.metadata?.stockPerSize || {};
   const videoUrl = product.metadata?.videoUrl;
 
@@ -609,7 +642,7 @@ const ProductDetail = () => {
             >
               {isRTL ? 'توضیحات' : 'Description'}
             </TabsTrigger>
-            {Object.keys(specifications).length > 0 && (
+            {(Object.keys(specifications).length > 0 || technicalSpecsString) && (
               <TabsTrigger
                 value="specifications"
                 className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
@@ -635,16 +668,29 @@ const ProductDetail = () => {
             </div>
           </TabsContent>
 
-          {Object.keys(specifications).length > 0 && (
+          {(Object.keys(specifications).length > 0 || technicalSpecsString) && (
             <TabsContent value="specifications" className="pt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {Object.entries(specifications).map(([key, value]) => (
-                  <div key={key} className="flex justify-between p-3 bg-muted/50 rounded-lg border border-border">
-                    <span className="text-muted-foreground">{key}</span>
-                    <span className="font-medium">{String(value)}</span>
-                  </div>
-                ))}
-              </div>
+              {/* Technical Specifications from textarea */}
+              {technicalSpecsString && (
+                <div className="mb-6 p-4 bg-muted/50 rounded-lg border border-border">
+                  <h4 className="font-medium mb-3">{isRTL ? 'مشخصات فنی' : 'Technical Specifications'}</h4>
+                  <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
+                    {technicalSpecsString}
+                  </p>
+                </div>
+              )}
+              
+              {/* Key-value specifications */}
+              {Object.keys(specifications).length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {Object.entries(specifications).map(([key, value]) => (
+                    <div key={key} className="flex justify-between p-3 bg-muted/50 rounded-lg border border-border">
+                      <span className="text-muted-foreground">{key}</span>
+                      <span className="font-medium">{String(value)}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </TabsContent>
           )}
 
