@@ -248,9 +248,9 @@ const BuyerOrders = () => {
     return <Badge variant={statusConfig.variant}>{isRTL ? statusConfig.labelFa : statusConfig.label}</Badge>;
   };
 
-  const getCurrencySymbol = (currency: string) => {
-    return currency === "USD" ? "$" : "؋";
-  };
+  const getCurrencySymbol = (currency: string) => (currency === "USD" ? "$" : "؋");
+  const afnSymbol = isRTL ? "؋" : "AFN";
+
 
   const getSellerName = (sellerId: string, sellerPolicies: SellerPolicy[] | null) => {
     const policy = sellerPolicies?.find((p) => p.seller_id === sellerId);
@@ -414,10 +414,10 @@ const BuyerOrders = () => {
                     </div>
                     <div className="text-right">
                       <p className="text-lg font-bold text-primary">
-                        {order.total.toLocaleString()}{" "}
-                        {order.seller_orders?.[0]?.currency === "USD" ? "$" : isRTL ? "؋" : "AFN"}
+                        {order.total.toLocaleString()} {afnSymbol}
                       </p>
                       <p className="text-sm text-muted-foreground">
+
                         {order.order_items.length} {isRTL ? "محصول" : "items"}
                       </p>
                     </div>
@@ -596,10 +596,10 @@ const BuyerOrders = () => {
                                         <Truck className="w-3 h-3" />
                                         {isRTL ? "هزینه ارسال" : "Delivery fee"}
                                         <span className="font-medium text-foreground">
-                                          {sellerOrder?.delivery_fee?.toLocaleString() || 0}{" "}
-                                          {sellerOrder?.currency === "USD" ? "$" : isRTL ? "؋" : "AFN"}
+                                          {sellerOrder?.delivery_fee?.toLocaleString() || 0} {afnSymbol}
                                         </span>
                                       </p>
+
                                       <p className="font-semibold text-sm">
                                         {item.total_price.toLocaleString()}{" "}
                                         {sellerOrder?.currency === "USD" ? "$" : isRTL ? "؋" : "AFN"}
@@ -645,8 +645,7 @@ const BuyerOrders = () => {
                           <div className="flex justify-between">
                             <span className="text-muted-foreground">{isRTL ? "جمع محصولات" : "Subtotal"}</span>
                             <span>
-                              {order.subtotal.toLocaleString()}{" "}
-                              {order.seller_orders?.[0]?.currency === "USD" ? "$" : isRTL ? "؋" : "AFN"}
+                              {order.subtotal.toLocaleString()} {afnSymbol}
                             </span>
                           </div>
                           <div className="flex justify-between">
@@ -655,16 +654,14 @@ const BuyerOrders = () => {
                               {isRTL ? "هزینه ارسال" : "Shipping"}
                             </span>
                             <span>
-                              {order.shipping_cost.toLocaleString()}{" "}
-                              {order.seller_orders?.[0]?.currency === "USD" ? "$" : isRTL ? "؋" : "AFN"}
+                              {order.shipping_cost.toLocaleString()} {afnSymbol}
                             </span>
                           </div>
                           {order.discount > 0 && (
                             <div className="flex justify-between text-green-600">
                               <span>{isRTL ? "تخفیف" : "Discount"}</span>
                               <span>
-                                -{order.discount.toLocaleString()}{" "}
-                                {order.seller_orders?.[0]?.currency === "USD" ? "$" : isRTL ? "؋" : "AFN"}
+                                -{order.discount.toLocaleString()} {afnSymbol}
                               </span>
                             </div>
                           )}
@@ -672,10 +669,10 @@ const BuyerOrders = () => {
                           <div className="flex justify-between font-bold text-base">
                             <span>{isRTL ? "مجموع" : "Total"}</span>
                             <span className="text-primary">
-                              {order.total.toLocaleString()}{" "}
-                              {order.seller_orders?.[0]?.currency === "USD" ? "$" : isRTL ? "؋" : "AFN"}
+                              {order.total.toLocaleString()} {afnSymbol}
                             </span>
                           </div>
+
                           <div className="flex justify-between text-xs text-muted-foreground pt-2">
                             <span>{isRTL ? "روش پرداخت" : "Payment Method"}</span>
                             <span>
