@@ -645,7 +645,8 @@ const BuyerOrders = () => {
                           <div className="flex justify-between">
                             <span className="text-muted-foreground">{isRTL ? "جمع محصولات" : "Subtotal"}</span>
                             <span>
-                              {order.subtotal.toLocaleString()} {isRTL ? "؋" : "AFN"}
+                              {order.subtotal.toLocaleString()}{" "}
+                              {order.seller_orders?.[0]?.currency === "USD" ? "$" : isRTL ? "؋" : "AFN"}
                             </span>
                           </div>
                           <div className="flex justify-between">
@@ -654,14 +655,16 @@ const BuyerOrders = () => {
                               {isRTL ? "هزینه ارسال" : "Shipping"}
                             </span>
                             <span>
-                              {order.shipping_cost.toLocaleString()} {isRTL ? "؋" : "AFN"}
+                              {order.shipping_cost.toLocaleString()}{" "}
+                              {order.seller_orders?.[0]?.currency === "USD" ? "$" : isRTL ? "؋" : "AFN"}
                             </span>
                           </div>
                           {order.discount > 0 && (
                             <div className="flex justify-between text-green-600">
                               <span>{isRTL ? "تخفیف" : "Discount"}</span>
                               <span>
-                                -{order.discount.toLocaleString()} {isRTL ? "؋" : "AFN"}
+                                -{order.discount.toLocaleString()}{" "}
+                                {order.seller_orders?.[0]?.currency === "USD" ? "$" : isRTL ? "؋" : "AFN"}
                               </span>
                             </div>
                           )}
@@ -669,7 +672,8 @@ const BuyerOrders = () => {
                           <div className="flex justify-between font-bold text-base">
                             <span>{isRTL ? "مجموع" : "Total"}</span>
                             <span className="text-primary">
-                              {order.total.toLocaleString()} {isRTL ? "؋" : "AFN"}
+                              {order.total.toLocaleString()}{" "}
+                              {order.seller_orders?.[0]?.currency === "USD" ? "$" : isRTL ? "؋" : "AFN"}
                             </span>
                           </div>
                           <div className="flex justify-between text-xs text-muted-foreground pt-2">
