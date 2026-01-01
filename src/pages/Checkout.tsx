@@ -418,7 +418,7 @@ const Checkout = () => {
         sellerOrder.items.push(item);
       });
 
-      // Insert seller orders
+      // Insert seller orders - delivery fee is always in AFN
       const sellerOrdersToInsert = Array.from(sellerOrdersMap.values()).map((so, index) => ({
         order_id: order.id,
         seller_id: so.sellerId,
@@ -427,7 +427,7 @@ const Checkout = () => {
         subtotal: so.subtotal,
         delivery_fee: so.deliveryFee,
         total: so.subtotal + so.deliveryFee,
-        currency: so.currency,
+        currency: 'AFN', // Delivery fee is always in AFN regardless of product currency
         shipping_address: { ...addressForm } as unknown as Json,
         buyer_name: addressForm.name,
         buyer_phone: addressForm.phone,
