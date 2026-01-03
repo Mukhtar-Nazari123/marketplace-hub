@@ -25,11 +25,7 @@ const HeroSection = () => {
             />
 
             {/* Content Container */}
-            <div
-              className={`absolute right-10 top-1/2 -translate-y-1/2
-                p-4 lg:p-6 flex flex-col justify-center max-w-md
-                ${isRTL ? "items-end text-right" : "items-start text-left"}`}
-            >
+            <div className={`relative z-10 h-full flex items-center ${isRTL ? "justify-center" : "justify-start"}`}>
               {/* Floating Product Image - positioned absolutely */}
               <div
                 className={`absolute top-1/2 -translate-y-1/2 ${isRTL ? "left-8 lg:left-16" : "right-8 lg:right-16"}`}
@@ -41,7 +37,7 @@ const HeroSection = () => {
 
               {/* Text Content */}
               <div
-                className={`p-4 lg:p-6 flex flex-col justify-center max-w-md ${isRTL ? "items-end text-right me-4 lg:me-4" : "items-start text-left"}`}
+                className={`p-8 lg:p-12 flex flex-col justify-center max-w-md ${isRTL ? "items-end text-right me-8 lg:me-16" : "items-start text-left"}`}
               >
                 <Badge variant="sale" className="w-fit mb-4 text-sm px-4 py-1">
                   {t.hero.sale}
