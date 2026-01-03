@@ -44,9 +44,10 @@ const HeroSection = () => {
 
               {/* RIGHT: Text Content */}
               <div
-                className={`max-w-md p-6 lg:p-8 flex flex-col justify-center
-                ${isRTL ? "items-start text-right" : "items-start text-left"}`}
+                className={`max-w-md p-4 lg:p-8 flex flex-col justify-center text-center lg:text-left
+                ${isRTL ? "lg:items-end lg:text-right" : "lg:items-start lg:text-left"}`}
               >
+
                 <Badge variant="sale" className="w-fit mb-4 text-sm px-4 py-1">
                   {t.hero.sale}
                 </Badge>
