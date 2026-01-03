@@ -27,7 +27,7 @@ const HeroSection = () => {
             {/* Content Container */}
             <div
               className={`relative z-10 h-full flex items-center justify-between px-8 lg:px-16
-                ${isRTL ? "flex-row" : "flex-row-reverse"}`}
+              ${isRTL ? "flex-row-reverse" : "flex-row"}`}
             >
               {/* LEFT: Headphones */}
               <div className="flex-shrink-0">
