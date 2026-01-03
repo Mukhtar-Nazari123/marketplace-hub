@@ -22,6 +22,7 @@ import {
   BadgeCheck,
   Image,
   Tag,
+  LayoutGrid,
   FileText,
   Settings,
   LogOut,
@@ -58,6 +59,7 @@ export const AdminSidebar = () => {
   const contentNavItems = [
     { title: t.admin.banners.title, icon: Image, url: '/dashboard/banners' },
     { title: t.admin.promotions.title, icon: Tag, url: '/dashboard/promotions' },
+    { title: isRTL ? 'کارت‌های تبلیغاتی' : 'Promo Cards', icon: LayoutGrid, url: '/dashboard/promo-cards' },
     { title: t.admin.cms.title, icon: FileText, url: '/dashboard/cms' },
   ];
 

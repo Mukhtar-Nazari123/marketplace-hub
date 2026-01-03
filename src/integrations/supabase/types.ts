@@ -453,6 +453,87 @@ export type Database = {
         }
         Relationships: []
       }
+      promo_cards: {
+        Row: {
+          badge_text: string | null
+          badge_text_fa: string | null
+          badge_variant: string
+          category_id: string | null
+          color_theme: string
+          created_at: string
+          currency: string
+          id: string
+          image_url: string | null
+          is_active: boolean
+          link_url: string | null
+          product_id: string | null
+          sort_order: number
+          starting_price: number
+          subtitle: string | null
+          subtitle_fa: string | null
+          title: string
+          title_fa: string | null
+          updated_at: string
+        }
+        Insert: {
+          badge_text?: string | null
+          badge_text_fa?: string | null
+          badge_variant?: string
+          category_id?: string | null
+          color_theme?: string
+          created_at?: string
+          currency?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          link_url?: string | null
+          product_id?: string | null
+          sort_order?: number
+          starting_price?: number
+          subtitle?: string | null
+          subtitle_fa?: string | null
+          title: string
+          title_fa?: string | null
+          updated_at?: string
+        }
+        Update: {
+          badge_text?: string | null
+          badge_text_fa?: string | null
+          badge_variant?: string
+          category_id?: string | null
+          color_theme?: string
+          created_at?: string
+          currency?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          link_url?: string | null
+          product_id?: string | null
+          sort_order?: number
+          starting_price?: number
+          subtitle?: string | null
+          subtitle_fa?: string | null
+          title?: string
+          title_fa?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promo_cards_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "promo_cards_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       promotions: {
         Row: {
           applies_to: string
