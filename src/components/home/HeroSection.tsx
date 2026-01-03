@@ -36,7 +36,7 @@ const HeroSection = () => {
             >
 
               {/* LEFT: Headphones */}
-              <div className="flex-shrink-0">
+              <div className="flex-shrink-0 mb-6 lg:mb-0">
                 <div className="w-48 h-48 lg:w-72 lg:h-72 rounded-full bg-gradient-to-br from-cyan/30 to-orange/30 flex items-center justify-center animate-float opacity-80">
                   <Headphones className="w-24 h-24 lg:w-36 lg:h-36 text-background/50" />
                 </div>
