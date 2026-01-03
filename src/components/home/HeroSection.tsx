@@ -39,7 +39,7 @@ const HeroSection = () => {
               {/* RIGHT: Text Content */}
               <div
                 className={`max-w-md p-8 lg:p-12 flex flex-col justify-center
-                ${isRTL ? "items-start text-right" : "items-start text-left"}`}
+                ${isRTL ? "items-end text-right" : "items-start text-left"}`}
               >
                 <Badge variant="sale" className="w-fit mb-4 text-sm px-4 py-1">
                   {t.hero.sale}
