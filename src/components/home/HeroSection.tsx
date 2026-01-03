@@ -25,20 +25,18 @@ const HeroSection = () => {
             />
 
             {/* Content Container */}
-            <div className={`relative z-10 h-full flex items-center justify-end`}>
-              {/* Floating Product Image - positioned absolutely */}
-              <div
-                className={`absolute top-1/2 -translate-y-1/2 ${isRTL ? "left-8 lg:left-16" : "right-8 lg:right-16"}`}
-              >
+            <div className="relative z-10 h-full flex items-center justify-between px-8 lg:px-16">
+              {/* LEFT: Headphones */}
+              <div className="flex-shrink-0">
                 <div className="w-48 h-48 lg:w-72 lg:h-72 rounded-full bg-gradient-to-br from-cyan/30 to-orange/30 flex items-center justify-center animate-float opacity-80">
                   <Headphones className="w-24 h-24 lg:w-36 lg:h-36 text-background/50" />
                 </div>
               </div>
 
-              {/* Text Content */}
+              {/* RIGHT: Text Content */}
               <div
-                className={`p-8 lg:p-12 flex flex-col justify-center max-w-md
-                  ${isRTL ? "items-end text-right" : "items-start text-left"}`}
+                className={`max-w-md p-8 lg:p-12 flex flex-col justify-center
+                ${isRTL ? "items-end text-right" : "items-start text-left"}`}
               >
                 <Badge variant="sale" className="w-fit mb-4 text-sm px-4 py-1">
                   {t.hero.sale}
@@ -55,7 +53,9 @@ const HeroSection = () => {
                 <Button variant="orange" size="xl" className="w-fit group">
                   {t.hero.shopNow}
                   <ArrowLeft
-                    className={`h-5 w-5 transition-transform ${isRTL ? "group-hover:-translate-x-1" : "group-hover:translate-x-1 rotate-180"}`}
+                    className={`h-5 w-5 transition-transform ${
+                      isRTL ? "group-hover:-translate-x-1" : "group-hover:translate-x-1 rotate-180"
+                    }`}
                   />
                 </Button>
               </div>
