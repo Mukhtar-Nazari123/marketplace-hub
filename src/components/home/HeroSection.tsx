@@ -2,9 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Headphones } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
+import { usePromoCards } from "@/hooks/usePromoCards";
+import PromoCard from "./PromoCard";
+import PromoCardSkeleton from "./PromoCardSkeleton";
 
 const HeroSection = () => {
   const { t, isRTL } = useLanguage();
+  const { promoCards, loading } = usePromoCards();
 
   return (
     <section className="relative overflow-hidden">
@@ -65,52 +69,23 @@ const HeroSection = () => {
             </div>
           </div>
 
-          {/* Side Banners */}
+          {/* Side Banners - Dynamic from Database */}
           <div className="flex flex-col gap-6">
-            {/* Banner 1 */}
-            <div className="relative rounded-xl overflow-hidden bg-gradient-to-br from-cyan/10 to-cyan/5 p-6 flex-1 hover-lift animate-slide-in-left stagger-1">
-              <div className="absolute top-0 left-0 w-20 h-20 bg-cyan/20 rounded-full blur-2xl" />
-              <Badge variant="new" className="mb-2">
-                {t.hero.nowAvailable}
-              </Badge>
-              <h3 className="font-display font-bold text-lg text-foreground mb-1">
-                {t.hero.topSelling} <span className="text-cyan">iMAC</span>
-              </h3>
-              <p className="text-muted-foreground text-sm mb-2">{t.hero.latestGeneration}</p>
-              <p className="text-2xl font-bold text-cyan">
-                {t.hero.startingFrom} <span className="text-foreground">$399</span>
-              </p>
-            </div>
-
-            {/* Banner 2 */}
-            <div className="relative rounded-xl overflow-hidden bg-gradient-to-br from-orange/10 to-orange/5 p-6 flex-1 hover-lift animate-slide-in-left stagger-2">
-              <div className="absolute top-0 left-0 w-20 h-20 bg-orange/20 rounded-full blur-2xl" />
-              <Badge variant="sale" className="mb-2">
-                {t.hero.nowAvailable}
-              </Badge>
-              <h3 className="font-display font-bold text-lg text-foreground mb-1">
-                {t.hero.topSelling} <span className="text-orange">{t.hero.kitchenEssentials}</span>
-              </h3>
-              <p className="text-muted-foreground text-sm mb-2">{t.hero.kitchenEssentials}</p>
-              <p className="text-2xl font-bold text-orange">
-                {t.hero.startingFrom} <span className="text-foreground">$199</span>
-              </p>
-            </div>
-
-            {/* Banner 3 */}
-            <div className="relative rounded-xl overflow-hidden bg-gradient-to-br from-cyan/10 to-cyan/5 p-6 flex-1 hover-lift animate-slide-in-left stagger-3">
-              <div className="absolute top-0 left-0 w-20 h-20 bg-cyan/20 rounded-full blur-2xl" />
-              <Badge variant="new" className="mb-2">
-                {t.hero.nowAvailable}
-              </Badge>
-              <h3 className="font-display font-bold text-lg text-foreground mb-1">
-                {t.hero.topSelling} <span className="text-cyan">{t.hero.mustHaveGadgets}</span>
-              </h3>
-              <p className="text-muted-foreground text-sm mb-2">{t.hero.mustHaveGadgets}</p>
-              <p className="text-2xl font-bold text-cyan">
-                {t.hero.startingFrom} <span className="text-foreground">$99</span>
-              </p>
-            </div>
+            {loading ? (
+              <>
+                <PromoCardSkeleton />
+                <PromoCardSkeleton />
+                <PromoCardSkeleton />
+              </>
+            ) : promoCards.length === 0 ? (
+              <div className="flex items-center justify-center h-full text-muted-foreground">
+                {isRTL ? 'کارت تبلیغاتی وجود ندارد' : 'No promotions available'}
+              </div>
+            ) : (
+              promoCards.map((card, index) => (
+                <PromoCard key={card.id} card={card} index={index} />
+              ))
+            )}
           </div>
         </div>
       </div>
