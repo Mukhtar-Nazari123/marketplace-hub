@@ -32,7 +32,7 @@ const HeroSection = () => {
             <div
               className={`relative z-10 h-full flex flex-col lg:flex-row items-center
               justify-center lg:justify-between px-6 lg:px-16
-              flex-row-reverse}
+              flex-row-reverse'}
             >
 
               {/* LEFT: Headphones */}
