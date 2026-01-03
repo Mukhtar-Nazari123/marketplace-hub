@@ -25,7 +25,10 @@ const HeroSection = () => {
             />
 
             {/* Content Container */}
-            <div className="relative z-10 h-full flex items-center justify-between px-8 lg:px-16">
+            <div
+              className={`relative z-10 h-full flex items-center justify-between px-8 lg:px-16
+                ${isRTL ? "flex-row" : "flex-row-reverse"}`}
+            >
               {/* LEFT: Headphones */}
               <div className="flex-shrink-0">
                 <div className="w-48 h-48 lg:w-72 lg:h-72 rounded-full bg-gradient-to-br from-cyan/30 to-orange/30 flex items-center justify-center animate-float opacity-80">
