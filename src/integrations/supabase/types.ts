@@ -326,6 +326,7 @@ export type Database = {
           billing_address: Json | null
           buyer_id: string
           created_at: string
+          currency: string
           discount: number
           id: string
           notes: string | null
@@ -345,6 +346,7 @@ export type Database = {
           billing_address?: Json | null
           buyer_id: string
           created_at?: string
+          currency?: string
           discount?: number
           id?: string
           notes?: string | null
@@ -364,6 +366,7 @@ export type Database = {
           billing_address?: Json | null
           buyer_id?: string
           created_at?: string
+          currency?: string
           discount?: number
           id?: string
           notes?: string | null

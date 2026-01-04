@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { OrderItemReview } from "@/components/reviews/OrderItemReview";
+import { formatCurrency } from "@/lib/currencyFormatter";
 import {
   Package,
   MapPin,
@@ -22,7 +23,6 @@ import {
   XCircle,
   AlertCircle,
   Store,
-  DollarSign,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -89,6 +89,7 @@ interface Order {
   discount: number;
   tax: number;
   total: number;
+  currency: string;
   shipping_address: ShippingAddress | null;
   seller_policies: SellerPolicy[] | null;
   created_at: string;
@@ -247,10 +248,6 @@ const BuyerOrders = () => {
 
     return <Badge variant={statusConfig.variant}>{isRTL ? statusConfig.labelFa : statusConfig.label}</Badge>;
   };
-
-  const getCurrencySymbol = (currency: string) => (currency === "USD" ? "$" : "؋");
-  const afnSymbol = isRTL ? "؋" : "AFN";
-
 
   const getSellerName = (sellerId: string, sellerPolicies: SellerPolicy[] | null) => {
     const policy = sellerPolicies?.find((p) => p.seller_id === sellerId);
@@ -414,7 +411,7 @@ const BuyerOrders = () => {
                     </div>
                     <div className="text-right">
                       <p className="text-lg font-bold text-primary">
-                        {order.total.toLocaleString()} {afnSymbol}
+                        {formatCurrency(order.total, order.currency, isRTL)}
                       </p>
                       <p className="text-sm text-muted-foreground">
 
@@ -456,8 +453,7 @@ const BuyerOrders = () => {
                                     <div className="flex items-center gap-2">
                                       {getStatusBadge(sellerOrder.status)}
                                       <span className="font-semibold">
-                                        {getCurrencySymbol(sellerOrder.currency)}
-                                        {sellerOrder.total.toLocaleString()}
+                                        {formatCurrency(sellerOrder.total, sellerOrder.currency, isRTL)}
                                       </span>
                                     </div>
                                   </div>
@@ -577,8 +573,7 @@ const BuyerOrders = () => {
                                   <div className="flex-1 min-w-0">
                                     <p className="font-medium truncate text-sm">{item.product_name}</p>
                                     <p className="text-xs text-muted-foreground">
-                                      {item.quantity} × {item.unit_price.toLocaleString()}{" "}
-                                      {sellerOrder?.currency === "USD" ? "$" : isRTL ? "؋" : "AFN"}
+                                      {item.quantity} × {formatCurrency(item.unit_price, sellerOrder?.currency || order.currency, isRTL)}
                                     </p>
                                   </div>
                                   <div className="flex items-center gap-3">
@@ -596,13 +591,12 @@ const BuyerOrders = () => {
                                         <Truck className="w-3 h-3" />
                                         {isRTL ? "هزینه ارسال" : "Delivery fee"}
                                         <span className="font-medium text-foreground">
-                                          {sellerOrder?.delivery_fee?.toLocaleString() || 0} {afnSymbol}
+                                          {formatCurrency(sellerOrder?.delivery_fee || 0, sellerOrder?.currency || order.currency, isRTL)}
                                         </span>
                                       </p>
 
                                       <p className="font-semibold text-sm">
-                                        {item.total_price.toLocaleString()}{" "}
-                                        {sellerOrder?.currency === "USD" ? "$" : isRTL ? "؋" : "AFN"}
+                                        {formatCurrency(item.total_price, sellerOrder?.currency || order.currency, isRTL)}
                                       </p>
                                     </div>
                                   </div>
@@ -645,7 +639,7 @@ const BuyerOrders = () => {
                           <div className="flex justify-between">
                             <span className="text-muted-foreground">{isRTL ? "جمع محصولات" : "Subtotal"}</span>
                             <span>
-                              {order.subtotal.toLocaleString()} {afnSymbol}
+                              {formatCurrency(order.subtotal, order.currency, isRTL)}
                             </span>
                           </div>
                           <div className="flex justify-between">
@@ -654,14 +648,14 @@ const BuyerOrders = () => {
                               {isRTL ? "هزینه ارسال" : "Shipping"}
                             </span>
                             <span>
-                              {order.shipping_cost.toLocaleString()} {afnSymbol}
+                              {formatCurrency(order.shipping_cost, order.currency, isRTL)}
                             </span>
                           </div>
                           {order.discount > 0 && (
                             <div className="flex justify-between text-green-600">
                               <span>{isRTL ? "تخفیف" : "Discount"}</span>
                               <span>
-                                -{order.discount.toLocaleString()} {afnSymbol}
+                                -{formatCurrency(order.discount, order.currency, isRTL)}
                               </span>
                             </div>
                           )}
@@ -669,7 +663,7 @@ const BuyerOrders = () => {
                           <div className="flex justify-between font-bold text-base">
                             <span>{isRTL ? "مجموع" : "Total"}</span>
                             <span className="text-primary">
-                              {order.total.toLocaleString()} {afnSymbol}
+                              {formatCurrency(order.total, order.currency, isRTL)}
                             </span>
                           </div>
 
