@@ -207,6 +207,66 @@ export type Database = {
         }
         Relationships: []
       }
+      hero_banners: {
+        Row: {
+          background_image: string | null
+          badge_text: string | null
+          badge_text_fa: string | null
+          created_at: string
+          cta_link: string | null
+          cta_text: string | null
+          cta_text_fa: string | null
+          description: string | null
+          description_fa: string | null
+          display_order: number
+          highlight_words: string[] | null
+          icon_image: string | null
+          id: string
+          is_active: boolean
+          title: string
+          title_fa: string | null
+          updated_at: string
+        }
+        Insert: {
+          background_image?: string | null
+          badge_text?: string | null
+          badge_text_fa?: string | null
+          created_at?: string
+          cta_link?: string | null
+          cta_text?: string | null
+          cta_text_fa?: string | null
+          description?: string | null
+          description_fa?: string | null
+          display_order?: number
+          highlight_words?: string[] | null
+          icon_image?: string | null
+          id?: string
+          is_active?: boolean
+          title: string
+          title_fa?: string | null
+          updated_at?: string
+        }
+        Update: {
+          background_image?: string | null
+          badge_text?: string | null
+          badge_text_fa?: string | null
+          created_at?: string
+          cta_link?: string | null
+          cta_text?: string | null
+          cta_text_fa?: string | null
+          description?: string | null
+          description_fa?: string | null
+          display_order?: number
+          highlight_words?: string[] | null
+          icon_image?: string | null
+          id?: string
+          is_active?: boolean
+          title?: string
+          title_fa?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           created_at: string

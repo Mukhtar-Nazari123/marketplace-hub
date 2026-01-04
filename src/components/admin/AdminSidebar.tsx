@@ -21,6 +21,7 @@ import {
   ShoppingCart,
   BadgeCheck,
   Image,
+  Monitor,
   Tag,
   LayoutGrid,
   FileText,
@@ -57,6 +58,7 @@ export const AdminSidebar = () => {
   ];
 
   const contentNavItems = [
+    { title: isRTL ? 'بنرهای هیرو' : 'Hero Banners', icon: Monitor, url: '/dashboard/hero-banners' },
     { title: t.admin.banners.title, icon: Image, url: '/dashboard/banners' },
     { title: t.admin.promotions.title, icon: Tag, url: '/dashboard/promotions' },
     { title: isRTL ? 'کارت‌های تبلیغاتی' : 'Promo Cards', icon: LayoutGrid, url: '/dashboard/promo-cards' },
