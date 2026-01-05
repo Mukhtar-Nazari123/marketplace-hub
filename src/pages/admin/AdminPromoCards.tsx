@@ -9,11 +9,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Pencil, Trash2, GripVertical, LayoutGrid } from 'lucide-react';
+import { Plus, Pencil, Trash2, LayoutGrid } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n';
 import { usePromoCards, type PromoCard } from '@/hooks/usePromoCards';
 import { useCategories } from '@/hooks/useCategories';
 import { toast } from 'sonner';
+import ImageUpload from '@/components/admin/ImageUpload';
 
 const AdminPromoCards = () => {
   const { t, direction, isRTL } = useLanguage();
@@ -34,6 +35,7 @@ const AdminPromoCards = () => {
     color_theme: 'cyan',
     category_id: '',
     link_url: '',
+    image_url: '',
     is_active: true,
     sort_order: 0,
   });
@@ -54,6 +56,7 @@ const AdminPromoCards = () => {
       color_theme: 'cyan',
       category_id: '',
       link_url: '',
+      image_url: '',
       is_active: true,
       sort_order: promoCards.length + 1,
     });
@@ -76,6 +79,7 @@ const AdminPromoCards = () => {
         color_theme: card.color_theme,
         category_id: card.category_id || '',
         link_url: card.link_url || '',
+        image_url: card.image_url || '',
         is_active: card.is_active,
         sort_order: card.sort_order,
       });
@@ -96,8 +100,8 @@ const AdminPromoCards = () => {
         badge_text: formData.badge_text || null,
         badge_text_fa: formData.badge_text_fa || null,
         link_url: formData.link_url || null,
+        image_url: formData.image_url || null,
         product_id: null,
-        image_url: null,
       };
 
       if (editingCard) {
@@ -335,6 +339,16 @@ const AdminPromoCards = () => {
                       </div>
                     </div>
 
+                    <div className="space-y-2">
+                      <ImageUpload
+                        label={isRTL ? 'تصویر پس‌زمینه' : 'Background Image'}
+                        value={formData.image_url}
+                        onChange={(url) => setFormData(prev => ({ ...prev, image_url: url }))}
+                        placeholder={isRTL ? 'آپلود تصویر' : 'Upload background image'}
+                        folder="promo-cards"
+                      />
+                    </div>
+
                     <div className="flex items-center space-x-2 rtl:space-x-reverse">
                       <Switch 
                         checked={formData.is_active}
@@ -396,10 +410,7 @@ const AdminPromoCards = () => {
                   {promoCards.map((card) => (
                     <TableRow key={card.id}>
                       <TableCell>
-                        <div className="flex items-center gap-2">
-                          <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab" />
-                          {card.sort_order}
-                        </div>
+                        {card.sort_order}
                       </TableCell>
                       <TableCell>
                         <div>
