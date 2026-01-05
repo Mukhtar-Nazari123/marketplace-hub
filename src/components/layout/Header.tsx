@@ -28,7 +28,7 @@ const Header = () => {
   const { theme, setTheme } = useTheme();
 
   const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
+    setTheme(theme === "dark" ? "light" : "dark");
   };
   const { user, role, signOut } = useAuth();
   const { itemCount } = useCart();
@@ -38,28 +38,28 @@ const Header = () => {
   // Get dashboard link based on role
   const getDashboardLink = () => {
     // Role can be null briefly right after login; send to /dashboard which will redirect.
-    if (!role) return '/dashboard';
-    if (role === 'admin') return '/dashboard/admin';
-    if (role === 'seller') return '/dashboard/seller';
-    return '/dashboard/buyer';
+    if (!role) return "/dashboard";
+    if (role === "admin") return "/dashboard/admin";
+    if (role === "seller") return "/dashboard/seller";
+    return "/dashboard/buyer";
   };
 
   const getDashboardLabel = () => {
-    if (role === 'admin') return isRTL ? 'داشبورد مدیر' : 'Admin Dashboard';
-    if (role === 'seller') return isRTL ? 'داشبورد فروشنده' : 'Seller Dashboard';
-    if (role === 'buyer') return isRTL ? 'داشبورد خریدار' : 'Buyer Dashboard';
-    return isRTL ? 'داشبورد' : 'Dashboard';
+    if (role === "admin") return isRTL ? "داشبورد مدیر" : "Admin Dashboard";
+    if (role === "seller") return isRTL ? "داشبورد فروشنده" : "Seller Dashboard";
+    if (role === "buyer") return isRTL ? "داشبورد خریدار" : "Buyer Dashboard";
+    return isRTL ? "داشبورد" : "Dashboard";
   };
 
   const handleLogout = async () => {
     await signOut();
-    navigate('/login');
+    navigate("/login");
   };
 
   // Format cart count for RTL
   const formatCount = (count: number) => {
     if (isRTL) {
-      return count.toString().replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]);
+      return count.toString().replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[parseInt(d)]);
     }
     return count.toString();
   };
@@ -115,9 +115,11 @@ const Header = () => {
                     size="icon"
                     onClick={toggleTheme}
                     className="transition-all duration-300 hover:bg-primary/10 hover:scale-110"
-                    aria-label={theme === 'dark' ? (isRTL ? 'حالت روشن' : 'Light mode') : (isRTL ? 'حالت تاریک' : 'Dark mode')}
+                    aria-label={
+                      theme === "dark" ? (isRTL ? "حالت روشن" : "Light mode") : isRTL ? "حالت تاریک" : "Dark mode"
+                    }
                   >
-                    {theme === 'dark' ? (
+                    {theme === "dark" ? (
                       <Sun className="h-5 w-5 text-warning" />
                     ) : (
                       <Moon className="h-5 w-5 text-primary" />
@@ -125,14 +127,14 @@ const Header = () => {
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  {theme === 'dark' ? (isRTL ? 'حالت روشن' : 'Light mode') : (isRTL ? 'حالت تاریک' : 'Dark mode')}
+                  {theme === "dark" ? (isRTL ? "حالت روشن" : "Light mode") : isRTL ? "حالت تاریک" : "Dark mode"}
                 </TooltipContent>
               </Tooltip>
 
               {/* Wishlist */}
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Link to="/dashboard/wishlist">
+                  <Link to="/dashboard/buyer/wishlist">
                     <Button variant="ghost" size="icon" className="relative">
                       <Heart className="h-5 w-5" />
                       {wishlistCount > 0 && (
@@ -145,9 +147,7 @@ const Header = () => {
                     </Button>
                   </Link>
                 </TooltipTrigger>
-                <TooltipContent>
-                  {isRTL ? 'لیست علاقه‌مندی' : 'Wishlist'}
-                </TooltipContent>
+                <TooltipContent>{isRTL ? "لیست علاقه‌مندی" : "Wishlist"}</TooltipContent>
               </Tooltip>
 
               {/* Cart */}
@@ -171,9 +171,9 @@ const Header = () => {
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Link to={getDashboardLink()} className="flex">
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           className="relative transition-all duration-300 hover:bg-primary/10 hover:scale-110"
                           aria-label={getDashboardLabel()}
                         >
@@ -181,9 +181,7 @@ const Header = () => {
                         </Button>
                       </Link>
                     </TooltipTrigger>
-                    <TooltipContent>
-                      {getDashboardLabel()}
-                    </TooltipContent>
+                    <TooltipContent>{getDashboardLabel()}</TooltipContent>
                   </Tooltip>
 
                   {/* Logout Button */}
@@ -191,38 +189,34 @@ const Header = () => {
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <AlertDialogTrigger asChild>
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             className="transition-all duration-300 hover:bg-destructive/10 hover:scale-110"
-                            aria-label={isRTL ? 'خروج' : 'Logout'}
+                            aria-label={isRTL ? "خروج" : "Logout"}
                           >
                             <LogOut className="h-5 w-5 text-destructive" />
                           </Button>
                         </AlertDialogTrigger>
                       </TooltipTrigger>
-                      <TooltipContent>
-                        {isRTL ? 'خروج' : 'Logout'}
-                      </TooltipContent>
+                      <TooltipContent>{isRTL ? "خروج" : "Logout"}</TooltipContent>
                     </Tooltip>
-                    <AlertDialogContent dir={isRTL ? 'rtl' : 'ltr'}>
+                    <AlertDialogContent dir={isRTL ? "rtl" : "ltr"}>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          {isRTL ? 'خروج از حساب' : 'Logout'}
-                        </AlertDialogTitle>
+                        <AlertDialogTitle>{isRTL ? "خروج از حساب" : "Logout"}</AlertDialogTitle>
                         <AlertDialogDescription>
-                          {isRTL ? 'آیا مطمئن هستید که می‌خواهید از حساب خود خارج شوید؟' : 'Are you sure you want to logout from your account?'}
+                          {isRTL
+                            ? "آیا مطمئن هستید که می‌خواهید از حساب خود خارج شوید؟"
+                            : "Are you sure you want to logout from your account?"}
                         </AlertDialogDescription>
                       </AlertDialogHeader>
-                      <AlertDialogFooter className={isRTL ? 'flex-row-reverse gap-2' : ''}>
-                        <AlertDialogCancel>
-                          {isRTL ? 'انصراف' : 'Cancel'}
-                        </AlertDialogCancel>
-                        <AlertDialogAction 
+                      <AlertDialogFooter className={isRTL ? "flex-row-reverse gap-2" : ""}>
+                        <AlertDialogCancel>{isRTL ? "انصراف" : "Cancel"}</AlertDialogCancel>
+                        <AlertDialogAction
                           onClick={handleLogout}
                           className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         >
-                          {isRTL ? 'خروج' : 'Logout'}
+                          {isRTL ? "خروج" : "Logout"}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
