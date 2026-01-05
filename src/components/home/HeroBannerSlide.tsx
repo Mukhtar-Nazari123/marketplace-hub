@@ -29,38 +29,45 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
   };
 
   return (
-    <div className="lg:col-span-2 relative rounded-2xl overflow-hidden gradient-hero min-h-[400px] lg:min-h-[500px] animate-fade-in">
-      {/* Background image if provided */}
-      {banner.background_image && (
+    <div className="lg:col-span-2 relative rounded-2xl overflow-hidden min-h-[400px] lg:min-h-[500px] animate-fade-in">
+      {/* Background: image or gradient fallback */}
+      {banner.background_image ? (
         <img
           src={banner.background_image}
           alt=""
           className="absolute inset-0 w-full h-full object-cover"
         />
+      ) : (
+        <div className="absolute inset-0 gradient-hero" />
       )}
       
+      {/* Overlay gradient for text readability */}
       <div
-        className={`absolute inset-0 ${isRTL ? "bg-gradient-to-l from-foreground via-foreground/95 to-foreground/70" : "bg-gradient-to-r from-foreground via-foreground/95 to-foreground/70"}`}
+        className={`absolute inset-0 ${isRTL ? "bg-gradient-to-l from-foreground/95 via-foreground/80 to-foreground/40" : "bg-gradient-to-r from-foreground/95 via-foreground/80 to-foreground/40"}`}
       />
 
-      {/* Decorative Elements */}
-      <div
-        className={`absolute top-10 w-64 h-64 bg-cyan/20 rounded-full blur-3xl ${isRTL ? "right-10" : "left-10"}`}
-      />
-      <div
-        className={`absolute bottom-10 w-48 h-48 bg-orange/20 rounded-full blur-3xl ${isRTL ? "right-10" : "left-10"}`}
-      />
+      {/* Decorative Elements - only show when no background image */}
+      {!banner.background_image && (
+        <>
+          <div
+            className={`absolute top-10 w-64 h-64 bg-cyan/20 rounded-full blur-3xl ${isRTL ? "right-10" : "left-10"}`}
+          />
+          <div
+            className={`absolute bottom-10 w-48 h-48 bg-orange/20 rounded-full blur-3xl ${isRTL ? "right-10" : "left-10"}`}
+          />
+        </>
+      )}
 
       {/* Content Container */}
       <div className={`relative z-10 h-full flex items-center justify-between px-8 lg:px-16 flex-row-reverse`}>
         {/* Icon/Image */}
         <div className="flex-shrink-0">
           {banner.icon_image ? (
-            <div className="w-48 h-48 lg:w-72 lg:h-72 rounded-full bg-gradient-to-br from-cyan/30 to-orange/30 flex items-center justify-center animate-float">
+            <div className="w-48 h-48 lg:w-72 lg:h-72 rounded-full bg-gradient-to-br from-cyan/30 to-orange/30 flex items-center justify-center animate-float overflow-hidden">
               <img 
                 src={banner.icon_image} 
                 alt="" 
-                className="w-24 h-24 lg:w-36 lg:h-36 object-contain"
+                className="w-full h-full object-contain p-4"
               />
             </div>
           ) : (
