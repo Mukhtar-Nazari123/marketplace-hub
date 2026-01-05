@@ -9,9 +9,10 @@ import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit, Trash2, Image, Monitor } from 'lucide-react';
+import { Plus, Edit, Trash2, Monitor } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n';
 import { useHeroBanners, HeroBannerInput } from '@/hooks/useHeroBanners';
+import ImageUpload from '@/components/admin/ImageUpload';
 
 const AdminHeroBanners = () => {
   const { direction } = useLanguage();
@@ -223,22 +224,20 @@ const AdminHeroBanners = () => {
                           onChange={(e) => setFormData({ ...formData, cta_link: e.target.value })}
                         />
                       </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="background_image">Background Image URL</Label>
-                        <Input
-                          id="background_image"
-                          placeholder="https://example.com/image.jpg"
+                      <div className="grid grid-cols-2 gap-4">
+                        <ImageUpload
+                          label="Background Image"
                           value={formData.background_image || ''}
-                          onChange={(e) => setFormData({ ...formData, background_image: e.target.value })}
+                          onChange={(url) => setFormData({ ...formData, background_image: url })}
+                          placeholder="Upload background image"
+                          folder="hero-banners"
                         />
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor="icon_image">Icon/Product Image URL</Label>
-                        <Input
-                          id="icon_image"
-                          placeholder="https://example.com/icon.png"
+                        <ImageUpload
+                          label="Icon/Product Image"
                           value={formData.icon_image || ''}
-                          onChange={(e) => setFormData({ ...formData, icon_image: e.target.value })}
+                          onChange={(url) => setFormData({ ...formData, icon_image: url })}
+                          placeholder="Upload product image"
+                          folder="hero-banners"
                         />
                       </div>
                     </div>
