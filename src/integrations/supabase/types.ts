@@ -327,6 +327,7 @@ export type Database = {
           buyer_id: string
           created_at: string
           currency: string
+          delivery_fee_afn: number
           discount: number
           id: string
           notes: string | null
@@ -334,6 +335,7 @@ export type Database = {
           payment_method: string | null
           payment_status: string
           seller_policies: Json | null
+          settlement_currency: string
           shipping_address: Json | null
           shipping_cost: number
           status: string
@@ -349,6 +351,7 @@ export type Database = {
           buyer_id: string
           created_at?: string
           currency?: string
+          delivery_fee_afn?: number
           discount?: number
           id?: string
           notes?: string | null
@@ -356,6 +359,7 @@ export type Database = {
           payment_method?: string | null
           payment_status?: string
           seller_policies?: Json | null
+          settlement_currency?: string
           shipping_address?: Json | null
           shipping_cost?: number
           status?: string
@@ -371,6 +375,7 @@ export type Database = {
           buyer_id?: string
           created_at?: string
           currency?: string
+          delivery_fee_afn?: number
           discount?: number
           id?: string
           notes?: string | null
@@ -378,6 +383,7 @@ export type Database = {
           payment_method?: string | null
           payment_status?: string
           seller_policies?: Json | null
+          settlement_currency?: string
           shipping_address?: Json | null
           shipping_cost?: number
           status?: string

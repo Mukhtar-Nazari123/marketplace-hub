@@ -67,11 +67,16 @@ interface Order {
   status: string;
   payment_status: string;
   payment_method: string | null;
-  subtotal: number;
+  subtotal_usd: number;
+  subtotal_afn: number;
+  delivery_fee_afn: number;
+  total_usd: number;
+  total_afn: number;
   tax: number;
   shipping_cost: number;
   discount: number;
-  total: number;
+  currency: string;
+  settlement_currency: string;
   notes: string | null;
   shipping_address: ShippingAddress | null;
   billing_address: ShippingAddress | null;
@@ -350,20 +355,22 @@ const AdminOrderDetail = () => {
 
               {/* Order Summary */}
               <div className="p-4 bg-muted/30 border-t border-border space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{isRTL ? 'جمع فرعی' : 'Subtotal'}</span>
-                  <span>{formatCurrency(Number(order.subtotal), isRTL ? 'fa' : 'en')}</span>
-                </div>
-                {Number(order.shipping_cost) > 0 && (
+                {order.subtotal_usd > 0 && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">{isRTL ? 'هزینه ارسال' : 'Shipping'}</span>
-                    <span>{formatCurrency(Number(order.shipping_cost), isRTL ? 'fa' : 'en')}</span>
+                    <span className="text-muted-foreground">{isRTL ? 'جمع فرعی (USD)' : 'Subtotal (USD)'}</span>
+                    <span>${Number(order.subtotal_usd).toFixed(2)}</span>
                   </div>
                 )}
-                {Number(order.tax) > 0 && (
+                {order.subtotal_afn > 0 && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">{isRTL ? 'مالیات' : 'Tax'}</span>
-                    <span>{formatCurrency(Number(order.tax), isRTL ? 'fa' : 'en')}</span>
+                    <span className="text-muted-foreground">{isRTL ? 'جمع فرعی (AFN)' : 'Subtotal (AFN)'}</span>
+                    <span>{Number(order.subtotal_afn).toFixed(0)} AFN</span>
+                  </div>
+                )}
+                {Number(order.delivery_fee_afn) > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">{isRTL ? 'هزینه ارسال' : 'Delivery Fee'}</span>
+                    <span>{Number(order.delivery_fee_afn).toFixed(0)} AFN</span>
                   </div>
                 )}
                 {Number(order.discount) > 0 && (
@@ -373,10 +380,18 @@ const AdminOrderDetail = () => {
                   </div>
                 )}
                 <Separator />
-                <div className="flex justify-between font-bold text-lg">
-                  <span>{isRTL ? 'مجموع کل' : 'Total'}</span>
-                  <span className="text-primary">{formatCurrency(Number(order.total), isRTL ? 'fa' : 'en')}</span>
-                </div>
+                {order.total_usd > 0 && (
+                  <div className="flex justify-between font-bold text-lg">
+                    <span>{isRTL ? 'مجموع (USD)' : 'Total (USD)'}</span>
+                    <span className="text-primary">${Number(order.total_usd).toFixed(2)}</span>
+                  </div>
+                )}
+                {order.total_afn > 0 && (
+                  <div className="flex justify-between font-bold text-lg">
+                    <span>{isRTL ? 'مجموع (AFN)' : 'Total (AFN)'}</span>
+                    <span className="text-primary">{Number(order.total_afn).toFixed(0)} AFN</span>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
