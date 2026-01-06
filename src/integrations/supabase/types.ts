@@ -327,7 +327,6 @@ export type Database = {
           buyer_id: string
           created_at: string
           currency: string
-          delivery_fee_afn: number
           discount: number
           id: string
           notes: string | null
@@ -335,15 +334,12 @@ export type Database = {
           payment_method: string | null
           payment_status: string
           seller_policies: Json | null
-          settlement_currency: string
           shipping_address: Json | null
           shipping_cost: number
           status: string
-          subtotal: number
           subtotal_afn: number
           subtotal_usd: number
           tax: number
-          total: number
           total_afn: number
           total_usd: number
           updated_at: string
@@ -353,7 +349,6 @@ export type Database = {
           buyer_id: string
           created_at?: string
           currency?: string
-          delivery_fee_afn?: number
           discount?: number
           id?: string
           notes?: string | null
@@ -361,15 +356,12 @@ export type Database = {
           payment_method?: string | null
           payment_status?: string
           seller_policies?: Json | null
-          settlement_currency?: string
           shipping_address?: Json | null
           shipping_cost?: number
           status?: string
-          subtotal: number
           subtotal_afn?: number
           subtotal_usd?: number
           tax?: number
-          total: number
           total_afn?: number
           total_usd?: number
           updated_at?: string
@@ -379,7 +371,6 @@ export type Database = {
           buyer_id?: string
           created_at?: string
           currency?: string
-          delivery_fee_afn?: number
           discount?: number
           id?: string
           notes?: string | null
@@ -387,15 +378,12 @@ export type Database = {
           payment_method?: string | null
           payment_status?: string
           seller_policies?: Json | null
-          settlement_currency?: string
           shipping_address?: Json | null
           shipping_cost?: number
           status?: string
-          subtotal?: number
           subtotal_afn?: number
           subtotal_usd?: number
           tax?: number
-          total?: number
           total_afn?: number
           total_usd?: number
           updated_at?: string
