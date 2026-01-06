@@ -84,12 +84,16 @@ interface Order {
   status: string;
   payment_status: string;
   payment_method: string | null;
-  subtotal: number;
+  subtotal_usd: number;
+  subtotal_afn: number;
+  delivery_fee_afn: number;
+  total_usd: number;
+  total_afn: number;
   shipping_cost: number;
   discount: number;
   tax: number;
-  total: number;
   currency: string;
+  settlement_currency: string;
   shipping_address: ShippingAddress | null;
   seller_policies: SellerPolicy[] | null;
   created_at: string;
@@ -410,11 +414,12 @@ const BuyerOrders = () => {
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-lg font-bold text-primary">
-                        {formatCurrency(order.total, order.currency, isRTL)}
-                      </p>
+                      <div className="text-lg font-bold text-primary">
+                        {order.total_usd > 0 && <span>${order.total_usd.toFixed(2)}</span>}
+                        {order.total_usd > 0 && order.total_afn > 0 && <span className="mx-1">+</span>}
+                        {order.total_afn > 0 && <span>{order.total_afn.toFixed(0)} AFN</span>}
+                      </div>
                       <p className="text-sm text-muted-foreground">
-
                         {order.order_items.length} {isRTL ? "محصول" : "items"}
                       </p>
                     </div>
@@ -636,35 +641,41 @@ const BuyerOrders = () => {
                           {isRTL ? "خلاصه پرداخت" : "Payment Summary"}
                         </h4>
                         <div className="p-4 bg-muted/50 rounded-lg text-sm space-y-2">
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">{isRTL ? "جمع محصولات" : "Subtotal"}</span>
-                            <span>
-                              {formatCurrency(order.subtotal, order.currency, isRTL)}
-                            </span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground flex items-center gap-1">
-                              <Truck className="w-3 h-3" />
-                              {isRTL ? "هزینه ارسال" : "Shipping"}
-                            </span>
-                            <span>
-                              {formatCurrency(order.shipping_cost, order.currency, isRTL)}
-                            </span>
-                          </div>
+                          {order.subtotal_usd > 0 && (
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">{isRTL ? "جمع محصولات (USD)" : "Subtotal (USD)"}</span>
+                              <span>${order.subtotal_usd.toFixed(2)}</span>
+                            </div>
+                          )}
+                          {order.subtotal_afn > 0 && (
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">{isRTL ? "جمع محصولات (AFN)" : "Subtotal (AFN)"}</span>
+                              <span>{order.subtotal_afn.toFixed(0)} AFN</span>
+                            </div>
+                          )}
+                          {order.delivery_fee_afn > 0 && (
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground flex items-center gap-1">
+                                <Truck className="w-3 h-3" />
+                                {isRTL ? "هزینه ارسال" : "Delivery Fee"}
+                              </span>
+                              <span>{order.delivery_fee_afn.toFixed(0)} AFN</span>
+                            </div>
+                          )}
                           {order.discount > 0 && (
                             <div className="flex justify-between text-green-600">
                               <span>{isRTL ? "تخفیف" : "Discount"}</span>
-                              <span>
-                                -{formatCurrency(order.discount, order.currency, isRTL)}
-                              </span>
+                              <span>-{formatCurrency(order.discount, order.currency, isRTL)}</span>
                             </div>
                           )}
                           <Separator />
                           <div className="flex justify-between font-bold text-base">
                             <span>{isRTL ? "مجموع" : "Total"}</span>
-                            <span className="text-primary">
-                              {formatCurrency(order.total, order.currency, isRTL)}
-                            </span>
+                            <div className="text-primary">
+                              {order.total_usd > 0 && <span>${order.total_usd.toFixed(2)}</span>}
+                              {order.total_usd > 0 && order.total_afn > 0 && <span className="mx-1">+</span>}
+                              {order.total_afn > 0 && <span>{order.total_afn.toFixed(0)} AFN</span>}
+                            </div>
                           </div>
 
                           <div className="flex justify-between text-xs text-muted-foreground pt-2">

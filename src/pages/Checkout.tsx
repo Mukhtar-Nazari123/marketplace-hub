@@ -335,12 +335,20 @@ const Checkout = () => {
         shipping_policy: p.shippingPolicy,
       }));
 
-      // Calculate totals for order
-      const totalProductAmount = currencyBreakdowns.reduce((sum, cb) => sum + cb.productSubtotal, 0);
-      const totalDeliveryFees = deliveryBreakdown.totalDeliveryAFN;
-      const grandTotal = totalProductAmount + totalDeliveryFees;
+      // Calculate totals by currency
+      const usdBreakdown = currencyBreakdowns.find(cb => cb.currency === 'USD');
+      const afnBreakdown = currencyBreakdowns.find(cb => cb.currency === 'AFN');
+      
+      const subtotalUSD = usdBreakdown?.productSubtotal || 0;
+      const subtotalAFN = afnBreakdown?.productSubtotal || 0;
+      const deliveryFeeAFN = deliveryBreakdown.totalDeliveryAFN;
+      
+      // USD total = subtotal only (no delivery)
+      // AFN total = subtotal + delivery
+      const totalUSD = subtotalUSD;
+      const totalAFN = subtotalAFN + deliveryFeeAFN;
 
-      // Create main order
+      // Create main order with multi-currency fields
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert([{
@@ -349,11 +357,16 @@ const Checkout = () => {
           status: 'pending',
           payment_status: 'pending',
           payment_method: 'cash_on_delivery',
-          subtotal: totalProductAmount,
-          shipping_cost: totalDeliveryFees,
+          currency: 'AFN', // Always AFN
+          subtotal_usd: subtotalUSD,
+          subtotal_afn: subtotalAFN,
+          delivery_fee_afn: deliveryFeeAFN,
+          total_usd: totalUSD,
+          total_afn: totalAFN,
+          shipping_cost: deliveryFeeAFN, // Also store in shipping_cost for backward compatibility
           discount: 0,
           tax: 0,
-          total: grandTotal,
+          settlement_currency: subtotalUSD > 0 && subtotalAFN > 0 ? 'AFN' : (subtotalUSD > 0 ? 'USD' : 'AFN'),
           shipping_address: { ...addressForm } as unknown as Json,
           billing_address: { ...addressForm } as unknown as Json,
           seller_policies: [...policiesSnapshot] as unknown as Json,
