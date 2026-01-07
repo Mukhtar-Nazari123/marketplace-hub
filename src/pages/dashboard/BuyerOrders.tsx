@@ -656,34 +656,48 @@ const BuyerOrders = () => {
                         </h4>
                         <div className="p-4 bg-muted/50 rounded-lg text-sm space-y-2">
                           <div className="flex justify-between">
-                            <span className="text-muted-foreground">{isRTL ? "جمع محصولات (USD)" : "Subtotal (USD)"}</span>
-                            <span>{formatCurrency(order.subtotal_usd, 'USD', isRTL)}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">{isRTL ? "جمع محصولات (AFN)" : "Subtotal (AFN)"}</span>
-                            <span>{formatCurrency(order.subtotal_afn, 'AFN', isRTL)}</span>
+                            <span className="text-muted-foreground">{isRTL ? "جمع محصولات" : "Subtotal"}</span>
+                            <span>
+                              {order.subtotal_usd > 0 && order.subtotal_afn > 0 ? (
+                                <>
+                                  {formatCurrency(order.subtotal_usd, "USD", isRTL)} +{" "}
+                                  {formatCurrency(order.subtotal_afn, "AFN", isRTL)}
+                                </>
+                              ) : order.subtotal_usd > 0 ? (
+                                formatCurrency(order.subtotal_usd, "USD", isRTL)
+                              ) : (
+                                formatCurrency(order.subtotal_afn, "AFN", isRTL)
+                              )}
+                            </span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-muted-foreground flex items-center gap-1">
                               <Truck className="w-3 h-3" />
                               {isRTL ? "هزینه ارسال" : "Shipping"}
                             </span>
-                            <span>{formatCurrency(order.delivery_fee_afn, 'AFN', isRTL)}</span>
+                            <span>{formatCurrency(order.delivery_fee_afn, "AFN", isRTL)}</span>
                           </div>
                           {order.discount > 0 && (
                             <div className="flex justify-between text-green-600">
                               <span>{isRTL ? "تخفیف" : "Discount"}</span>
-                              <span>-{formatCurrency(order.discount, 'AFN', isRTL)}</span>
+                              <span>-{formatCurrency(order.discount, "AFN", isRTL)}</span>
                             </div>
                           )}
                           <Separator />
                           <div className="flex justify-between font-bold text-base">
-                            <span>{isRTL ? "مجموع (USD)" : "Total (USD)"}</span>
-                            <span>{formatCurrency(order.total_usd, 'USD', isRTL)}</span>
-                          </div>
-                          <div className="flex justify-between font-bold text-base">
-                            <span>{isRTL ? "مجموع (AFN)" : "Total (AFN)"}</span>
-                            <span className="text-primary">{formatCurrency(order.total_afn, 'AFN', isRTL)}</span>
+                            <span>{isRTL ? "مجموع" : "Total"}</span>
+                            <span className="text-primary">
+                              {order.total_usd > 0 && order.total_afn > 0 ? (
+                                <>
+                                  {formatCurrency(order.total_usd, "USD", isRTL)} +{" "}
+                                  {formatCurrency(order.total_afn, "AFN", isRTL)}
+                                </>
+                              ) : order.total_usd > 0 ? (
+                                formatCurrency(order.total_usd, "USD", isRTL)
+                              ) : (
+                                formatCurrency(order.total_afn, "AFN", isRTL)
+                              )}
+                            </span>
                           </div>
 
                           <div className="flex justify-between text-xs text-muted-foreground pt-2">
