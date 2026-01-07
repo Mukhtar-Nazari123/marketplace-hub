@@ -7,6 +7,7 @@ import { useLanguage } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/hooks/useCart";
 import { useWishlist } from "@/hooks/useWishlist";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   AlertDialog,
@@ -26,6 +27,7 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { t, isRTL } = useLanguage();
   const { theme, setTheme } = useTheme();
+  const { siteName, logoUrl } = useSiteSettings();
 
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark");
@@ -71,11 +73,19 @@ const Header = () => {
           <div className="flex items-center justify-between gap-4">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-lg bg-orange flex items-center justify-center">
-                <span className="text-accent-foreground font-bold text-xl">M</span>
-              </div>
+              {logoUrl ? (
+                <img 
+                  src={logoUrl} 
+                  alt={siteName} 
+                  className="w-10 h-10 rounded-lg object-contain"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-lg bg-orange flex items-center justify-center">
+                  <span className="text-accent-foreground font-bold text-xl">{siteName.charAt(0)}</span>
+                </div>
+              )}
               <div className="hidden sm:block">
-                <h1 className="font-display text-xl font-bold text-foreground">{isRTL ? "مارکت" : "Market"}</h1>
+                <h1 className="font-display text-xl font-bold text-foreground">{siteName}</h1>
                 <p className="text-xs text-muted-foreground -mt-1">{t.footer.onlineStore}</p>
               </div>
             </Link>
