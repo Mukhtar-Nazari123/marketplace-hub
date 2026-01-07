@@ -55,7 +55,9 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
       )}
 
       {/* Content Container */}
-      <div className={`relative z-10 h-full flex flex-col md:flex-row items-center justify-center md:justify-between px-4 sm:px-8 lg:px-16 py-6 md:py-0 gap-4 md:gap-8 ${isRTL ? "md:flex-row-reverse" : ""}`}>
+      <div
+        className={`relative z-10 h-full flex flex-col md:flex-row items-center justify-center md:justify-between px-4 sm:px-8 lg:px-16 py-6 md:py-0 gap-4 md:gap-8 flex-row-reverse ${isRTL ? "md:flex-row-reverse" : ""}`}
+      >
         {/* Icon/Image - Hidden on mobile, shown on md+ */}
         <div className="flex-shrink-0 hidden md:block">
           {banner.icon_image ? (
@@ -80,9 +82,15 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
             </Badge>
           )}
 
-          <h2 className="font-display text-2xl sm:text-3xl lg:text-5xl font-bold text-background mb-2 md:mb-4 leading-tight">{title}</h2>
+          <h2 className="font-display text-2xl sm:text-3xl lg:text-5xl font-bold text-background mb-2 md:mb-4 leading-tight">
+            {title}
+          </h2>
 
-          {description && <p className="text-background/70 mb-4 md:mb-6 text-sm sm:text-base lg:text-lg line-clamp-2 md:line-clamp-none">{description}</p>}
+          {description && (
+            <p className="text-background/70 mb-4 md:mb-6 text-sm sm:text-base lg:text-lg line-clamp-2 md:line-clamp-none">
+              {description}
+            </p>
+          )}
 
           {ctaText && (
             <Button variant="orange" size="default" className="w-fit group md:text-base" onClick={handleCtaClick}>
