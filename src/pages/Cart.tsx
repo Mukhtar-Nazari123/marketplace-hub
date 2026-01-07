@@ -67,7 +67,7 @@ const Cart = () => {
       ...item,
       currency,
       currencySymbol: getCurrencySymbol(currency),
-      originalPrice: hasDiscount ? comparePrice : null,
+      originalPrice,
       effectivePrice,
       itemTotal: effectivePrice * item.quantity,
       sellerId: product?.seller_id || 'unknown',
