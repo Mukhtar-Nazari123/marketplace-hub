@@ -584,7 +584,7 @@ const BuyerOrders = () => {
                                     <p className="font-medium truncate text-sm">{item.product_name}</p>
                                     <p className="text-xs text-muted-foreground">
                                       {item.quantity} ×{" "}
-                                      {formatCurrency(item.unit_price, sellerOrder?.currency || order.currency, isRTL)}
+                                      {formatCurrency(item.unit_price, sellerOrder?.currency || 'AFN', isRTL)}
                                     </p>
                                   </div>
                                   <div className="flex items-center gap-3">
@@ -613,7 +613,7 @@ const BuyerOrders = () => {
                                       <p className="font-semibold text-sm">
                                         {formatCurrency(
                                           item.total_price,
-                                          sellerOrder?.currency || order.currency,
+                                          sellerOrder?.currency || 'AFN',
                                           isRTL,
                                         )}
                                       </p>
