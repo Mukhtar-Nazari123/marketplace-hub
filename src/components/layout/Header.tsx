@@ -74,7 +74,7 @@ const Header = () => {
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2">
               {logoUrl ? (
-                <img src={logoUrl} alt={siteName} className="transform scale-110 w-15 h-15 rounded-lg object-contain" />
+                <img src={logoUrl} alt={siteName} className="transform scale-10 w-15 h-15 rounded-lg object-contain" />
               ) : (
                 <div className="w-10 h-10 rounded-lg bg-orange flex items-center justify-center">
                   <span className="text-accent-foreground font-bold text-xl">{siteName.charAt(0)}</span>
