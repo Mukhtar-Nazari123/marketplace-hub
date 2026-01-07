@@ -155,12 +155,12 @@ const ProductCard = ({ product, getRating }: ProductCardInternalProps) => {
 
   return (
     <div
-      className="group bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300"
+      className="group bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300 h-full flex flex-col"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Image */}
-      <div className="relative aspect-square overflow-hidden">
+      {/* Image - Fixed aspect ratio */}
+      <div className="relative aspect-square overflow-hidden flex-shrink-0">
         <Link to={`/products/${product.slug}`}>
           <img
             src={product.images[0] || '/placeholder.svg'}
@@ -205,46 +205,49 @@ const ProductCard = ({ product, getRating }: ProductCardInternalProps) => {
         </div>
       </div>
 
-      {/* Content */}
-      <div className="p-4">
-        <Link to={`/products/${product.slug}`}>
-          <h3 className="font-medium text-foreground hover:text-primary transition-colors line-clamp-2 mb-2">
+      {/* Content - Flex grow to fill remaining space */}
+      <div className="p-4 flex flex-col flex-grow">
+        {/* Name - Fixed height with truncation */}
+        <Link to={`/products/${product.slug}`} className="flex-shrink-0">
+          <h3 className="font-medium text-foreground hover:text-primary transition-colors h-11 line-clamp-2 overflow-hidden mb-2">
             {getProductName(product.name, language)}
           </h3>
         </Link>
 
-        {/* Rating */}
-        <div className="mb-2">
+        {/* Rating - Fixed height */}
+        <div className="h-5 mb-2 flex-shrink-0">
           <CompactRating rating={averageRating} reviewCount={reviewCount} size="sm" />
         </div>
 
-        {/* Price */}
-        <div className="flex items-center gap-2 flex-wrap mb-3">
+        {/* Price - Fixed height container */}
+        <div className="h-7 flex items-center gap-2 mb-3 flex-shrink-0">
           {product.originalPrice && product.originalPrice !== product.price && (
-            <span className="text-sm text-muted-foreground line-through">
+            <span className="text-sm text-muted-foreground line-through truncate">
               {product.currency === 'USD' ? '$' : ''}{product.originalPrice.toLocaleString()} {product.currency !== 'USD' ? currencySymbol : ''}
             </span>
           )}
-          <span className="text-lg font-bold text-orange">
+          <span className="text-lg font-bold text-orange truncate">
             {product.currency === 'USD' ? '$' : ''}{product.price.toLocaleString()} {product.currency !== 'USD' ? currencySymbol : ''}
           </span>
-          <Badge variant="outline" className="text-xs ml-auto">{product.currency || 'AFN'}</Badge>
+          <Badge variant="outline" className="text-xs ml-auto flex-shrink-0">{product.currency || 'AFN'}</Badge>
         </div>
 
-        {/* Add to Cart */}
-        <Button 
-          variant="cyan" 
-          size="sm" 
-          className="w-full gap-2"
-          onClick={handleAddToCart}
-          disabled={isAddingToCart}
-        >
-          <ShoppingCart size={16} className={isAddingToCart ? 'animate-pulse' : ''} />
-          {isAddingToCart 
-            ? (isRTL ? 'در حال افزودن...' : 'Adding...') 
-            : t.product.addToCart
-          }
-        </Button>
+        {/* Add to Cart - Push to bottom */}
+        <div className="mt-auto flex-shrink-0">
+          <Button 
+            variant="cyan" 
+            size="sm" 
+            className="w-full gap-2"
+            onClick={handleAddToCart}
+            disabled={isAddingToCart}
+          >
+            <ShoppingCart size={16} className={isAddingToCart ? 'animate-pulse' : ''} />
+            {isAddingToCart 
+              ? (isRTL ? 'در حال افزودن...' : 'Adding...') 
+              : t.product.addToCart
+            }
+          </Button>
+        </div>
       </div>
     </div>
   );

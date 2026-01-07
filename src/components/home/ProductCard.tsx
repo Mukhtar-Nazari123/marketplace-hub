@@ -92,7 +92,7 @@ const ProductCard = ({
 
   return (
     <div
-      className="group relative bg-card rounded-xl border border-border overflow-hidden hover-lift"
+      className="group relative bg-card rounded-xl border border-border overflow-hidden hover-lift h-full flex flex-col"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -133,8 +133,8 @@ const ProductCard = ({
         </button>
       )}
 
-      {/* Image */}
-      <Link to={`/products/${id}`}>
+      {/* Image - Fixed aspect ratio */}
+      <Link to={`/products/${id}`} className="block flex-shrink-0">
         <div className="relative aspect-square overflow-hidden">
           {image ? (
             <img src={image} alt={name} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
@@ -168,50 +168,52 @@ const ProductCard = ({
         </div>
       </Link>
 
-      {/* Content */}
-      <div className="p-4">
-        {/* Rating */}
-        <div className="mb-2">
+      {/* Content - Flex grow to fill remaining space */}
+      <div className="p-4 flex flex-col flex-grow">
+        {/* Rating - Fixed height */}
+        <div className="h-5 mb-2 flex-shrink-0">
           <CompactRating rating={rating} reviewCount={reviews} size="sm" />
         </div>
 
-        {/* Name */}
-        <Link to={`/products/${id}`}>
-          <h3 className="font-medium text-foreground mb-2 line-clamp-2 group-hover:text-cyan transition-colors">
+        {/* Name - Fixed height with truncation */}
+        <Link to={`/products/${id}`} className="flex-shrink-0">
+          <h3 className="font-medium text-foreground h-11 line-clamp-2 group-hover:text-cyan transition-colors overflow-hidden">
             {name}
           </h3>
         </Link>
 
-        {/* Price */}
-        <div className="flex items-center gap-2 flex-wrap">
+        {/* Price - Fixed height container */}
+        <div className="h-7 flex items-center gap-2 flex-shrink-0 mt-2">
           {originalPrice && (
-            <span className="text-sm text-muted-foreground line-through">
+            <span className="text-sm text-muted-foreground line-through truncate">
               {formatPrice(originalPrice)} {currencySymbol}
             </span>
           )}
-          <span className="text-lg font-bold text-orange">{formatPrice(price)} {currencySymbol}</span>
-          <Badge variant="outline" className="text-xs ml-auto">{currency}</Badge>
+          <span className="text-lg font-bold text-orange truncate">{formatPrice(price)} {currencySymbol}</span>
+          <Badge variant="outline" className="text-xs ml-auto flex-shrink-0">{currency}</Badge>
         </div>
 
-        {/* Countdown */}
-        {countdown && (
-          <div className="mt-3 flex items-center justify-center gap-1 bg-foreground text-background rounded-lg p-2">
-            <div className="text-center">
-              <span className="font-bold text-lg">{isRTL ? countdown.hours.toString().padStart(2, "0").replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]) : countdown.hours.toString().padStart(2, "0")}</span>
-              <p className="text-[10px] uppercase opacity-70">{t.product.hours}</p>
+        {/* Countdown - Fixed height reserved space */}
+        <div className="h-14 mt-auto flex-shrink-0">
+          {countdown ? (
+            <div className="flex items-center justify-center gap-1 bg-foreground text-background rounded-lg p-2 h-full">
+              <div className="text-center">
+                <span className="font-bold text-lg">{isRTL ? countdown.hours.toString().padStart(2, "0").replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]) : countdown.hours.toString().padStart(2, "0")}</span>
+                <p className="text-[10px] uppercase opacity-70">{t.product.hours}</p>
+              </div>
+              <span className="font-bold">:</span>
+              <div className="text-center">
+                <span className="font-bold text-lg">{isRTL ? countdown.minutes.toString().padStart(2, "0").replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]) : countdown.minutes.toString().padStart(2, "0")}</span>
+                <p className="text-[10px] uppercase opacity-70">{t.product.minutes}</p>
+              </div>
+              <span className="font-bold">:</span>
+              <div className="text-center">
+                <span className="font-bold text-lg">{isRTL ? countdown.seconds.toString().padStart(2, "0").replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]) : countdown.seconds.toString().padStart(2, "0")}</span>
+                <p className="text-[10px] uppercase opacity-70">{t.product.seconds}</p>
+              </div>
             </div>
-            <span className="font-bold">:</span>
-            <div className="text-center">
-              <span className="font-bold text-lg">{isRTL ? countdown.minutes.toString().padStart(2, "0").replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]) : countdown.minutes.toString().padStart(2, "0")}</span>
-              <p className="text-[10px] uppercase opacity-70">{t.product.minutes}</p>
-            </div>
-            <span className="font-bold">:</span>
-            <div className="text-center">
-              <span className="font-bold text-lg">{isRTL ? countdown.seconds.toString().padStart(2, "0").replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]) : countdown.seconds.toString().padStart(2, "0")}</span>
-              <p className="text-[10px] uppercase opacity-70">{t.product.seconds}</p>
-            </div>
-          </div>
-        )}
+          ) : null}
+        </div>
       </div>
     </div>
   );
