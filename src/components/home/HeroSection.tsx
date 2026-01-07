@@ -31,7 +31,7 @@ const HeroSection = () => {
             </div>}
 
           {/* Side Banners - Horizontal scroll on mobile, vertical on desktop */}
-          <div className="flex flex-row lg:flex-col gap-3 sm:gap-4 lg:gap-6 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x snap-mandatory lg:snap-none rounded">
+          <div className="flex flex-row lg:flex-col gap-3 sm:gap-4 lg:gap-6 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 px-4 sm:mx-0 sm:px-0 snap-x snap-mandatory lg:snap-none rounded mx-0">
             {promoLoading ? <>
                 <div className="min-w-[260px] sm:min-w-[280px] lg:min-w-0 lg:w-full snap-start"><PromoCardSkeleton /></div>
                 <div className="min-w-[260px] sm:min-w-[280px] lg:min-w-0 lg:w-full snap-start"><PromoCardSkeleton /></div>
