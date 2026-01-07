@@ -414,7 +414,15 @@ const BuyerOrders = () => {
                     </div>
                     <div className="text-right">
                       <p className="text-lg font-bold text-primary">
-                        {formatCurrency(order.total_afn, 'AFN', isRTL)}
+                        {order.total_usd > 0 && order.total_afn > 0 ? (
+                          <>
+                            {formatCurrency(order.total_usd, 'USD', isRTL)} + {formatCurrency(order.total_afn, 'AFN', isRTL)}
+                          </>
+                        ) : order.total_usd > 0 ? (
+                          formatCurrency(order.total_usd, 'USD', isRTL)
+                        ) : (
+                          formatCurrency(order.total_afn, 'AFN', isRTL)
+                        )}
                       </p>
                       <p className="text-sm text-muted-foreground">
                         {order.order_items.length} {isRTL ? "محصول" : "items"}
