@@ -56,7 +56,7 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
 
       {/* Content Container */}
       <div
-        className={`relative z-10 h-full flex flex-col md:flex-row items-center justify-center md:justify-between px-4 sm:px-8 lg:px-16 py-6 md:py-0 gap-4 md:gap-8 flex-row-reverse ${isRTL ? "md:flex-row-reverse" : ""}`}
+        className={`relative z-10 h-full flex flex-col md:flex-row items-center justify-center md:justify-between px-4 sm:px-8 lg:px-16 py-6 md:py-0 gap-4 md:gap-8 flex-row-reverse`}
       >
         {/* Icon/Image - Hidden on mobile, shown on md+ */}
         <div className="flex-shrink-0 hidden md:block">
@@ -74,7 +74,7 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
         {/* Text Content */}
         <div
           className={`w-full md:max-w-md flex flex-col justify-center
-          ${isRTL ? "items-end text-right" : "items-start text-left"}`}
+          ${isRTL ? "items-start text-right" : "items-start text-left"}`}
         >
           {badgeText && (
             <Badge variant="sale" className="w-fit mb-3 md:mb-4 text-xs sm:text-sm px-3 sm:px-4 py-1">
