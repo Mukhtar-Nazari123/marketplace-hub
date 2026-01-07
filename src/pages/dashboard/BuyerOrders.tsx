@@ -604,7 +604,7 @@ const BuyerOrders = () => {
                                         <span className="font-medium text-foreground">
                                         {formatCurrency(
                                             sellerOrder?.delivery_fee || 0,
-                                            sellerOrder?.currency || order.currency,
+                                            'AFN',
                                             isRTL,
                                           )}
                                         </span>
