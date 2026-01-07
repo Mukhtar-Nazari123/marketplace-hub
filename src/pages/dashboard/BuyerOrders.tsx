@@ -36,6 +36,7 @@ interface OrderItem {
   seller_id: string;
   product_id: string | null;
   product_sku?: string | null;
+  product_currency?: string | null;
 }
 
 interface SellerPolicy {
@@ -118,7 +119,7 @@ const BuyerOrders = () => {
           *,
           order_items (
             *,
-            products:product_id (sku)
+            products:product_id (sku, currency)
           )
         `,
         )
@@ -132,10 +133,11 @@ const BuyerOrders = () => {
         (data || []).map(async (order) => {
           const { data: sellerOrders } = await supabase.from("seller_orders").select("*").eq("order_id", order.id);
 
-          // Map order items to include product_sku
+          // Map order items to include product_sku and product_currency
           const orderItemsWithSku = (order.order_items || []).map((item: any) => ({
             ...item,
             product_sku: item.products?.sku || null,
+            product_currency: item.products?.currency || null,
           }));
 
           // Group items by seller for seller sub-orders
@@ -584,7 +586,7 @@ const BuyerOrders = () => {
                                     <p className="font-medium truncate text-sm">{item.product_name}</p>
                                     <p className="text-xs text-muted-foreground">
                                       {item.quantity} ×{" "}
-                                      {formatCurrency(item.unit_price, sellerOrder?.currency || 'AFN', isRTL)}
+                                      {formatCurrency(item.unit_price, item.product_currency || 'AFN', isRTL)}
                                     </p>
                                   </div>
                                   <div className="flex items-center gap-3">
@@ -613,7 +615,7 @@ const BuyerOrders = () => {
                                       <p className="font-semibold text-sm">
                                         {formatCurrency(
                                           item.total_price,
-                                          sellerOrder?.currency || 'AFN',
+                                          item.product_currency || 'AFN',
                                           isRTL,
                                         )}
                                       </p>
