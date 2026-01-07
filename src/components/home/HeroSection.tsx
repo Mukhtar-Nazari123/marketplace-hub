@@ -15,36 +15,40 @@ const HeroSection = () => {
   const activeBanner = heroBanners[0];
 
   return (
-    <section className="relative overflow-hidden">
-      <div className="container py-8">
-        <div className="grid lg:grid-cols-3 gap-6">
+    <section className="relative w-full overflow-hidden">
+      <div className="container px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Main Hero */}
           {heroLoading ? (
             <HeroBannerSkeleton />
           ) : activeBanner ? (
             <HeroBannerSlide banner={activeBanner} />
           ) : (
-            <div className="lg:col-span-2 relative rounded-2xl overflow-hidden bg-muted min-h-[400px] lg:min-h-[500px] flex items-center justify-center">
-              <p className="text-muted-foreground">
+            <div className="lg:col-span-2 relative rounded-xl sm:rounded-2xl overflow-hidden bg-muted min-h-[280px] sm:min-h-[350px] lg:min-h-[500px] flex items-center justify-center">
+              <p className="text-muted-foreground text-sm sm:text-base">
                 {isRTL ? "بنر تبلیغاتی موجود نیست" : "No hero banner available"}
               </p>
             </div>
           )}
 
-          {/* Side Banners - Dynamic from Database */}
-          <div className="flex flex-col gap-6">
+          {/* Side Banners - Horizontal scroll on mobile, vertical on desktop */}
+          <div className="flex flex-row lg:flex-col gap-3 sm:gap-4 lg:gap-6 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x snap-mandatory lg:snap-none">
             {promoLoading ? (
               <>
-                <PromoCardSkeleton />
-                <PromoCardSkeleton />
-                <PromoCardSkeleton />
+                <div className="min-w-[260px] sm:min-w-[280px] lg:min-w-0 lg:w-full snap-start"><PromoCardSkeleton /></div>
+                <div className="min-w-[260px] sm:min-w-[280px] lg:min-w-0 lg:w-full snap-start"><PromoCardSkeleton /></div>
+                <div className="min-w-[260px] sm:min-w-[280px] lg:min-w-0 lg:w-full snap-start"><PromoCardSkeleton /></div>
               </>
             ) : promoCards.length === 0 ? (
-              <div className="flex items-center justify-center h-full text-muted-foreground">
+              <div className="flex items-center justify-center w-full min-h-[120px] text-muted-foreground text-sm">
                 {isRTL ? "کارت تبلیغاتی وجود ندارد" : "No promotions available"}
               </div>
             ) : (
-              promoCards.map((card, index) => <PromoCard key={card.id} card={card} index={index} />)
+              promoCards.map((card, index) => (
+                <div key={card.id} className="min-w-[260px] sm:min-w-[280px] lg:min-w-0 lg:w-full snap-start">
+                  <PromoCard card={card} index={index} />
+                </div>
+              ))
             )}
           </div>
         </div>
