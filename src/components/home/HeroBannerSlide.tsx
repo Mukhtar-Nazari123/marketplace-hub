@@ -72,7 +72,7 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
         {/* Text Content */}
         <div
           className={`max-w-md p-6 lg:p-8 flex flex-col justify-center
-          ${isRTL ? "items-end text-right me-8 lg:me-16" : "items-start text-left"}`}
+          ${isRTL ? "items-start text-right me-8 lg:me-16" : "items-start text-left"}`}
         >
           {badgeText && (
             <Badge variant="sale" className="w-fit mb-4 text-sm px-4 py-1">
