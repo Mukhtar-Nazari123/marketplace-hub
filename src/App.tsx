@@ -56,7 +56,7 @@ import AdminReviews from "./pages/admin/AdminReviews";
 import AdminContactMessages from "./pages/admin/AdminContactMessages";
 import AdminContactSettings from "./pages/admin/AdminContactSettings";
 import AdminNewsletter from "./pages/admin/AdminNewsletter";
-
+import AdminSocialLinks from "./pages/admin/AdminSocialLinks";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -109,6 +109,7 @@ const App = () => (
                       <Route path="/dashboard/contact-messages" element={<AdminContactMessages />} />
                       <Route path="/dashboard/contact-settings" element={<AdminContactSettings />} />
                       <Route path="/dashboard/newsletter" element={<AdminNewsletter />} />
+                      <Route path="/dashboard/social-links" element={<AdminSocialLinks />} />
                       {/* Shared Profile Route (keep existing) */}
                       <Route path="/dashboard/profile" element={<BuyerProfile />} />
 
