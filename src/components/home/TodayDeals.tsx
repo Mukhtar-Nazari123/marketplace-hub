@@ -2,7 +2,7 @@ import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Clock } from "lucide-
 import { Button } from "@/components/ui/button";
 import ProductCard from "./ProductCard";
 import { useLanguage } from "@/lib/i18n";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProductRatings } from "@/hooks/useProductRatings";
@@ -21,6 +21,7 @@ const TodayDeals = () => {
   const { t, isRTL } = useLanguage();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const productIds = products.map(p => p.id);
   const { getRating, loading: ratingsLoading } = useProductRatings(productIds);
@@ -47,19 +48,27 @@ const TodayDeals = () => {
     }
   };
 
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: isRTL ? 300 : -300, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: isRTL ? -300 : 300, behavior: 'smooth' });
+    }
+  };
+
   const getProductCardData = (product: Product) => {
     const currency = (product.currency as 'AFN' | 'USD') || 'AFN';
     
-    // Handle inverted price scenario: if compare_at_price exists and differs from price
-    // The original price is the higher value, current price is the lower value
     const hasDiscount = product.compare_at_price && product.compare_at_price !== product.price;
     let originalPrice: number | undefined;
     let currentPrice = product.price;
     let discount: number | undefined;
 
     if (hasDiscount) {
-      // If compare_at_price > price, normal scenario
-      // If compare_at_price < price, data is inverted - use compare_at_price as current
       if (product.compare_at_price! > product.price) {
         originalPrice = product.compare_at_price!;
         currentPrice = product.price;
@@ -70,7 +79,6 @@ const TodayDeals = () => {
       discount = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
     }
     
-    // Check if product is new (created within last 7 days)
     const isNew = new Date(product.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
     const { averageRating, reviewCount } = getRating(product.id);
@@ -107,20 +115,24 @@ const TodayDeals = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="icon" className="rounded-full">
+            <Button variant="outline" size="icon" className="rounded-full" onClick={scrollRight}>
               <ChevronRight className="h-4 w-4" />
             </Button>
-            <Button variant="outline" size="icon" className="rounded-full">
+            <Button variant="outline" size="icon" className="rounded-full" onClick={scrollLeft}>
               <ChevronLeft className="h-4 w-4" />
             </Button>
           </div>
         </div>
 
-        {/* Products Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        {/* Products - Horizontal Scroll */}
+        <div 
+          ref={scrollContainerRef}
+          className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 scroll-smooth"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
           {isLoading ? (
             [...Array(5)].map((_, index) => (
-              <div key={index} className="space-y-3">
+              <div key={index} className="min-w-[200px] md:min-w-[220px] lg:min-w-[240px] space-y-3 flex-shrink-0">
                 <Skeleton className="aspect-square rounded-lg" />
                 <Skeleton className="h-4 w-3/4" />
                 <Skeleton className="h-4 w-1/2" />
@@ -130,14 +142,14 @@ const TodayDeals = () => {
             products.map((product, index) => (
               <div
                 key={product.id}
-                className="opacity-0 animate-fade-in-up"
+                className="min-w-[200px] md:min-w-[220px] lg:min-w-[240px] flex-shrink-0 opacity-0 animate-fade-in-up"
                 style={{ animationDelay: `${index * 100}ms`, animationFillMode: "forwards" }}
               >
                 <ProductCard {...getProductCardData(product)} />
               </div>
             ))
           ) : (
-            <div className="col-span-5 text-center py-12 text-muted-foreground">
+            <div className="w-full text-center py-12 text-muted-foreground">
               {isRTL ? 'هنوز محصولی فعال نشده است' : 'No active products yet'}
             </div>
           )}
