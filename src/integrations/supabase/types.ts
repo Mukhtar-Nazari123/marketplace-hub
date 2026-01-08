@@ -920,6 +920,45 @@ export type Database = {
         }
         Relationships: []
       }
+      site_contact_settings: {
+        Row: {
+          address_en: string | null
+          address_fa: string | null
+          created_at: string
+          id: string
+          phone: string | null
+          support_email: string | null
+          updated_at: string
+          updated_by: string | null
+          working_hours_en: string | null
+          working_hours_fa: string | null
+        }
+        Insert: {
+          address_en?: string | null
+          address_fa?: string | null
+          created_at?: string
+          id?: string
+          phone?: string | null
+          support_email?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          working_hours_en?: string | null
+          working_hours_fa?: string | null
+        }
+        Update: {
+          address_en?: string | null
+          address_fa?: string | null
+          created_at?: string
+          id?: string
+          phone?: string | null
+          support_email?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          working_hours_en?: string | null
+          working_hours_fa?: string | null
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           created_at: string

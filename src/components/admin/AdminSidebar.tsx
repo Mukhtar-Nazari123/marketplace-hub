@@ -68,6 +68,7 @@ export const AdminSidebar = () => {
   ];
 
   const settingsNavItems = [
+    { title: isRTL ? 'تنظیمات تماس' : 'Contact Settings', icon: MessageSquare, url: '/dashboard/contact-settings' },
     { title: t.admin.settings.title, icon: Settings, url: '/dashboard/settings' },
   ];
 

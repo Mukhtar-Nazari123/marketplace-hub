@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useLanguage } from '@/lib/i18n';
 import { useAuth } from '@/hooks/useAuth';
+import { useContactSettings } from '@/hooks/useContactSettings';
 import TopBar from '@/components/layout/TopBar';
 import Header from '@/components/layout/Header';
 import Navigation from '@/components/layout/Navigation';
@@ -11,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   ChevronLeft,
   ChevronRight,
@@ -26,6 +28,7 @@ import {
 const Contact = () => {
   const { t, language, isRTL } = useLanguage();
   const { user, role } = useAuth();
+  const { address, phone, email, workingHours, isLoading: isLoadingSettings } = useContactSettings();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -136,22 +139,26 @@ const Contact = () => {
     {
       icon: MapPin,
       title: t.contact.address,
-      value: t.contact.addressText,
+      value: address,
+      loading: isLoadingSettings,
     },
     {
       icon: Phone,
       title: t.contact.phone,
-      value: t.contact.phoneNumber,
+      value: phone,
+      loading: isLoadingSettings,
     },
     {
       icon: Mail,
       title: t.contact.email,
-      value: t.contact.emailAddress,
+      value: email,
+      loading: isLoadingSettings,
     },
     {
       icon: Clock,
       title: t.contact.workingHours,
-      value: t.contact.workingHoursText,
+      value: workingHours,
+      loading: isLoadingSettings,
     },
   ];
 
@@ -201,9 +208,13 @@ const Contact = () => {
                   <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
                     <info.icon className="text-primary" size={24} />
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <h3 className="font-bold text-foreground mb-1">{info.title}</h3>
-                    <p className="text-muted-foreground">{info.value}</p>
+                    {info.loading ? (
+                      <Skeleton className="h-5 w-32" />
+                    ) : (
+                      <p className="text-muted-foreground">{info.value}</p>
+                    )}
                   </div>
                 </div>
               ))}
