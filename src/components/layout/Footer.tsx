@@ -15,9 +15,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/lib/i18n";
+import { useContactSettings } from "@/hooks/useContactSettings";
 
 const Footer = () => {
   const { t, isRTL } = useLanguage();
+  const { address, phone: contactPhone, email: contactEmail } = useContactSettings();
 
   const quickLinks = [
     { label: t.footer.aboutUs, href: "/about" },
@@ -172,15 +174,15 @@ const Footer = () => {
             <div className="mt-6 space-y-2">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Phone className="h-4 w-4 text-cyan" />
-                <span>{isRTL ? "+۹۳ ۱۲۳-۴۵۶-۷۸۹" : "+93 123-456-789"}</span>
+                <span dir="ltr">{contactPhone}</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Mail className="h-4 w-4 text-cyan" />
-                <span>support@market.af</span>
+                <span dir="ltr">{contactEmail}</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <MapPin className="h-4 w-4 text-cyan" />
-                <span>{t.contact.addressText}</span>
+                <span>{address}</span>
               </div>
             </div>
           </div>
