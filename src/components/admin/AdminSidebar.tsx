@@ -32,6 +32,7 @@ import {
   Globe,
   Star,
   MessageSquare,
+  Mail,
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -65,6 +66,7 @@ export const AdminSidebar = () => {
     { title: t.admin.promotions.title, icon: Tag, url: '/dashboard/promotions' },
     { title: isRTL ? 'کارت‌های تبلیغاتی' : 'Promo Cards', icon: LayoutGrid, url: '/dashboard/promo-cards' },
     { title: t.admin.cms.title, icon: FileText, url: '/dashboard/cms' },
+    { title: isRTL ? 'خبرنامه' : 'Newsletter', icon: Mail, url: '/dashboard/newsletter' },
   ];
 
   const settingsNavItems = [
