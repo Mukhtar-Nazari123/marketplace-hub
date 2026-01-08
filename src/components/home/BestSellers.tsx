@@ -114,7 +114,7 @@ const BestSellers = () => {
                 {t.bestSellers.weeklyBestSellers}
               </h2>
             </div>
-            <Button variant="/product" className="text-muted-foreground hover:text-cyan gap-1">
+            <Button variant="link" className="text-muted-foreground hover:text-cyan gap-1">
               {t.deals.seeAll} <ArrowLeft className="h-4 w-4" />
             </Button>
           </div>
