@@ -1,4 +1,4 @@
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ProductCard from "./ProductCard";
 import { useState, useEffect } from "react";
@@ -7,6 +7,7 @@ import { useCategories } from "@/hooks/useCategories";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProductRatings } from "@/hooks/useProductRatings";
+import { Link } from "react-router-dom";
 
 interface Product {
   id: string;
@@ -39,18 +40,32 @@ const BestSellers = () => {
   }, [rootCategories, activeCategory]);
 
   useEffect(() => {
-    fetchActiveProducts();
-  }, []);
+    if (activeCategory) {
+      fetchProductsByCategory();
+    }
+  }, [activeCategory]);
 
-  const fetchActiveProducts = async () => {
+  const fetchProductsByCategory = async () => {
+    if (!activeCategory) return;
+    
+    setIsLoading(true);
     try {
-      const { data, error } = await supabase
+      // Find the category ID from slug
+      const category = rootCategories.find(c => c.slug === activeCategory);
+      
+      let query = supabase
         .from("products")
-        .select("id, name, price, compare_at_price, images, is_featured, currency, created_at")
+        .select("id, name, price, compare_at_price, images, is_featured, currency, created_at, category_id")
         .eq("status", "active")
         .order("is_featured", { ascending: false })
         .order("created_at", { ascending: false })
         .limit(5);
+
+      if (category) {
+        query = query.eq("category_id", category.id);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       setProducts((data as Product[]) || []);
@@ -114,18 +129,22 @@ const BestSellers = () => {
                 {t.bestSellers.weeklyBestSellers}
               </h2>
             </div>
-            <Button variant="link" className="text-muted-foreground hover:text-cyan gap-1">
-              {t.deals.seeAll} <ArrowLeft className="h-4 w-4" />
-            </Button>
+            <Link to="/products" className="text-muted-foreground hover:text-cyan flex items-center gap-1">
+              {t.deals.seeAll} {isRTL ? <ArrowLeft className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
+            </Link>
           </div>
           <div className="flex items-center gap-2 overflow-x-auto pb-2 lg:pb-0">
             {categoriesLoading ? (
               [...Array(4)].map((_, i) => <Skeleton key={i} className="h-10 w-24" />)
             ) : rootCategories.length > 0 ? (
               rootCategories.map((category) => (
-                <button
+                <Link
                   key={category.id}
-                  onClick={() => setActiveCategory(category.slug)}
+                  to={`/products?category=${category.slug}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setActiveCategory(category.slug);
+                  }}
                   className={`px-4 py-2 text-sm font-medium whitespace-nowrap rounded-lg transition-all ${
                     activeCategory === category.slug
                       ? "bg-cyan text-primary-foreground"
@@ -133,7 +152,7 @@ const BestSellers = () => {
                   }`}
                 >
                   {category.name}
-                </button>
+                </Link>
               ))
             ) : (
               <span className="text-sm text-muted-foreground">{isRTL ? "دسته‌بندی موجود نیست" : "No categories"}</span>
