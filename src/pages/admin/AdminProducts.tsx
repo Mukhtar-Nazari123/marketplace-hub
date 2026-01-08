@@ -56,6 +56,7 @@ interface Product {
   name: string;
   slug: string;
   price: number;
+  compare_at_price: number | null;
   currency: string;
   status: string;
   seller_id: string;
@@ -322,7 +323,22 @@ const AdminProducts = () => {
                         <TableCell>
                           <div className="font-medium">{product.name}</div>
                         </TableCell>
-                        <TableCell>{formatPriceWithCurrency(Number(product.price), product.currency || 'AFN', isRTL)}</TableCell>
+                        <TableCell>
+                          <div className="flex flex-col">
+                            {product.compare_at_price && product.compare_at_price > product.price ? (
+                              <>
+                                <span className="text-sm text-muted-foreground line-through">
+                                  {formatPriceWithCurrency(Number(product.compare_at_price), product.currency || 'AFN', isRTL)}
+                                </span>
+                                <span className="font-medium text-primary">
+                                  {formatPriceWithCurrency(Number(product.price), product.currency || 'AFN', isRTL)}
+                                </span>
+                              </>
+                            ) : (
+                              <span>{formatPriceWithCurrency(Number(product.price), product.currency || 'AFN', isRTL)}</span>
+                            )}
+                          </div>
+                        </TableCell>
                         <TableCell>{getStatusBadge(product.status)}</TableCell>
                         <TableCell>
                           {formatDate(new Date(product.created_at), direction === 'rtl' ? 'fa' : 'en')}
