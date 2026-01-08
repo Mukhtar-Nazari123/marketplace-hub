@@ -207,6 +207,63 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_messages: {
+        Row: {
+          admin_reply: string | null
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          ip_address: string | null
+          locale: string
+          message: string
+          phone: string | null
+          replied_at: string | null
+          replied_by: string | null
+          status: string
+          subject: string
+          updated_at: string
+          user_id: string | null
+          user_role: string
+        }
+        Insert: {
+          admin_reply?: string | null
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          ip_address?: string | null
+          locale?: string
+          message: string
+          phone?: string | null
+          replied_at?: string | null
+          replied_by?: string | null
+          status?: string
+          subject: string
+          updated_at?: string
+          user_id?: string | null
+          user_role?: string
+        }
+        Update: {
+          admin_reply?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          ip_address?: string | null
+          locale?: string
+          message?: string
+          phone?: string | null
+          replied_at?: string | null
+          replied_by?: string | null
+          status?: string
+          subject?: string
+          updated_at?: string
+          user_id?: string | null
+          user_role?: string
+        }
+        Relationships: []
+      }
       hero_banners: {
         Row: {
           background_image: string | null
