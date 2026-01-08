@@ -132,7 +132,7 @@ const TodayDeals = () => {
         >
           {isLoading ? (
             [...Array(5)].map((_, index) => (
-              <div key={index} className="w-[160px] md:w-[180px] lg:w-[200px] space-y-3 flex-shrink-0">
+              <div key={index} className="space-y-3">
                 <Skeleton className="aspect-square rounded-lg" />
                 <Skeleton className="h-4 w-3/4" />
                 <Skeleton className="h-4 w-1/2" />
