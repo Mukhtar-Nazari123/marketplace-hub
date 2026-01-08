@@ -33,6 +33,7 @@ import {
   Star,
   MessageSquare,
   Mail,
+  Share2,
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -70,6 +71,7 @@ export const AdminSidebar = () => {
   ];
 
   const settingsNavItems = [
+    { title: isRTL ? 'لینک‌های اجتماعی' : 'Social Links', icon: Share2, url: '/dashboard/social-links' },
     { title: isRTL ? 'تنظیمات تماس' : 'Contact Settings', icon: MessageSquare, url: '/dashboard/contact-settings' },
     { title: t.admin.settings.title, icon: Settings, url: '/dashboard/settings' },
   ];

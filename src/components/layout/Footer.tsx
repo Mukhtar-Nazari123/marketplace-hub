@@ -3,6 +3,9 @@ import {
   Twitter,
   Instagram,
   Youtube,
+  Linkedin,
+  Github,
+  Globe,
   Mail,
   Phone,
   MapPin,
@@ -14,11 +17,27 @@ import {
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/lib/i18n";
 import { useContactSettings } from "@/hooks/useContactSettings";
+import { useSocialLinks } from "@/hooks/useSocialLinks";
 import NewsletterForm from "@/components/newsletter/NewsletterForm";
+
+const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+  Facebook,
+  Twitter,
+  Instagram,
+  Youtube,
+  YouTube: Youtube,
+  LinkedIn: Linkedin,
+  Linkedin,
+  GitHub: Github,
+  Github,
+  Other: Globe,
+  Globe,
+};
 
 const Footer = () => {
   const { t, isRTL } = useLanguage();
   const { address, phone: contactPhone, email: contactEmail } = useContactSettings();
+  const { data: socialLinks } = useSocialLinks();
 
   const quickLinks = [
     { label: t.footer.aboutUs, href: "/about" },
@@ -100,30 +119,20 @@ const Footer = () => {
             </Link>
             <p className="text-muted-foreground text-sm mb-4">{t.footer.description}</p>
             <div className="flex gap-3">
-              <a
-                href="#"
-                className="w-10 h-10 rounded-full bg-background/10 flex items-center justify-center hover:bg-cyan transition-colors"
-              >
-                <Facebook className="h-5 w-5" />
-              </a>
-              <a
-                href="#"
-                className="w-10 h-10 rounded-full bg-background/10 flex items-center justify-center hover:bg-cyan transition-colors"
-              >
-                <Twitter className="h-5 w-5" />
-              </a>
-              <a
-                href="#"
-                className="w-10 h-10 rounded-full bg-background/10 flex items-center justify-center hover:bg-cyan transition-colors"
-              >
-                <Instagram className="h-5 w-5" />
-              </a>
-              <a
-                href="#"
-                className="w-10 h-10 rounded-full bg-background/10 flex items-center justify-center hover:bg-cyan transition-colors"
-              >
-                <Youtube className="h-5 w-5" />
-              </a>
+              {socialLinks?.map((link) => {
+                const IconComponent = ICON_MAP[link.icon] || Globe;
+                return (
+                  <a
+                    key={link.id}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 rounded-full bg-background/10 flex items-center justify-center hover:bg-cyan transition-colors"
+                  >
+                    <IconComponent className="h-5 w-5" />
+                  </a>
+                );
+              })}
             </div>
           </div>
 
