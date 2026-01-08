@@ -182,7 +182,8 @@ const AdminProductView = () => {
   };
 
   const metadata = product?.metadata as ProductMetadata | null;
-  const currency = metadata?.currency || 'AFN';
+  // Use product.currency from database first, then fallback to metadata
+  const currency = (product as any)?.currency || metadata?.currency || 'AFN';
   const currencySymbol = currency === 'AFN' ? '؋' : '$';
   const CurrencyIcon = currency === 'AFN' ? Banknote : DollarSign;
 
@@ -362,14 +363,14 @@ const AdminProductView = () => {
                       {isRTL ? 'قیمت' : 'Price'} ({currency})
                     </p>
                     <div className="flex items-baseline gap-2">
-                      <span className="text-3xl font-bold">
-                        {currencySymbol}{Number(product.price).toLocaleString()}
-                      </span>
-                      {product.compare_at_price && (
+                      {product.compare_at_price && product.compare_at_price > product.price && (
                         <span className="text-lg text-muted-foreground line-through">
                           {currencySymbol}{Number(product.compare_at_price).toLocaleString()}
                         </span>
                       )}
+                      <span className="text-3xl font-bold">
+                        {currencySymbol}{Number(product.price).toLocaleString()}
+                      </span>
                     </div>
                   </div>
                 </div>
