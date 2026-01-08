@@ -24,11 +24,11 @@ const BestSellers = () => {
   const { getRootCategories, loading: categoriesLoading } = useCategories();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   const rootCategories = getRootCategories().slice(0, 5);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
-  const productIds = products.map(p => p.id);
+  const productIds = products.map((p) => p.id);
   const { getRating } = useProductRatings(productIds);
 
   // Set first category as active when categories load
@@ -45,25 +45,25 @@ const BestSellers = () => {
   const fetchActiveProducts = async () => {
     try {
       const { data, error } = await supabase
-        .from('products')
-        .select('id, name, price, compare_at_price, images, is_featured, currency, created_at')
-        .eq('status', 'active')
-        .order('is_featured', { ascending: false })
-        .order('created_at', { ascending: false })
+        .from("products")
+        .select("id, name, price, compare_at_price, images, is_featured, currency, created_at")
+        .eq("status", "active")
+        .order("is_featured", { ascending: false })
+        .order("created_at", { ascending: false })
         .limit(5);
 
       if (error) throw error;
       setProducts((data as Product[]) || []);
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.error("Error fetching products:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
   const getProductCardData = (product: Product) => {
-    const currency = (product.currency as 'AFN' | 'USD') || 'AFN';
-    
+    const currency = (product.currency as "AFN" | "USD") || "AFN";
+
     // Handle inverted price scenario: if compare_at_price exists and differs from price
     // The original price is the higher value, current price is the lower value
     const hasDiscount = product.compare_at_price && product.compare_at_price !== product.price;
@@ -83,7 +83,7 @@ const BestSellers = () => {
       }
       discount = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
     }
-    
+
     // Check if product is new (created within last 7 days)
     const isNew = new Date(product.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
@@ -110,33 +110,33 @@ const BestSellers = () => {
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 bg-orange px-4 py-2 rounded-lg">
-              <h2 className="font-display font-bold text-lg text-accent-foreground">{t.bestSellers.weeklyBestSellers}</h2>
+              <h2 className="font-display font-bold text-lg text-accent-foreground">
+                {t.bestSellers.weeklyBestSellers}
+              </h2>
             </div>
-            <Button variant="link" className="text-muted-foreground hover:text-cyan gap-1">
+            <Button variant="/product" className="text-muted-foreground hover:text-cyan gap-1">
               {t.deals.seeAll} <ArrowLeft className="h-4 w-4" />
             </Button>
           </div>
           <div className="flex items-center gap-2 overflow-x-auto pb-2 lg:pb-0">
             {categoriesLoading ? (
-              [...Array(4)].map((_, i) => (
-                <Skeleton key={i} className="h-10 w-24" />
-              ))
+              [...Array(4)].map((_, i) => <Skeleton key={i} className="h-10 w-24" />)
             ) : rootCategories.length > 0 ? (
               rootCategories.map((category) => (
                 <button
                   key={category.id}
                   onClick={() => setActiveCategory(category.slug)}
                   className={`px-4 py-2 text-sm font-medium whitespace-nowrap rounded-lg transition-all ${
-                    activeCategory === category.slug ? "bg-cyan text-primary-foreground" : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                    activeCategory === category.slug
+                      ? "bg-cyan text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
                   }`}
                 >
                   {category.name}
                 </button>
               ))
             ) : (
-              <span className="text-sm text-muted-foreground">
-                {isRTL ? 'دسته‌بندی موجود نیست' : 'No categories'}
-              </span>
+              <span className="text-sm text-muted-foreground">{isRTL ? "دسته‌بندی موجود نیست" : "No categories"}</span>
             )}
           </div>
         </div>
@@ -151,9 +151,9 @@ const BestSellers = () => {
             ))
           ) : products.length > 0 ? (
             products.map((product, index) => (
-              <div 
-                key={product.id} 
-                className="opacity-0 animate-fade-in-up" 
+              <div
+                key={product.id}
+                className="opacity-0 animate-fade-in-up"
                 style={{ animationDelay: `${index * 100}ms`, animationFillMode: "forwards" }}
               >
                 <ProductCard {...getProductCardData(product)} />
@@ -161,7 +161,7 @@ const BestSellers = () => {
             ))
           ) : (
             <div className="col-span-5 text-center py-12 text-muted-foreground">
-              {isRTL ? 'هنوز محصولی فعال نشده است' : 'No active products yet'}
+              {isRTL ? "هنوز محصولی فعال نشده است" : "No active products yet"}
             </div>
           )}
         </div>
