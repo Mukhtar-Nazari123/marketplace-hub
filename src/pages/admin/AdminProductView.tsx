@@ -375,6 +375,21 @@ const AdminProductView = () => {
                   </div>
                 </div>
 
+                {/* Delivery Fee Section */}
+                {(product as any)?.delivery_fee !== undefined && (product as any).delivery_fee > 0 && (
+                  <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg">
+                    <Package className="h-8 w-8 text-primary" />
+                    <div>
+                      <p className="text-sm text-muted-foreground">
+                        {isRTL ? 'هزینه ارسال' : 'Delivery Fee'} ({currency})
+                      </p>
+                      <span className="text-2xl font-bold">
+                        {currencySymbol}{Number((product as any).delivery_fee).toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
                 <Separator />
 
                 {/* Details Grid */}
@@ -490,21 +505,31 @@ const AdminProductView = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 gap-3">
-                    {Object.entries(metadata.attributes).map(([key, value]) => (
-                      <div key={key} className="p-3 bg-muted/50 rounded-lg">
-                        <p className="text-xs text-muted-foreground capitalize">
-                          {key.replace(/([A-Z])/g, ' $1').trim()}
-                        </p>
-                        <p className="font-medium">
-                          {typeof value === 'boolean' 
-                            ? (value ? 'Yes' : 'No')
-                            : Array.isArray(value)
-                              ? value.join(', ')
-                              : String(value)}
-                        </p>
-                      </div>
-                    ))}
+                  <div className="space-y-3">
+                    {/* Sort attributes: boolean (warranty) first, then others */}
+                    {Object.entries(metadata.attributes)
+                      .sort(([, a], [, b]) => {
+                        // Boolean values (like warranty) come first
+                        const aIsBoolean = typeof a === 'boolean';
+                        const bIsBoolean = typeof b === 'boolean';
+                        if (aIsBoolean && !bIsBoolean) return -1;
+                        if (!aIsBoolean && bIsBoolean) return 1;
+                        return 0;
+                      })
+                      .map(([key, value]) => (
+                        <div key={key} className="p-3 bg-muted/50 rounded-lg">
+                          <p className="text-xs text-muted-foreground capitalize">
+                            {key.replace(/([A-Z])/g, ' $1').trim()}
+                          </p>
+                          <p className="font-medium">
+                            {typeof value === 'boolean' 
+                              ? (value ? (isRTL ? 'بله' : 'Yes') : (isRTL ? 'خیر' : 'No'))
+                              : Array.isArray(value)
+                                ? value.join(', ')
+                                : String(value)}
+                          </p>
+                        </div>
+                      ))}
                   </div>
                 </CardContent>
               </Card>
