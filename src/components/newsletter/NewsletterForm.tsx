@@ -59,11 +59,11 @@ const NewsletterForm = ({ variant = 'default', className = '' }: NewsletterFormP
             placeholder={isRTL ? 'ایمیل شما' : 'Your email'}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="ps-9"
+            className="ps-9 border-2 border-orange focus:border-orange"
             disabled={isPending}
           />
         </div>
-        <Button type="submit" disabled={isPending} size="sm">
+        <Button type="submit" disabled={isPending} size="sm" className="border-2 border-orange bg-orange hover:bg-orange-dark text-white">
           {isPending ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
@@ -83,11 +83,11 @@ const NewsletterForm = ({ variant = 'default', className = '' }: NewsletterFormP
           placeholder={isRTL ? 'آدرس ایمیل شما' : 'Enter your email address'}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="ps-10 h-12"
+          className="ps-10 h-12 border-2 border-orange focus:border-orange"
           disabled={isPending}
         />
       </div>
-      <Button type="submit" className="w-full h-11" disabled={isPending}>
+      <Button type="submit" className="w-full h-11 border-2 border-orange bg-orange hover:bg-orange-dark text-white" disabled={isPending}>
         {isPending ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin me-2" />
