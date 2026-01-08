@@ -304,11 +304,11 @@ const SellerProductView = () => {
                   <span className="text-sm text-muted-foreground">AFN:</span>
                   {product.compare_at_price && product.compare_at_price > product.price ? (
                     <>
-                      <span className="text-2xl font-bold text-primary">
-                        {product.price.toLocaleString()}
-                      </span>
                       <span className="text-lg text-muted-foreground line-through">
                         {product.compare_at_price.toLocaleString()}
+                      </span>
+                      <span className="text-2xl font-bold text-primary">
+                        {product.price.toLocaleString()}
                       </span>
                       <Badge variant="secondary" className="bg-success/10 text-success">
                         {Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)}% OFF
@@ -325,11 +325,11 @@ const SellerProductView = () => {
                     <span className="text-sm text-muted-foreground">USD:</span>
                     {discountPriceUSD && discountPriceUSD < priceUSD ? (
                       <>
-                        <span className="text-xl font-bold text-green-600">
-                          ${discountPriceUSD.toLocaleString()}
-                        </span>
                         <span className="text-muted-foreground line-through">
                           ${priceUSD.toLocaleString()}
+                        </span>
+                        <span className="text-xl font-bold text-green-600">
+                          ${discountPriceUSD.toLocaleString()}
                         </span>
                       </>
                     ) : (
