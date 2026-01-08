@@ -11,11 +11,10 @@ import {
   Shield,
   Headphones,
 } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/lib/i18n";
 import { useContactSettings } from "@/hooks/useContactSettings";
+import NewsletterForm from "@/components/newsletter/NewsletterForm";
 
 const Footer = () => {
   const { t, isRTL } = useLanguage();
@@ -160,17 +159,7 @@ const Footer = () => {
           <div>
             <h4 className="font-display font-bold text-lg mb-4">{t.footer.newsletter}</h4>
             <p className="text-muted-foreground text-sm mb-4">{t.footer.subscribeText}</p>
-            <div className="flex gap-2">
-              <Input
-                type="email"
-                placeholder={t.footer.enterEmail}
-                className="bg-background/10 border-background/20 text-background placeholder:text-muted-foreground"
-                dir={isRTL ? "rtl" : "ltr"}
-              />
-              <Button variant="orange" size="icon">
-                <Mail className="h-4 w-4" />
-              </Button>
-            </div>
+            <NewsletterForm variant="compact" />
             <div className="mt-6 space-y-2">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Phone className="h-4 w-4 text-cyan" />
