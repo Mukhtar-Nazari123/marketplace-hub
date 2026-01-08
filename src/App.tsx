@@ -53,6 +53,7 @@ import SellerReviews from "./pages/dashboard/SellerReviews";
 import Wishlist from "./pages/dashboard/Wishlist";
 import BuyerReviews from "./pages/dashboard/BuyerReviews";
 import AdminReviews from "./pages/admin/AdminReviews";
+import AdminContactMessages from "./pages/admin/AdminContactMessages";
 
 const queryClient = new QueryClient();
 
@@ -103,6 +104,7 @@ const App = () => (
                       <Route path="/dashboard/cms" element={<AdminCMS />} />
                       <Route path="/dashboard/settings" element={<AdminSettings />} />
                       <Route path="/dashboard/reviews" element={<AdminReviews />} />
+                      <Route path="/dashboard/contact-messages" element={<AdminContactMessages />} />
 
                       {/* Shared Profile Route (keep existing) */}
                       <Route path="/dashboard/profile" element={<BuyerProfile />} />

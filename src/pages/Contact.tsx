@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useLanguage } from '@/lib/i18n';
+import { useAuth } from '@/hooks/useAuth';
 import TopBar from '@/components/layout/TopBar';
 import Header from '@/components/layout/Header';
 import Navigation from '@/components/layout/Navigation';
@@ -9,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import {
   ChevronLeft,
   ChevronRight,
@@ -18,10 +20,12 @@ import {
   Clock,
   Send,
   MessageCircle,
+  Loader2,
 } from 'lucide-react';
 
 const Contact = () => {
   const { t, language, isRTL } = useLanguage();
+  const { user, role } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -30,21 +34,102 @@ const Contact = () => {
     message: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = isRTL ? 'نام الزامی است' : 'Name is required';
+    } else if (formData.name.length > 100) {
+      newErrors.name = isRTL ? 'نام باید کمتر از 100 حرف باشد' : 'Name must be less than 100 characters';
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = isRTL ? 'ایمیل الزامی است' : 'Email is required';
+    } else if (!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(formData.email)) {
+      newErrors.email = isRTL ? 'لطفاً یک ایمیل معتبر وارد کنید' : 'Please enter a valid email';
+    }
+
+    if (!formData.subject.trim()) {
+      newErrors.subject = isRTL ? 'موضوع الزامی است' : 'Subject is required';
+    } else if (formData.subject.length > 200) {
+      newErrors.subject = isRTL ? 'موضوع باید کمتر از 200 حرف باشد' : 'Subject must be less than 200 characters';
+    }
+
+    if (!formData.message.trim()) {
+      newErrors.message = isRTL ? 'پیام الزامی است' : 'Message is required';
+    } else if (formData.message.length < 10) {
+      newErrors.message = isRTL ? 'پیام باید حداقل 10 حرف باشد' : 'Message must be at least 10 characters';
+    } else if (formData.message.length > 5000) {
+      newErrors.message = isRTL ? 'پیام باید کمتر از 5000 حرف باشد' : 'Message must be less than 5000 characters';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
     setIsSubmitting(true);
 
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      const payload = {
+        full_name: formData.name.trim(),
+        email: formData.email.trim().toLowerCase(),
+        phone: formData.phone.trim() || undefined,
+        subject: formData.subject.trim(),
+        message: formData.message.trim(),
+        user_id: user?.id || undefined,
+        user_role: role || 'guest',
+        locale: language,
+      };
 
-    toast({
-      title: isRTL ? 'موفق!' : 'Success!',
-      description: t.contact.success,
-    });
+      const { data, error } = await supabase.functions.invoke('contact-submit', {
+        body: payload,
+      });
 
-    setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
-    setIsSubmitting(false);
+      if (error) {
+        throw error;
+      }
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to submit message');
+      }
+
+      toast({
+        title: isRTL ? 'موفق!' : 'Success!',
+        description: isRTL ? 'پیام شما با موفقیت ارسال شد.' : 'Your message has been sent successfully.',
+      });
+
+      setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+      setErrors({});
+    } catch (error: any) {
+      console.error('Error submitting contact form:', error);
+      
+      let errorMessage = isRTL 
+        ? 'ارسال پیام ناموفق بود. لطفاً دوباره تلاش کنید.'
+        : 'Failed to send message. Please try again.';
+
+      if (error.message?.includes('Too many requests')) {
+        errorMessage = isRTL 
+          ? 'تعداد درخواست‌ها بیش از حد مجاز است. لطفاً بعداً تلاش کنید.'
+          : 'Too many requests. Please try again later.';
+      }
+
+      toast({
+        title: isRTL ? 'خطا' : 'Error',
+        description: errorMessage,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const contactInfo = [
@@ -145,24 +230,34 @@ const Contact = () => {
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium mb-2">{t.contact.name}</label>
+                      <label className="block text-sm font-medium mb-2">
+                        {t.contact.name} <span className="text-destructive">*</span>
+                      </label>
                       <Input
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        required
                         placeholder={isRTL ? 'نام شما' : 'Your name'}
+                        className={errors.name ? 'border-destructive' : ''}
                       />
+                      {errors.name && (
+                        <p className="text-sm text-destructive mt-1">{errors.name}</p>
+                      )}
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-2">{t.contact.email}</label>
+                      <label className="block text-sm font-medium mb-2">
+                        {t.contact.email} <span className="text-destructive">*</span>
+                      </label>
                       <Input
                         type="email"
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        required
                         placeholder={isRTL ? 'ایمیل شما' : 'Your email'}
                         dir="ltr"
+                        className={errors.email ? 'border-destructive' : ''}
                       />
+                      {errors.email && (
+                        <p className="text-sm text-destructive mt-1">{errors.email}</p>
+                      )}
                     </div>
                   </div>
 
@@ -178,25 +273,38 @@ const Contact = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-2">{t.contact.subject}</label>
+                      <label className="block text-sm font-medium mb-2">
+                        {t.contact.subject} <span className="text-destructive">*</span>
+                      </label>
                       <Input
                         value={formData.subject}
                         onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                        required
                         placeholder={isRTL ? 'موضوع پیام' : 'Message subject'}
+                        className={errors.subject ? 'border-destructive' : ''}
                       />
+                      {errors.subject && (
+                        <p className="text-sm text-destructive mt-1">{errors.subject}</p>
+                      )}
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-2">{t.contact.message}</label>
+                    <label className="block text-sm font-medium mb-2">
+                      {t.contact.message} <span className="text-destructive">*</span>
+                    </label>
                     <Textarea
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      required
                       rows={6}
                       placeholder={isRTL ? 'پیام خود را بنویسید...' : 'Write your message...'}
+                      className={errors.message ? 'border-destructive' : ''}
                     />
+                    {errors.message && (
+                      <p className="text-sm text-destructive mt-1">{errors.message}</p>
+                    )}
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {formData.message.length}/5000
+                    </p>
                   </div>
 
                   <Button
@@ -207,7 +315,7 @@ const Contact = () => {
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? (
-                      <span className="animate-spin">⏳</span>
+                      <Loader2 className="animate-spin" size={20} />
                     ) : (
                       <Send size={20} />
                     )}

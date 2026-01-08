@@ -31,6 +31,7 @@ import {
   ChevronDown,
   Globe,
   Star,
+  MessageSquare,
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -55,6 +56,7 @@ export const AdminSidebar = () => {
     { title: t.admin.orders.title, icon: ShoppingCart, url: '/dashboard/orders' },
     { title: t.admin.sellers.title, icon: BadgeCheck, url: '/dashboard/sellers' },
     { title: isRTL ? 'نظرات' : 'Reviews', icon: Star, url: '/dashboard/reviews' },
+    { title: isRTL ? 'پیام‌های تماس' : 'Contact Messages', icon: MessageSquare, url: '/dashboard/contact-messages' },
   ];
 
   const contentNavItems = [
