@@ -18,6 +18,7 @@ import { Link } from "react-router-dom";
 import { useLanguage } from "@/lib/i18n";
 import { useContactSettings } from "@/hooks/useContactSettings";
 import { useSocialLinks } from "@/hooks/useSocialLinks";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 import NewsletterForm from "@/components/newsletter/NewsletterForm";
 
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -38,6 +39,7 @@ const Footer = () => {
   const { t, isRTL } = useLanguage();
   const { address, phone: contactPhone, email: contactEmail } = useContactSettings();
   const { data: socialLinks } = useSocialLinks();
+  const { siteName, logoUrl } = useSiteSettings();
 
   const quickLinks = [
     { label: t.footer.aboutUs, href: "/about" },
@@ -109,11 +111,15 @@ const Footer = () => {
           {/* About */}
           <div>
             <Link to="/" className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-orange flex items-center justify-center">
-                <span className="text-accent-foreground font-bold text-xl">M</span>
-              </div>
+              {logoUrl ? (
+                <img src={logoUrl} alt={siteName} className="w-10 h-10 rounded-lg object-contain" />
+              ) : (
+                <div className="w-10 h-10 rounded-lg bg-orange flex items-center justify-center">
+                  <span className="text-accent-foreground font-bold text-xl">{siteName.charAt(0)}</span>
+                </div>
+              )}
               <div>
-                <h3 className="font-display text-xl font-bold">{isRTL ? "مارکت" : "Market"}</h3>
+                <h3 className="font-display text-xl font-bold">{siteName}</h3>
                 <p className="text-xs text-muted-foreground -mt-1">{t.footer.onlineStore}</p>
               </div>
             </Link>
@@ -192,7 +198,7 @@ const Footer = () => {
         <div className="container py-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">
-              © {isRTL ? "۱۴۰۳" : "2024"} {isRTL ? "مارکت" : "Market"}. {t.footer.allRightsReserved}
+              © {isRTL ? "۱۴۰۳" : "2024"} {siteName}. {t.footer.allRightsReserved}
             </p>
             <div className="flex items-center gap-4">
               <img
