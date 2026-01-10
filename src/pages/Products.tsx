@@ -10,7 +10,7 @@ import Header from '@/components/layout/Header';
 import Navigation from '@/components/layout/Navigation';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, SlidersHorizontal, X, Sparkles, Loader2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, SlidersHorizontal, X, Sparkles, Loader2, Search } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -26,8 +26,13 @@ const Products = () => {
   const [searchParams] = useSearchParams();
   const filterType = searchParams.get('filter'); // 'new', 'sale'
   const categorySlug = searchParams.get('category');
+  const searchQuery = searchParams.get('search');
 
-  const { products: dbProducts, loading } = useProducts({ status: 'active' });
+  // Pass search query to backend
+  const { products: dbProducts, loading } = useProducts({ 
+    status: 'active',
+    search: searchQuery || undefined
+  });
   const { getRootCategories, loading: categoriesLoading } = useCategories();
 
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -120,7 +125,7 @@ const Products = () => {
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [categorySlug, filterType, filters, sortBy]);
+  }, [categorySlug, filterType, filters, sortBy, searchQuery]);
 
   const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
   const paginatedProducts = filteredProducts.slice(
@@ -129,6 +134,11 @@ const Products = () => {
   );
 
   const getTitle = () => {
+    if (searchQuery && searchQuery.trim()) {
+      return isRTL 
+        ? `نتایج جستجو برای "${searchQuery}"` 
+        : `Search results for "${searchQuery}"`;
+    }
     if (filterType === 'new') return t.product.newProducts;
     if (filterType === 'sale') return t.filters.discount;
     if (categorySlug) {
@@ -260,7 +270,10 @@ const Products = () => {
                 <h1 className="text-2xl font-bold text-foreground">{getTitle()}</h1>
                 <p className="text-muted-foreground">
                   {loading ? (
-                    <Skeleton className="h-4 w-24 inline-block" />
+                    <span className="inline-flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      {isRTL ? 'در حال جستجو...' : 'Searching...'}
+                    </span>
                   ) : (
                     `${filteredProducts.length} ${isRTL ? 'محصول' : 'products'}`
                   )}
@@ -306,6 +319,32 @@ const Products = () => {
                     </div>
                   </div>
                 ))}
+              </div>
+            ) : paginatedProducts.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mb-4">
+                  <Search className="h-12 w-12 text-muted-foreground" />
+                </div>
+                <h3 className="text-lg font-semibold text-foreground mb-2">
+                  {isRTL ? 'محصولی یافت نشد' : 'No products found'}
+                </h3>
+                <p className="text-muted-foreground max-w-md">
+                  {searchQuery 
+                    ? (isRTL 
+                        ? `نتیجه‌ای برای "${searchQuery}" پیدا نشد. لطفاً عبارت دیگری را جستجو کنید.`
+                        : `No results found for "${searchQuery}". Try a different search term.`)
+                    : (isRTL 
+                        ? 'محصولی با فیلترهای انتخاب شده یافت نشد.'
+                        : 'No products match the selected filters.')
+                  }
+                </p>
+                {searchQuery && (
+                  <Link to="/products">
+                    <Button variant="outline" className="mt-4">
+                      {isRTL ? 'مشاهده همه محصولات' : 'View all products'}
+                    </Button>
+                  </Link>
+                )}
               </div>
             ) : (
               <ProductGrid
