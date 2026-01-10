@@ -219,12 +219,11 @@ const BestSellers = () => {
             {isRTL ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
           </Button>
 
-          <ScrollArea className="w-full" dir={isRTL ? "rtl" : "ltr"}>
-            <div
-              ref={scrollContainerRef}
-              className="flex gap-4 pb-4"
-              style={{ scrollBehavior: "smooth" }}
-            >
+          <div
+            ref={scrollContainerRef}
+            className="flex gap-4 pb-4 overflow-x-auto scrollbar-hide"
+            style={{ scrollBehavior: "smooth" }}
+          >
               {isLoading ? (
                 [...Array(6)].map((_, index) => (
                   <div key={index} className="flex-shrink-0 w-[200px] md:w-[220px] space-y-3">
@@ -244,13 +243,11 @@ const BestSellers = () => {
                   </div>
                 ))
               ) : (
-                <div className="w-full text-center py-12 text-muted-foreground">
-                  {isRTL ? "هنوز محصولی فعال نشده است" : "No active products yet"}
-                </div>
-              )}
-            </div>
-            <ScrollBar orientation="horizontal" className="opacity-0" />
-          </ScrollArea>
+              <div className="w-full text-center py-12 text-muted-foreground">
+                {isRTL ? "هنوز محصولی فعال نشده است" : "No active products yet"}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </section>
