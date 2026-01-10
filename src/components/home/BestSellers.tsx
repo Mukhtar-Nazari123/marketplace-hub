@@ -1,13 +1,14 @@
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ProductCard from "./ProductCard";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/lib/i18n";
 import { useCategories } from "@/hooks/useCategories";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProductRatings } from "@/hooks/useProductRatings";
 import { Link } from "react-router-dom";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 interface Product {
   id: string;
@@ -25,6 +26,9 @@ const BestSellers = () => {
   const { getRootCategories, loading: categoriesLoading } = useCategories();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(true);
 
   const rootCategories = getRootCategories().slice(0, 5);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -59,7 +63,7 @@ const BestSellers = () => {
         .eq("status", "active")
         .order("is_featured", { ascending: false })
         .order("created_at", { ascending: false })
-        .limit(5);
+        .limit(10);
 
       if (category) {
         query = query.eq("category_id", category.id);
@@ -119,6 +123,41 @@ const BestSellers = () => {
     };
   };
 
+  const updateArrowVisibility = () => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const { scrollLeft, scrollWidth, clientWidth } = container;
+    const isAtStart = isRTL ? scrollLeft >= -10 : scrollLeft <= 10;
+    const isAtEnd = isRTL 
+      ? scrollLeft <= -(scrollWidth - clientWidth - 10)
+      : scrollLeft >= scrollWidth - clientWidth - 10;
+
+    setShowLeftArrow(!isAtStart);
+    setShowRightArrow(!isAtEnd);
+  };
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    updateArrowVisibility();
+    container.addEventListener("scroll", updateArrowVisibility);
+    return () => container.removeEventListener("scroll", updateArrowVisibility);
+  }, [products, isRTL]);
+
+  const scroll = (direction: "left" | "right") => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const scrollAmount = 300;
+    const newScrollLeft = direction === "left"
+      ? container.scrollLeft - scrollAmount
+      : container.scrollLeft + scrollAmount;
+
+    container.scrollTo({ left: newScrollLeft, behavior: "smooth" });
+  };
+
   return (
     <section className="py-12 bg-secondary/30">
       <div className="container">
@@ -159,30 +198,63 @@ const BestSellers = () => {
             )}
           </div>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-          {isLoading ? (
-            [...Array(5)].map((_, index) => (
-              <div key={index} className="space-y-3">
-                <Skeleton className="aspect-square rounded-lg" />
-                <Skeleton className="h-4 w-3/4" />
-                <Skeleton className="h-4 w-1/2" />
-              </div>
-            ))
-          ) : products.length > 0 ? (
-            products.map((product, index) => (
-              <div
-                key={product.id}
-                className="opacity-0 animate-fade-in-up"
-                style={{ animationDelay: `${index * 100}ms`, animationFillMode: "forwards" }}
-              >
-                <ProductCard {...getProductCardData(product)} />
-              </div>
-            ))
-          ) : (
-            <div className="col-span-5 text-center py-12 text-muted-foreground">
-              {isRTL ? "هنوز محصولی فعال نشده است" : "No active products yet"}
-            </div>
+        <div className="relative group">
+          {/* Left Arrow */}
+          {showLeftArrow && (
+            <Button
+              variant="outline"
+              size="icon"
+              className={`absolute ${isRTL ? 'right-0' : 'left-0'} top-1/2 -translate-y-1/2 z-10 bg-background/90 backdrop-blur-sm shadow-lg opacity-0 group-hover:opacity-100 transition-opacity hidden md:flex`}
+              onClick={() => scroll(isRTL ? "right" : "left")}
+            >
+              {isRTL ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
+            </Button>
           )}
+
+          {/* Right Arrow */}
+          {showRightArrow && (
+            <Button
+              variant="outline"
+              size="icon"
+              className={`absolute ${isRTL ? 'left-0' : 'right-0'} top-1/2 -translate-y-1/2 z-10 bg-background/90 backdrop-blur-sm shadow-lg opacity-0 group-hover:opacity-100 transition-opacity hidden md:flex`}
+              onClick={() => scroll(isRTL ? "left" : "right")}
+            >
+              {isRTL ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+            </Button>
+          )}
+
+          <ScrollArea className="w-full" dir={isRTL ? "rtl" : "ltr"}>
+            <div
+              ref={scrollContainerRef}
+              className="flex gap-4 pb-4"
+              style={{ scrollBehavior: "smooth" }}
+            >
+              {isLoading ? (
+                [...Array(6)].map((_, index) => (
+                  <div key={index} className="flex-shrink-0 w-[200px] md:w-[220px] space-y-3">
+                    <Skeleton className="aspect-square rounded-lg" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                  </div>
+                ))
+              ) : products.length > 0 ? (
+                products.map((product, index) => (
+                  <div
+                    key={product.id}
+                    className="flex-shrink-0 w-[200px] md:w-[220px] opacity-0 animate-fade-in-up"
+                    style={{ animationDelay: `${index * 50}ms`, animationFillMode: "forwards" }}
+                  >
+                    <ProductCard {...getProductCardData(product)} />
+                  </div>
+                ))
+              ) : (
+                <div className="w-full text-center py-12 text-muted-foreground">
+                  {isRTL ? "هنوز محصولی فعال نشده است" : "No active products yet"}
+                </div>
+              )}
+            </div>
+            <ScrollBar orientation="horizontal" className="opacity-0" />
+          </ScrollArea>
         </div>
       </div>
     </section>
