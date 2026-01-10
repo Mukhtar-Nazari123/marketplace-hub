@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
+import { formatCurrency } from '@/lib/currencyFormatter';
 import {
   ArrowLeft,
   ArrowRight,
@@ -36,6 +37,7 @@ interface Product {
   description: string | null;
   price: number;
   compare_at_price: number | null;
+  currency: string;
   quantity: number;
   sku: string | null;
   images: string[] | null;
@@ -116,7 +118,7 @@ const SellerProductView = () => {
   const images = product?.images || [];
   const priceUSD = (metadata.priceUSD as number) || 0;
   const discountPriceUSD = (metadata.discountPriceUSD as number) || null;
-  const currency = (metadata.currency as string) || 'AFN';
+  const productCurrency = product?.currency || 'AFN';
 
   const nextImage = () => {
     if (images.length > 0) {
@@ -299,47 +301,47 @@ const SellerProductView = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-0 space-y-3">
-                {/* AFN Price */}
-                <div className="flex items-baseline gap-3">
-                  <span className="text-sm text-muted-foreground">AFN:</span>
+                {/* Primary Price */}
+                <div className={cn("flex items-baseline gap-3", isRTL && "flex-row-reverse")}>
+                  <span className="text-sm text-muted-foreground">{productCurrency}:</span>
                   {product.compare_at_price && product.compare_at_price > product.price ? (
                     <>
                       <span className="text-lg text-muted-foreground line-through">
-                        {product.compare_at_price.toLocaleString()}
+                        {formatCurrency(product.compare_at_price, productCurrency, isRTL)}
                       </span>
-                      <span className="text-2xl font-bold text-primary">
-                        {product.price.toLocaleString()}
+                      <span className="text-2xl font-bold text-amber-500">
+                        {formatCurrency(product.price, productCurrency, isRTL)}
                       </span>
                       <Badge variant="secondary" className="bg-success/10 text-success">
-                        {Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)}% OFF
+                        {Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)}% {isRTL ? 'تخفیف' : 'OFF'}
                       </Badge>
                     </>
                   ) : (
-                    <span className="text-2xl font-bold">{product.price.toLocaleString()}</span>
+                    <span className="text-2xl font-bold">{formatCurrency(product.price, productCurrency, isRTL)}</span>
                   )}
                 </div>
 
-                {/* USD Price */}
-                {priceUSD > 0 && (
-                  <div className="flex items-baseline gap-3">
+                {/* USD Price (if different currency and available) */}
+                {priceUSD > 0 && productCurrency !== 'USD' && (
+                  <div className={cn("flex items-baseline gap-3", isRTL && "flex-row-reverse")}>
                     <span className="text-sm text-muted-foreground">USD:</span>
                     {discountPriceUSD && discountPriceUSD < priceUSD ? (
                       <>
                         <span className="text-muted-foreground line-through">
-                          ${priceUSD.toLocaleString()}
+                          {formatCurrency(priceUSD, 'USD', isRTL)}
                         </span>
-                        <span className="text-xl font-bold text-green-600">
-                          ${discountPriceUSD.toLocaleString()}
+                        <span className="text-xl font-bold text-amber-500">
+                          {formatCurrency(discountPriceUSD, 'USD', isRTL)}
                         </span>
                       </>
                     ) : (
-                      <span className="text-xl font-bold">${priceUSD.toLocaleString()}</span>
+                      <span className="text-xl font-bold">{formatCurrency(priceUSD, 'USD', isRTL)}</span>
                     )}
                   </div>
                 )}
 
                 <div className="text-xs text-muted-foreground">
-                  {isRTL ? 'واحد پول اصلی:' : 'Primary currency:'} {currency}
+                  {isRTL ? 'واحد پول اصلی:' : 'Primary currency:'} {productCurrency}
                 </div>
               </CardContent>
             </Card>
