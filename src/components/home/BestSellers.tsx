@@ -199,29 +199,25 @@ const BestSellers = () => {
           </div>
         </div>
         <div className="relative group">
-          {/* Left Arrow */}
-          {showLeftArrow && (
-            <Button
-              variant="outline"
-              size="icon"
-              className={`absolute ${isRTL ? 'right-0' : 'left-0'} top-1/2 -translate-y-1/2 z-10 bg-background/90 backdrop-blur-sm shadow-lg opacity-0 group-hover:opacity-100 transition-opacity hidden md:flex`}
-              onClick={() => scroll(isRTL ? "right" : "left")}
-            >
-              {isRTL ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
-            </Button>
-          )}
+          {/* Left Scroll Button - Floating in middle */}
+          <Button
+            variant="secondary"
+            size="icon"
+            className={`absolute ${isRTL ? 'right-0' : 'left-0'} top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full shadow-lg bg-background/90 backdrop-blur-sm border border-border hover:bg-background transition-opacity duration-200 hidden md:flex ${showLeftArrow ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+            onClick={() => scroll(isRTL ? "right" : "left")}
+          >
+            {isRTL ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
+          </Button>
 
-          {/* Right Arrow */}
-          {showRightArrow && (
-            <Button
-              variant="outline"
-              size="icon"
-              className={`absolute ${isRTL ? 'left-0' : 'right-0'} top-1/2 -translate-y-1/2 z-10 bg-background/90 backdrop-blur-sm shadow-lg opacity-0 group-hover:opacity-100 transition-opacity hidden md:flex`}
-              onClick={() => scroll(isRTL ? "left" : "right")}
-            >
-              {isRTL ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
-            </Button>
-          )}
+          {/* Right Scroll Button - Floating in middle */}
+          <Button
+            variant="secondary"
+            size="icon"
+            className={`absolute ${isRTL ? 'left-0' : 'right-0'} top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full shadow-lg bg-background/90 backdrop-blur-sm border border-border hover:bg-background transition-opacity duration-200 hidden md:flex ${showRightArrow ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+            onClick={() => scroll(isRTL ? "left" : "right")}
+          >
+            {isRTL ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+          </Button>
 
           <ScrollArea className="w-full" dir={isRTL ? "rtl" : "ltr"}>
             <div
