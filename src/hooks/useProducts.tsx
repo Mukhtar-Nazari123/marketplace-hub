@@ -18,6 +18,7 @@ export interface DBProduct {
   currency: string;
   metadata: {
     brand?: string;
+    keywords?: string[];
     [key: string]: unknown;
   } | null;
   category?: {
@@ -25,6 +26,9 @@ export interface DBProduct {
     name: string;
     slug: string;
     parent_id: string | null;
+  } | null;
+  seller_verification?: {
+    business_name: string | null;
   } | null;
 }
 
@@ -35,6 +39,7 @@ interface UseProductsOptions {
   featured?: boolean;
   limit?: number;
   sellerId?: string;
+  search?: string;
 }
 
 export const useProducts = (options: UseProductsOptions = {}) => {
@@ -42,7 +47,7 @@ export const useProducts = (options: UseProductsOptions = {}) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const { status = 'active', categoryId, categorySlug, featured, limit, sellerId } = options;
+  const { status = 'active', categoryId, categorySlug, featured, limit, sellerId, search } = options;
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -70,6 +75,13 @@ export const useProducts = (options: UseProductsOptions = {}) => {
         query = query.eq('seller_id', sellerId);
       }
 
+      // Backend search - search by name (case-insensitive)
+      if (search && search.trim().length >= 2) {
+        const searchTerm = search.trim();
+        // Use ilike for case-insensitive search on name and description
+        query = query.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
+      }
+
       if (limit) {
         query = query.limit(limit);
       }
@@ -86,6 +98,50 @@ export const useProducts = (options: UseProductsOptions = {}) => {
         );
       }
 
+      // Additional client-side search for brand and keywords in metadata
+      if (search && search.trim().length >= 2) {
+        const searchLower = search.trim().toLowerCase();
+        filteredData = filteredData.filter((p) => {
+          // Already matched by name/description from backend, but let's also check metadata
+          const metadata = (p.metadata && typeof p.metadata === 'object' && !Array.isArray(p.metadata)) 
+            ? p.metadata as Record<string, unknown>
+            : {};
+          const brand = (typeof metadata.brand === 'string' ? metadata.brand : '').toLowerCase();
+          const keywords = Array.isArray(metadata.keywords) 
+            ? (metadata.keywords as string[]).map((k) => String(k).toLowerCase())
+            : [];
+          const categoryName = (p.category?.name || '').toLowerCase();
+          
+          return (
+            p.name.toLowerCase().includes(searchLower) ||
+            (p.description || '').toLowerCase().includes(searchLower) ||
+            brand.includes(searchLower) ||
+            keywords.some((k) => k.includes(searchLower)) ||
+            categoryName.includes(searchLower)
+          );
+        });
+
+        // Sort by relevance: exact name match first, then partial name match, then others
+        filteredData.sort((a, b) => {
+          const aNameLower = a.name.toLowerCase();
+          const bNameLower = b.name.toLowerCase();
+          const aExact = aNameLower === searchLower;
+          const bExact = bNameLower === searchLower;
+          const aStartsWith = aNameLower.startsWith(searchLower);
+          const bStartsWith = bNameLower.startsWith(searchLower);
+          const aIncludes = aNameLower.includes(searchLower);
+          const bIncludes = bNameLower.includes(searchLower);
+
+          if (aExact && !bExact) return -1;
+          if (!aExact && bExact) return 1;
+          if (aStartsWith && !bStartsWith) return -1;
+          if (!aStartsWith && bStartsWith) return 1;
+          if (aIncludes && !bIncludes) return -1;
+          if (!aIncludes && bIncludes) return 1;
+          return 0;
+        });
+      }
+
       setProducts(filteredData as DBProduct[]);
     } catch (err) {
       console.error('Error fetching products:', err);
@@ -93,7 +149,7 @@ export const useProducts = (options: UseProductsOptions = {}) => {
     } finally {
       setLoading(false);
     }
-  }, [status, categoryId, categorySlug, featured, limit, sellerId]);
+  }, [status, categoryId, categorySlug, featured, limit, sellerId, search]);
 
   useEffect(() => {
     fetchProducts();
