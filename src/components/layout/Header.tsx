@@ -25,6 +25,7 @@ import { useTheme } from "next-themes";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const { t, isRTL } = useLanguage();
   const { theme, setTheme } = useTheme();
   const { siteName, logoUrl } = useSiteSettings();
@@ -36,6 +37,19 @@ const Header = () => {
   const { itemCount } = useCart();
   const { itemCount: wishlistCount } = useWishlist();
   const navigate = useNavigate();
+
+  const handleSearch = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
 
   // Get dashboard link based on role
   const getDashboardLink = () => {
@@ -88,14 +102,18 @@ const Header = () => {
 
             {/* Search Bar */}
             <div className="flex-1 max-w-2xl hidden md:flex">
-              <div className="relative w-full">
+              <form onSubmit={handleSearch} className="relative w-full">
                 <Input
                   type="text"
                   placeholder={t.header.searchPlaceholder}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={handleKeyDown}
                   className={`w-full h-11 rounded-full border-2 border-border focus:border-cyan transition-colors ${isRTL ? "pr-4 pl-24 text-right" : "pl-4 pr-24 text-left"}`}
                   dir={isRTL ? "rtl" : "ltr"}
                 />
                 <Button
+                  type="submit"
                   variant="cyan"
                   size="sm"
                   className={`absolute top-1/2 -translate-y-1/2 rounded-full px-6 ${isRTL ? "left-1" : "right-1"}`}
@@ -103,7 +121,7 @@ const Header = () => {
                   <Search className={`h-4 w-4 ${isRTL ? "ml-1" : "mr-1"}`} />
                   {t.header.search}
                 </Button>
-              </div>
+              </form>
             </div>
 
             {/* Actions */}
@@ -253,21 +271,25 @@ const Header = () => {
 
           {/* Mobile Search */}
           <div className="mt-4 md:hidden">
-            <div className="relative w-full">
+            <form onSubmit={handleSearch} className="relative w-full">
               <Input
                 type="text"
                 placeholder={t.header.searchPlaceholder}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={handleKeyDown}
                 className={`w-full h-10 rounded-full border-2 border-border ${isRTL ? "pr-4 pl-20 text-right" : "pl-4 pr-20 text-left"}`}
                 dir={isRTL ? "rtl" : "ltr"}
               />
               <Button
+                type="submit"
                 variant="cyan"
                 size="sm"
                 className={`absolute top-1/2 -translate-y-1/2 rounded-full px-4 ${isRTL ? "left-1" : "right-1"}`}
               >
                 <Search className="h-4 w-4" />
               </Button>
-            </div>
+            </form>
           </div>
         </div>
       </header>
