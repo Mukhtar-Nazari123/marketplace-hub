@@ -324,18 +324,18 @@ const AdminProducts = () => {
                           <div className="font-medium">{product.name}</div>
                         </TableCell>
                         <TableCell>
-                          <div className="flex flex-col">
+                          <div className="flex flex-col gap-1">
                             {product.compare_at_price && product.compare_at_price > product.price ? (
                               <>
-                                <span className="text-sm text-muted-foreground line-through">
+                                <span className="text-xs text-muted-foreground line-through">
                                   {formatPriceWithCurrency(Number(product.compare_at_price), product.currency || 'AFN', isRTL)}
                                 </span>
-                                <span className="font-medium text-primary">
+                                <span className="font-semibold text-amber-500">
                                   {formatPriceWithCurrency(Number(product.price), product.currency || 'AFN', isRTL)}
                                 </span>
                               </>
                             ) : (
-                              <span>{formatPriceWithCurrency(Number(product.price), product.currency || 'AFN', isRTL)}</span>
+                              <span className="font-medium">{formatPriceWithCurrency(Number(product.price), product.currency || 'AFN', isRTL)}</span>
                             )}
                           </div>
                         </TableCell>
