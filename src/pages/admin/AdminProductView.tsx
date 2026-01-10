@@ -362,15 +362,15 @@ const AdminProductView = () => {
                     <p className="text-sm text-muted-foreground">
                       {isRTL ? 'قیمت' : 'Price'} ({currency})
                     </p>
-                    <div className="flex items-baseline gap-2">
+                    <div className="flex items-baseline gap-3">
+                      <span className="text-3xl font-bold text-primary">
+                        {currencySymbol}{Number(product.price).toLocaleString()}
+                      </span>
                       {product.compare_at_price && product.compare_at_price > product.price && (
-                        <span className="text-lg text-muted-foreground line-through">
+                        <span className="text-xl text-muted-foreground line-through">
                           {currencySymbol}{Number(product.compare_at_price).toLocaleString()}
                         </span>
                       )}
-                      <span className="text-3xl font-bold">
-                        {currencySymbol}{Number(product.price).toLocaleString()}
-                      </span>
                     </div>
                   </div>
                 </div>
