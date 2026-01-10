@@ -54,6 +54,34 @@ export const useProducts = (options: UseProductsOptions = {}) => {
     setError(null);
 
     try {
+      // Normalize search term
+      const searchTerm = search?.trim() || '';
+      const searchLower = searchTerm.toLowerCase();
+      const hasSearch = searchTerm.length >= 2;
+
+      // Fetch seller verifications for store name search and mapping
+      let sellerMap: Map<string, string> = new Map();
+      let matchingSellerIds: string[] = [];
+      
+      if (hasSearch) {
+        const { data: sellerData } = await supabase
+          .from('seller_verifications')
+          .select('seller_id, business_name')
+          .eq('status', 'approved');
+        
+        if (sellerData) {
+          sellerData.forEach(s => {
+            if (s.business_name) {
+              sellerMap.set(s.seller_id, s.business_name);
+              // Check if seller store name matches search
+              if (s.business_name.toLowerCase().includes(searchLower)) {
+                matchingSellerIds.push(s.seller_id);
+              }
+            }
+          });
+        }
+      }
+
       let query = supabase
         .from('products')
         .select(`
@@ -75,13 +103,6 @@ export const useProducts = (options: UseProductsOptions = {}) => {
         query = query.eq('seller_id', sellerId);
       }
 
-      // Backend search - search by name (case-insensitive)
-      if (search && search.trim().length >= 2) {
-        const searchTerm = search.trim();
-        // Use ilike for case-insensitive search on name and description
-        query = query.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
-      }
-
       if (limit) {
         query = query.limit(limit);
       }
@@ -90,55 +111,82 @@ export const useProducts = (options: UseProductsOptions = {}) => {
 
       if (fetchError) throw fetchError;
 
-      // If filtering by category slug, we need to filter after fetch
-      let filteredData = data || [];
+      // Map products with seller names
+      let filteredData = (data || []).map(p => ({
+        ...p,
+        seller_verification: sellerMap.has(p.seller_id) 
+          ? { business_name: sellerMap.get(p.seller_id) || null }
+          : null
+      }));
+
+      // If filtering by category slug, filter after fetch
       if (categorySlug && filteredData.length > 0) {
         filteredData = filteredData.filter(
           (p) => p.category?.slug === categorySlug || p.category?.parent_id === categorySlug
         );
       }
 
-      // Additional client-side search for brand and keywords in metadata
-      if (search && search.trim().length >= 2) {
-        const searchLower = search.trim().toLowerCase();
+      // Multi-field search filtering
+      if (hasSearch) {
         filteredData = filteredData.filter((p) => {
-          // Already matched by name/description from backend, but let's also check metadata
+          // Parse metadata safely
           const metadata = (p.metadata && typeof p.metadata === 'object' && !Array.isArray(p.metadata)) 
             ? p.metadata as Record<string, unknown>
             : {};
+          
+          // Extract searchable fields
+          const productName = p.name.toLowerCase();
+          const description = (p.description || '').toLowerCase();
           const brand = (typeof metadata.brand === 'string' ? metadata.brand : '').toLowerCase();
           const keywords = Array.isArray(metadata.keywords) 
             ? (metadata.keywords as string[]).map((k) => String(k).toLowerCase())
             : [];
           const categoryName = (p.category?.name || '').toLowerCase();
+          const sellerName = (p.seller_verification?.business_name || '').toLowerCase();
           
-          return (
-            p.name.toLowerCase().includes(searchLower) ||
-            (p.description || '').toLowerCase().includes(searchLower) ||
-            brand.includes(searchLower) ||
-            keywords.some((k) => k.includes(searchLower)) ||
-            categoryName.includes(searchLower)
-          );
+          // Check all search fields
+          const matchesName = productName.includes(searchLower);
+          const matchesDescription = description.includes(searchLower);
+          const matchesBrand = brand.includes(searchLower);
+          const matchesKeywords = keywords.some((k) => k.includes(searchLower));
+          const matchesCategory = categoryName.includes(searchLower);
+          const matchesSeller = sellerName.includes(searchLower) || matchingSellerIds.includes(p.seller_id);
+          
+          return matchesName || matchesDescription || matchesBrand || matchesKeywords || matchesCategory || matchesSeller;
         });
 
-        // Sort by relevance: exact name match first, then partial name match, then others
+        // Relevance ranking - priority: name > brand > keywords > category > seller > description
         filteredData.sort((a, b) => {
-          const aNameLower = a.name.toLowerCase();
-          const bNameLower = b.name.toLowerCase();
-          const aExact = aNameLower === searchLower;
-          const bExact = bNameLower === searchLower;
-          const aStartsWith = aNameLower.startsWith(searchLower);
-          const bStartsWith = bNameLower.startsWith(searchLower);
-          const aIncludes = aNameLower.includes(searchLower);
-          const bIncludes = bNameLower.includes(searchLower);
-
-          if (aExact && !bExact) return -1;
-          if (!aExact && bExact) return 1;
-          if (aStartsWith && !bStartsWith) return -1;
-          if (!aStartsWith && bStartsWith) return 1;
-          if (aIncludes && !bIncludes) return -1;
-          if (!aIncludes && bIncludes) return 1;
-          return 0;
+          const getScore = (p: typeof a) => {
+            const productName = p.name.toLowerCase();
+            const metadata = (p.metadata && typeof p.metadata === 'object' && !Array.isArray(p.metadata)) 
+              ? p.metadata as Record<string, unknown>
+              : {};
+            const brand = (typeof metadata.brand === 'string' ? metadata.brand : '').toLowerCase();
+            const keywords = Array.isArray(metadata.keywords) 
+              ? (metadata.keywords as string[]).map((k) => String(k).toLowerCase())
+              : [];
+            const categoryName = (p.category?.name || '').toLowerCase();
+            
+            // Exact name match - highest priority
+            if (productName === searchLower) return 100;
+            // Name starts with search term
+            if (productName.startsWith(searchLower)) return 90;
+            // Name contains search term
+            if (productName.includes(searchLower)) return 80;
+            // Brand matches
+            if (brand.includes(searchLower)) return 70;
+            // Keywords match
+            if (keywords.some((k) => k.includes(searchLower))) return 60;
+            // Category matches
+            if (categoryName.includes(searchLower)) return 50;
+            // Seller matches
+            if ((p.seller_verification?.business_name || '').toLowerCase().includes(searchLower)) return 40;
+            // Description matches
+            return 30;
+          };
+          
+          return getScore(b) - getScore(a);
         });
       }
 
