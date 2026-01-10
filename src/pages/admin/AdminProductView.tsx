@@ -381,7 +381,7 @@ const AdminProductView = () => {
                     <Package className="h-8 w-8 text-primary" />
                     <div>
                       <p className="text-sm text-muted-foreground">
-                        {isRTL ? 'هزینه ارسال' : 'Delivery Fee'} ({currency})
+                        {isRTL ? 'هزینه ارسال', 'AFN' : 'Delivery Fee'} ({currency})
                       </p>
                       <span className="text-2xl font-bold">
                         {currencySymbol}{Number((product as any).delivery_fee).toLocaleString()}
