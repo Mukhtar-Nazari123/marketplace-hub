@@ -58,20 +58,6 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
       <div
         className={`relative z-10 h-full flex flex-col md:flex-row items-center justify-center md:justify-between px-4 sm:px-8 lg:px-16 py-6 md:py-0 gap-4 md:gap-8 flex-row-reverse`}
       >
-        {/* Icon/Image - Hidden on mobile, shown on md+ */}
-        <div className="flex-shrink-0 hidden md:block">
-          {banner.icon_image ? (
-            <div className="w-32 h-32 lg:w-72 lg:h-72 rounded-full bg-gradient-to-br from-cyan/30 to-orange/30 flex items-center justify-center animate-float overflow-hidden">
-              <img src={banner.icon_image} alt="" className="w-full h-full object-contain p-4" />
-            </div>
-          ) : (
-            <div className="w-32 h-32 lg:w-72 lg:h-72 rounded-full bg-gradient-to-br from-cyan/30 to-orange/30 flex items-center justify-center animate-float opacity-80">
-              <Headphones className="w-16 h-16 lg:w-36 lg:h-36 text-background/50" />
-            </div>
-          )}
-        </div>
-
-        {/* Text Content */}
         <div
           className={`w-full md:max-w-md flex flex-col justify-center
           ${isRTL ? "items-start text-right" : "items-start text-left"}`}
@@ -103,6 +89,20 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
             </Button>
           )}
         </div>
+        {/* Icon/Image - Hidden on mobile, shown on md+ */}
+        <div className="flex-shrink-0 hidden md:block">
+          {banner.icon_image ? (
+            <div className="w-32 h-32 lg:w-72 lg:h-72 rounded-full bg-gradient-to-br from-cyan/30 to-orange/30 flex items-center justify-center animate-float overflow-hidden">
+              <img src={banner.icon_image} alt="" className="w-full h-full object-contain p-4" />
+            </div>
+          ) : (
+            <div className="w-32 h-32 lg:w-72 lg:h-72 rounded-full bg-gradient-to-br from-cyan/30 to-orange/30 flex items-center justify-center animate-float opacity-80">
+              <Headphones className="w-16 h-16 lg:w-36 lg:h-36 text-background/50" />
+            </div>
+          )}
+        </div>
+
+        {/* Text Content */}
       </div>
     </div>
   );
