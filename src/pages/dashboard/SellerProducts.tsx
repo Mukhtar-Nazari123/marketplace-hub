@@ -37,6 +37,7 @@ import {
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { formatCurrency } from '@/lib/currencyFormatter';
 
 interface Product {
   id: string;
@@ -45,6 +46,7 @@ interface Product {
   description: string | null;
   price: number;
   compare_at_price: number | null;
+  currency: string;
   quantity: number;
   images: string[] | null;
   status: string;
@@ -74,7 +76,7 @@ const SellerProducts = () => {
     try {
       const { data, error } = await supabase
         .from('products')
-        .select('id, name, slug, description, price, compare_at_price, quantity, images, status, created_at, metadata')
+        .select('id, name, slug, description, price, compare_at_price, currency, quantity, images, status, created_at, metadata')
         .eq('seller_id', user.id)
         .order('created_at', { ascending: false });
 
@@ -132,12 +134,8 @@ const SellerProducts = () => {
     product.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat(isRTL ? 'fa-IR' : 'en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-    }).format(price);
+  const formatPriceWithCurrency = (price: number, currency: string) => {
+    return formatCurrency(price, currency, isRTL);
   };
 
   return (
@@ -296,13 +294,19 @@ const SellerProducts = () => {
                     </h3>
 
                     {/* Price */}
-                    <div className={cn("flex items-center gap-2", isRTL && "flex-row-reverse")}>
-                      <span className="font-bold text-primary">
-                        {formatPrice(product.price)}
-                      </span>
-                      {product.compare_at_price && product.compare_at_price > product.price && (
-                        <span className="text-sm text-muted-foreground line-through">
-                          {formatPrice(product.compare_at_price)}
+                    <div className={cn("flex flex-col gap-1", isRTL && "items-end")}>
+                      {product.compare_at_price && product.compare_at_price > product.price ? (
+                        <>
+                          <span className="text-xs text-muted-foreground line-through">
+                            {formatPriceWithCurrency(product.compare_at_price, product.currency || 'AFN')}
+                          </span>
+                          <span className="font-bold text-amber-500">
+                            {formatPriceWithCurrency(product.price, product.currency || 'AFN')}
+                          </span>
+                        </>
+                      ) : (
+                        <span className="font-bold text-primary">
+                          {formatPriceWithCurrency(product.price, product.currency || 'AFN')}
                         </span>
                       )}
                     </div>
