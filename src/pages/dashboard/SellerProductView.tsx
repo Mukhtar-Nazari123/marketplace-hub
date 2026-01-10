@@ -302,22 +302,25 @@ const SellerProductView = () => {
               </CardHeader>
               <CardContent className="p-0 space-y-3">
                 {/* Primary Price */}
-                <div className={cn("flex items-baseline gap-3", isRTL && "flex-row-reverse")}>
-                  <span className="text-sm text-muted-foreground">{productCurrency}:</span>
+                <div className="flex flex-col gap-1">
                   {product.compare_at_price && product.compare_at_price > product.price ? (
                     <>
-                      <span className="text-lg text-muted-foreground line-through">
+                      <span className={cn("text-sm text-muted-foreground line-through", isRTL && "text-right")}>
                         {formatCurrency(product.compare_at_price, productCurrency, isRTL)}
                       </span>
-                      <span className="text-2xl font-bold text-amber-500">
-                        {formatCurrency(product.price, productCurrency, isRTL)}
-                      </span>
-                      <Badge variant="secondary" className="bg-success/10 text-success">
-                        {Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)}% {isRTL ? 'تخفیف' : 'OFF'}
-                      </Badge>
+                      <div className={cn("flex items-center gap-2", isRTL && "flex-row-reverse justify-end")}>
+                        <span className="text-2xl font-bold text-amber-500">
+                          {formatCurrency(product.price, productCurrency, isRTL)}
+                        </span>
+                        <Badge variant="secondary" className="bg-success/10 text-success">
+                          {Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)}% {isRTL ? 'تخفیف' : 'OFF'}
+                        </Badge>
+                      </div>
                     </>
                   ) : (
-                    <span className="text-2xl font-bold">{formatCurrency(product.price, productCurrency, isRTL)}</span>
+                    <span className={cn("text-2xl font-bold", isRTL && "text-right")}>
+                      {formatCurrency(product.price, productCurrency, isRTL)}
+                    </span>
                   )}
                 </div>
 
