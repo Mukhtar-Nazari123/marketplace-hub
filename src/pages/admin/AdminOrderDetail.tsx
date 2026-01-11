@@ -44,6 +44,7 @@ interface OrderItem {
   quantity: number;
   total_price: number;
   seller_id: string;
+  product_currency?: string | null;
   product?: {
     sku: string | null;
   } | null;
@@ -119,7 +120,7 @@ const AdminOrderDetail = () => {
             quantity,
             total_price,
             seller_id,
-            products:product_id (sku)
+            products:product_id (sku, currency)
           )
         `)
         .eq('id', id)
@@ -138,6 +139,7 @@ const AdminOrderDetail = () => {
       const processedItems = (orderData.order_items || []).map((item: any) => ({
         ...item,
         product: item.products || null,
+        product_currency: item.products?.currency || null,
       }));
 
       setOrder({
@@ -339,13 +341,17 @@ const AdminOrderDetail = () => {
                       )}
                       <div className="flex flex-wrap items-center gap-4 mt-2 text-sm">
                         <span className="text-muted-foreground">
-                          {isRTL ? 'قیمت واحد:' : 'Unit:'} {formatCurrency(Number(item.unit_price), isRTL ? 'fa' : 'en')}
+                          {isRTL ? 'قیمت واحد:' : 'Unit:'} {item.product_currency === 'USD' 
+                            ? `$${Number(item.unit_price).toLocaleString()}` 
+                            : `${Number(item.unit_price).toLocaleString()} AFN`}
                         </span>
                         <span className="text-muted-foreground">
                           {isRTL ? 'تعداد:' : 'Qty:'} {item.quantity}
                         </span>
                         <span className="font-semibold text-primary">
-                          {isRTL ? 'جمع:' : 'Total:'} {formatCurrency(Number(item.total_price), isRTL ? 'fa' : 'en')}
+                          {isRTL ? 'جمع:' : 'Total:'} {item.product_currency === 'USD' 
+                            ? `$${Number(item.total_price).toLocaleString()}` 
+                            : `${Number(item.total_price).toLocaleString()} AFN`}
                         </span>
                       </div>
                     </div>
