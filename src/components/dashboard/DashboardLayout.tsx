@@ -1,11 +1,13 @@
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useSellerStatus } from '@/hooks/useSellerStatus';
 import { useLanguage } from '@/lib/i18n';
 import { DashboardSidebar } from './DashboardSidebar';
 import { DashboardHeader } from './DashboardHeader';
+import { MobileSidebarDrawer } from './MobileSidebarDrawer';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Loader2 } from 'lucide-react';
 
 interface DashboardLayoutProps {
@@ -26,6 +28,8 @@ export const DashboardLayout = ({
   const { isRTL } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
+  const isMobile = useIsMobile();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!loading) {
@@ -74,10 +78,25 @@ export const DashboardLayout = ({
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
-        <DashboardSidebar />
-        <SidebarInset className="flex-1">
-          <DashboardHeader title={title} description={description} />
-          <main className="flex-1 overflow-auto p-4 md:p-6 animate-fade-in">
+        {/* Desktop Sidebar - hidden on mobile */}
+        {!isMobile && <DashboardSidebar />}
+        
+        {/* Mobile Drawer */}
+        {isMobile && (
+          <MobileSidebarDrawer 
+            open={mobileMenuOpen} 
+            onOpenChange={setMobileMenuOpen} 
+          />
+        )}
+        
+        <SidebarInset className="flex-1 flex flex-col min-w-0">
+          <DashboardHeader 
+            title={title} 
+            description={description} 
+            onMobileMenuToggle={() => setMobileMenuOpen(true)}
+            isMobile={isMobile}
+          />
+          <main className="flex-1 overflow-auto p-3 sm:p-4 md:p-6 animate-fade-in">
             {children}
           </main>
         </SidebarInset>
