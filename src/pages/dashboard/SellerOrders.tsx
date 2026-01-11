@@ -283,9 +283,6 @@ const SellerOrders = () => {
     );
   };
 
-  const getCurrencySymbol = (currency: string) => {
-    return currency === 'USD' ? '$' : '؋';
-  };
 
   const filteredOrders = filterStatus === 'all'
     ? orders
@@ -651,14 +648,18 @@ const SellerOrders = () => {
                               <div className="flex-1 min-w-0">
                                 <p className="font-medium truncate">{item.product_name}</p>
                                 <p className="text-sm text-muted-foreground">
-                                  {item.quantity} × {getCurrencySymbol(order.currency)}
-                                  {item.unit_price.toLocaleString()}
+                                  {item.quantity} × {formatCurrency(item.unit_price, order.currency, isRTL)}
                                 </p>
                               </div>
-                              <div className="text-right">
+                              <div className="text-right space-y-1">
+                                <p className="text-xs text-muted-foreground">
+                                  {isRTL ? 'هزینه ارسال' : 'Delivery fee'}{' '}
+                                  <span className="font-medium text-foreground">
+                                    {formatCurrency(order.delivery_fee, 'AFN', isRTL)}
+                                  </span>
+                                </p>
                                 <p className="font-semibold">
-                                  {getCurrencySymbol(order.currency)}
-                                  {item.total_price.toLocaleString()}
+                                  {formatCurrency(item.total_price, order.currency, isRTL)}
                                 </p>
                               </div>
                             </div>
@@ -714,8 +715,7 @@ const SellerOrders = () => {
                               {isRTL ? 'جمع محصولات' : 'Subtotal'}
                             </span>
                             <span>
-                              {getCurrencySymbol(order.currency)}
-                              {order.subtotal.toLocaleString()}
+                              {formatCurrency(order.subtotal, order.currency, isRTL)}
                             </span>
                           </div>
                           <div className="flex justify-between">
@@ -724,16 +724,20 @@ const SellerOrders = () => {
                               {isRTL ? 'هزینه ارسال' : 'Delivery Fee'}
                             </span>
                             <span>
-                              {getCurrencySymbol(order.currency)}
-                              {order.delivery_fee.toLocaleString()}
+                              {formatCurrency(order.delivery_fee, 'AFN', isRTL)}
                             </span>
                           </div>
                           <Separator />
                           <div className="flex justify-between font-bold text-base">
                             <span>{isRTL ? 'مجموع' : 'Total'}</span>
                             <span className="text-primary">
-                              {getCurrencySymbol(order.currency)}
-                              {order.total.toLocaleString()}
+                              {order.delivery_fee > 0 ? (
+                                <>
+                                  {formatCurrency(order.subtotal, order.currency, isRTL)} + {formatCurrency(order.delivery_fee, 'AFN', isRTL)}
+                                </>
+                              ) : (
+                                formatCurrency(order.total, order.currency, isRTL)
+                              )}
                             </span>
                           </div>
                         </div>
