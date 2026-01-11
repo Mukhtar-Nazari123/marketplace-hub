@@ -28,6 +28,7 @@ import {
   Eye,
   ChevronLeft,
   ChevronRight,
+  Settings,
 } from 'lucide-react';
 
 interface Product {
@@ -465,26 +466,45 @@ const SellerProductView = () => {
           </Card>
         )}
 
-        {/* Attributes */}
+        {/* Specifications */}
         {metadata.attributes && Object.keys(metadata.attributes as Record<string, unknown>).length > 0 && (
-          <Card className="p-6">
-            <CardHeader className="p-0 pb-4">
-              <CardTitle className="text-base">
-                {isRTL ? 'مشخصات' : 'Specifications'}
+          <Card className="overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b">
+              <CardTitle className="text-base flex items-center gap-2">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Settings className="h-4 w-4 text-primary" />
+                </div>
+                {isRTL ? 'مشخصات فنی' : 'Technical Specifications'}
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-0">
+            <CardContent className="p-6">
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {Object.entries(metadata.attributes as Record<string, unknown>).map(([key, value]) => {
                   if (!value) return null;
+                  const formattedKey = key.replace(/([A-Z])/g, ' $1').trim();
+                  const isBooleanValue = typeof value === 'boolean';
+                  
                   return (
-                    <div key={key} className="flex justify-between p-3 bg-muted/50 rounded-lg">
-                      <span className="text-muted-foreground capitalize">
-                        {key.replace(/([A-Z])/g, ' $1').trim()}
-                      </span>
-                      <span className="font-medium">
-                        {typeof value === 'boolean' ? (isRTL ? 'بله' : 'Yes') : String(value)}
-                      </span>
+                    <div 
+                      key={key} 
+                      className="group relative p-4 rounded-xl border bg-card hover:shadow-md hover:border-primary/30 transition-all duration-200"
+                    >
+                      <div className="flex flex-col gap-2">
+                        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                          {formattedKey}
+                        </span>
+                        <span className={cn(
+                          "font-semibold text-foreground",
+                          isBooleanValue && value && "text-green-600 dark:text-green-400",
+                          isBooleanValue && !value && "text-red-500"
+                        )}>
+                          {isBooleanValue 
+                            ? (value ? (isRTL ? '✓ بله' : '✓ Yes') : (isRTL ? '✗ خیر' : '✗ No'))
+                            : String(value)
+                          }
+                        </span>
+                      </div>
+                      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                     </div>
                   );
                 })}
