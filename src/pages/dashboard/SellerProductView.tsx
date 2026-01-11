@@ -353,7 +353,7 @@ const SellerProductView = () => {
                   </span>
                   <span className="font-semibold">
                     {product.delivery_fee > 0 
-                      ? formatCurrency(product.delivery_fee, productCurrency, isRTL)
+                      ? formatCurrency(product.delivery_fee, 'AFN', isRTL)
                       : (isRTL ? 'رایگان' : 'Free')
                     }
                   </span>
