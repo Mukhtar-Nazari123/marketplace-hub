@@ -126,10 +126,6 @@ const Header = () => {
 
             {/* Actions */}
             <div className="flex items-center gap-2 sm:gap-4">
-              {/* Mobile Search */}
-              <Button variant="ghost" size="icon" className="md:hidden">
-                <Search className="h-5 w-5" />
-              </Button>
 
               {/* Theme Toggle */}
               <Tooltip>
