@@ -185,7 +185,6 @@ const AdminProductView = () => {
   const metadata = product?.metadata as ProductMetadata | null;
   // Use product.currency from database first, then fallback to metadata
   const currency = (product as any)?.currency || metadata?.currency || 'AFN';
-  const currencySymbol = currency === 'AFN' ? '؋' : '$';
   const CurrencyIcon = currency === 'AFN' ? Banknote : DollarSign;
 
   if (isLoading) {
@@ -366,19 +365,40 @@ const AdminProductView = () => {
                   </div>
                   
                   {/* Price Display */}
-                  <div className="flex items-center gap-3 flex-wrap">
-                    {product.compare_at_price && product.compare_at_price > product.price && (
-                      <span className="text-lg text-muted-foreground line-through">
-                        {formatCurrency(product.compare_at_price, currency, isRTL)}
+                  <div
+                    className={`flex items-baseline gap-3 flex-wrap ${isRTL ? 'flex-row-reverse' : ''}`}
+                  >
+                    {product.compare_at_price !== null && product.compare_at_price !== product.price ? (
+                      <>
+                        <span className="text-lg text-muted-foreground line-through">
+                          {formatCurrency(
+                            Math.max(product.compare_at_price, product.price),
+                            currency,
+                            isRTL
+                          )}
+                        </span>
+                        <span className="text-2xl font-bold text-orange">
+                          {formatCurrency(
+                            Math.min(product.compare_at_price, product.price),
+                            currency,
+                            isRTL
+                          )}
+                        </span>
+                        <Badge
+                          variant="secondary"
+                          className="bg-success/10 text-success text-xs px-2 py-0.5"
+                        >
+                          {Math.round(
+                            (Math.abs(product.compare_at_price - product.price) /
+                              Math.max(product.compare_at_price, product.price)) *
+                              100
+                          )}% {isRTL ? 'تخفیف' : 'OFF'}
+                        </Badge>
+                      </>
+                    ) : (
+                      <span className="text-2xl font-bold">
+                        {formatCurrency(product.price, currency, isRTL)}
                       </span>
-                    )}
-                    <span className="text-2xl font-bold text-primary">
-                      {formatCurrency(product.price, currency, isRTL)}
-                    </span>
-                    {product.compare_at_price && product.compare_at_price > product.price && (
-                      <Badge className="bg-destructive/90 text-destructive-foreground text-xs px-2 py-0.5">
-                        {Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)}% OFF
-                      </Badge>
                     )}
                   </div>
 
