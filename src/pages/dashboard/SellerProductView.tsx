@@ -304,16 +304,18 @@ const SellerProductView = () => {
               <CardContent className="p-0 space-y-3">
                 {/* Primary Price */}
                 <div className={cn("flex items-baseline gap-3 flex-wrap", isRTL && "flex-row-reverse")}>
-                  {product.compare_at_price && product.compare_at_price > product.price ? (
+                  {product.compare_at_price && product.compare_at_price !== product.price ? (
                     <>
+                      {/* Original price (the higher one) lined through */}
                       <span className="text-lg text-muted-foreground line-through">
-                        {formatCurrency(product.compare_at_price, productCurrency, isRTL)}
+                        {formatCurrency(Math.max(product.compare_at_price, product.price), productCurrency, isRTL)}
                       </span>
+                      {/* Discounted price (the lower one) bold in orange */}
                       <span className="text-2xl font-bold text-orange">
-                        {formatCurrency(product.price, productCurrency, isRTL)}
+                        {formatCurrency(Math.min(product.compare_at_price, product.price), productCurrency, isRTL)}
                       </span>
                       <Badge variant="secondary" className="bg-success/10 text-success">
-                        {Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)}% {isRTL ? 'تخفیف' : 'OFF'}
+                        {Math.round((Math.abs(product.compare_at_price - product.price) / Math.max(product.compare_at_price, product.price)) * 100)}% {isRTL ? 'تخفیف' : 'OFF'}
                       </Badge>
                     </>
                   ) : (
