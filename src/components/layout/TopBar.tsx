@@ -1,6 +1,7 @@
 import { Phone, Globe, User } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/lib/i18n";
+import { useContactSettings } from "@/hooks/useContactSettings";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const TopBar = () => {
@@ -10,6 +11,8 @@ const TopBar = () => {
     setLanguage,
     isRTL
   } = useLanguage();
+
+  const { phone } = useContactSettings();
 
   const toggleLanguage = () => {
     setLanguage(language === "fa" ? "en" : "fa");
@@ -23,7 +26,7 @@ const TopBar = () => {
             <div className="flex items-center gap-2">
               <Phone className="h-4 w-4 text-cyan" />
               <span>
-                {t.topBar.callUs} {isRTL ? "+۹۳ ۱۲۳-۴۵۶-۷۸۹" : "+93 123-456-789"}
+                {t.topBar.callUs} {phone}
               </span>
             </div>
             <div className="hidden md:flex items-center gap-4">
