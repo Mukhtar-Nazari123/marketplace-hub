@@ -16,20 +16,20 @@ const BuyerDashboard = () => {
       allowedRoles={["buyer"]}
     >
       <h1 className="sr-only">{isRTL ? "داشبورد خریدار" : "Buyer Dashboard"}</h1>
-      <section className="grid gap-4 md:grid-cols-3">
+      <section className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
         <Card className="border-border/50">
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-base">
+            <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
               <User className="h-4 w-4 text-primary" />
               {isRTL ? "پروفایل" : "Profile"}
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-xs sm:text-sm">
               {isRTL ? "مدیریت اطلاعات حساب" : "Manage your account"}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Link to="/dashboard/profile">
-              <Button variant="secondary" className="w-full">
+              <Button variant="secondary" className="w-full min-h-[44px]">
                 {isRTL ? "رفتن به پروفایل" : "Go to profile"}
               </Button>
             </Link>
@@ -38,30 +38,30 @@ const BuyerDashboard = () => {
 
         <Card className="border-border/50">
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-base">
+            <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
               <ShoppingBag className="h-4 w-4 text-primary" />
               {isRTL ? "سفارشات" : "Orders"}
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-xs sm:text-sm">
               {isRTL ? "مشاهده و پیگیری سفارشات" : "View and track orders"}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Link to="/dashboard/buyer/orders">
-              <Button variant="secondary" className="w-full">
+              <Button variant="secondary" className="w-full min-h-[44px]">
                 {isRTL ? "مشاهده سفارشات" : "View Orders"}
               </Button>
             </Link>
           </CardContent>
         </Card>
 
-        <Card className="border-border/50">
+        <Card className="border-border/50 sm:col-span-2 md:col-span-1">
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-base">
+            <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
               <MapPin className="h-4 w-4 text-primary" />
               {isRTL ? "آدرس‌ها" : "Addresses"}
             </CardTitle>
-            <CardDescription>{isRTL ? "به‌زودی" : "Coming soon"}</CardDescription>
+            <CardDescription className="text-xs sm:text-sm">{isRTL ? "به‌زودی" : "Coming soon"}</CardDescription>
           </CardHeader>
           <CardContent>
             <Badge variant="secondary">{isRTL ? "خریدار" : "Buyer"}</Badge>

@@ -136,37 +136,37 @@ const Wishlist = () => {
       description={texts.description}
       allowedRoles={['buyer']}
     >
-      <div className="space-y-6 animate-fade-in">
+      <div className="space-y-4 sm:space-y-6 animate-fade-in">
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
             {[...Array(4)].map((_, i) => (
               <Card key={i}>
-                <CardContent className="p-4 space-y-4">
-                  <Skeleton className="w-full h-40 rounded-lg" />
+                <CardContent className="p-3 sm:p-4 space-y-3 sm:space-y-4">
+                  <Skeleton className="w-full h-32 sm:h-40 rounded-lg" />
                   <Skeleton className="h-5 w-3/4" />
                   <Skeleton className="h-4 w-1/2" />
                   <div className="flex gap-2">
-                    <Skeleton className="h-9 flex-1" />
-                    <Skeleton className="h-9 w-9" />
+                    <Skeleton className="h-10 sm:h-9 flex-1" />
+                    <Skeleton className="h-10 sm:h-9 w-10 sm:w-9" />
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
         ) : wishlist.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-4">
-              <Heart className="h-10 w-10 text-muted-foreground" />
+          <div className="flex flex-col items-center justify-center py-12 sm:py-16 text-center px-4">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-muted flex items-center justify-center mb-4">
+              <Heart className="h-8 w-8 sm:h-10 sm:w-10 text-muted-foreground" />
             </div>
-            <h3 className="text-xl font-semibold text-foreground mb-2">{texts.empty}</h3>
-            <p className="text-muted-foreground mb-6">{texts.emptyDesc}</p>
-            <Button onClick={() => navigate('/products')}>
+            <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">{texts.empty}</h3>
+            <p className="text-muted-foreground mb-6 text-sm sm:text-base">{texts.emptyDesc}</p>
+            <Button onClick={() => navigate('/products')} className="min-h-[44px]">
               <Package className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
               {texts.browseProducts}
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
             {wishlist.map((item) => {
               const product = item.product;
               const isAvailable = product && product.status === 'active' && product.quantity > 0;
@@ -212,12 +212,12 @@ const Wishlist = () => {
                         <p className="text-muted-foreground text-sm">{texts.unavailable}</p>
                       )}
 
-                      {/* Actions */}
+                      {/* Actions - Touch-friendly */}
                       <div className="flex gap-2">
                         <Button
                           variant="default"
                           size="sm"
-                          className="flex-1"
+                          className="flex-1 min-h-[44px]"
                           disabled={!isAvailable}
                           onClick={() => product && addToCart(product.name)}
                         >
@@ -227,7 +227,7 @@ const Wishlist = () => {
                         <Button
                           variant="outline"
                           size="icon"
-                          className="shrink-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                          className="shrink-0 text-destructive hover:bg-destructive/10 hover:text-destructive min-h-[44px] min-w-[44px]"
                           disabled={removingIds.has(item.id)}
                           onClick={() => removeFromWishlist(item.id)}
                         >
