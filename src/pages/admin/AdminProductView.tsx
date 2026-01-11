@@ -37,7 +37,8 @@ import {
   Play,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useLanguage, formatDate, formatCurrency } from '@/lib/i18n';
+import { useLanguage, formatDate } from '@/lib/i18n';
+import { formatCurrency } from '@/lib/currencyFormatter';
 import { Json } from '@/integrations/supabase/types';
 
 interface ProductMetadata {
@@ -355,40 +356,49 @@ const AdminProductView = () => {
                 </div>
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* Price Section */}
-                <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg">
-                  <CurrencyIcon className="h-8 w-8 text-primary" />
-                  <div>
-                    <p className="text-sm text-muted-foreground">
-                      {isRTL ? 'قیمت' : 'Price'} ({currency})
-                    </p>
-                    <div className="flex items-baseline gap-2">
-                      {product.compare_at_price && product.compare_at_price > product.price && (
-                        <span className="text-lg text-muted-foreground line-through">
-                          {Number(product.compare_at_price).toLocaleString()} {currencySymbol}
-                        </span>
-                      )}
-                      <span className="text-2xl font-bold text-amber-500">
-                        {Number(product.price).toLocaleString()} {currencySymbol}
+                {/* Pricing Section - Modern Design */}
+                <div className="p-5 bg-gradient-to-br from-primary/5 via-primary/10 to-accent/5 rounded-xl border border-primary/10">
+                  <div className="flex items-center gap-2 mb-3">
+                    <CurrencyIcon className="h-5 w-5 text-primary" />
+                    <span className="font-semibold text-foreground">
+                      {isRTL ? 'قیمت‌گذاری' : 'Pricing'}
+                    </span>
+                  </div>
+                  
+                  {/* Price Display */}
+                  <div className="flex items-center gap-3 flex-wrap">
+                    {product.compare_at_price && product.compare_at_price > product.price && (
+                      <span className="text-lg text-muted-foreground line-through">
+                        {formatCurrency(product.compare_at_price, currency, isRTL)}
+                      </span>
+                    )}
+                    <span className="text-2xl font-bold text-primary">
+                      {formatCurrency(product.price, currency, isRTL)}
+                    </span>
+                    {product.compare_at_price && product.compare_at_price > product.price && (
+                      <Badge className="bg-destructive/90 text-destructive-foreground text-xs px-2 py-0.5">
+                        {Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)}% OFF
+                      </Badge>
+                    )}
+                  </div>
+
+                  {/* Delivery Fee - Always in AFN */}
+                  {(product as any)?.delivery_fee !== undefined && (product as any).delivery_fee > 0 && (
+                    <div className="mt-3 pt-3 border-t border-primary/10">
+                      <span className="text-sm text-muted-foreground">
+                        {isRTL ? 'هزینه ارسال:' : 'Delivery Fee:'}
+                      </span>
+                      <span className="font-bold text-foreground ms-2">
+                        {formatCurrency((product as any).delivery_fee, 'AFN', isRTL)}
                       </span>
                     </div>
+                  )}
+
+                  {/* Primary Currency */}
+                  <div className="mt-2 text-xs text-muted-foreground">
+                    {isRTL ? 'ارز اصلی:' : 'Primary currency:'} {currency}
                   </div>
                 </div>
-
-                {/* Delivery Fee Section */}
-                {(product as any)?.delivery_fee !== undefined && (product as any).delivery_fee > 0 && (
-                  <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg">
-                    <Package className="h-8 w-8 text-primary" />
-                    <div>
-                      <p className="text-sm text-muted-foreground">
-                        {isRTL ? 'هزینه ارسال' : 'Delivery Fee'} ({currency})
-                      </p>
-                      <span className="text-2xl font-bold">
-                        {currencySymbol}{Number((product as any).delivery_fee).toLocaleString()}
-                      </span>
-                    </div>
-                  </div>
-                )}
 
                 <Separator />
 
