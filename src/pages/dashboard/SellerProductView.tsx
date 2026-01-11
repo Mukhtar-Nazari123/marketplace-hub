@@ -478,37 +478,84 @@ const SellerProductView = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {Object.entries(metadata.attributes as Record<string, unknown>).map(([key, value]) => {
-                  if (!value) return null;
-                  const formattedKey = key.replace(/([A-Z])/g, ' $1').trim();
-                  const isBooleanValue = typeof value === 'boolean';
-                  
-                  return (
-                    <div 
-                      key={key} 
-                      className="group relative p-4 rounded-xl border bg-card hover:shadow-md hover:border-primary/30 transition-all duration-200"
-                    >
-                      <div className="flex flex-col gap-2">
-                        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                          {formattedKey}
-                        </span>
-                        <span className={cn(
-                          "font-semibold text-foreground",
-                          isBooleanValue && value && "text-green-600 dark:text-green-400",
-                          isBooleanValue && !value && "text-red-500"
-                        )}>
-                          {isBooleanValue 
-                            ? (value ? (isRTL ? '✓ بله' : '✓ Yes') : (isRTL ? '✗ خیر' : '✗ No'))
-                            : String(value)
-                          }
-                        </span>
+              {(() => {
+                const attrs = metadata.attributes as Record<string, unknown>;
+                const hasWarranty = attrs.hasWarranty;
+                const warrantyDuration = attrs.warrantyDuration;
+                const hasWarrantyInfo = hasWarranty !== undefined || warrantyDuration;
+                
+                // Filter out warranty fields from other specs
+                const otherSpecs = Object.entries(attrs).filter(
+                  ([key]) => key !== 'hasWarranty' && key !== 'warrantyDuration'
+                );
+                const hasOtherSpecs = otherSpecs.some(([, value]) => value);
+
+                return (
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {/* Specifications Card */}
+                    {hasOtherSpecs && (
+                      <div className="p-5 rounded-xl border bg-muted/30 hover:shadow-md transition-all duration-200">
+                        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                          {isRTL ? 'مشخصات' : 'Specifications'}
+                        </h4>
+                        <div className="space-y-2 text-sm text-foreground leading-relaxed">
+                          {otherSpecs.map(([key, value]) => {
+                            if (!value) return null;
+                            const formattedKey = key.replace(/([A-Z])/g, ' $1').trim();
+                            const displayValue = typeof value === 'boolean' 
+                              ? (value ? (isRTL ? 'بله' : 'Yes') : (isRTL ? 'خیر' : 'No'))
+                              : String(value);
+                            return (
+                              <div key={key} className="flex gap-2">
+                                <span className="font-medium capitalize">{formattedKey}:</span>
+                                <span>{displayValue}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
-                      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                    </div>
-                  );
-                })}
-              </div>
+                    )}
+
+                    {/* Warranty Card */}
+                    {hasWarrantyInfo && (
+                      <div className="p-5 rounded-xl border bg-muted/30 hover:shadow-md transition-all duration-200">
+                        <div className="space-y-4">
+                          {/* Has Warranty */}
+                          <div>
+                            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
+                              <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                              {isRTL ? 'گارانتی' : 'Has Warranty'}
+                            </h4>
+                            <span className={cn(
+                              "font-semibold text-lg",
+                              hasWarranty ? "text-green-600 dark:text-green-400" : "text-red-500"
+                            )}>
+                              {hasWarranty 
+                                ? (isRTL ? '✓ بله' : '✓ Yes') 
+                                : (isRTL ? '✗ خیر' : '✗ No')
+                              }
+                            </span>
+                          </div>
+
+                          {/* Warranty Duration */}
+                          {warrantyDuration && (
+                            <div className="pt-3 border-t border-border/50">
+                              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                                {isRTL ? 'مدت گارانتی' : 'Warranty Duration'}
+                              </h4>
+                              <span className="font-semibold text-lg text-foreground">
+                                {String(warrantyDuration)}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
             </CardContent>
           </Card>
         )}
