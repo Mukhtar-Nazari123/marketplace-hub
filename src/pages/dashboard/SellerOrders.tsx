@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { useLanguage } from '@/lib/i18n';
+import { formatCurrency } from '@/lib/currencyFormatter';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -480,7 +481,13 @@ const SellerOrders = () => {
                     </div>
                     <div className="text-right">
                       <p className="text-lg font-bold text-primary">
-                        {getCurrencySymbol(order.currency)}{order.total.toLocaleString()}
+                        {order.delivery_fee > 0 ? (
+                          <>
+                            {formatCurrency(order.subtotal, order.currency, isRTL)} + {formatCurrency(order.delivery_fee, 'AFN', isRTL)}
+                          </>
+                        ) : (
+                          formatCurrency(order.total, order.currency, isRTL)
+                        )}
                       </p>
                       <p className="text-sm text-muted-foreground">
                         {order.order_items?.length || 0} {isRTL ? 'محصول' : 'items'}
