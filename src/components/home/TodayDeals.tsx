@@ -142,7 +142,7 @@ const TodayDeals = () => {
             products.map((product, index) => (
               <div
                 key={product.id}
-                className="w-[160px] md:w-[180px] lg:w-[200px] flex-shrink-0 opacity-0 animate-fade-in-up"
+                className="w-[200px] md:w-[220px] flex-shrink-0 opacity-0 animate-fade-in-up"
                 style={{ animationDelay: `${index * 100}ms`, animationFillMode: "forwards" }}
               >
                 <ProductCard {...getProductCardData(product)} />
