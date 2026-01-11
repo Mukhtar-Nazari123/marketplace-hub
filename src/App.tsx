@@ -25,6 +25,7 @@ import Checkout from "./pages/Checkout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminProducts from "./pages/admin/AdminProducts";
+import AdminDeals from "./pages/admin/AdminDeals";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminOrderDetail from "./pages/admin/AdminOrderDetail";
 import AdminSellers from "./pages/admin/AdminSellers";
@@ -110,6 +111,7 @@ const App = () => (
                       <Route path="/dashboard/contact-settings" element={<AdminContactSettings />} />
                       <Route path="/dashboard/newsletter" element={<AdminNewsletter />} />
                       <Route path="/dashboard/social-links" element={<AdminSocialLinks />} />
+                      <Route path="/dashboard/deals" element={<AdminDeals />} />
                       {/* Shared Profile Route (keep existing) */}
                       <Route path="/dashboard/profile" element={<BuyerProfile />} />
 

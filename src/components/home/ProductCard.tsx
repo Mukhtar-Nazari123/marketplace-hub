@@ -9,6 +9,7 @@ import { useWishlist } from "@/hooks/useWishlist";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 import CompactRating from "@/components/ui/CompactRating";
+import DealCountdown from "./DealCountdown";
 
 interface ProductCardProps {
   id: string;
@@ -22,11 +23,16 @@ interface ProductCardProps {
   isNew?: boolean;
   isHot?: boolean;
   discount?: number;
+  // Legacy countdown support (static)
   countdown?: {
     hours: number;
     minutes: number;
     seconds: number;
   };
+  // New deal countdown support (dynamic)
+  isDeal?: boolean;
+  dealStartAt?: string | null;
+  dealEndAt?: string | null;
   currency?: 'AFN' | 'USD';
 }
 
@@ -43,6 +49,9 @@ const ProductCard = ({
   isHot,
   discount,
   countdown,
+  isDeal,
+  dealStartAt,
+  dealEndAt,
   currency = 'AFN',
 }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -56,6 +65,9 @@ const ProductCard = ({
   const isWishlisted = isInWishlist(id);
   const isBuyer = role === 'buyer';
   const currencySymbol = currency === 'USD' ? '$' : (isRTL ? 'افغانی' : 'AFN');
+
+  // Show countdown if deal is active with valid end time
+  const showDealCountdown = isDeal && dealEndAt;
 
   const formatPrice = (num: number) => {
     if (isRTL) {
@@ -195,7 +207,10 @@ const ProductCard = ({
 
         {/* Countdown - Fixed height reserved space */}
         <div className="h-14 mt-auto flex-shrink-0">
-          {countdown ? (
+          {showDealCountdown ? (
+            <DealCountdown dealEndAt={dealEndAt} dealStartAt={dealStartAt} />
+          ) : countdown ? (
+            // Legacy static countdown support
             <div className="flex items-center justify-center gap-1 bg-foreground text-background rounded-lg p-2 h-full">
               <div className="text-center">
                 <span className="font-bold text-lg">{isRTL ? countdown.hours.toString().padStart(2, "0").replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]) : countdown.hours.toString().padStart(2, "0")}</span>
