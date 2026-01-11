@@ -703,11 +703,11 @@ const SellerOrders = () => {
                         </div>
                       )}
 
-                      {/* Order Total */}
+                      {/* Payment Summary */}
                       <div className="space-y-3">
                         <h4 className="font-semibold flex items-center gap-2">
                           <DollarSign className="w-4 h-4" />
-                          {isRTL ? 'خلاصه سفارش' : 'Order Summary'}
+                          {isRTL ? 'خلاصه پرداخت' : 'Payment Summary'}
                         </h4>
                         <div className="p-4 bg-muted/50 rounded-lg text-sm space-y-2">
                           <div className="flex justify-between">
@@ -715,13 +715,20 @@ const SellerOrders = () => {
                               {isRTL ? 'جمع محصولات' : 'Subtotal'}
                             </span>
                             <span>
-                              {formatCurrency(order.subtotal, order.currency, isRTL)}
+                              {order.currency !== 'AFN' && order.delivery_fee > 0 ? (
+                                <>
+                                  {formatCurrency(order.subtotal, order.currency, isRTL)} +{' '}
+                                  {formatCurrency(0, 'AFN', isRTL)}
+                                </>
+                              ) : (
+                                formatCurrency(order.subtotal, order.currency, isRTL)
+                              )}
                             </span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-muted-foreground flex items-center gap-1">
                               <Truck className="w-3 h-3" />
-                              {isRTL ? 'هزینه ارسال' : 'Delivery Fee'}
+                              {isRTL ? 'هزینه ارسال' : 'Shipping'}
                             </span>
                             <span>
                               {formatCurrency(order.delivery_fee, 'AFN', isRTL)}
@@ -731,9 +738,10 @@ const SellerOrders = () => {
                           <div className="flex justify-between font-bold text-base">
                             <span>{isRTL ? 'مجموع' : 'Total'}</span>
                             <span className="text-primary">
-                              {order.delivery_fee > 0 ? (
+                              {order.currency !== 'AFN' && order.delivery_fee > 0 ? (
                                 <>
-                                  {formatCurrency(order.subtotal, order.currency, isRTL)} + {formatCurrency(order.delivery_fee, 'AFN', isRTL)}
+                                  {formatCurrency(order.subtotal, order.currency, isRTL)} +{' '}
+                                  {formatCurrency(order.delivery_fee, 'AFN', isRTL)}
                                 </>
                               ) : (
                                 formatCurrency(order.total, order.currency, isRTL)
