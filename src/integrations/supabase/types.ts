@@ -491,10 +491,13 @@ export type Database = {
           cost_price: number | null
           created_at: string
           currency: string
+          deal_end_at: string | null
+          deal_start_at: string | null
           delivery_fee: number
           description: string | null
           id: string
           images: string[] | null
+          is_deal: boolean | null
           is_featured: boolean
           low_stock_threshold: number | null
           metadata: Json | null
@@ -517,10 +520,13 @@ export type Database = {
           cost_price?: number | null
           created_at?: string
           currency?: string
+          deal_end_at?: string | null
+          deal_start_at?: string | null
           delivery_fee?: number
           description?: string | null
           id?: string
           images?: string[] | null
+          is_deal?: boolean | null
           is_featured?: boolean
           low_stock_threshold?: number | null
           metadata?: Json | null
@@ -543,10 +549,13 @@ export type Database = {
           cost_price?: number | null
           created_at?: string
           currency?: string
+          deal_end_at?: string | null
+          deal_start_at?: string | null
           delivery_fee?: number
           description?: string | null
           id?: string
           images?: string[] | null
+          is_deal?: boolean | null
           is_featured?: boolean
           low_stock_threshold?: number | null
           metadata?: Json | null

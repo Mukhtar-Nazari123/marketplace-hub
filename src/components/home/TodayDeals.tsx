@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProductRatings } from "@/hooks/useProductRatings";
 
-interface Product {
+interface DealProduct {
   id: string;
   name: string;
   price: number;
@@ -15,11 +15,14 @@ interface Product {
   images: string[];
   currency: string;
   created_at: string;
+  is_deal: boolean;
+  deal_start_at: string | null;
+  deal_end_at: string | null;
 }
 
 const TodayDeals = () => {
   const { t, isRTL } = useLanguage();
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<DealProduct[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -27,22 +30,31 @@ const TodayDeals = () => {
   const { getRating, loading: ratingsLoading } = useProductRatings(productIds);
 
   useEffect(() => {
-    fetchActiveProducts();
+    fetchActiveDeals();
+    
+    // Refresh deals every minute to check for expired ones
+    const interval = setInterval(fetchActiveDeals, 60000);
+    return () => clearInterval(interval);
   }, []);
 
-  const fetchActiveProducts = async () => {
+  const fetchActiveDeals = async () => {
     try {
+      const now = new Date().toISOString();
+      
       const { data, error } = await supabase
         .from('products')
-        .select('id, name, price, compare_at_price, images, currency, created_at')
+        .select('id, name, price, compare_at_price, images, currency, created_at, is_deal, deal_start_at, deal_end_at')
         .eq('status', 'active')
-        .order('created_at', { ascending: false })
-        .limit(5);
+        .eq('is_deal', true)
+        .lte('deal_start_at', now) // Deal has started
+        .gte('deal_end_at', now)   // Deal hasn't ended
+        .order('deal_end_at', { ascending: true }) // Show soonest expiring first
+        .limit(10);
 
       if (error) throw error;
-      setProducts((data as Product[]) || []);
+      setProducts((data as DealProduct[]) || []);
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.error('Error fetching deal products:', error);
     } finally {
       setIsLoading(false);
     }
@@ -60,7 +72,7 @@ const TodayDeals = () => {
     }
   };
 
-  const getProductCardData = (product: Product) => {
+  const getProductCardData = (product: DealProduct) => {
     const currency = (product.currency as 'AFN' | 'USD') || 'AFN';
     
     const hasDiscount = product.compare_at_price && product.compare_at_price !== product.price;
@@ -94,9 +106,17 @@ const TodayDeals = () => {
       discount,
       image: product.images?.[0],
       currency,
-      countdown: { hours: 90, minutes: 48, seconds: 53 },
+      // Pass real deal data for countdown
+      isDeal: product.is_deal,
+      dealStartAt: product.deal_start_at,
+      dealEndAt: product.deal_end_at,
     };
   };
+
+  // Don't render section if no active deals
+  if (!isLoading && products.length === 0) {
+    return null;
+  }
 
   return (
     <section className="py-12 bg-background">
@@ -132,13 +152,14 @@ const TodayDeals = () => {
         >
           {isLoading ? (
             [...Array(5)].map((_, index) => (
-              <div key={index} className="space-y-3">
+              <div key={index} className="w-[200px] md:w-[220px] flex-shrink-0 space-y-3">
                 <Skeleton className="aspect-square rounded-lg" />
                 <Skeleton className="h-4 w-3/4" />
                 <Skeleton className="h-4 w-1/2" />
+                <Skeleton className="h-14 rounded-lg" />
               </div>
             ))
-          ) : products.length > 0 ? (
+          ) : (
             products.map((product, index) => (
               <div
                 key={product.id}
@@ -148,10 +169,6 @@ const TodayDeals = () => {
                 <ProductCard {...getProductCardData(product)} />
               </div>
             ))
-          ) : (
-            <div className="w-full text-center py-12 text-muted-foreground">
-              {isRTL ? 'هنوز محصولی فعال نشده است' : 'No active products yet'}
-            </div>
           )}
         </div>
       </div>
