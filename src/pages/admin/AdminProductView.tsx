@@ -400,18 +400,33 @@ const AdminProductView = () => {
                   </div>
                 </div>
 
+                {/* Stock & SKU Grid - Modern Design */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-4 bg-muted/30 rounded-xl border border-border/50">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Package className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">
+                        {isRTL ? 'موجودی' : 'Stock'}
+                      </span>
+                    </div>
+                    <p className="text-2xl font-bold">{product.quantity}</p>
+                  </div>
+                  
+                  <div className="p-4 bg-muted/30 rounded-xl border border-border/50">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-muted-foreground font-mono text-lg">#</span>
+                      <span className="text-sm text-muted-foreground">
+                        {isRTL ? 'کد محصول' : 'SKU'}
+                      </span>
+                    </div>
+                    <p className="text-lg font-mono font-semibold">{product.sku || 'N/A'}</p>
+                  </div>
+                </div>
+
                 <Separator />
 
                 {/* Details Grid */}
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground flex items-center gap-1">
-                      <Package className="h-3 w-3" />
-                      {isRTL ? 'موجودی' : 'Stock'}
-                    </p>
-                    <p className="font-medium">{product.quantity}</p>
-                  </div>
-                  
                   <div className="space-y-1">
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                       <Layers className="h-3 w-3" />
