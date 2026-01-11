@@ -101,6 +101,25 @@ const formatProductSKUs = (items: OrderItem[] | undefined, isRTL: boolean): stri
   return `${skus[0]}${isRTL ? ' و ' : ', '}+${skus.length - 1}`;
 };
 
+// Helper to calculate totals by currency from order items
+const calculateTotalsByCurrency = (items: OrderItem[] | undefined): { usdTotal: number; afnTotal: number } => {
+  if (!items || items.length === 0) return { usdTotal: 0, afnTotal: 0 };
+  
+  let usdTotal = 0;
+  let afnTotal = 0;
+  
+  items.forEach(item => {
+    const currency = item.product_currency?.toUpperCase() || 'AFN';
+    if (currency === 'USD') {
+      usdTotal += item.total_price;
+    } else {
+      afnTotal += item.total_price;
+    }
+  });
+  
+  return { usdTotal, afnTotal };
+};
+
 const ORDER_STATUSES = [
   { value: 'pending', label: 'Pending', labelFa: 'در انتظار', color: 'secondary' as const },
   { value: 'confirmed', label: 'Confirmed', labelFa: 'تایید شده', color: 'default' as const },
@@ -480,14 +499,23 @@ const SellerOrders = () => {
                     </div>
                     <div className="text-right">
                       <p className="text-lg font-bold text-primary">
-                        {order.currency !== 'AFN' && order.delivery_fee > 0 ? (
-                          <>
-                            {formatCurrency(order.subtotal, order.currency, isRTL)} +{' '}
-                            {formatCurrency(order.delivery_fee, 'AFN', isRTL)}
-                          </>
-                        ) : (
-                          formatCurrency(order.total, order.currency, isRTL)
-                        )}
+                        {(() => {
+                          const { usdTotal, afnTotal } = calculateTotalsByCurrency(order.order_items);
+                          const totalAfnWithDelivery = afnTotal + order.delivery_fee;
+                          
+                          if (usdTotal > 0 && totalAfnWithDelivery > 0) {
+                            return (
+                              <>
+                                {formatCurrency(usdTotal, 'USD', isRTL)} +{' '}
+                                {formatCurrency(totalAfnWithDelivery, 'AFN', isRTL)}
+                              </>
+                            );
+                          } else if (usdTotal > 0) {
+                            return formatCurrency(usdTotal, 'USD', isRTL);
+                          } else {
+                            return formatCurrency(totalAfnWithDelivery, 'AFN', isRTL);
+                          }
+                        })()}
                       </p>
                       <p className="text-sm text-muted-foreground">
                         {order.order_items?.length || 0} {isRTL ? 'محصول' : 'items'}
@@ -713,44 +741,54 @@ const SellerOrders = () => {
                           {isRTL ? 'خلاصه پرداخت' : 'Payment Summary'}
                         </h4>
                         <div className="p-4 bg-muted/50 rounded-lg text-sm space-y-2">
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">
-                              {isRTL ? 'جمع محصولات' : 'Subtotal'}
-                            </span>
-                            <span>
-                              {order.currency !== 'AFN' && order.delivery_fee > 0 ? (
-                                <>
-                                  {formatCurrency(order.subtotal, order.currency, isRTL)} +{' '}
-                                  {formatCurrency(0, 'AFN', isRTL)}
-                                </>
-                              ) : (
-                                formatCurrency(order.subtotal, order.currency, isRTL)
-                              )}
-                            </span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground flex items-center gap-1">
-                              <Truck className="w-3 h-3" />
-                              {isRTL ? 'هزینه ارسال' : 'Shipping'}
-                            </span>
-                            <span>
-                              {formatCurrency(order.delivery_fee, 'AFN', isRTL)}
-                            </span>
-                          </div>
-                          <Separator />
-                          <div className="flex justify-between font-bold text-base">
-                            <span>{isRTL ? 'مجموع' : 'Total'}</span>
-                            <span className="text-primary">
-                              {order.currency !== 'AFN' && order.delivery_fee > 0 ? (
-                                <>
-                                  {formatCurrency(order.subtotal, order.currency, isRTL)} +{' '}
-                                  {formatCurrency(order.delivery_fee, 'AFN', isRTL)}
-                                </>
-                              ) : (
-                                formatCurrency(order.total, order.currency, isRTL)
-                              )}
-                            </span>
-                          </div>
+                          {(() => {
+                            const { usdTotal, afnTotal } = calculateTotalsByCurrency(order.order_items);
+                            const totalAfnWithDelivery = afnTotal + order.delivery_fee;
+                            const hasMixedCurrency = usdTotal > 0 && afnTotal >= 0;
+                            
+                            return (
+                              <>
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">
+                                    {isRTL ? 'جمع محصولات' : 'Subtotal'}
+                                  </span>
+                                  <span>
+                                    {hasMixedCurrency ? (
+                                      <>
+                                        {formatCurrency(usdTotal, 'USD', isRTL)} +{' '}
+                                        {formatCurrency(afnTotal, 'AFN', isRTL)}
+                                      </>
+                                    ) : (
+                                      formatCurrency(afnTotal, 'AFN', isRTL)
+                                    )}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground flex items-center gap-1">
+                                    <Truck className="w-3 h-3" />
+                                    {isRTL ? 'هزینه ارسال' : 'Shipping'}
+                                  </span>
+                                  <span>
+                                    {formatCurrency(order.delivery_fee, 'AFN', isRTL)}
+                                  </span>
+                                </div>
+                                <Separator />
+                                <div className="flex justify-between font-bold text-base">
+                                  <span>{isRTL ? 'مجموع' : 'Total'}</span>
+                                  <span className="text-primary">
+                                    {hasMixedCurrency ? (
+                                      <>
+                                        {formatCurrency(usdTotal, 'USD', isRTL)} +{' '}
+                                        {formatCurrency(totalAfnWithDelivery, 'AFN', isRTL)}
+                                      </>
+                                    ) : (
+                                      formatCurrency(totalAfnWithDelivery, 'AFN', isRTL)
+                                    )}
+                                  </span>
+                                </div>
+                              </>
+                            );
+                          })()}
                         </div>
                       </div>
                     </div>
