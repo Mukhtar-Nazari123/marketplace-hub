@@ -384,133 +384,268 @@ const BuyerOrders = () => {
           </Card>
         </div>
 
-        {/* Orders List - Mobile Card Layout */}
-        <div className="space-y-3 sm:hidden">
+        {/* Orders List - Mobile Accordion Layout */}
+        <Accordion type="single" collapsible className="space-y-3 sm:hidden">
           {orders.map((order) => {
             const sellerGroups = groupItemsBySeller(order.order_items, order.seller_policies);
             return (
-              <Card key={order.id} className="overflow-hidden">
-                <CardContent className="p-4 space-y-3">
-                  {/* Order Header */}
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="space-y-1 min-w-0">
-                      <span className="font-mono text-xs bg-muted px-2 py-0.5 rounded block w-fit">
-                        {order.order_number}
-                      </span>
-                      <p className="text-xs text-muted-foreground flex items-center gap-1">
-                        <Clock className="w-3 h-3 shrink-0" />
-                        {format(new Date(order.created_at), "PP")}
-                      </p>
-                    </div>
-                    <div className="flex flex-col items-end gap-1 shrink-0">
-                      {getStatusBadge(order.status)}
-                      {getPaymentStatusBadge(order.payment_status)}
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  {/* Order Summary */}
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">
-                      {order.order_items.length} {isRTL ? "محصول" : "items"}
-                      {sellerGroups.length > 1 && (
-                        <span className="text-xs ml-1">
-                          ({sellerGroups.length} {isRTL ? "فروشنده" : "sellers"})
+              <AccordionItem
+                key={order.id}
+                value={order.id}
+                className="border rounded-lg bg-card overflow-hidden"
+              >
+                <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                  <div className="flex flex-col w-full text-left gap-2">
+                    {/* Order Header */}
+                    <div className="flex items-start justify-between gap-2 w-full">
+                      <div className="space-y-1 min-w-0">
+                        <span className="font-mono text-xs bg-muted px-2 py-0.5 rounded block w-fit">
+                          {order.order_number}
                         </span>
-                      )}
-                    </span>
-                    <span className="font-bold text-primary">
-                      {order.total_usd > 0 && order.total_afn > 0 ? (
-                        <>
-                          {formatCurrency(order.total_usd, 'USD', isRTL)} + {formatCurrency(order.total_afn, 'AFN', isRTL)}
-                        </>
-                      ) : order.total_usd > 0 ? (
-                        formatCurrency(order.total_usd, 'USD', isRTL)
-                      ) : (
-                        formatCurrency(order.total_afn, 'AFN', isRTL)
-                      )}
-                    </span>
-                  </div>
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Clock className="w-3 h-3 shrink-0" />
+                          {format(new Date(order.created_at), "PP")}
+                        </p>
+                      </div>
+                      <div className="flex flex-col items-end gap-1 shrink-0">
+                        {getStatusBadge(order.status)}
+                        {getPaymentStatusBadge(order.payment_status)}
+                      </div>
+                    </div>
 
-                  {/* Vertical Status Timeline for Mobile */}
-                  {order.seller_orders && order.seller_orders.length > 0 && (
-                    <div className="pt-2">
-                      {order.seller_orders.map((sellerOrder) => {
-                        const statusSteps = ["pending", "confirmed", "shipped", "delivered"];
-                        const isRejected = sellerOrder.status === "rejected";
-                        const currentIndex = isRejected ? -1 : statusSteps.indexOf(sellerOrder.status);
-                        
-                        if (isRejected) {
+                    {/* Order Summary */}
+                    <div className="flex items-center justify-between w-full">
+                      <span className="text-sm text-muted-foreground">
+                        {order.order_items.length} {isRTL ? "محصول" : "items"}
+                        {sellerGroups.length > 1 && (
+                          <span className="text-xs ml-1">
+                            ({sellerGroups.length} {isRTL ? "فروشنده" : "sellers"})
+                          </span>
+                        )}
+                      </span>
+                      <span className="font-bold text-primary">
+                        {order.total_usd > 0 && order.total_afn > 0 ? (
+                          <>
+                            {formatCurrency(order.total_usd, 'USD', isRTL)} + {formatCurrency(order.total_afn, 'AFN', isRTL)}
+                          </>
+                        ) : order.total_usd > 0 ? (
+                          formatCurrency(order.total_usd, 'USD', isRTL)
+                        ) : (
+                          formatCurrency(order.total_afn, 'AFN', isRTL)
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                </AccordionTrigger>
+
+                <AccordionContent className="px-4 pb-4">
+                  <div className="space-y-4 pt-2">
+                    {/* Seller Sub-Orders Status */}
+                    {order.seller_orders && order.seller_orders.length > 0 && (
+                      <div className="space-y-3">
+                        {order.seller_orders.map((sellerOrder) => {
+                          const statusSteps = ["pending", "confirmed", "shipped", "delivered"];
+                          const isRejected = sellerOrder.status === "rejected";
+                          const currentIndex = isRejected ? -1 : statusSteps.indexOf(sellerOrder.status);
+                          
+                          if (isRejected) {
+                            return (
+                              <div key={sellerOrder.id} className="flex items-center gap-2 p-2 rounded-lg bg-destructive/10 border border-destructive/20">
+                                <XCircle className="w-5 h-5 text-destructive shrink-0" />
+                                <span className="text-sm text-destructive font-medium">
+                                  {isRTL ? "رد شده" : "Rejected"}
+                                </span>
+                              </div>
+                            );
+                          }
+
                           return (
-                            <div key={sellerOrder.id} className="flex items-center gap-2 p-2 rounded-lg bg-destructive/10 border border-destructive/20">
-                              <XCircle className="w-5 h-5 text-destructive shrink-0" />
-                              <span className="text-sm text-destructive font-medium">
-                                {isRTL ? "رد شده" : "Rejected"}
-                              </span>
+                            <div key={sellerOrder.id} className="space-y-2">
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                <span className="font-mono bg-primary/10 text-primary px-1.5 py-0.5 rounded text-[10px]">
+                                  {formatProductSKUs(sellerOrder.items, isRTL)}
+                                </span>
+                              </div>
+                              {/* Horizontal Timeline */}
+                              <div className="flex items-center gap-1 overflow-x-auto pb-1">
+                                {statusSteps.map((step, index) => {
+                                  const isCompleted = currentIndex >= index;
+                                  const isCurrent = sellerOrder.status === step;
+                                  const icons: Record<string, typeof CheckCircle> = {
+                                    pending: Clock,
+                                    confirmed: CheckCircle,
+                                    shipped: Truck,
+                                    delivered: CheckCircle,
+                                  };
+                                  const Icon = icons[step];
+                                  const labels: Record<string, { en: string; fa: string }> = {
+                                    pending: { en: "Pending", fa: "در انتظار" },
+                                    confirmed: { en: "Confirmed", fa: "تایید" },
+                                    shipped: { en: "Shipped", fa: "ارسال" },
+                                    delivered: { en: "Done", fa: "تحویل" },
+                                  };
+
+                                  return (
+                                    <div key={step} className="flex items-center">
+                                      <div className="flex flex-col items-center">
+                                        <div
+                                          className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${
+                                            isCompleted
+                                              ? "bg-primary text-primary-foreground"
+                                              : "bg-muted text-muted-foreground"
+                                          } ${isCurrent ? "ring-2 ring-primary/30" : ""}`}
+                                        >
+                                          <Icon className="w-3 h-3" />
+                                        </div>
+                                        <span className={`text-[9px] mt-0.5 ${isCompleted ? "text-primary" : "text-muted-foreground"}`}>
+                                          {isRTL ? labels[step].fa : labels[step].en}
+                                        </span>
+                                      </div>
+                                      {index < statusSteps.length - 1 && (
+                                        <div className={`w-4 h-0.5 mx-0.5 ${currentIndex > index ? "bg-primary" : "bg-muted"}`} />
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                              </div>
                             </div>
                           );
-                        }
+                        })}
+                      </div>
+                    )}
 
+                    <Separator />
+
+                    {/* Products List */}
+                    <div className="space-y-3">
+                      <h4 className="font-semibold flex items-center gap-2 text-sm">
+                        <Package className="w-4 h-4" />
+                        {isRTL ? "محصولات" : "Products"}
+                      </h4>
+                      {sellerGroups.map(([sellerId, group]) => {
+                        const sellerOrder = order.seller_orders?.find((so) => so.seller_id === sellerId);
                         return (
-                          <div key={sellerOrder.id} className="flex flex-col gap-1">
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                              <span className="font-mono bg-primary/10 text-primary px-1.5 py-0.5 rounded text-[10px]">
-                                {formatProductSKUs(sellerOrder.items, isRTL)}
-                              </span>
+                          <div key={sellerId} className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Store className="w-3 h-3 text-muted-foreground" />
+                                <span className="font-medium text-xs">{group.sellerName}</span>
+                              </div>
+                              {sellerOrder && getStatusBadge(sellerOrder.status)}
                             </div>
-                            {/* Vertical Timeline */}
-                            <div className="flex items-center gap-1 overflow-x-auto pb-1">
-                              {statusSteps.map((step, index) => {
-                                const isCompleted = currentIndex >= index;
-                                const isCurrent = sellerOrder.status === step;
-                                const icons: Record<string, typeof CheckCircle> = {
-                                  pending: Clock,
-                                  confirmed: CheckCircle,
-                                  shipped: Truck,
-                                  delivered: CheckCircle,
-                                };
-                                const Icon = icons[step];
-                                const labels: Record<string, { en: string; fa: string }> = {
-                                  pending: { en: "Pending", fa: "در انتظار" },
-                                  confirmed: { en: "Confirmed", fa: "تایید" },
-                                  shipped: { en: "Shipped", fa: "ارسال" },
-                                  delivered: { en: "Done", fa: "تحویل" },
-                                };
-
-                                return (
-                                  <div key={step} className="flex items-center">
-                                    <div className="flex flex-col items-center">
-                                      <div
-                                        className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${
-                                          isCompleted
-                                            ? "bg-primary text-primary-foreground"
-                                            : "bg-muted text-muted-foreground"
-                                        } ${isCurrent ? "ring-2 ring-primary/30" : ""}`}
-                                      >
-                                        <Icon className="w-3 h-3" />
-                                      </div>
-                                      <span className={`text-[9px] mt-0.5 ${isCompleted ? "text-primary" : "text-muted-foreground"}`}>
-                                        {isRTL ? labels[step].fa : labels[step].en}
-                                      </span>
+                            {group.items.map((item) => (
+                              <div key={item.id} className="flex items-center gap-3 p-2 bg-muted/50 rounded-lg">
+                                <div className="w-10 h-10 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+                                  {item.product_image ? (
+                                    <img src={item.product_image} alt={item.product_name} className="w-full h-full object-cover" />
+                                  ) : (
+                                    <div className="w-full h-full flex items-center justify-center">
+                                      <Package className="w-4 h-4 text-muted-foreground" />
                                     </div>
-                                    {index < statusSteps.length - 1 && (
-                                      <div className={`w-4 h-0.5 mx-0.5 ${currentIndex > index ? "bg-primary" : "bg-muted"}`} />
-                                    )}
-                                  </div>
-                                );
-                              })}
-                            </div>
+                                  )}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-medium truncate text-xs">{item.product_name}</p>
+                                  <p className="text-[10px] text-muted-foreground">
+                                    {item.quantity} × {formatCurrency(item.unit_price, item.product_currency || 'AFN', isRTL)}
+                                  </p>
+                                </div>
+                                <div className="text-right shrink-0">
+                                  <p className="font-semibold text-xs">
+                                    {formatCurrency(item.total_price, item.product_currency || 'AFN', isRTL)}
+                                  </p>
+                                </div>
+                              </div>
+                            ))}
                           </div>
                         );
                       })}
                     </div>
-                  )}
-                </CardContent>
-              </Card>
+
+                    <Separator />
+
+                    {/* Shipping Address */}
+                    {order.shipping_address && (
+                      <div className="space-y-2">
+                        <h4 className="font-semibold flex items-center gap-2 text-sm">
+                          <MapPin className="w-4 h-4" />
+                          {isRTL ? "آدرس ارسال" : "Shipping Address"}
+                        </h4>
+                        <div className="p-3 bg-muted/50 rounded-lg text-xs space-y-1">
+                          <p className="font-medium">{order.shipping_address.name}</p>
+                          <p className="text-muted-foreground">{order.shipping_address.phone}</p>
+                          <p className="text-muted-foreground">
+                            {order.shipping_address.city}, {order.shipping_address.fullAddress}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Payment Summary */}
+                    <div className="space-y-2">
+                      <h4 className="font-semibold flex items-center gap-2 text-sm">
+                        <CreditCard className="w-4 h-4" />
+                        {isRTL ? "خلاصه پرداخت" : "Payment Summary"}
+                      </h4>
+                      <div className="p-3 bg-muted/50 rounded-lg text-xs space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">{isRTL ? "جمع محصولات" : "Subtotal"}</span>
+                          <span>
+                            {order.subtotal_usd > 0 && order.subtotal_afn > 0 ? (
+                              <>
+                                {formatCurrency(order.subtotal_usd, "USD", isRTL)} + {formatCurrency(order.subtotal_afn, "AFN", isRTL)}
+                              </>
+                            ) : order.subtotal_usd > 0 ? (
+                              formatCurrency(order.subtotal_usd, "USD", isRTL)
+                            ) : (
+                              formatCurrency(order.subtotal_afn, "AFN", isRTL)
+                            )}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground flex items-center gap-1">
+                            <Truck className="w-3 h-3" />
+                            {isRTL ? "ارسال" : "Shipping"}
+                          </span>
+                          <span>{formatCurrency(order.delivery_fee_afn, "AFN", isRTL)}</span>
+                        </div>
+                        {order.discount > 0 && (
+                          <div className="flex justify-between text-green-600">
+                            <span>{isRTL ? "تخفیف" : "Discount"}</span>
+                            <span>-{formatCurrency(order.discount, "AFN", isRTL)}</span>
+                          </div>
+                        )}
+                        <Separator />
+                        <div className="flex justify-between font-bold text-sm">
+                          <span>{isRTL ? "مجموع" : "Total"}</span>
+                          <span className="text-primary">
+                            {order.total_usd > 0 && order.total_afn > 0 ? (
+                              <>
+                                {formatCurrency(order.total_usd, "USD", isRTL)} + {formatCurrency(order.total_afn, "AFN", isRTL)}
+                              </>
+                            ) : order.total_usd > 0 ? (
+                              formatCurrency(order.total_usd, "USD", isRTL)
+                            ) : (
+                              formatCurrency(order.total_afn, "AFN", isRTL)
+                            )}
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-[10px] text-muted-foreground pt-1">
+                          <span>{isRTL ? "روش پرداخت" : "Payment"}</span>
+                          <span>
+                            {order.payment_method === "cash_on_delivery"
+                              ? isRTL ? "پرداخت در محل" : "Cash on Delivery"
+                              : order.payment_method}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
             );
           })}
-        </div>
+        </Accordion>
 
         {/* Desktop Accordion Layout */}
         <Accordion type="single" collapsible className="space-y-4 hidden sm:block">
