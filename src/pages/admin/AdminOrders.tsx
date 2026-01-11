@@ -23,7 +23,8 @@ import {
 } from '@/components/ui/select';
 import { Search, Filter, RefreshCw, Eye } from 'lucide-react';
 import { toast } from 'sonner';
-import { useLanguage, formatDate, formatCurrency } from '@/lib/i18n';
+import { useLanguage, formatDate } from '@/lib/i18n';
+import { formatCurrency } from '@/lib/currencyFormatter';
 
 interface OrderItem {
   id: string;
@@ -37,7 +38,12 @@ interface Order {
   buyer_id: string;
   status: string;
   payment_status: string;
-  total: number;
+  total_afn: number;
+  total_usd: number;
+  subtotal_afn: number;
+  subtotal_usd: number;
+  delivery_fee_afn: number;
+  currency: string;
   created_at: string;
   order_items?: OrderItem[];
   seller_orders?: { currency: string }[];
@@ -292,7 +298,20 @@ const AdminOrders = () => {
                         </TableCell>
                         <TableCell>{getStatusBadge(order.status)}</TableCell>
                         <TableCell>{getPaymentBadge(order.payment_status)}</TableCell>
-                        <TableCell>{formatPriceWithCurrency(Number(order.total), order.seller_orders?.[0]?.currency || 'AFN', isRTL)}</TableCell>
+                        <TableCell>
+                          {order.delivery_fee_afn > 0 ? (
+                            <>
+                              {order.currency === 'USD' 
+                                ? formatCurrency(order.subtotal_usd, 'USD', isRTL)
+                                : formatCurrency(order.subtotal_afn, 'AFN', isRTL)
+                              } + {formatCurrency(order.delivery_fee_afn, 'AFN', isRTL)}
+                            </>
+                          ) : (
+                            order.currency === 'USD'
+                              ? formatCurrency(order.total_usd, 'USD', isRTL)
+                              : formatCurrency(order.total_afn, 'AFN', isRTL)
+                          )}
+                        </TableCell>
                         <TableCell>
                           {formatDate(new Date(order.created_at), direction === 'rtl' ? 'fa' : 'en')}
                         </TableCell>
