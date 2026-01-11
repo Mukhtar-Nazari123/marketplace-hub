@@ -65,6 +65,7 @@ interface OrderItem {
   seller_id: string;
   product_id: string | null;
   product_sku?: string | null;
+  product_currency?: string | null;
 }
 
 interface SellerOrder {
@@ -163,15 +164,16 @@ const SellerOrders = () => {
             .from('order_items')
             .select(`
               *,
-              products:product_id (sku)
+              products:product_id (sku, currency)
             `)
             .eq('order_id', order.order_id)
             .eq('seller_id', user.id);
 
-          // Map items to include product_sku
+          // Map items to include product_sku and product_currency
           const itemsWithSku = (items || []).map((item: any) => ({
             ...item,
             product_sku: item.products?.sku || null,
+            product_currency: item.products?.currency || order.currency,
           }));
 
           return {
@@ -649,7 +651,7 @@ const SellerOrders = () => {
                               <div className="flex-1 min-w-0">
                                 <p className="font-medium truncate">{item.product_name}</p>
                                 <p className="text-sm text-muted-foreground">
-                                  {item.quantity} × {formatCurrency(item.unit_price, order.currency, isRTL)}
+                                  {item.quantity} × {formatCurrency(item.unit_price, item.product_currency || order.currency, isRTL)}
                                 </p>
                               </div>
                               <div className="text-right space-y-1">
@@ -660,7 +662,7 @@ const SellerOrders = () => {
                                   </span>
                                 </p>
                                 <p className="font-semibold">
-                                  {formatCurrency(item.total_price, order.currency, isRTL)}
+                                  {formatCurrency(item.total_price, item.product_currency || order.currency, isRTL)}
                                 </p>
                               </div>
                             </div>
