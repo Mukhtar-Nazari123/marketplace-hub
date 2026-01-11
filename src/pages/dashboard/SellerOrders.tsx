@@ -478,9 +478,10 @@ const SellerOrders = () => {
                     </div>
                     <div className="text-right">
                       <p className="text-lg font-bold text-primary">
-                        {order.delivery_fee > 0 ? (
+                        {order.currency !== 'AFN' && order.delivery_fee > 0 ? (
                           <>
-                            {formatCurrency(order.subtotal, order.currency, isRTL)} + {formatCurrency(order.delivery_fee, 'AFN', isRTL)}
+                            {formatCurrency(order.subtotal, order.currency, isRTL)} +{' '}
+                            {formatCurrency(order.delivery_fee, 'AFN', isRTL)}
                           </>
                         ) : (
                           formatCurrency(order.total, order.currency, isRTL)
