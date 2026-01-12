@@ -44,7 +44,7 @@ const HomeBanner = ({ banner }: HomeBannerProps) => {
 
   return (
     <div
-      className="relative w-full rounded-xl overflow-hidden"
+      className="relative w-full rounded-2xl overflow-hidden min-h-[200px]"
       style={{
         ...backgroundStyle,
         direction: isRTL ? 'rtl' : 'ltr',
@@ -56,29 +56,30 @@ const HomeBanner = ({ banner }: HomeBannerProps) => {
       )}
 
       {/* Decorative circles */}
-      <div className="absolute right-0 top-1/2 -translate-y-1/2 w-48 h-48 rounded-full bg-white/10 blur-sm" />
-      <div className="absolute right-24 top-1/2 -translate-y-1/2 w-32 h-32 rounded-full bg-white/5" />
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full -translate-y-1/2 -translate-x-1/2" />
+        <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-white rounded-full translate-y-1/2" />
+      </div>
 
-      <div className="relative z-10 flex flex-col md:flex-row items-center justify-between p-6 md:p-8 lg:p-10 gap-4 md:gap-6">
+      <div className="relative z-10 flex flex-col md:flex-row items-center justify-between p-8 md:p-12 gap-6">
         {/* Icon/Image */}
-        <div className="flex items-center gap-4 md:gap-6">
+        <div className="flex items-center gap-8 mb-6 md:mb-0">
           {banner.icon_or_image_path && (
-            <div className="flex-shrink-0 w-14 h-14 md:w-16 md:h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+            <div className="hidden md:flex w-24 h-24 rounded-full bg-white/20 items-center justify-center backdrop-blur-sm">
               <img 
                 src={banner.icon_or_image_path} 
                 alt="" 
-                className="w-8 h-8 md:w-10 md:h-10 object-contain"
+                className="w-12 h-12 object-contain"
               />
             </div>
           )}
 
-          {/* Text Content */}
-          <div className={`text-${isRTL ? 'right' : 'left'}`}>
-            <h3 className="text-white text-lg md:text-xl lg:text-2xl font-bold leading-tight">
+          <div className={`text-center ${isRTL ? 'md:text-right' : 'md:text-left'}`}>
+            <h3 className="font-display text-2xl md:text-3xl font-bold text-white mb-2">
               {title}
             </h3>
             {subtitle && (
-              <p className="text-white/80 text-sm md:text-base mt-1">
+              <p className="text-white/80">
                 {subtitle}
               </p>
             )}
@@ -86,23 +87,25 @@ const HomeBanner = ({ banner }: HomeBannerProps) => {
         </div>
 
         {/* CTA and Price */}
-        <div className="flex flex-col sm:flex-row items-center gap-3 md:gap-4">
+        <div className="flex items-center gap-6">
           {buttonText && (
             <Button
               onClick={handleClick}
-              className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-lg hover:shadow-xl"
+              variant="orange"
+              size="xl"
+              className="group"
             >
               {buttonText}
-              <ArrowIcon className="w-4 h-4" />
+              <ArrowIcon className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Button>
           )}
 
           {priceText && (
-            <div className={`text-${isRTL ? 'right' : 'left'}`}>
-              <span className="text-white/70 text-xs block">
+            <div className={`hidden sm:block ${isRTL ? 'text-left' : 'text-right'}`}>
+              <span className="text-white/60 text-sm block">
                 {isRTL ? 'شروع از' : 'Starting from'}
               </span>
-              <span className="text-white text-xl md:text-2xl font-bold">
+              <span className="font-display text-3xl font-bold text-white">
                 {priceText}
               </span>
             </div>
