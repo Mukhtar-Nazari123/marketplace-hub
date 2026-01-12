@@ -44,6 +44,78 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_notifications: {
+        Row: {
+          buyer_id: string | null
+          buyer_name: string | null
+          created_at: string
+          id: string
+          is_read: boolean | null
+          message_en: string
+          message_fa: string
+          order_currency: string | null
+          order_number: string | null
+          order_total: number | null
+          product_image_url: string | null
+          product_name: string | null
+          related_entity_id: string | null
+          related_entity_type: string | null
+          seller_id: string | null
+          seller_name: string | null
+          store_logo_url: string | null
+          store_name: string | null
+          title_en: string
+          title_fa: string
+          type: string
+        }
+        Insert: {
+          buyer_id?: string | null
+          buyer_name?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          message_en: string
+          message_fa: string
+          order_currency?: string | null
+          order_number?: string | null
+          order_total?: number | null
+          product_image_url?: string | null
+          product_name?: string | null
+          related_entity_id?: string | null
+          related_entity_type?: string | null
+          seller_id?: string | null
+          seller_name?: string | null
+          store_logo_url?: string | null
+          store_name?: string | null
+          title_en: string
+          title_fa: string
+          type: string
+        }
+        Update: {
+          buyer_id?: string | null
+          buyer_name?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          message_en?: string
+          message_fa?: string
+          order_currency?: string | null
+          order_number?: string | null
+          order_total?: number | null
+          product_image_url?: string | null
+          product_name?: string | null
+          related_entity_id?: string | null
+          related_entity_type?: string | null
+          seller_id?: string | null
+          seller_name?: string | null
+          store_logo_url?: string | null
+          store_name?: string | null
+          title_en?: string
+          title_fa?: string
+          type?: string
+        }
+        Relationships: []
+      }
       banners: {
         Row: {
           created_at: string

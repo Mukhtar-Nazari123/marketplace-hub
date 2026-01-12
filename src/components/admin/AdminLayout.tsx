@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/lib/i18n';
 import { AdminSidebar } from './AdminSidebar';
+import { NotificationDropdown } from './notifications/NotificationDropdown';
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
 import { Separator } from '@/components/ui/separator';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from '@/components/ui/breadcrumb';
@@ -63,6 +64,7 @@ export const AdminLayout = ({ children, title, description }: AdminLayoutProps) 
             <span className={`text-sm text-muted-foreground ${isRTL ? 'ml-auto' : 'mr-auto'}`}>{description}</span>
           )}
           <div className={`flex items-center gap-2 ${isRTL ? 'mr-auto' : 'ml-auto'}`}>
+            <NotificationDropdown />
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
