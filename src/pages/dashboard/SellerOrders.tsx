@@ -343,16 +343,16 @@ const SellerOrders = () => {
     >
       <div className="space-y-6">
         {/* Stats Cards */}
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 md:gap-4 md:grid-cols-4">
           <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-                  <Package className="w-6 h-6 text-primary" />
+            <CardContent className="p-3 md:pt-6 md:px-6">
+              <div className="flex items-center gap-2 md:gap-4">
+                <div className="w-9 h-9 md:w-12 md:h-12 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                  <Package className="w-4 h-4 md:w-6 md:h-6 text-primary" />
                 </div>
-                <div>
-                  <p className="text-2xl font-bold">{orders.length}</p>
-                  <p className="text-sm text-muted-foreground">
+                <div className="min-w-0">
+                  <p className="text-lg md:text-2xl font-bold">{orders.length}</p>
+                  <p className="text-xs md:text-sm text-muted-foreground truncate">
                     {isRTL ? 'کل سفارشات' : 'Total Orders'}
                   </p>
                 </div>
@@ -361,16 +361,16 @@ const SellerOrders = () => {
           </Card>
 
           <Card className="bg-gradient-to-br from-amber-500/10 to-amber-500/5 border-amber-500/20">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center">
-                  <Clock className="w-6 h-6 text-amber-600" />
+            <CardContent className="p-3 md:pt-6 md:px-6">
+              <div className="flex items-center gap-2 md:gap-4">
+                <div className="w-9 h-9 md:w-12 md:h-12 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0">
+                  <Clock className="w-4 h-4 md:w-6 md:h-6 text-amber-600" />
                 </div>
-                <div>
-                  <p className="text-2xl font-bold">
+                <div className="min-w-0">
+                  <p className="text-lg md:text-2xl font-bold">
                     {orders.filter((o) => o.status === 'pending').length}
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs md:text-sm text-muted-foreground truncate">
                     {isRTL ? 'در انتظار' : 'Pending'}
                   </p>
                 </div>
@@ -379,16 +379,16 @@ const SellerOrders = () => {
           </Card>
 
           <Card className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 border-blue-500/20">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center">
-                  <Truck className="w-6 h-6 text-blue-600" />
+            <CardContent className="p-3 md:pt-6 md:px-6">
+              <div className="flex items-center gap-2 md:gap-4">
+                <div className="w-9 h-9 md:w-12 md:h-12 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                  <Truck className="w-4 h-4 md:w-6 md:h-6 text-blue-600" />
                 </div>
-                <div>
-                  <p className="text-2xl font-bold">
+                <div className="min-w-0">
+                  <p className="text-lg md:text-2xl font-bold">
                     {orders.filter((o) => o.status === 'shipped').length}
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs md:text-sm text-muted-foreground truncate">
                     {isRTL ? 'ارسال شده' : 'Shipped'}
                   </p>
                 </div>
@@ -397,16 +397,16 @@ const SellerOrders = () => {
           </Card>
 
           <Card className="bg-gradient-to-br from-green-500/10 to-green-500/5 border-green-500/20">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center">
-                  <CheckCircle className="w-6 h-6 text-green-600" />
+            <CardContent className="p-3 md:pt-6 md:px-6">
+              <div className="flex items-center gap-2 md:gap-4">
+                <div className="w-9 h-9 md:w-12 md:h-12 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                  <CheckCircle className="w-4 h-4 md:w-6 md:h-6 text-green-600" />
                 </div>
-                <div>
-                  <p className="text-2xl font-bold">
+                <div className="min-w-0">
+                  <p className="text-lg md:text-2xl font-bold">
                     {orders.filter((o) => o.status === 'delivered').length}
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs md:text-sm text-muted-foreground truncate">
                     {isRTL ? 'تحویل شده' : 'Delivered'}
                   </p>
                 </div>
