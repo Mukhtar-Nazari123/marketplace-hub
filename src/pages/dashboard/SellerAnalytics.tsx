@@ -407,7 +407,7 @@ const SellerAnalytics = () => {
           </Card>
 
           {/* Order Status Breakdown */}
-          <Card className="hover:shadow-lg transition-shadow">
+          <Card className="hover:shadow-lg transition-shadow flex flex-col min-h-[320px] sm:min-h-0">
             <CardHeader className="p-4 sm:p-6">
               <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                 <Package className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
@@ -417,8 +417,8 @@ const SellerAnalytics = () => {
                 {isRTL ? 'توزیع وضعیت سفارشات' : 'Order status distribution'}
               </CardDescription>
             </CardHeader>
-            <CardContent className="p-4 sm:p-6 pt-0">
-              <div className="h-[160px] sm:h-[200px]">
+            <CardContent className="p-4 sm:p-6 pt-0 flex-1 flex flex-col">
+              <div className="h-[140px] sm:h-[200px] flex-1">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -459,6 +459,107 @@ const SellerAnalytics = () => {
                   </div>
                 ))}
               </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Bottom Row - Stack on mobile with equal heights */}
+        <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
+          {/* Top Selling Products */}
+          <Card className="hover:shadow-lg transition-shadow flex flex-col min-h-[320px]">
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                {isRTL ? 'محصولات پرفروش' : 'Top Selling Products'}
+              </CardTitle>
+              <CardDescription className="text-xs sm:text-sm">
+                {isRTL ? 'بر اساس درآمد' : 'By revenue'}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-4 sm:p-6 pt-0 flex-1">
+              {topProducts.length === 0 ? (
+                <div className="text-center py-6 sm:py-8 text-muted-foreground h-full flex flex-col items-center justify-center">
+                  <ShoppingBag className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-3 opacity-50" />
+                  <p className="text-sm sm:text-base">{isRTL ? 'هنوز فروشی ندارید' : 'No sales yet'}</p>
+                </div>
+              ) : (
+                <div className="space-y-2 sm:space-y-4">
+                  {topProducts.map((product, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-2 sm:gap-4 p-2 sm:p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                    >
+                      <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs sm:text-sm font-bold text-primary flex-shrink-0">
+                        {index + 1}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm sm:text-base truncate">{product.name}</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground">
+                          {product.quantity} {isRTL ? 'فروخته شده' : 'sold'}
+                        </p>
+                      </div>
+                      <div className="text-end flex-shrink-0">
+                        <p className="font-bold text-sm sm:text-base text-primary">
+                          {product.revenue.toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Low Stock Alerts */}
+          <Card className="hover:shadow-lg transition-shadow flex flex-col min-h-[320px]">
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" />
+                {isRTL ? 'هشدار موجودی' : 'Low Stock Alerts'}
+              </CardTitle>
+              <CardDescription className="text-xs sm:text-sm">
+                {isRTL ? 'محصولات با موجودی کم' : 'Products running low on stock'}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-4 sm:p-6 pt-0 flex-1">
+              {lowStockProducts.length === 0 ? (
+                <div className="text-center py-6 sm:py-8 text-muted-foreground h-full flex flex-col items-center justify-center">
+                  <CheckCircle className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-3 text-green-500 opacity-70" />
+                  <p className="text-sm sm:text-base">{isRTL ? 'موجودی همه محصولات کافی است' : 'All products have sufficient stock'}</p>
+                </div>
+              ) : (
+                <div className="space-y-2 sm:space-y-3">
+                  {lowStockProducts.map(product => (
+                    <div
+                      key={product.id}
+                      className="flex items-center gap-2 sm:gap-4 p-2 sm:p-3 rounded-lg bg-amber-500/10 border border-amber-500/20"
+                    >
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-muted overflow-hidden flex-shrink-0">
+                        {product.images?.[0] ? (
+                          <img
+                            src={product.images[0]}
+                            alt={product.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Package className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm sm:text-base truncate">{product.name}</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground">
+                          {getCurrencySymbol(product.currency)}{product.price.toLocaleString()}
+                        </p>
+                      </div>
+                      <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/30 text-xs flex-shrink-0">
+                        {product.quantity} {isRTL ? 'عدد' : 'left'}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
