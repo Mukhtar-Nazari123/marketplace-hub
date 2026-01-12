@@ -178,16 +178,16 @@ const SellerReviews = () => {
     >
       <div className="space-y-6">
         {/* Summary Cards */}
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-2 gap-3 md:gap-4 md:grid-cols-3">
           <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-                  <MessageSquare className="w-6 h-6 text-primary" />
+            <CardContent className="p-3 md:pt-6 md:px-6">
+              <div className="flex items-center gap-2 md:gap-4">
+                <div className="w-9 h-9 md:w-12 md:h-12 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                  <MessageSquare className="w-4 h-4 md:w-6 md:h-6 text-primary" />
                 </div>
-                <div>
-                  <p className="text-2xl font-bold">{totalReviews}</p>
-                  <p className="text-sm text-muted-foreground">
+                <div className="min-w-0">
+                  <p className="text-lg md:text-2xl font-bold">{totalReviews}</p>
+                  <p className="text-xs md:text-sm text-muted-foreground truncate">
                     {isRTL ? 'کل نظرات' : 'Total Reviews'}
                   </p>
                 </div>
@@ -196,14 +196,14 @@ const SellerReviews = () => {
           </Card>
 
           <Card className="bg-gradient-to-br from-orange/10 to-orange/5 border-orange/20">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-orange/20 flex items-center justify-center">
-                  <Star className="w-6 h-6 text-orange fill-orange" />
+            <CardContent className="p-3 md:pt-6 md:px-6">
+              <div className="flex items-center gap-2 md:gap-4">
+                <div className="w-9 h-9 md:w-12 md:h-12 rounded-full bg-orange/20 flex items-center justify-center flex-shrink-0">
+                  <Star className="w-4 h-4 md:w-6 md:h-6 text-orange fill-orange" />
                 </div>
-                <div>
-                  <p className="text-2xl font-bold">{averageRating}</p>
-                  <p className="text-sm text-muted-foreground">
+                <div className="min-w-0">
+                  <p className="text-lg md:text-2xl font-bold">{averageRating}</p>
+                  <p className="text-xs md:text-sm text-muted-foreground truncate">
                     {isRTL ? 'میانگین امتیاز' : 'Average Rating'}
                   </p>
                 </div>
@@ -211,15 +211,15 @@ const SellerReviews = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-green-500/10 to-green-500/5 border-green-500/20">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-green-600" />
+          <Card className="col-span-2 md:col-span-1 bg-gradient-to-br from-green-500/10 to-green-500/5 border-green-500/20">
+            <CardContent className="p-3 md:pt-6 md:px-6">
+              <div className="flex items-center gap-2 md:gap-4">
+                <div className="w-9 h-9 md:w-12 md:h-12 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                  <TrendingUp className="w-4 h-4 md:w-6 md:h-6 text-green-600" />
                 </div>
-                <div>
-                  <p className="text-2xl font-bold">{fiveStarCount}</p>
-                  <p className="text-sm text-muted-foreground">
+                <div className="min-w-0">
+                  <p className="text-lg md:text-2xl font-bold">{fiveStarCount}</p>
+                  <p className="text-xs md:text-sm text-muted-foreground truncate">
                     {isRTL ? 'نظرات ۵ ستاره' : '5-Star Reviews'}
                   </p>
                 </div>
