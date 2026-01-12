@@ -64,6 +64,7 @@ export const AdminSidebar = () => {
 
   const contentNavItems = [
     { title: isRTL ? 'تخفیف‌های روزانه' : "Today's Deals", icon: Zap, url: '/dashboard/deals' },
+    { title: isRTL ? 'بنرهای خانه' : 'Home Banners', icon: LayoutGrid, url: '/dashboard/home-banners' },
     { title: isRTL ? 'بنرهای هیرو' : 'Hero Banners', icon: Monitor, url: '/dashboard/hero-banners' },
     { title: t.admin.banners.title, icon: Image, url: '/dashboard/banners' },
     { title: t.admin.promotions.title, icon: Tag, url: '/dashboard/promotions' },
