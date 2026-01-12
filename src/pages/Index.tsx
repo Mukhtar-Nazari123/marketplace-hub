@@ -8,6 +8,7 @@ import PromoBanner from "@/components/home/PromoBanner";
 import BestSellers from "@/components/home/BestSellers";
 import CategoryBanners from "@/components/home/CategoryBanners";
 import CategoryProductRows from "@/components/home/CategoryProductRows";
+import HomeBannerList from "@/components/home/HomeBannerList";
 
 const Index = () => {
   return (
@@ -28,6 +29,11 @@ const Index = () => {
 
         {/* Today's Deals */}
         <TodayDeals />
+
+        {/* Promotional Home Banners */}
+        <section className="container mx-auto px-4 py-6">
+          <HomeBannerList />
+        </section>
 
         {/* Promo Banner */}
         <PromoBanner />

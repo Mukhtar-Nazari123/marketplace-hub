@@ -324,6 +324,69 @@ export type Database = {
         }
         Relationships: []
       }
+      home_banners: {
+        Row: {
+          background_color: string | null
+          background_image_path: string | null
+          background_type: string
+          button_text_en: string | null
+          button_text_fa: string | null
+          button_url: string | null
+          created_at: string
+          icon_or_image_path: string | null
+          id: string
+          is_active: boolean
+          price_text_en: string | null
+          price_text_fa: string | null
+          priority: number
+          subtitle_en: string | null
+          subtitle_fa: string | null
+          title_en: string
+          title_fa: string | null
+          updated_at: string
+        }
+        Insert: {
+          background_color?: string | null
+          background_image_path?: string | null
+          background_type?: string
+          button_text_en?: string | null
+          button_text_fa?: string | null
+          button_url?: string | null
+          created_at?: string
+          icon_or_image_path?: string | null
+          id?: string
+          is_active?: boolean
+          price_text_en?: string | null
+          price_text_fa?: string | null
+          priority?: number
+          subtitle_en?: string | null
+          subtitle_fa?: string | null
+          title_en: string
+          title_fa?: string | null
+          updated_at?: string
+        }
+        Update: {
+          background_color?: string | null
+          background_image_path?: string | null
+          background_type?: string
+          button_text_en?: string | null
+          button_text_fa?: string | null
+          button_url?: string | null
+          created_at?: string
+          icon_or_image_path?: string | null
+          id?: string
+          is_active?: boolean
+          price_text_en?: string | null
+          price_text_fa?: string | null
+          priority?: number
+          subtitle_en?: string | null
+          subtitle_fa?: string | null
+          title_en?: string
+          title_fa?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       newsletter_subscribers: {
         Row: {
           created_at: string
