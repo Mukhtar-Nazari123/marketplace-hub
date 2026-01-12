@@ -35,6 +35,7 @@ import {
   Mail,
   Share2,
   Zap,
+  Bell,
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -54,6 +55,7 @@ export const AdminSidebar = () => {
 
   const mainNavItems = [
     { title: t.admin.dashboard, icon: LayoutDashboard, url: '/dashboard/admin' },
+    { title: isRTL ? 'اعلان‌ها' : 'Notifications', icon: Bell, url: '/dashboard/admin/notifications' },
     { title: t.admin.users.title, icon: Users, url: '/dashboard/users' },
     { title: t.admin.products.title, icon: Package, url: '/dashboard/products' },
     { title: t.admin.orders.title, icon: ShoppingCart, url: '/dashboard/orders' },
