@@ -188,14 +188,18 @@ const SellerAnalytics = () => {
     }));
   }, [orders]);
 
-  // Top selling products
+  // Top selling products - get currency from products table
   const topProducts = useMemo(() => {
-    const productSales: Record<string, { name: string; quantity: number; revenue: number }> = {};
+    const productSales: Record<string, { name: string; quantity: number; revenue: number; currency: string }> = {};
 
     orderItems.forEach(item => {
       const key = item.product_id || item.product_name;
+      // Find the product to get its currency
+      const product = products.find(p => p.id === item.product_id);
+      const currency = product?.currency || 'AFN';
+      
       if (!productSales[key]) {
-        productSales[key] = { name: item.product_name, quantity: 0, revenue: 0 };
+        productSales[key] = { name: item.product_name, quantity: 0, revenue: 0, currency };
       }
       productSales[key].quantity += item.quantity;
       productSales[key].revenue += item.total_price;
@@ -204,7 +208,7 @@ const SellerAnalytics = () => {
     return Object.values(productSales)
       .sort((a, b) => b.revenue - a.revenue)
       .slice(0, 5);
-  }, [orderItems]);
+  }, [orderItems, products]);
 
   // Low stock alerts
   const lowStockProducts = useMemo(() => {
@@ -500,7 +504,7 @@ const SellerAnalytics = () => {
                       </div>
                       <div className="text-end flex-shrink-0">
                         <p className="font-bold text-sm sm:text-base text-primary">
-                          {product.revenue.toLocaleString()}
+                          {getCurrencySymbol(product.currency)}{product.revenue.toLocaleString()}
                         </p>
                       </div>
                     </div>
@@ -601,7 +605,7 @@ const SellerAnalytics = () => {
                       </div>
                       <div className="text-end flex-shrink-0">
                         <p className="font-bold text-sm sm:text-base text-primary">
-                          {product.revenue.toLocaleString()}
+                          {getCurrencySymbol(product.currency)}{product.revenue.toLocaleString()}
                         </p>
                       </div>
                     </div>
