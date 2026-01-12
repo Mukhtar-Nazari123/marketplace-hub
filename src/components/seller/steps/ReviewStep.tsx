@@ -177,12 +177,24 @@ export const ReviewStep = ({
         </p>
       </div>
 
-      <div className="flex justify-between pt-4">
-        <Button type="button" variant="outline" size="lg" onClick={onBack} disabled={submitting}>
+      <div className="flex flex-col-reverse sm:flex-row justify-between gap-3 pt-4">
+        <Button 
+          type="button" 
+          variant="outline" 
+          size="lg" 
+          onClick={onBack} 
+          disabled={submitting}
+          className="w-full sm:w-auto min-h-[44px]"
+        >
           {isRTL ? <ArrowRight className="w-4 h-4 ml-2" /> : <ArrowLeft className="w-4 h-4 mr-2" />}
           {isRTL ? 'مرحله قبل' : 'Previous'}
         </Button>
-        <Button size="lg" onClick={handleSubmit} disabled={submitting}>
+        <Button 
+          size="lg" 
+          onClick={handleSubmit} 
+          disabled={submitting}
+          className="w-full sm:w-auto min-h-[44px]"
+        >
           {submitting ? (
             <>
               <Loader2 className={cn("w-4 h-4 animate-spin", isRTL ? "ml-2" : "mr-2")} />
