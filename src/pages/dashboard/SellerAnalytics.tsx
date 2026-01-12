@@ -229,21 +229,21 @@ const SellerAnalytics = () => {
         description={isRTL ? 'آمار و گزارش فروش' : 'Sales statistics and reports'}
         allowedRoles={['seller']}
       >
-        <div className="space-y-6">
-          <div className="grid gap-4 md:grid-cols-4">
+        <div className="space-y-4 sm:space-y-6">
+          <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
             {[1, 2, 3, 4].map(i => (
               <Card key={i}>
-                <CardContent className="pt-6">
-                  <Skeleton className="h-12 w-12 rounded-full mb-4" />
-                  <Skeleton className="h-8 w-24 mb-2" />
-                  <Skeleton className="h-4 w-20" />
+                <CardContent className="p-4 sm:pt-6">
+                  <Skeleton className="h-10 w-10 sm:h-12 sm:w-12 rounded-full mb-3 sm:mb-4" />
+                  <Skeleton className="h-6 sm:h-8 w-20 sm:w-24 mb-2" />
+                  <Skeleton className="h-3 sm:h-4 w-16 sm:w-20" />
                 </CardContent>
               </Card>
             ))}
           </div>
           <Card>
-            <CardContent className="pt-6">
-              <Skeleton className="h-[300px] w-full" />
+            <CardContent className="p-4 sm:pt-6">
+              <Skeleton className="h-[200px] sm:h-[300px] w-full" />
             </CardContent>
           </Card>
         </div>
@@ -257,11 +257,11 @@ const SellerAnalytics = () => {
       description={isRTL ? 'آمار و گزارش فروش' : 'Sales statistics and reports'}
       allowedRoles={['seller']}
     >
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* Date Range Filter */}
         <div className="flex justify-end">
           <Select value={dateRange} onValueChange={setDateRange}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -272,19 +272,19 @@ const SellerAnalytics = () => {
           </Select>
         </div>
 
-        {/* Summary Cards */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {/* Summary Cards - 2 columns on mobile, 4 on desktop */}
+        <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
           <Card className="group hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-primary/20">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <DollarSign className="w-7 h-7 text-primary" />
+            <CardContent className="p-3 sm:p-4 sm:pt-6">
+              <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
+                <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <DollarSign className="w-5 h-5 sm:w-7 sm:h-7 text-primary" />
                 </div>
-                <div className="flex-1">
-                  <p className="text-3xl font-bold tracking-tight">
+                <div className="flex-1 text-center sm:text-start">
+                  <p className="text-xl sm:text-3xl font-bold tracking-tight">
                     {stats.totalSales.toLocaleString()}
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs sm:text-sm text-muted-foreground">
                     {isRTL ? 'کل فروش (؋)' : 'Total Sales (AFN)'}
                   </p>
                 </div>
@@ -293,14 +293,14 @@ const SellerAnalytics = () => {
           </Card>
 
           <Card className="group hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-transparent border-blue-500/20">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-blue-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <ShoppingBag className="w-7 h-7 text-blue-600" />
+            <CardContent className="p-3 sm:p-4 sm:pt-6">
+              <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
+                <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-blue-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <ShoppingBag className="w-5 h-5 sm:w-7 sm:h-7 text-blue-600" />
                 </div>
-                <div className="flex-1">
-                  <p className="text-3xl font-bold tracking-tight">{stats.totalOrders}</p>
-                  <p className="text-sm text-muted-foreground">
+                <div className="flex-1 text-center sm:text-start">
+                  <p className="text-xl sm:text-3xl font-bold tracking-tight">{stats.totalOrders}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
                     {isRTL ? 'کل سفارشات' : 'Total Orders'}
                   </p>
                 </div>
@@ -309,16 +309,16 @@ const SellerAnalytics = () => {
           </Card>
 
           <Card className="group hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-green-500/10 via-green-500/5 to-transparent border-green-500/20">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-green-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <TrendingUp className="w-7 h-7 text-green-600" />
+            <CardContent className="p-3 sm:p-4 sm:pt-6">
+              <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
+                <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-green-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <TrendingUp className="w-5 h-5 sm:w-7 sm:h-7 text-green-600" />
                 </div>
-                <div className="flex-1">
-                  <p className="text-3xl font-bold tracking-tight">
+                <div className="flex-1 text-center sm:text-start">
+                  <p className="text-xl sm:text-3xl font-bold tracking-tight">
                     {stats.netEarnings.toLocaleString()}
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs sm:text-sm text-muted-foreground">
                     {isRTL ? 'درآمد خالص (؋)' : 'Net Earnings (AFN)'}
                   </p>
                 </div>
@@ -327,14 +327,14 @@ const SellerAnalytics = () => {
           </Card>
 
           <Card className="group hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent border-amber-500/20">
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-amber-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Clock className="w-7 h-7 text-amber-600" />
+            <CardContent className="p-3 sm:p-4 sm:pt-6">
+              <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
+                <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-amber-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Clock className="w-5 h-5 sm:w-7 sm:h-7 text-amber-600" />
                 </div>
-                <div className="flex-1">
-                  <p className="text-3xl font-bold tracking-tight">{stats.pendingOrders}</p>
-                  <p className="text-sm text-muted-foreground">
+                <div className="flex-1 text-center sm:text-start">
+                  <p className="text-xl sm:text-3xl font-bold tracking-tight">{stats.pendingOrders}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
                     {isRTL ? 'سفارشات در انتظار' : 'Pending Orders'}
                   </p>
                 </div>
@@ -343,23 +343,23 @@ const SellerAnalytics = () => {
           </Card>
         </div>
 
-        {/* Charts Row */}
-        <div className="grid gap-6 lg:grid-cols-3">
+        {/* Charts Row - Stack on mobile */}
+        <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
           {/* Sales Trend Chart */}
           <Card className="lg:col-span-2 hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-primary" />
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                 {isRTL ? 'روند فروش' : 'Sales Trend'}
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-xs sm:text-sm">
                 {isRTL ? 'فروش روزانه در بازه انتخاب شده' : 'Daily sales over selected period'}
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="h-[300px]">
+            <CardContent className="p-2 sm:p-6 pt-0">
+              <div className="h-[200px] sm:h-[300px] -mx-2 sm:mx-0">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={salesTrendData}>
+                  <AreaChart data={salesTrendData} margin={{ left: 0, right: 10, top: 5, bottom: 5 }}>
                     <defs>
                       <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="hsl(195 100% 50%)" stopOpacity={0.3} />
@@ -370,16 +370,18 @@ const SellerAnalytics = () => {
                     <XAxis 
                       dataKey="date" 
                       stroke="hsl(var(--muted-foreground))"
-                      fontSize={12}
+                      fontSize={10}
                       tickLine={false}
                       axisLine={false}
+                      interval="preserveStartEnd"
                     />
                     <YAxis 
                       stroke="hsl(var(--muted-foreground))"
-                      fontSize={12}
+                      fontSize={10}
                       tickLine={false}
                       axisLine={false}
                       tickFormatter={(value) => `${value / 1000}k`}
+                      width={35}
                     />
                     <Tooltip
                       contentStyle={{
@@ -387,6 +389,7 @@ const SellerAnalytics = () => {
                         border: '1px solid hsl(var(--border))',
                         borderRadius: '8px',
                         boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                        fontSize: '12px',
                       }}
                       formatter={(value: number) => [`${value.toLocaleString()} ؋`, isRTL ? 'فروش' : 'Sales']}
                     />
@@ -405,25 +408,25 @@ const SellerAnalytics = () => {
 
           {/* Order Status Breakdown */}
           <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Package className="w-5 h-5 text-primary" />
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <Package className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                 {isRTL ? 'وضعیت سفارشات' : 'Order Status'}
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-xs sm:text-sm">
                 {isRTL ? 'توزیع وضعیت سفارشات' : 'Order status distribution'}
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="h-[200px]">
+            <CardContent className="p-4 sm:p-6 pt-0">
+              <div className="h-[160px] sm:h-[200px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={statusBreakdown}
                       cx="50%"
                       cy="50%"
-                      innerRadius={50}
-                      outerRadius={80}
+                      innerRadius={35}
+                      outerRadius={60}
                       paddingAngle={2}
                       dataKey="value"
                     >
@@ -436,19 +439,20 @@ const SellerAnalytics = () => {
                         backgroundColor: 'hsl(var(--card))',
                         border: '1px solid hsl(var(--border))',
                         borderRadius: '8px',
+                        fontSize: '12px',
                       }}
                     />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-              <div className="grid grid-cols-2 gap-2 mt-4">
+              <div className="grid grid-cols-2 gap-1.5 sm:gap-2 mt-3 sm:mt-4">
                 {statusBreakdown.map(status => (
-                  <div key={status.name} className="flex items-center gap-2 text-sm">
+                  <div key={status.name} className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm">
                     <div
-                      className="w-3 h-3 rounded-full"
+                      className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full flex-shrink-0"
                       style={{ backgroundColor: status.color }}
                     />
-                    <span className="text-muted-foreground">
+                    <span className="text-muted-foreground truncate">
                       {isRTL ? statusLabels[status.name]?.fa : statusLabels[status.name]?.en}
                     </span>
                     <span className="font-medium ms-auto">{status.value}</span>
@@ -459,44 +463,44 @@ const SellerAnalytics = () => {
           </Card>
         </div>
 
-        {/* Bottom Row */}
-        <div className="grid gap-6 lg:grid-cols-2">
+        {/* Bottom Row - Stack on mobile */}
+        <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
           {/* Top Selling Products */}
           <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-primary" />
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                 {isRTL ? 'محصولات پرفروش' : 'Top Selling Products'}
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-xs sm:text-sm">
                 {isRTL ? 'بر اساس درآمد' : 'By revenue'}
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4 sm:p-6 pt-0">
               {topProducts.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <ShoppingBag className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                  <p>{isRTL ? 'هنوز فروشی ندارید' : 'No sales yet'}</p>
+                <div className="text-center py-6 sm:py-8 text-muted-foreground">
+                  <ShoppingBag className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-3 opacity-50" />
+                  <p className="text-sm sm:text-base">{isRTL ? 'هنوز فروشی ندارید' : 'No sales yet'}</p>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-2 sm:space-y-4">
                   {topProducts.map((product, index) => (
                     <div
                       key={index}
-                      className="flex items-center gap-4 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                      className="flex items-center gap-2 sm:gap-4 p-2 sm:p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
                     >
-                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">
+                      <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs sm:text-sm font-bold text-primary flex-shrink-0">
                         {index + 1}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium truncate">{product.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {product.quantity} {isRTL ? 'عدد فروخته شده' : 'sold'}
+                        <p className="font-medium text-sm sm:text-base truncate">{product.name}</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground">
+                          {product.quantity} {isRTL ? 'فروخته شده' : 'sold'}
                         </p>
                       </div>
-                      <div className="text-right">
-                        <p className="font-bold text-primary">
-                          {product.revenue.toLocaleString()} ؋
+                      <div className="text-end flex-shrink-0">
+                        <p className="font-bold text-sm sm:text-base text-primary">
+                          {product.revenue.toLocaleString()}
                         </p>
                       </div>
                     </div>
@@ -508,29 +512,29 @@ const SellerAnalytics = () => {
 
           {/* Low Stock Alerts */}
           <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-amber-500" />
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" />
                 {isRTL ? 'هشدار موجودی' : 'Low Stock Alerts'}
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-xs sm:text-sm">
                 {isRTL ? 'محصولات با موجودی کم' : 'Products running low on stock'}
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4 sm:p-6 pt-0">
               {lowStockProducts.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <CheckCircle className="w-12 h-12 mx-auto mb-3 text-green-500 opacity-70" />
-                  <p>{isRTL ? 'موجودی همه محصولات کافی است' : 'All products have sufficient stock'}</p>
+                <div className="text-center py-6 sm:py-8 text-muted-foreground">
+                  <CheckCircle className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-3 text-green-500 opacity-70" />
+                  <p className="text-sm sm:text-base">{isRTL ? 'موجودی همه محصولات کافی است' : 'All products have sufficient stock'}</p>
                 </div>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-2 sm:space-y-3">
                   {lowStockProducts.map(product => (
                     <div
                       key={product.id}
-                      className="flex items-center gap-4 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20"
+                      className="flex items-center gap-2 sm:gap-4 p-2 sm:p-3 rounded-lg bg-amber-500/10 border border-amber-500/20"
                     >
-                      <div className="w-12 h-12 rounded-lg bg-muted overflow-hidden flex-shrink-0">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-muted overflow-hidden flex-shrink-0">
                         {product.images?.[0] ? (
                           <img
                             src={product.images[0]}
@@ -539,17 +543,17 @@ const SellerAnalytics = () => {
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
-                            <Package className="w-5 h-5 text-muted-foreground" />
+                            <Package className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
                           </div>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium truncate">{product.name}</p>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="font-medium text-sm sm:text-base truncate">{product.name}</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground">
                           {getCurrencySymbol(product.currency)}{product.price.toLocaleString()}
                         </p>
                       </div>
-                      <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/30">
+                      <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/30 text-xs flex-shrink-0">
                         {product.quantity} {isRTL ? 'عدد' : 'left'}
                       </Badge>
                     </div>
