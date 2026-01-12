@@ -528,14 +528,14 @@ const SellerOrders = () => {
                   <div className="space-y-6">
                     {/* Status Update */}
                     <Card className="bg-muted/30 border-primary/10">
-                      <CardContent className="pt-6">
+                      <CardContent className="pt-4 sm:pt-6">
                         <div className="space-y-4">
-                          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                          <div className="flex flex-col gap-3 sm:gap-4">
                             <div>
-                              <h4 className="font-medium mb-1">
+                              <h4 className="font-medium mb-1 text-sm sm:text-base">
                                 {isRTL ? 'وضعیت سفارش' : 'Order Status'}
                               </h4>
-                              <p className="text-sm text-muted-foreground">
+                              <p className="text-xs sm:text-sm text-muted-foreground">
                                 {isRTL
                                   ? 'مرحله بعد: '
                                   : 'Next step: '}
@@ -546,13 +546,15 @@ const SellerOrders = () => {
                                 </span>
                               </p>
                             </div>
-                            <div className="flex gap-2">
+                            {/* Action Buttons - Stack vertically on mobile */}
+                            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                               {canRejectOrder(order.status) && (
                                 <Button
                                   variant="destructive"
                                   onClick={() => handleRejectOrder(order.id)}
                                   disabled={updatingStatus?.orderId === order.id}
-                                  className="gap-2"
+                                  className="gap-2 w-full sm:w-auto min-h-[44px]"
+                                  size="sm"
                                 >
                                   {updatingStatus?.orderId === order.id && updatingStatus?.action === 'reject' ? (
                                     <RefreshCw className="w-4 h-4 animate-spin" />
@@ -566,7 +568,8 @@ const SellerOrders = () => {
                                 <Button
                                   onClick={() => handleStatusUpdate(order.id, getNextStatus(order.status)!)}
                                   disabled={updatingStatus?.orderId === order.id}
-                                  className="gap-2"
+                                  className="gap-2 w-full sm:w-auto min-h-[44px]"
+                                  size="sm"
                                 >
                                   {updatingStatus?.orderId === order.id && updatingStatus?.action === 'confirm' ? (
                                     <RefreshCw className="w-4 h-4 animate-spin" />
@@ -579,16 +582,16 @@ const SellerOrders = () => {
                             </div>
                           </div>
                           
-                          {/* Progress Steps */}
-                          <div className="pt-4">
+                          {/* Progress Steps - Horizontal scroll on mobile */}
+                          <div className="pt-2 sm:pt-4 overflow-x-auto pb-2">
                             {order.status === 'rejected' ? (
-                              <div className="flex items-center justify-center gap-2 py-4">
-                                <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-destructive/10 border border-destructive/20">
-                                  <div className="w-10 h-10 rounded-full bg-destructive flex items-center justify-center">
-                                    <XCircle className="w-5 h-5 text-destructive-foreground" />
+                              <div className="flex items-center justify-center gap-2 py-2 sm:py-4">
+                                <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 rounded-lg bg-destructive/10 border border-destructive/20">
+                                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-destructive flex items-center justify-center flex-shrink-0">
+                                    <XCircle className="w-4 h-4 sm:w-5 sm:h-5 text-destructive-foreground" />
                                   </div>
                                   <div>
-                                    <p className="font-medium text-destructive">
+                                    <p className="font-medium text-destructive text-sm sm:text-base">
                                       {isRTL ? 'رد شده' : 'Rejected'}
                                     </p>
                                     <p className="text-xs text-muted-foreground">
@@ -598,13 +601,13 @@ const SellerOrders = () => {
                                 </div>
                               </div>
                             ) : (
-                            <div className="relative flex items-center justify-between">
+                            <div className="relative flex items-center justify-between min-w-[280px]">
                               {/* Progress Line Background */}
-                              <div className="absolute top-5 start-0 end-0 h-0.5 bg-muted" />
+                              <div className="absolute top-4 sm:top-5 start-0 end-0 h-0.5 bg-muted" />
                               
                               {/* Progress Line Fill */}
                               <div
-                                className="absolute top-5 start-0 h-0.5 bg-primary transition-all duration-500"
+                                className="absolute top-4 sm:top-5 start-0 h-0.5 bg-primary transition-all duration-500"
                                 style={{
                                   width: `${(STATUS_SEQUENCE.indexOf(order.status) / (STATUS_SEQUENCE.length - 1)) * 100}%`,
                                 }}
@@ -625,16 +628,16 @@ const SellerOrders = () => {
                                 return (
                                   <div key={step.value} className="relative flex flex-col items-center z-10">
                                     <div
-                                      className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 border-2 ${
+                                      className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-300 border-2 ${
                                         isCompleted
                                           ? 'bg-primary text-primary-foreground border-primary'
                                           : 'bg-background text-muted-foreground border-muted'
-                                      } ${isCurrent ? 'ring-4 ring-primary/20 scale-110' : ''}`}
+                                      } ${isCurrent ? 'ring-2 sm:ring-4 ring-primary/20 scale-105 sm:scale-110' : ''}`}
                                     >
-                                      <Icon className="w-5 h-5" />
+                                      <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                                     </div>
                                     <span
-                                      className={`mt-2 text-xs font-medium text-center transition-colors ${
+                                      className={`mt-1 sm:mt-2 text-[10px] sm:text-xs font-medium text-center transition-colors whitespace-nowrap ${
                                         isCompleted ? 'text-primary' : 'text-muted-foreground'
                                       }`}
                                     >
