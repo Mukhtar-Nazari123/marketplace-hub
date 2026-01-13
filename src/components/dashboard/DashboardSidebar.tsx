@@ -12,7 +12,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarRail,
 } from '@/components/ui/sidebar';
 import {
   LayoutDashboard,
@@ -293,7 +292,6 @@ export const DashboardSidebar = () => {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
-      <SidebarRail />
     </Sidebar>
   );
 };
