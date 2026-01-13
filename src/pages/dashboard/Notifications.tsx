@@ -274,7 +274,12 @@ const Notifications = () => {
                       </div>
 
                       {/* Meta info */}
-                      <div className="flex items-center gap-3 mt-3 text-xs text-muted-foreground">
+                      <div className="flex flex-wrap items-center gap-3 mt-3 text-xs text-muted-foreground">
+                        {notification.type === 'ORDER_STATUS_CHANGED' && notification.order_status && (
+                          <Badge variant="outline" className="text-xs h-6 px-2 bg-blue-50 text-blue-700 border-blue-200 font-medium">
+                            {notification.order_status.charAt(0).toUpperCase() + notification.order_status.slice(1)}
+                          </Badge>
+                        )}
                         {notification.order_number && (
                           <span className="flex items-center gap-1">
                             <ShoppingCart className="h-3 w-3" />
