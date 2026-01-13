@@ -185,13 +185,14 @@ const Header = () => {
                 </Button>
               </Link>
 
+              {/* Notification Bell - Only for buyers and sellers */}
+              {user && (role === 'buyer' || role === 'seller') && (
+                <NotificationBell />
+              )}
+
               {/* Account / Dashboard / Logout */}
               {user ? (
                 <div className="flex items-center gap-1 sm:gap-2">
-                  {/* Notification Bell - Only for buyers and sellers */}
-                  {(role === 'buyer' || role === 'seller') && (
-                    <NotificationBell />
-                  )}
 
                   {/* Dashboard Link */}
                   <Tooltip>
