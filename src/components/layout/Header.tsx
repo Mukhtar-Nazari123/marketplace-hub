@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import MobileMenu from "./MobileMenu";
 import { useTheme } from "next-themes";
-import { NotificationBell } from "@/components/notifications/NotificationBell";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -184,11 +183,6 @@ const Header = () => {
                   )}
                 </Button>
               </Link>
-
-              {/* Notification Bell - Only for buyers and sellers */}
-              {user && (role === 'buyer' || role === 'seller') && (
-                <NotificationBell />
-              )}
 
               {/* Account / Dashboard / Logout */}
               {user ? (

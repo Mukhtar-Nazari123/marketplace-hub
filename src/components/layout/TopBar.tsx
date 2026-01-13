@@ -2,7 +2,9 @@ import { Phone, Globe, User } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/lib/i18n";
 import { useContactSettings } from "@/hooks/useContactSettings";
+import { useAuth } from "@/hooks/useAuth";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 
 const TopBar = () => {
   const {
@@ -13,6 +15,7 @@ const TopBar = () => {
   } = useLanguage();
 
   const { phone } = useContactSettings();
+  const { user, role } = useAuth();
 
   const toggleLanguage = () => {
     setLanguage(language === "fa" ? "en" : "fa");
@@ -47,6 +50,12 @@ const TopBar = () => {
             </div>
           </div>
           <div className="flex items-center gap-4">
+            {/* Notification Bell - Only for buyers and sellers */}
+            {user && (role === 'buyer' || role === 'seller') && (
+              <div className="[&_button]:text-background [&_button:hover]:text-cyan [&_button]:h-8 [&_button]:w-8">
+                <NotificationBell />
+              </div>
+            )}
             <Tooltip>
               <TooltipTrigger asChild>
                 <Link to="/dashboard/profile" className="hover:text-cyan transition-colors p-1">
