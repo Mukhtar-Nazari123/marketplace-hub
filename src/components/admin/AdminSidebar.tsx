@@ -14,6 +14,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
+  useSidebar,
 } from '@/components/ui/sidebar';
 import {
   LayoutDashboard,
@@ -55,6 +56,8 @@ export const AdminSidebar = () => {
   const { user, signOut } = useAuth();
   const { t, language, setLanguage, isRTL } = useLanguage();
   const { unreadCount } = useAdminNotifications();
+  const { state } = useSidebar();
+  const isCollapsed = state === 'collapsed';
 
   // Format unread count for display
   const formatUnreadCount = (count: number): string => {
@@ -120,10 +123,12 @@ export const AdminSidebar = () => {
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                 <Store className="size-4" />
               </div>
-              <div className="flex flex-col gap-0.5 leading-none">
-                <span className="font-semibold">{t.admin.panelTitle}</span>
-                <span className="text-xs text-muted-foreground">{t.admin.panelSubtitle}</span>
-              </div>
+              {!isCollapsed && (
+                <div className="flex flex-col gap-0.5 leading-none">
+                  <span className="font-semibold">{t.admin.panelTitle}</span>
+                  <span className="text-xs text-muted-foreground">{t.admin.panelSubtitle}</span>
+                </div>
+              )}
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -131,7 +136,7 @@ export const AdminSidebar = () => {
       
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>{t.admin.main}</SidebarGroupLabel>
+          {!isCollapsed && <SidebarGroupLabel>{t.admin.main}</SidebarGroupLabel>}
           <SidebarGroupContent>
             <SidebarMenu>
               {mainNavItems.map((item) => (
@@ -143,10 +148,10 @@ export const AdminSidebar = () => {
                   >
                     <button onClick={() => navigate(item.url)} className="w-full flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <item.icon className="h-4 w-4" />
-                        <span>{item.title}</span>
+                        <item.icon className="h-4 w-4 shrink-0" />
+                        {!isCollapsed && <span>{item.title}</span>}
                       </div>
-                      {item.showBadge && unreadCount > 0 && (
+                      {item.showBadge && unreadCount > 0 && !isCollapsed && (
                         <Badge 
                           className="bg-orange-500 hover:bg-orange-600 text-white text-xs font-medium px-2 py-0.5 min-w-[20px] h-5 flex items-center justify-center rounded-full shadow-sm"
                         >
@@ -162,7 +167,7 @@ export const AdminSidebar = () => {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>{t.admin.content}</SidebarGroupLabel>
+          {!isCollapsed && <SidebarGroupLabel>{t.admin.content}</SidebarGroupLabel>}
           <SidebarGroupContent>
             <SidebarMenu>
               {contentNavItems.map((item) => (
@@ -173,8 +178,8 @@ export const AdminSidebar = () => {
                     tooltip={item.title}
                   >
                     <button onClick={() => navigate(item.url)}>
-                      <item.icon />
-                      <span>{item.title}</span>
+                      <item.icon className="h-4 w-4 shrink-0" />
+                      {!isCollapsed && <span>{item.title}</span>}
                     </button>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -184,7 +189,7 @@ export const AdminSidebar = () => {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>{t.admin.system}</SidebarGroupLabel>
+          {!isCollapsed && <SidebarGroupLabel>{t.admin.system}</SidebarGroupLabel>}
           <SidebarGroupContent>
             <SidebarMenu>
               {settingsNavItems.map((item) => (
@@ -195,8 +200,8 @@ export const AdminSidebar = () => {
                     tooltip={item.title}
                   >
                     <button onClick={() => navigate(item.url)}>
-                      <item.icon />
-                      <span>{item.title}</span>
+                      <item.icon className="h-4 w-4 shrink-0" />
+                      {!isCollapsed && <span>{item.title}</span>}
                     </button>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -211,8 +216,8 @@ export const AdminSidebar = () => {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton onClick={toggleLanguage} tooltip={language === 'fa' ? 'English' : 'دری'}>
-                  <Globe />
-                  <span>{language === 'fa' ? 'English' : 'دری'}</span>
+                  <Globe className="h-4 w-4 shrink-0" />
+                  {!isCollapsed && <span>{language === 'fa' ? 'English' : 'دری'}</span>}
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
@@ -229,18 +234,22 @@ export const AdminSidebar = () => {
                   size="lg"
                   className="data-[state=open]:bg-sidebar-accent"
                 >
-                  <Avatar className="h-8 w-8">
+                  <Avatar className="h-8 w-8 shrink-0">
                     <AvatarFallback className="bg-primary text-primary-foreground">
                       {user?.email?.charAt(0).toUpperCase() || 'A'}
                     </AvatarFallback>
                   </Avatar>
-                  <div className={`grid flex-1 text-sm leading-tight ${isRTL ? 'text-right' : 'text-left'}`}>
-                    <span className="truncate font-semibold">{t.admin.manager}</span>
-                    <span className="truncate text-xs text-muted-foreground">
-                      {user?.email}
-                    </span>
-                  </div>
-                  <ChevronDown className={`size-4 ${isRTL ? 'mr-auto' : 'ml-auto'}`} />
+                  {!isCollapsed && (
+                    <>
+                      <div className={`grid flex-1 text-sm leading-tight ${isRTL ? 'text-right' : 'text-left'}`}>
+                        <span className="truncate font-semibold">{t.admin.manager}</span>
+                        <span className="truncate text-xs text-muted-foreground">
+                          {user?.email}
+                        </span>
+                      </div>
+                      <ChevronDown className={`size-4 ${isRTL ? 'mr-auto' : 'ml-auto'}`} />
+                    </>
+                  )}
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent
