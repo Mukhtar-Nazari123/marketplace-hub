@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/lib/i18n';
+import { useAdminNotifications } from '@/hooks/useAdminNotifications';
 import {
   Sidebar,
   SidebarContent,
@@ -46,22 +47,35 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 export const AdminSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { t, language, setLanguage, isRTL } = useLanguage();
+  const { unreadCount } = useAdminNotifications();
+
+  // Format unread count for display
+  const formatUnreadCount = (count: number): string => {
+    if (count > 15) return isRTL ? '۱۵+' : '15+';
+    if (isRTL) {
+      // Convert to Persian numerals
+      const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+      return count.toString().replace(/\d/g, (d) => persianDigits[parseInt(d)]);
+    }
+    return count.toString();
+  };
 
   const mainNavItems = [
-    { title: t.admin.dashboard, icon: LayoutDashboard, url: '/dashboard/admin' },
-    { title: isRTL ? 'اعلان‌ها' : 'Notifications', icon: Bell, url: '/dashboard/admin/notifications' },
-    { title: t.admin.users.title, icon: Users, url: '/dashboard/users' },
-    { title: t.admin.products.title, icon: Package, url: '/dashboard/products' },
-    { title: t.admin.orders.title, icon: ShoppingCart, url: '/dashboard/orders' },
-    { title: t.admin.sellers.title, icon: BadgeCheck, url: '/dashboard/sellers' },
-    { title: isRTL ? 'نظرات' : 'Reviews', icon: Star, url: '/dashboard/reviews' },
-    { title: isRTL ? 'پیام‌های تماس' : 'Contact Messages', icon: MessageSquare, url: '/dashboard/contact-messages' },
+    { title: t.admin.dashboard, icon: LayoutDashboard, url: '/dashboard/admin', showBadge: false },
+    { title: isRTL ? 'اعلان‌ها' : 'Notifications', icon: Bell, url: '/dashboard/admin/notifications', showBadge: true },
+    { title: t.admin.users.title, icon: Users, url: '/dashboard/users', showBadge: false },
+    { title: t.admin.products.title, icon: Package, url: '/dashboard/products', showBadge: false },
+    { title: t.admin.orders.title, icon: ShoppingCart, url: '/dashboard/orders', showBadge: false },
+    { title: t.admin.sellers.title, icon: BadgeCheck, url: '/dashboard/sellers', showBadge: false },
+    { title: isRTL ? 'نظرات' : 'Reviews', icon: Star, url: '/dashboard/reviews', showBadge: false },
+    { title: isRTL ? 'پیام‌های تماس' : 'Contact Messages', icon: MessageSquare, url: '/dashboard/contact-messages', showBadge: false },
   ];
 
   const contentNavItems = [
@@ -127,9 +141,18 @@ export const AdminSidebar = () => {
                     isActive={isActive(item.url)}
                     tooltip={item.title}
                   >
-                    <button onClick={() => navigate(item.url)}>
-                      <item.icon />
-                      <span>{item.title}</span>
+                    <button onClick={() => navigate(item.url)} className="w-full flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.title}</span>
+                      </div>
+                      {item.showBadge && unreadCount > 0 && (
+                        <Badge 
+                          className="bg-orange-500 hover:bg-orange-600 text-white text-xs font-medium px-2 py-0.5 min-w-[20px] h-5 flex items-center justify-center rounded-full shadow-sm"
+                        >
+                          {formatUnreadCount(unreadCount)}
+                        </Badge>
+                      )}
                     </button>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
