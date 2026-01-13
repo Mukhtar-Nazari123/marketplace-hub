@@ -489,6 +489,93 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          buyer_name: string | null
+          created_at: string
+          id: string
+          is_read: boolean | null
+          message_en: string
+          message_fa: string
+          order_currency: string | null
+          order_id: string | null
+          order_number: string | null
+          order_status: string | null
+          order_total: number | null
+          product_id: string | null
+          product_image_url: string | null
+          product_name: string | null
+          rating: number | null
+          rejection_reason: string | null
+          related_entity_id: string | null
+          related_entity_type: string | null
+          seller_id: string | null
+          store_logo_url: string | null
+          store_name: string | null
+          title_en: string
+          title_fa: string
+          type: string
+          user_id: string
+          user_role: string
+        }
+        Insert: {
+          buyer_name?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          message_en: string
+          message_fa: string
+          order_currency?: string | null
+          order_id?: string | null
+          order_number?: string | null
+          order_status?: string | null
+          order_total?: number | null
+          product_id?: string | null
+          product_image_url?: string | null
+          product_name?: string | null
+          rating?: number | null
+          rejection_reason?: string | null
+          related_entity_id?: string | null
+          related_entity_type?: string | null
+          seller_id?: string | null
+          store_logo_url?: string | null
+          store_name?: string | null
+          title_en: string
+          title_fa: string
+          type: string
+          user_id: string
+          user_role: string
+        }
+        Update: {
+          buyer_name?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          message_en?: string
+          message_fa?: string
+          order_currency?: string | null
+          order_id?: string | null
+          order_number?: string | null
+          order_status?: string | null
+          order_total?: number | null
+          product_id?: string | null
+          product_image_url?: string | null
+          product_name?: string | null
+          rating?: number | null
+          rejection_reason?: string | null
+          related_entity_id?: string | null
+          related_entity_type?: string | null
+          seller_id?: string | null
+          store_logo_url?: string | null
+          store_name?: string | null
+          title_en?: string
+          title_fa?: string
+          type?: string
+          user_id?: string
+          user_role?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           created_at: string

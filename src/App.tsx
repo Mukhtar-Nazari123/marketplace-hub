@@ -60,6 +60,8 @@ import AdminContactSettings from "./pages/admin/AdminContactSettings";
 import AdminNewsletter from "./pages/admin/AdminNewsletter";
 import AdminSocialLinks from "./pages/admin/AdminSocialLinks";
 import AdminNotifications from "./pages/admin/AdminNotifications";
+import Notifications from "./pages/dashboard/Notifications";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -128,6 +130,9 @@ const App = () => (
                       <Route path="/dashboard/buyer/addresses" element={<BuyerProfile />} />
                       <Route path="/dashboard/buyer/wishlist" element={<Wishlist />} />
                       <Route path="/dashboard/buyer/payments" element={<BuyerProfile />} />
+
+                      {/* Shared Notifications Route for Buyers/Sellers */}
+                      <Route path="/dashboard/notifications" element={<Notifications />} />
 
                       {/* Seller Routes */}
                       <Route path="/dashboard/seller" element={<SellerDashboard />} />

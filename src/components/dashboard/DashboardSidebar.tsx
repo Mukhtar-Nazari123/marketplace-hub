@@ -35,9 +35,12 @@ import {
   Plus,
   Home,
   Star,
+  Bell,
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { useNotifications } from '@/hooks/useNotifications';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -57,46 +60,59 @@ export const DashboardSidebar = () => {
   const { user, role, signOut } = useAuth();
   const { t, language, setLanguage, isRTL } = useLanguage();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const { unreadCount } = useNotifications();
+
+  // Format unread count for display
+  const formatUnreadCount = (count: number): string => {
+    if (count > 15) return isRTL ? '۱۵+' : '15+';
+    if (isRTL) {
+      const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+      return count.toString().replace(/\d/g, (d) => persianDigits[parseInt(d)]);
+    }
+    return count.toString();
+  };
 
   // Admin navigation items
   const adminMainNavItems = [
-    { title: t.admin.dashboard, icon: LayoutDashboard, url: '/dashboard/admin' },
-    { title: t.admin.users.title, icon: Users, url: '/dashboard/users' },
-    { title: t.admin.products.title, icon: Package, url: '/dashboard/products' },
-    { title: t.admin.orders.title, icon: ShoppingCart, url: '/dashboard/orders' },
-    { title: t.admin.sellers.title, icon: BadgeCheck, url: '/dashboard/sellers' },
+    { title: t.admin.dashboard, icon: LayoutDashboard, url: '/dashboard/admin', showBadge: false },
+    { title: t.admin.users.title, icon: Users, url: '/dashboard/users', showBadge: false },
+    { title: t.admin.products.title, icon: Package, url: '/dashboard/products', showBadge: false },
+    { title: t.admin.orders.title, icon: ShoppingCart, url: '/dashboard/orders', showBadge: false },
+    { title: t.admin.sellers.title, icon: BadgeCheck, url: '/dashboard/sellers', showBadge: false },
   ];
 
   const adminContentNavItems = [
-    { title: t.admin.banners.title, icon: Image, url: '/dashboard/banners' },
-    { title: t.admin.promotions.title, icon: Tag, url: '/dashboard/promotions' },
-    { title: t.admin.cms.title, icon: FileText, url: '/dashboard/cms' },
+    { title: t.admin.banners.title, icon: Image, url: '/dashboard/banners', showBadge: false },
+    { title: t.admin.promotions.title, icon: Tag, url: '/dashboard/promotions', showBadge: false },
+    { title: t.admin.cms.title, icon: FileText, url: '/dashboard/cms', showBadge: false },
   ];
 
   const adminSettingsNavItems = [
-    { title: t.admin.settings.title, icon: Settings, url: '/dashboard/settings' },
+    { title: t.admin.settings.title, icon: Settings, url: '/dashboard/settings', showBadge: false },
   ];
 
   // Seller navigation items (shared dashboard)
   const sellerNavItems = [
-    { title: isRTL ? 'داشبورد' : 'Dashboard', icon: LayoutDashboard, url: '/dashboard/seller' },
-    { title: isRTL ? 'محصولات من' : 'My Products', icon: Package, url: '/dashboard/seller/products' },
-    { title: isRTL ? 'سفارشات' : 'Orders', icon: ShoppingCart, url: '/dashboard/seller/orders' },
-    { title: isRTL ? 'نظرات' : 'Reviews', icon: Star, url: '/dashboard/seller/reviews' },
-    { title: isRTL ? 'آمار فروش' : 'Analytics', icon: BarChart3, url: '/dashboard/seller/analytics' },
-    { title: isRTL ? 'پروفایل' : 'Profile', icon: User, url: '/dashboard/profile' },
-    { title: isRTL ? 'افزودن محصول' : 'Add Product', icon: Plus, url: '/dashboard/seller/products/new' },
+    { title: isRTL ? 'داشبورد' : 'Dashboard', icon: LayoutDashboard, url: '/dashboard/seller', showBadge: false },
+    { title: isRTL ? 'اعلان‌ها' : 'Notifications', icon: Bell, url: '/dashboard/notifications', showBadge: true },
+    { title: isRTL ? 'محصولات من' : 'My Products', icon: Package, url: '/dashboard/seller/products', showBadge: false },
+    { title: isRTL ? 'سفارشات' : 'Orders', icon: ShoppingCart, url: '/dashboard/seller/orders', showBadge: false },
+    { title: isRTL ? 'نظرات' : 'Reviews', icon: Star, url: '/dashboard/seller/reviews', showBadge: false },
+    { title: isRTL ? 'آمار فروش' : 'Analytics', icon: BarChart3, url: '/dashboard/seller/analytics', showBadge: false },
+    { title: isRTL ? 'پروفایل' : 'Profile', icon: User, url: '/dashboard/profile', showBadge: false },
+    { title: isRTL ? 'افزودن محصول' : 'Add Product', icon: Plus, url: '/dashboard/seller/products/new', showBadge: false },
   ];
 
   // Buyer navigation items (shared dashboard)
   const buyerNavItems = [
-    { title: isRTL ? 'داشبورد' : 'Dashboard', icon: LayoutDashboard, url: '/dashboard/buyer' },
-    { title: isRTL ? 'پروفایل' : 'Profile', icon: User, url: '/dashboard/profile' },
-    { title: isRTL ? 'سفارشات من' : 'My Orders', icon: ShoppingCart, url: '/dashboard/buyer/orders' },
-    { title: isRTL ? 'نظرات من' : 'My Reviews', icon: Star, url: '/dashboard/buyer/reviews' },
-    { title: isRTL ? 'آدرس‌ها' : 'Addresses', icon: MapPin, url: '/dashboard/buyer/addresses' },
-    { title: isRTL ? 'علاقه‌مندی‌ها' : 'Wishlist', icon: Heart, url: '/dashboard/buyer/wishlist' },
-    { title: isRTL ? 'روش‌های پرداخت' : 'Payment Methods', icon: CreditCard, url: '/dashboard/buyer/payments' },
+    { title: isRTL ? 'داشبورد' : 'Dashboard', icon: LayoutDashboard, url: '/dashboard/buyer', showBadge: false },
+    { title: isRTL ? 'اعلان‌ها' : 'Notifications', icon: Bell, url: '/dashboard/notifications', showBadge: true },
+    { title: isRTL ? 'پروفایل' : 'Profile', icon: User, url: '/dashboard/profile', showBadge: false },
+    { title: isRTL ? 'سفارشات من' : 'My Orders', icon: ShoppingCart, url: '/dashboard/buyer/orders', showBadge: false },
+    { title: isRTL ? 'نظرات من' : 'My Reviews', icon: Star, url: '/dashboard/buyer/reviews', showBadge: false },
+    { title: isRTL ? 'آدرس‌ها' : 'Addresses', icon: MapPin, url: '/dashboard/buyer/addresses', showBadge: false },
+    { title: isRTL ? 'علاقه‌مندی‌ها' : 'Wishlist', icon: Heart, url: '/dashboard/buyer/wishlist', showBadge: false },
+    { title: isRTL ? 'روش‌های پرداخت' : 'Payment Methods', icon: CreditCard, url: '/dashboard/buyer/payments', showBadge: false },
   ];
 
   const handleLogout = async () => {
@@ -129,7 +145,7 @@ export const DashboardSidebar = () => {
     : 'Are you sure you want to logout?';
   const cancelText = isRTL ? 'انصراف' : 'Cancel';
 
-  const renderNavItems = (items: typeof adminMainNavItems, label?: string) => (
+  const renderNavItems = (items: typeof sellerNavItems, label?: string) => (
     <SidebarGroup>
       {label && <SidebarGroupLabel>{label}</SidebarGroupLabel>}
       <SidebarGroupContent>
@@ -142,9 +158,18 @@ export const DashboardSidebar = () => {
                 tooltip={item.title}
                 className="transition-all duration-200 hover:translate-x-1"
               >
-                <button onClick={() => navigate(item.url)}>
-                  <item.icon className="transition-transform duration-200 group-hover:scale-110" />
-                  <span>{item.title}</span>
+                <button onClick={() => navigate(item.url)} className="w-full flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <item.icon className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+                    <span>{item.title}</span>
+                  </div>
+                  {item.showBadge && unreadCount > 0 && (
+                    <Badge 
+                      className="bg-orange-500 hover:bg-orange-600 text-white text-xs font-medium px-2 py-0.5 min-w-[20px] h-5 flex items-center justify-center rounded-full shadow-sm"
+                    >
+                      {formatUnreadCount(unreadCount)}
+                    </Badge>
+                  )}
                 </button>
               </SidebarMenuButton>
             </SidebarMenuItem>

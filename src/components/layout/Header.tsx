@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import MobileMenu from "./MobileMenu";
 import { useTheme } from "next-themes";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -187,6 +188,11 @@ const Header = () => {
               {/* Account / Dashboard / Logout */}
               {user ? (
                 <div className="flex items-center gap-1 sm:gap-2">
+                  {/* Notification Bell - Only for buyers and sellers */}
+                  {(role === 'buyer' || role === 'seller') && (
+                    <NotificationBell />
+                  )}
+
                   {/* Dashboard Link */}
                   <Tooltip>
                     <TooltipTrigger asChild>
