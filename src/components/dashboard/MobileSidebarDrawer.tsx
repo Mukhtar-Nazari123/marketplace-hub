@@ -28,6 +28,7 @@ import {
   Home,
   Star,
   X,
+  Bell,
 } from 'lucide-react';
 import {
   AlertDialog,
@@ -84,6 +85,7 @@ export const MobileSidebarDrawer = ({ open, onOpenChange }: MobileSidebarDrawerP
     { title: isRTL ? 'سفارشات' : 'Orders', icon: ShoppingCart, url: '/dashboard/seller/orders' },
     { title: isRTL ? 'نظرات' : 'Reviews', icon: Star, url: '/dashboard/seller/reviews' },
     { title: isRTL ? 'آمار فروش' : 'Analytics', icon: BarChart3, url: '/dashboard/seller/analytics' },
+    { title: isRTL ? 'اعلان‌ها' : 'Notifications', icon: Bell, url: '/dashboard/notifications' },
     { title: isRTL ? 'پروفایل' : 'Profile', icon: User, url: '/dashboard/profile' },
     { title: isRTL ? 'افزودن محصول' : 'Add Product', icon: Plus, url: '/dashboard/seller/products/new' },
   ];
@@ -94,6 +96,7 @@ export const MobileSidebarDrawer = ({ open, onOpenChange }: MobileSidebarDrawerP
     { title: isRTL ? 'پروفایل' : 'Profile', icon: User, url: '/dashboard/profile' },
     { title: isRTL ? 'سفارشات من' : 'My Orders', icon: ShoppingCart, url: '/dashboard/buyer/orders' },
     { title: isRTL ? 'نظرات من' : 'My Reviews', icon: Star, url: '/dashboard/buyer/reviews' },
+    { title: isRTL ? 'اعلان‌ها' : 'Notifications', icon: Bell, url: '/dashboard/notifications' },
     { title: isRTL ? 'آدرس‌ها' : 'Addresses', icon: MapPin, url: '/dashboard/buyer/addresses' },
     { title: isRTL ? 'علاقه‌مندی‌ها' : 'Wishlist', icon: Heart, url: '/dashboard/buyer/wishlist' },
     { title: isRTL ? 'روش‌های پرداخت' : 'Payment Methods', icon: CreditCard, url: '/dashboard/buyer/payments' },
