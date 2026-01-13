@@ -205,9 +205,16 @@ export const NotificationBell = () => {
                       <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
                         {isRTL ? notification.message_fa : notification.message_en}
                       </p>
-                      <p className="text-xs text-muted-foreground/70 mt-1">
-                        {formatTimeAgo(notification.created_at)}
-                      </p>
+                      <div className="flex items-center gap-2 mt-1">
+                        {notification.type === 'ORDER_STATUS_CHANGED' && notification.order_status && (
+                          <Badge variant="outline" className="text-[10px] h-5 px-1.5 bg-blue-50 text-blue-700 border-blue-200">
+                            {notification.order_status.charAt(0).toUpperCase() + notification.order_status.slice(1)}
+                          </Badge>
+                        )}
+                        <p className="text-xs text-muted-foreground/70">
+                          {formatTimeAgo(notification.created_at)}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </button>
