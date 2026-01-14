@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Ensure proper scroll behavior for route navigation */
+html, body {
+  height: 100%;
+  scroll-behavior: auto;
+}
+
 /* Persian/Dari font for RTL */
 @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap');
 /* English font for LTR */
