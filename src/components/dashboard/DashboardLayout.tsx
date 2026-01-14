@@ -96,7 +96,7 @@ export const DashboardLayout = ({
             onMobileMenuToggle={() => setMobileMenuOpen(true)}
             isMobile={isMobile}
           />
-          <main className="flex-1 overflow-auto p-3 sm:p-4 md:p-6 animate-fade-in">
+          <main data-main-content className="flex-1 overflow-auto p-3 sm:p-4 md:p-6 animate-fade-in">
             {children}
           </main>
         </SidebarInset>

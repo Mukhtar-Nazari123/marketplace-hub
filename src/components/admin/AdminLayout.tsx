@@ -93,7 +93,7 @@ export const AdminLayout = ({ children, title, description }: AdminLayoutProps) 
             </Button>
           </div>
         </header>
-        <main className="flex-1 overflow-auto p-6">
+        <main data-main-content className="flex-1 overflow-auto p-6">
           {children}
         </main>
       </SidebarInset>
