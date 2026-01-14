@@ -25,12 +25,10 @@ export const DashboardLayout = ({
   description, 
   allowedRoles = ['admin', 'seller', 'buyer', 'moderator'] 
 }: DashboardLayoutProps) => {
-  // If we're inside the shared DashboardShell, the chrome (sidebar/header/scroll) is handled there.
-  // Return children directly to prevent sidebar/header re-mount on every page.
+  // Check if we're inside DashboardShell - MUST be called first (hooks must be unconditional)
   const { inShell } = useDashboardChrome();
-  if (inShell) return children;
-
-  // ALL HOOKS MUST BE CALLED BEFORE ANY CONDITIONAL RETURNS
+  
+  // ALL HOOKS MUST BE CALLED UNCONDITIONALLY - before any conditional returns
   const { user, role, loading } = useAuth();
   const { status: sellerStatus, loading: sellerStatusLoading } = useSellerStatus();
   const { isRTL } = useLanguage();
@@ -40,8 +38,9 @@ export const DashboardLayout = ({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const mainContentRef = useRef<HTMLElement>(null);
 
-  // Redirect logic
+  // Redirect logic - only when NOT in shell (shell handles this)
   useEffect(() => {
+    if (inShell) return; // Shell handles redirects
     if (!loading) {
       if (!user) {
         navigate('/login', { state: { from: location.pathname } });
@@ -51,23 +50,30 @@ export const DashboardLayout = ({
         else navigate('/dashboard/buyer');
       }
     }
-  }, [user, role, loading, navigate, allowedRoles, location.pathname]);
+  }, [user, role, loading, navigate, allowedRoles, location.pathname, inShell]);
 
-  // Check seller status - redirect pending/rejected sellers to pending page
+  // Check seller status - only when NOT in shell
   useEffect(() => {
+    if (inShell) return; // Shell handles this
     if (!loading && !sellerStatusLoading && role === 'seller' && allowedRoles.includes('seller')) {
       if (sellerStatus && sellerStatus !== 'approved') {
         navigate('/dashboard/seller/pending');
       }
     }
-  }, [role, sellerStatus, sellerStatusLoading, loading, navigate, allowedRoles]);
+  }, [role, sellerStatus, sellerStatusLoading, loading, navigate, allowedRoles, inShell]);
 
-  // Scroll to top on route change within dashboard
+  // Scroll to top on route change - only when NOT in shell
   useEffect(() => {
+    if (inShell) return; // Shell handles scroll
     if (mainContentRef.current) {
       mainContentRef.current.scrollTop = 0;
     }
-  }, [location.pathname]);
+  }, [location.pathname, inShell]);
+
+  // If inside DashboardShell, just return children (shell provides chrome)
+  if (inShell) {
+    return <>{children}</>;
+  }
 
   // Loading state
   if (loading || (role === 'seller' && sellerStatusLoading)) {
