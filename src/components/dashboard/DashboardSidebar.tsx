@@ -12,6 +12,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from '@/components/ui/sidebar';
 import {
   LayoutDashboard,
@@ -60,6 +61,8 @@ export const DashboardSidebar = () => {
   const { t, language, setLanguage, isRTL } = useLanguage();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const { unreadCount } = useNotifications();
+  const { state } = useSidebar();
+  const isCollapsed = state === 'collapsed';
 
   // Format unread count for display
   const formatUnreadCount = (count: number): string => {
@@ -146,7 +149,7 @@ export const DashboardSidebar = () => {
 
   const renderNavItems = (items: typeof sellerNavItems, label?: string) => (
     <SidebarGroup>
-      {label && <SidebarGroupLabel>{label}</SidebarGroupLabel>}
+      {label && !isCollapsed && <SidebarGroupLabel>{label}</SidebarGroupLabel>}
       <SidebarGroupContent>
         <SidebarMenu>
           {items.map((item) => (
@@ -159,10 +162,10 @@ export const DashboardSidebar = () => {
               >
                 <button onClick={() => navigate(item.url)} className="w-full flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <item.icon className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                    <span>{item.title}</span>
+                    <item.icon className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover:scale-110" />
+                    {!isCollapsed && <span>{item.title}</span>}
                   </div>
-                  {item.showBadge && unreadCount > 0 && (
+                  {item.showBadge && unreadCount > 0 && !isCollapsed && (
                     <Badge 
                       className="bg-orange-500 hover:bg-orange-600 text-white text-xs font-medium px-2 py-0.5 min-w-[20px] h-5 flex items-center justify-center rounded-full shadow-sm"
                     >
@@ -187,12 +190,14 @@ export const DashboardSidebar = () => {
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/70 text-primary-foreground shadow-lg transition-transform group-hover:scale-105">
                 <Store className="size-4" />
               </div>
-              <div className="flex flex-col gap-0.5 leading-none">
-                <span className="font-semibold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
-                  {role === 'admin' ? t.admin.panelTitle : (isRTL ? 'داشبورد' : 'Dashboard')}
-                </span>
-                <span className="text-xs text-muted-foreground">{getRoleLabel()}</span>
-              </div>
+              {!isCollapsed && (
+                <div className="flex flex-col gap-0.5 leading-none">
+                  <span className="font-semibold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
+                    {role === 'admin' ? t.admin.panelTitle : (isRTL ? 'داشبورد' : 'Dashboard')}
+                  </span>
+                  <span className="text-xs text-muted-foreground">{getRoleLabel()}</span>
+                </div>
+              )}
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -225,8 +230,8 @@ export const DashboardSidebar = () => {
                   tooltip={isRTL ? 'صفحه اصلی' : 'Home'}
                   className="transition-all duration-200 hover:translate-x-1"
                 >
-                  <Home className="transition-transform duration-200 hover:scale-110" />
-                  <span>{isRTL ? 'صفحه اصلی' : 'Home'}</span>
+                  <Home className="shrink-0 transition-transform duration-200 hover:scale-110" />
+                  {!isCollapsed && <span>{isRTL ? 'صفحه اصلی' : 'Home'}</span>}
                 </SidebarMenuButton>
               </SidebarMenuItem>
               {/* Language Switcher */}
@@ -236,8 +241,8 @@ export const DashboardSidebar = () => {
                   tooltip={language === 'fa' ? 'English' : 'دری'}
                   className="transition-all duration-200 hover:translate-x-1"
                 >
-                  <Globe className="transition-transform duration-200 hover:rotate-12" />
-                  <span>{language === 'fa' ? 'English' : 'دری'}</span>
+                  <Globe className="shrink-0 transition-transform duration-200 hover:rotate-12" />
+                  {!isCollapsed && <span>{language === 'fa' ? 'English' : 'دری'}</span>}
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
@@ -248,46 +253,50 @@ export const DashboardSidebar = () => {
       <SidebarFooter className="border-t border-border/50">
         <SidebarMenu>
           <SidebarMenuItem>
-            <div className="flex items-center gap-3 px-2 py-2">
-              <Avatar className="h-9 w-9 ring-2 ring-primary/20 transition-all hover:ring-primary/40">
+            <div className={`flex items-center gap-3 px-2 py-2 ${isCollapsed ? 'justify-center' : ''}`}>
+              <Avatar className="h-9 w-9 shrink-0 ring-2 ring-primary/20 transition-all hover:ring-primary/40">
                 <AvatarFallback className="bg-gradient-to-br from-primary to-primary/60 text-primary-foreground font-medium">
                   {user?.email?.charAt(0).toUpperCase() || 'U'}
                 </AvatarFallback>
               </Avatar>
-              <div className={`grid flex-1 text-sm leading-tight min-w-0 ${isRTL ? 'text-right' : 'text-left'}`}>
-                <span className="truncate font-semibold">{getRoleLabel()}</span>
-                <span className="truncate text-xs text-muted-foreground">
-                  {user?.email}
-                </span>
-              </div>
-              <AlertDialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="shrink-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all duration-200"
-                  >
-                    <LogOut className="h-4 w-4" />
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent className="animate-scale-in">
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>{confirmLogoutText}</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      {logoutConfirmMessage}
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter className={isRTL ? 'flex-row-reverse gap-2' : ''}>
-                    <AlertDialogCancel>{cancelText}</AlertDialogCancel>
-                    <AlertDialogAction 
-                      onClick={handleLogout}
-                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    >
-                      {logoutText}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+              {!isCollapsed && (
+                <>
+                  <div className={`grid flex-1 text-sm leading-tight min-w-0 ${isRTL ? 'text-right' : 'text-left'}`}>
+                    <span className="truncate font-semibold">{getRoleLabel()}</span>
+                    <span className="truncate text-xs text-muted-foreground">
+                      {user?.email}
+                    </span>
+                  </div>
+                  <AlertDialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="shrink-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all duration-200"
+                      >
+                        <LogOut className="h-4 w-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="animate-scale-in">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>{confirmLogoutText}</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          {logoutConfirmMessage}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter className={isRTL ? 'flex-row-reverse gap-2' : ''}>
+                        <AlertDialogCancel>{cancelText}</AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={handleLogout}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          {logoutText}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </>
+              )}
             </div>
           </SidebarMenuItem>
         </SidebarMenu>
