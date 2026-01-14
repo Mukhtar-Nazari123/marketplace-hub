@@ -24,7 +24,7 @@ const Navigation = () => {
   ];
 
   return (
-    <nav className="bg-card border-b border-border">
+    <nav className="bg-card border-b border-border shadow-sm">
       <div className="container">
         <div className="flex items-center">
           {/* Category Dropdown */}

@@ -82,7 +82,7 @@ const Header = () => {
 
   return (
     <>
-      <header className="bg-card border-b border-border sticky top-0 z-40 shadow-sm">
+      <header className="bg-card border-b border-border shadow-sm">
         <div className="container py-4">
           <div className="flex items-center justify-between gap-4">
             {/* Logo */}

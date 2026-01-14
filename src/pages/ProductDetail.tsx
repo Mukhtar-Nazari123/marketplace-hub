@@ -226,9 +226,12 @@ const ProductDetail = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <TopBar />
-        <Header />
-        <Navigation />
+        {/* Sticky Navbar */}
+        <div className="sticky top-0 z-50">
+          <TopBar />
+          <Header />
+          <Navigation />
+        </div>
         <div className="container mx-auto px-4 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <Skeleton className="aspect-square rounded-xl" />
@@ -302,9 +305,12 @@ const ProductDetail = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <TopBar />
-      <Header />
-      <Navigation />
+      {/* Sticky Navbar */}
+      <div className="sticky top-0 z-50">
+        <TopBar />
+        <Header />
+        <Navigation />
+      </div>
 
       {/* Breadcrumb */}
       <div className="bg-muted/50 py-3">

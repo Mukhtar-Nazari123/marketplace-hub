@@ -61,9 +61,12 @@ const About = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <TopBar />
-      <Header />
-      <Navigation />
+      {/* Sticky Navbar */}
+      <div className="sticky top-0 z-50">
+        <TopBar />
+        <Header />
+        <Navigation />
+      </div>
 
       {/* Breadcrumb */}
       <div className="bg-muted/50 py-3">
