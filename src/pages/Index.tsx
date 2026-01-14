@@ -2,6 +2,7 @@ import TopBar from "@/components/layout/TopBar";
 import Header from "@/components/layout/Header";
 import Navigation from "@/components/layout/Navigation";
 import Footer from "@/components/layout/Footer";
+import StickyNavbar from "@/components/layout/StickyNavbar";
 import HeroSection from "@/components/home/HeroSection";
 import TodayDeals from "@/components/home/TodayDeals";
 
@@ -13,17 +14,12 @@ import HomeBannerList from "@/components/home/HomeBannerList";
 const Index = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      {/* Sticky Navbar Container */}
-      <div className="sticky top-0 z-50">
-        {/* Top Bar */}
+      {/* Auto-hide Sticky Navbar */}
+      <StickyNavbar>
         <TopBar />
-
-        {/* Header */}
         <Header />
-
-        {/* Navigation */}
         <Navigation />
-      </div>
+      </StickyNavbar>
 
       {/* Main Content */}
       <main className="flex-1">

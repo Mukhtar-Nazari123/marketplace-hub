@@ -6,6 +6,7 @@ import TopBar from '@/components/layout/TopBar';
 import Header from '@/components/layout/Header';
 import Navigation from '@/components/layout/Navigation';
 import Footer from '@/components/layout/Footer';
+import StickyNavbar from '@/components/layout/StickyNavbar';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ChevronLeft, ChevronRight, Search, Calendar, User } from 'lucide-react';
@@ -37,12 +38,12 @@ const Blog = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Sticky Navbar */}
-      <div className="sticky top-0 z-50">
+      {/* Auto-hide Sticky Navbar */}
+      <StickyNavbar>
         <TopBar />
         <Header />
         <Navigation />
-      </div>
+      </StickyNavbar>
 
       {/* Breadcrumb */}
       <div className="bg-muted/50 py-3">

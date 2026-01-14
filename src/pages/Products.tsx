@@ -9,6 +9,7 @@ import TopBar from '@/components/layout/TopBar';
 import Header from '@/components/layout/Header';
 import Navigation from '@/components/layout/Navigation';
 import Footer from '@/components/layout/Footer';
+import StickyNavbar from '@/components/layout/StickyNavbar';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, SlidersHorizontal, X, Sparkles, Loader2, Search } from 'lucide-react';
 import {
@@ -150,12 +151,12 @@ const Products = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Sticky Navbar */}
-      <div className="sticky top-0 z-50">
+      {/* Auto-hide Sticky Navbar */}
+      <StickyNavbar>
         <TopBar />
         <Header />
         <Navigation />
-      </div>
+      </StickyNavbar>
 
       {/* Breadcrumb */}
       <div className="bg-muted/50 py-3">
