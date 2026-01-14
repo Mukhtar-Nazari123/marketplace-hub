@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { useLanguage } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
@@ -105,6 +106,7 @@ interface Order {
 const BuyerOrders = () => {
   const { isRTL } = useLanguage();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -321,7 +323,7 @@ const BuyerOrders = () => {
                 ? "با خرید اولین محصول، سفارشات شما در اینجا نمایش داده می‌شود."
                 : "Your orders will appear here once you make your first purchase."}
             </p>
-            <Button onClick={() => (window.location.href = "/products")}>
+            <Button onClick={() => navigate("/products")}>
               {isRTL ? "مشاهده محصولات" : "Browse Products"}
             </Button>
           </CardContent>
