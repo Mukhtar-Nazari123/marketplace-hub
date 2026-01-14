@@ -24,6 +24,7 @@ export const DashboardLayout = ({
   description, 
   allowedRoles = ['admin', 'seller', 'buyer', 'moderator'] 
 }: DashboardLayoutProps) => {
+  // ALL HOOKS MUST BE CALLED BEFORE ANY CONDITIONAL RETURNS
   const { user, role, loading } = useAuth();
   const { status: sellerStatus, loading: sellerStatusLoading } = useSellerStatus();
   const { isRTL } = useLanguage();
@@ -31,13 +32,14 @@ export const DashboardLayout = ({
   const location = useLocation();
   const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const mainContentRef = useRef<HTMLElement>(null);
 
+  // Redirect logic
   useEffect(() => {
     if (!loading) {
       if (!user) {
         navigate('/login', { state: { from: location.pathname } });
       } else if (role && !allowedRoles.includes(role)) {
-        // Redirect to appropriate dashboard based on role
         if (role === 'admin') navigate('/dashboard/admin');
         else if (role === 'seller') navigate('/dashboard/seller');
         else navigate('/dashboard/buyer');
@@ -54,6 +56,14 @@ export const DashboardLayout = ({
     }
   }, [role, sellerStatus, sellerStatusLoading, loading, navigate, allowedRoles]);
 
+  // Scroll to top on route change within dashboard
+  useEffect(() => {
+    if (mainContentRef.current) {
+      mainContentRef.current.scrollTop = 0;
+    }
+  }, [location.pathname]);
+
+  // Loading state
   if (loading || (role === 'seller' && sellerStatusLoading)) {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
@@ -67,6 +77,7 @@ export const DashboardLayout = ({
     );
   }
 
+  // Auth/role check
   if (!user || (role && !allowedRoles.includes(role))) {
     return null;
   }
@@ -75,15 +86,6 @@ export const DashboardLayout = ({
   if (role === 'seller' && sellerStatus && sellerStatus !== 'approved') {
     return null;
   }
-
-  // Scroll to top on route change within dashboard
-  const mainContentRef = useRef<HTMLElement>(null);
-  
-  useEffect(() => {
-    if (mainContentRef.current) {
-      mainContentRef.current.scrollTop = 0;
-    }
-  }, [location.pathname]);
 
   return (
     <SidebarProvider>
