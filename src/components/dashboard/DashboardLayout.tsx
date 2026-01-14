@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState, useRef, memo, Suspense } from 'react';
+import { ReactNode, useEffect, useState, useRef, Suspense } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useSellerStatus } from '@/hooks/useSellerStatus';
@@ -10,6 +10,7 @@ import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Loader2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useDashboardChrome } from './DashboardChromeContext';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -24,6 +25,11 @@ export const DashboardLayout = ({
   description, 
   allowedRoles = ['admin', 'seller', 'buyer', 'moderator'] 
 }: DashboardLayoutProps) => {
+  // If we're inside the shared DashboardShell, the chrome (sidebar/header/scroll) is handled there.
+  // Return children directly to prevent sidebar/header re-mount on every page.
+  const { inShell } = useDashboardChrome();
+  if (inShell) return children;
+
   // ALL HOOKS MUST BE CALLED BEFORE ANY CONDITIONAL RETURNS
   const { user, role, loading } = useAuth();
   const { status: sellerStatus, loading: sellerStatusLoading } = useSellerStatus();
