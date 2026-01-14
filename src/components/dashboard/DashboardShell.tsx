@@ -221,32 +221,34 @@ export default function DashboardShell() {
   }
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background">
-        {!isMobile && <DashboardSidebar />}
+    <DashboardChromeProvider value={{ inShell: true }}>
+      <SidebarProvider>
+        <div className="min-h-screen flex w-full bg-background">
+          {!isMobile && <DashboardSidebar />}
 
-        {isMobile && (
-          <MobileSidebarDrawer open={mobileMenuOpen} onOpenChange={setMobileMenuOpen} />
-        )}
+          {isMobile && (
+            <MobileSidebarDrawer open={mobileMenuOpen} onOpenChange={setMobileMenuOpen} />
+          )}
 
-        <SidebarInset className="flex-1 flex flex-col min-w-0">
-          <DashboardHeader
-            title={header.title}
-            description={header.description}
-            onMobileMenuToggle={() => setMobileMenuOpen(true)}
-            isMobile={isMobile}
-          />
+          <SidebarInset className="flex-1 flex flex-col min-w-0">
+            <DashboardHeader
+              title={header.title}
+              description={header.description}
+              onMobileMenuToggle={() => setMobileMenuOpen(true)}
+              isMobile={isMobile}
+            />
 
-          <main ref={mainContentRef} data-main-content className="flex-1 overflow-auto p-3 sm:p-4 md:p-6">
-            <Suspense fallback={<DashboardSkeleton />}>
-              <div className="animate-fade-in">
-                <Outlet />
-              </div>
-            </Suspense>
-          </main>
-        </SidebarInset>
-      </div>
-    </SidebarProvider>
+            <main ref={mainContentRef} data-main-content className="flex-1 overflow-auto p-3 sm:p-4 md:p-6">
+              <Suspense fallback={<DashboardSkeleton />}>
+                <div className="animate-fade-in">
+                  <Outlet />
+                </div>
+              </Suspense>
+            </main>
+          </SidebarInset>
+        </div>
+      </SidebarProvider>
+    </DashboardChromeProvider>
   );
 }
 
