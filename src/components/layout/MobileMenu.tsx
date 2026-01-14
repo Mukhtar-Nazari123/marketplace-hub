@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/lib/i18n";
 import { useCategories } from "@/hooks/useCategories";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface MobileMenuProps {
@@ -16,6 +17,7 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const { t, isRTL } = useLanguage();
   const { getRootCategories, loading } = useCategories();
+  const { siteName, logoUrl } = useSiteSettings();
 
   const rootCategories = getRootCategories();
 
@@ -42,12 +44,20 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
       <div className={`fixed top-0 h-full w-80 max-w-[85vw] bg-card z-50 lg:hidden shadow-xl overflow-y-auto ${isRTL ? 'right-0 animate-slide-in-right' : 'left-0 animate-slide-in-left'}`}>
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-orange flex items-center justify-center">
-              <span className="text-accent-foreground font-bold">M</span>
-            </div>
-            <span className="font-display font-bold text-foreground">{isRTL ? 'مارکت' : 'Market'}</span>
-          </div>
+          <Link to="/" className="flex items-center gap-2" onClick={onClose}>
+            {logoUrl ? (
+              <img 
+                src={logoUrl} 
+                alt={siteName} 
+                className="w-8 h-8 rounded-lg object-contain border-2 border-orange" 
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-lg bg-orange flex items-center justify-center">
+                <span className="text-accent-foreground font-bold">{siteName.charAt(0)}</span>
+              </div>
+            )}
+            <span className="font-display font-bold text-foreground">{siteName}</span>
+          </Link>
           <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-5 w-5" />
           </Button>
