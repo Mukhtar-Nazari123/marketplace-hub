@@ -285,9 +285,12 @@ const SellerProfileComplete = () => {
 
   return (
     <div className={cn("min-h-screen flex flex-col bg-background", isRTL && "rtl")}>
-      <TopBar />
-      <Header />
-      <Navigation />
+      {/* Sticky Navbar */}
+      <div className="sticky top-0 z-50">
+        <TopBar />
+        <Header />
+        <Navigation />
+      </div>
       
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-3xl mx-auto">

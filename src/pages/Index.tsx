@@ -13,14 +13,17 @@ import HomeBannerList from "@/components/home/HomeBannerList";
 const Index = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      {/* Top Bar */}
-      <TopBar />
+      {/* Sticky Navbar Container */}
+      <div className="sticky top-0 z-50">
+        {/* Top Bar */}
+        <TopBar />
 
-      {/* Header */}
-      <Header />
+        {/* Header */}
+        <Header />
 
-      {/* Navigation */}
-      <Navigation />
+        {/* Navigation */}
+        <Navigation />
+      </div>
 
       {/* Main Content */}
       <main className="flex-1">

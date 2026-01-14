@@ -72,9 +72,12 @@ const SellerPending = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <TopBar />
-      <Header />
-      <Navigation />
+      {/* Sticky Navbar */}
+      <div className="sticky top-0 z-50">
+        <TopBar />
+        <Header />
+        <Navigation />
+      </div>
       
       <main className="flex-1 container mx-auto px-4 py-12 flex flex-col items-center justify-center gap-6">
         {/* Incomplete Profile Banner */}
