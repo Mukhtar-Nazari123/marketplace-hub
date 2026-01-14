@@ -86,11 +86,15 @@ const Header = () => {
         <div className="container py-4">
           <div className="flex items-center justify-between gap-4">
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-2">
+            <Link to="/" className="flex items-center gap-2 flex-shrink-0">
               {logoUrl ? (
-                <img src={logoUrl} alt={siteName} className="w-12 h-12 rounded-lg object-contain border-2 border-orange" />
+                <img 
+                  src={logoUrl} 
+                  alt={siteName} 
+                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg object-contain border-2 border-orange flex-shrink-0" 
+                />
               ) : (
-                <div className="w-10 h-10 rounded-lg bg-orange border-2 border-orange flex items-center justify-center">
+                <div className="w-10 h-10 rounded-lg bg-orange border-2 border-orange flex items-center justify-center flex-shrink-0">
                   <span className="text-accent-foreground font-bold text-xl">{siteName.charAt(0)}</span>
                 </div>
               )}
