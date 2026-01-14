@@ -60,6 +60,7 @@ import AdminNewsletter from "./pages/admin/AdminNewsletter";
 import AdminSocialLinks from "./pages/admin/AdminSocialLinks";
 import AdminNotifications from "./pages/admin/AdminNotifications";
 import Notifications from "./pages/dashboard/Notifications";
+import DashboardShell from "@/components/dashboard/DashboardShell";
 
 const queryClient = new QueryClient();
 
@@ -92,8 +93,35 @@ const App = () => (
                       <Route path="/cart" element={<Cart />} />
                       <Route path="/checkout" element={<Checkout />} />
 
-                      {/* Dashboard Routes - All nested under /dashboard */}
-                      <Route path="/dashboard" element={<DashboardIndex />} />
+                      {/* Dashboard Routes */}
+                      <Route path="/dashboard/seller/pending" element={<SellerPending />} />
+
+                      {/* Buyer + Seller dashboard shell (sidebar/header stay mounted) */}
+                      <Route path="/dashboard/*" element={<DashboardShell />}>
+                        <Route index element={<DashboardIndex />} />
+
+                        {/* Shared */}
+                        <Route path="profile" element={<BuyerProfile />} />
+                        <Route path="notifications" element={<Notifications />} />
+
+                        {/* Buyer */}
+                        <Route path="buyer" element={<BuyerDashboard />} />
+                        <Route path="buyer/orders" element={<BuyerOrders />} />
+                        <Route path="buyer/reviews" element={<BuyerReviews />} />
+                        <Route path="buyer/addresses" element={<BuyerProfile />} />
+                        <Route path="buyer/wishlist" element={<Wishlist />} />
+                        <Route path="buyer/payments" element={<BuyerProfile />} />
+
+                        {/* Seller */}
+                        <Route path="seller" element={<SellerDashboard />} />
+                        <Route path="seller/products" element={<SellerProducts />} />
+                        <Route path="seller/orders" element={<SellerOrders />} />
+                        <Route path="seller/reviews" element={<SellerReviews />} />
+                        <Route path="seller/analytics" element={<SellerAnalytics />} />
+                        <Route path="seller/products/new" element={<AddProduct />} />
+                        <Route path="seller/products/edit/:id" element={<EditProduct />} />
+                        <Route path="seller/products/view/:id" element={<SellerProductView />} />
+                      </Route>
 
                       {/* Admin Routes */}
                       <Route path="/dashboard/admin" element={<AdminDashboard />} />
@@ -118,30 +146,7 @@ const App = () => (
                       <Route path="/dashboard/admin/notifications" element={<AdminNotifications />} />
                       <Route path="/dashboard/admin/products/:id" element={<AdminProductView />} />
                       <Route path="/dashboard/admin/orders/:id" element={<AdminOrderDetail />} />
-                      {/* Shared Profile Route (keep existing) */}
-                      <Route path="/dashboard/profile" element={<BuyerProfile />} />
 
-                      {/* Buyer Routes */}
-                      <Route path="/dashboard/buyer" element={<BuyerDashboard />} />
-                      <Route path="/dashboard/buyer/orders" element={<BuyerOrders />} />
-                      <Route path="/dashboard/buyer/reviews" element={<BuyerReviews />} />
-                      <Route path="/dashboard/buyer/addresses" element={<BuyerProfile />} />
-                      <Route path="/dashboard/buyer/wishlist" element={<Wishlist />} />
-                      <Route path="/dashboard/buyer/payments" element={<BuyerProfile />} />
-
-                      {/* Shared Notifications Route for Buyers/Sellers */}
-                      <Route path="/dashboard/notifications" element={<Notifications />} />
-
-                      {/* Seller Routes */}
-                      <Route path="/dashboard/seller" element={<SellerDashboard />} />
-                      <Route path="/dashboard/seller/products" element={<SellerProducts />} />
-                      <Route path="/dashboard/seller/orders" element={<SellerOrders />} />
-                      <Route path="/dashboard/seller/reviews" element={<SellerReviews />} />
-                      <Route path="/dashboard/seller/analytics" element={<SellerAnalytics />} />
-                      <Route path="/dashboard/seller/products/new" element={<AddProduct />} />
-                      <Route path="/dashboard/seller/products/edit/:id" element={<EditProduct />} />
-                      <Route path="/dashboard/seller/pending" element={<SellerPending />} />
-                      <Route path="/dashboard/seller/products/view/:id" element={<SellerProductView />} />
                       {/* Seller Onboarding Routes */}
                       <Route path="/seller/profile-choice" element={<SellerProfileChoice />} />
                       <Route path="/seller/complete-profile" element={<SellerProfileComplete />} />
