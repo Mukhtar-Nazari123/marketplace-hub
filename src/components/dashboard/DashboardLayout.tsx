@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState, useRef, memo, Suspense } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useSellerStatus } from '@/hooks/useSellerStatus';
@@ -9,6 +9,7 @@ import { MobileSidebarDrawer } from './MobileSidebarDrawer';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Loader2 } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -75,13 +76,22 @@ export const DashboardLayout = ({
     return null;
   }
 
+  // Scroll to top on route change within dashboard
+  const mainContentRef = useRef<HTMLElement>(null);
+  
+  useEffect(() => {
+    if (mainContentRef.current) {
+      mainContentRef.current.scrollTop = 0;
+    }
+  }, [location.pathname]);
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
-        {/* Desktop Sidebar - hidden on mobile */}
+        {/* Desktop Sidebar - hidden on mobile, renders once */}
         {!isMobile && <DashboardSidebar />}
         
-        {/* Mobile Drawer */}
+        {/* Mobile Drawer - renders once, controlled visibility */}
         {isMobile && (
           <MobileSidebarDrawer 
             open={mobileMenuOpen} 
@@ -90,17 +100,43 @@ export const DashboardLayout = ({
         )}
         
         <SidebarInset className="flex-1 flex flex-col min-w-0">
+          {/* Header stays mounted, only title changes */}
           <DashboardHeader 
             title={title} 
             description={description} 
             onMobileMenuToggle={() => setMobileMenuOpen(true)}
             isMobile={isMobile}
           />
-          <main data-main-content className="flex-1 overflow-auto p-3 sm:p-4 md:p-6 animate-fade-in">
-            {children}
+          {/* Main content area with scroll reset */}
+          <main 
+            ref={mainContentRef}
+            data-main-content 
+            className="flex-1 overflow-auto p-3 sm:p-4 md:p-6 scroll-smooth"
+          >
+            <Suspense fallback={<DashboardSkeleton />}>
+              <div className="animate-fade-in">
+                {children}
+              </div>
+            </Suspense>
           </main>
         </SidebarInset>
       </div>
     </SidebarProvider>
   );
 };
+
+// Skeleton loader for dashboard content
+const DashboardSkeleton = () => (
+  <div className="space-y-4">
+    <div className="flex items-center justify-between">
+      <Skeleton className="h-8 w-48" />
+      <Skeleton className="h-10 w-24" />
+    </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {[...Array(4)].map((_, i) => (
+        <Skeleton key={i} className="h-32 rounded-lg" />
+      ))}
+    </div>
+    <Skeleton className="h-64 rounded-lg" />
+  </div>
+);

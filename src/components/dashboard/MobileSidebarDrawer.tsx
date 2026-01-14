@@ -40,7 +40,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface MobileSidebarDrawerProps {
   open: boolean;
@@ -54,9 +54,15 @@ export const MobileSidebarDrawer = ({ open, onOpenChange }: MobileSidebarDrawerP
   const { t, language, setLanguage, isRTL } = useLanguage();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
-  // Close drawer on route change
+  // Close drawer on route change - use callback to prevent unnecessary re-renders
+  const closeDrawer = useCallback(() => {
+    if (open) {
+      onOpenChange(false);
+    }
+  }, [open, onOpenChange]);
+
   useEffect(() => {
-    onOpenChange(false);
+    closeDrawer();
   }, [location.pathname]);
 
   // Admin navigation items
@@ -125,10 +131,15 @@ export const MobileSidebarDrawer = ({ open, onOpenChange }: MobileSidebarDrawerP
     return isRTL ? 'کاربر' : 'User';
   };
 
-  const handleNavigation = (url: string) => {
-    navigate(url);
+  // Optimized navigation - closes drawer first for smoother transition
+  const handleNavigation = useCallback((url: string) => {
+    // Close drawer immediately for better UX
     onOpenChange(false);
-  };
+    // Navigate after a small delay for smooth animation
+    requestAnimationFrame(() => {
+      navigate(url);
+    });
+  }, [navigate, onOpenChange]);
 
   const logoutText = isRTL ? 'خروج' : 'Logout';
   const confirmLogoutText = isRTL ? 'تأیید خروج' : 'Confirm Logout';
