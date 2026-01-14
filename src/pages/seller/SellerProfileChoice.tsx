@@ -8,6 +8,7 @@ import TopBar from '@/components/layout/TopBar';
 import Header from '@/components/layout/Header';
 import Navigation from '@/components/layout/Navigation';
 import Footer from '@/components/layout/Footer';
+import StickyNavbar from '@/components/layout/StickyNavbar';
 import { ClipboardCheck, Clock, ArrowRight, ArrowLeft, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -36,12 +37,12 @@ const SellerProfileChoice = () => {
 
   return (
     <div className={cn("min-h-screen flex flex-col bg-background", isRTL && "rtl")}>
-      {/* Sticky Navbar */}
-      <div className="sticky top-0 z-50">
+      {/* Auto-hide Sticky Navbar */}
+      <StickyNavbar>
         <TopBar />
         <Header />
         <Navigation />
-      </div>
+      </StickyNavbar>
       
       <main className="flex-1 container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">

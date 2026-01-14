@@ -12,6 +12,7 @@ import TopBar from '@/components/layout/TopBar';
 import Header from '@/components/layout/Header';
 import Navigation from '@/components/layout/Navigation';
 import Footer from '@/components/layout/Footer';
+import StickyNavbar from '@/components/layout/StickyNavbar';
 
 const SellerPending = () => {
   const { user, role, loading: authLoading } = useAuth();
@@ -72,12 +73,12 @@ const SellerPending = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Sticky Navbar */}
-      <div className="sticky top-0 z-50">
+      {/* Auto-hide Sticky Navbar */}
+      <StickyNavbar>
         <TopBar />
         <Header />
         <Navigation />
-      </div>
+      </StickyNavbar>
       
       <main className="flex-1 container mx-auto px-4 py-12 flex flex-col items-center justify-center gap-6">
         {/* Incomplete Profile Banner */}

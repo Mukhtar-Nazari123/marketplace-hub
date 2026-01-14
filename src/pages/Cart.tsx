@@ -6,6 +6,7 @@ import TopBar from '@/components/layout/TopBar';
 import Header from '@/components/layout/Header';
 import Navigation from '@/components/layout/Navigation';
 import Footer from '@/components/layout/Footer';
+import StickyNavbar from '@/components/layout/StickyNavbar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -149,12 +150,12 @@ const Cart = () => {
   if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-background">
-        {/* Sticky Navbar */}
-        <div className="sticky top-0 z-50">
+        {/* Auto-hide Sticky Navbar */}
+        <StickyNavbar>
           <TopBar />
           <Header />
           <Navigation />
-        </div>
+        </StickyNavbar>
         <div className="container mx-auto px-4 py-12 flex justify-center">
           <div className="animate-pulse text-muted-foreground">{texts.loading}</div>
         </div>
@@ -165,12 +166,12 @@ const Cart = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Sticky Navbar */}
-      <div className="sticky top-0 z-50">
+      {/* Auto-hide Sticky Navbar */}
+      <StickyNavbar>
         <TopBar />
         <Header />
         <Navigation />
-      </div>
+      </StickyNavbar>
 
       {/* Breadcrumb */}
       <div className="bg-muted/50 py-3">
