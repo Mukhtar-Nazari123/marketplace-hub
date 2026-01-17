@@ -32,7 +32,7 @@ const TopBar = () => {
                 {t.topBar.callUs} {phone}
               </span>
             </div>
-            <div className="hidden lg:flex items-center gap-4">
+            <div className="flex items-center gap-4">
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button 
@@ -40,7 +40,7 @@ const TopBar = () => {
                     className="flex items-center gap-1 hover:text-cyan transition-colors p-1"
                   >
                     <Globe className="h-4 w-4" />
-                    <span className="text-xs">{language === "fa" ? "دری" : "EN"}</span>
+                    <span className="text-xs hidden sm:inline">{language === "fa" ? "دری" : "EN"}</span>
                   </button>
                 </TooltipTrigger>
                 <TooltipContent>
