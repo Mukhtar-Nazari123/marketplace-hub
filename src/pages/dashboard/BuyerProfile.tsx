@@ -184,13 +184,13 @@ const BuyerProfile = () => {
       const fileName = `${user.id}/avatars/${Date.now()}.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('seller-assets')
+        .from('profiles')
         .upload(fileName, file, { upsert: true });
 
       if (uploadError) throw uploadError;
 
       const { data: { publicUrl } } = supabase.storage
-        .from('seller-assets')
+        .from('profiles')
         .getPublicUrl(fileName);
 
       // Update avatar URL in profiles table
