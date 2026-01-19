@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/lib/i18n';
 import type { Json } from '@/integrations/supabase/types';
@@ -68,6 +68,8 @@ const BuyerProfile = () => {
   const [avatarUrl, setAvatarUrl] = useState('');
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
 
   // Security State
   const [currentPassword, setCurrentPassword] = useState('');
@@ -148,7 +150,74 @@ const BuyerProfile = () => {
         variant: 'destructive',
       });
     } finally {
-      setIsSavingProfile(false);
+    setIsSavingProfile(false);
+    }
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: isRTL ? 'خطا' : 'Error',
+        description: isRTL ? 'لطفاً یک فایل تصویر انتخاب کنید' : 'Please select an image file',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: isRTL ? 'خطا' : 'Error',
+        description: isRTL ? 'حجم تصویر باید کمتر از ۵ مگابایت باشد' : 'Image must be less than 5MB',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsUploadingAvatar(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `avatars/${user.id}-${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('seller-assets')
+        .upload(fileName, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('seller-assets')
+        .getPublicUrl(fileName);
+
+      // Update avatar URL in profiles table
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('user_id', user.id);
+
+      if (updateError) throw updateError;
+
+      setAvatarUrl(publicUrl);
+      toast({
+        title: isRTL ? 'موفقیت' : 'Success',
+        description: isRTL ? 'تصویر پروفایل با موفقیت آپلود شد' : 'Profile photo uploaded successfully',
+      });
+    } catch (error) {
+      console.error('Avatar upload error:', error);
+      toast({
+        title: isRTL ? 'خطا' : 'Error',
+        description: isRTL ? 'خطا در آپلود تصویر' : 'Failed to upload image',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsUploadingAvatar(false);
+      if (avatarInputRef.current) {
+        avatarInputRef.current.value = '';
+      }
     }
   };
 
@@ -374,10 +443,26 @@ const BuyerProfile = () => {
                       </AvatarFallback>
                     </Avatar>
                     {isEditingProfile && (
-                      <button className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                        <Camera className="h-6 w-6 text-white" />
+                      <button 
+                        type="button"
+                        onClick={() => avatarInputRef.current?.click()}
+                        disabled={isUploadingAvatar}
+                        className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                      >
+                        {isUploadingAvatar ? (
+                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
+                        ) : (
+                          <Camera className="h-6 w-6 text-white" />
+                        )}
                       </button>
                     )}
+                    <input
+                      ref={avatarInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAvatarUpload}
+                      className="hidden"
+                    />
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold">{fullName || (isRTL ? 'نام وارد نشده' : 'No name set')}</h3>
