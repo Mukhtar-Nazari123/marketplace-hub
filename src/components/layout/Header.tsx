@@ -83,7 +83,7 @@ const Header = () => {
   return <>
       <header className="bg-background border-b border-muted-foreground/20 shadow-sm sticky top-0 z-50">
         <div className="container px-2 sm:px-4 py-2">
-          <div className="flex items-center justify-between gap-1 sm:gap-4">
+          <div className="flex items-center justify-between gap-1 sm:gap-2">
             {/* Logo - Only image */}
             <Link to="/" className="flex-shrink-0">
               {logoUrl ? <img src={logoUrl} alt={siteName} className="h-10 sm:h-12 w-auto object-contain" /> : <span className="text-primary font-bold text-2xl">{siteName}</span>}
