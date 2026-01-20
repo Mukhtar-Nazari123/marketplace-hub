@@ -108,12 +108,11 @@ const Header = () => {
                 />
                 <Button
                   type="submit"
-                  variant="ghost"
                   size="sm"
-                  className={`absolute top-1/2 -translate-y-1/2 rounded-full px-4 text-muted-foreground hover:text-foreground hover:bg-muted ${isRTL ? "left-1" : "right-1"}`}
+                  className={`absolute top-1/2 -translate-y-1/2 rounded-full px-4 ${isRTL ? "left-1" : "right-1"}`}
                 >
                   <Search className={`h-4 w-4 ${isRTL ? "ml-1" : "mr-1"}`} />
-                  <span className="text-sm font-normal">{t.header.search}</span>
+                  <span className="text-sm">{t.header.search}</span>
                 </Button>
               </form>
             </div>
@@ -274,9 +273,8 @@ const Header = () => {
               />
               <Button
                 type="submit"
-                variant="ghost"
                 size="sm"
-                className={`absolute top-1/2 -translate-y-1/2 rounded-full px-3 text-muted-foreground hover:text-foreground hover:bg-muted ${isRTL ? "left-1" : "right-1"}`}
+                className={`absolute top-1/2 -translate-y-1/2 rounded-full px-3 ${isRTL ? "left-1" : "right-1"}`}
               >
                 <Search className="h-4 w-4" />
               </Button>
