@@ -112,10 +112,9 @@ const Footer = () => {
           <div>
             <Link to="/" className="flex-shrink-0 mb-4">
               {logoUrl ? (
-                <img src={logoUrl} alt={siteName} className="h-16 sm:h-[72px] w-auto object-contain" />
+                <img src={logoUrl} alt={siteName} className="h-10 sm:h-12 w-auto object-contain" />
               ) : (
                 <span className="text-primary font-bold text-2xl">{siteName}</span>
-              
               )}
             </Link>
             <p className="text-[#b6b6b6] text-sm mb-4">{t.footer.description}</p>
