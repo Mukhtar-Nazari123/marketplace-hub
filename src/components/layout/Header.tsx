@@ -81,7 +81,7 @@ const Header = () => {
             {/* Logo - Only image */}
             <Link to="/" className="flex-shrink-0">
               {logoUrl ? (
-                <img src={logoUrl} alt={siteName} className="h-10 sm:h-10 w-auto object-contain" />
+                <img src={logoUrl} alt={siteName} className="h-8 sm:h-10 w-auto object-contain" />
               ) : (
                 <span className="text-primary font-bold text-2xl">{siteName}</span>
               )}
