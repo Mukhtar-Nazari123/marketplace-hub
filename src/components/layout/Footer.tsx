@@ -110,18 +110,14 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* About */}
           <div>
-            <Link to="/" className="flex items-center gap-2 mb-4">
+            <Link to="/" className="flex-shrink-0 mb-4">
               {logoUrl ? (
-                <img src={logoUrl} alt={siteName} className="w-10 h-10 rounded-lg object-contain" />
+                <img src={logoUrl} alt={siteName} className="h-16 sm:h-[72px] w-auto object-contain" />
               ) : (
-                <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
-                  <span className="text-primary-foreground font-bold text-xl">{siteName.charAt(0)}</span>
+                <div className="h-16 sm:h-[72px] w-auto px-4 rounded-lg bg-primary flex items-center justify-center">
+                  <span className="text-primary-foreground font-bold text-2xl">{siteName}</span>
                 </div>
               )}
-              <div>
-                <h3 className="font-display text-xl font-bold text-primary">{siteName}</h3>
-                <p className="text-xs text-[#b6b6b6] -mt-1">{t.footer.onlineStore}</p>
-              </div>
             </Link>
             <p className="text-[#b6b6b6] text-sm mb-4">{t.footer.description}</p>
             <div className="flex gap-3">
