@@ -88,14 +88,9 @@ const Header = () => {
             {/* Logo - Only image */}
             <Link to="/" className="flex-shrink-0">
               {logoUrl ? (
-                <img 
-                  src={logoUrl} 
-                  alt={siteName} 
-                  className="h-16 sm:h-[72px] w-auto object-contain" 
-                />
+                <img src={logoUrl} alt={siteName} className="h-12 sm:h-14 w-auto object-contain" />
               ) : (
                 <span className="text-primary font-bold text-2xl">{siteName}</span>
-              
               )}
             </Link>
 
@@ -124,7 +119,6 @@ const Header = () => {
 
             {/* Actions */}
             <div className="flex items-center gap-2 sm:gap-4">
-
               {/* Theme Toggle */}
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -185,7 +179,6 @@ const Header = () => {
               {/* Account / Dashboard / Logout */}
               {user ? (
                 <div className="flex items-center gap-1 sm:gap-2">
-
                   {/* Dashboard Link - Red icon */}
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -230,7 +223,9 @@ const Header = () => {
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter className={isRTL ? "flex-row-reverse gap-2" : ""}>
-                        <AlertDialogCancel className="border-muted-foreground/30">{isRTL ? "انصراف" : "Cancel"}</AlertDialogCancel>
+                        <AlertDialogCancel className="border-muted-foreground/30">
+                          {isRTL ? "انصراف" : "Cancel"}
+                        </AlertDialogCancel>
                         <AlertDialogAction
                           onClick={handleLogout}
                           className="bg-primary text-primary-foreground hover:bg-primary/90"
