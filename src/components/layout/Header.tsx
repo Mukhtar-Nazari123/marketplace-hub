@@ -91,11 +91,11 @@ const Header = () => {
                 <img 
                   src={logoUrl} 
                   alt={siteName} 
-                  className="h-10 sm:h-12 w-auto object-contain" 
+                  className="h-12 sm:h-14 w-auto object-contain" 
                 />
               ) : (
-                <div className="h-10 sm:h-12 px-3 rounded-lg bg-primary flex items-center justify-center">
-                  <span className="text-primary-foreground font-bold text-xl">{siteName}</span>
+                <div className="h-12 sm:h-14 px-4 rounded-lg bg-primary flex items-center justify-center">
+                  <span className="text-primary-foreground font-bold text-2xl">{siteName}</span>
                 </div>
               )}
             </Link>
