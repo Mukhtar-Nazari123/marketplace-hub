@@ -91,7 +91,7 @@ const Header = () => {
                 <img 
                   src={logoUrl} 
                   alt={siteName} 
-                  className="h-12 sm:h-14 w-auto object-contain" 
+                  className="h-14 sm:h-16 w-auto min-w-[120px] sm:min-w-[140px] object-contain" 
                 />
               ) : (
                 <div className="h-12 sm:h-14 px-4 rounded-lg bg-primary flex items-center justify-center">
