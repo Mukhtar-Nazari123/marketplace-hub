@@ -44,19 +44,18 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
       <div className={`fixed top-0 h-full w-80 max-w-[85vw] bg-card z-50 lg:hidden shadow-xl overflow-y-auto ${isRTL ? 'right-0 animate-slide-in-right' : 'left-0 animate-slide-in-left'}`}>
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border">
-          <Link to="/" className="flex items-center gap-2" onClick={onClose}>
+          <Link to="/" className="flex-shrink-0" onClick={onClose}>
             {logoUrl ? (
               <img 
                 src={logoUrl} 
                 alt={siteName} 
-                className="w-8 h-8 rounded-lg object-contain border-2 border-orange" 
+                className="h-12 w-auto object-contain" 
               />
             ) : (
-              <div className="w-8 h-8 rounded-lg bg-orange flex items-center justify-center">
-                <span className="text-accent-foreground font-bold">{siteName.charAt(0)}</span>
+              <div className="h-12 w-12 rounded-lg bg-orange flex items-center justify-center">
+                <span className="text-accent-foreground font-bold text-lg">{siteName.charAt(0)}</span>
               </div>
             )}
-            <span className="font-display font-bold text-foreground">{siteName}</span>
           </Link>
           <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-5 w-5" />
