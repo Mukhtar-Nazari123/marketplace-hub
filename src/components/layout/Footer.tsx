@@ -110,7 +110,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* About */}
           <div>
-            <Link to="/" className="flex-shrink-0 mb-4">
+            <Link to="/" className="flex-shrink-0 mb-4 inline-block pb-2">
               {logoUrl ? (
                 <img src={logoUrl} alt={siteName} className="h-10 sm:h-12 w-auto object-contain" />
               ) : (
