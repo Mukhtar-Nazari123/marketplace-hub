@@ -94,9 +94,8 @@ const Header = () => {
                   className="h-16 sm:h-[72px] w-auto object-contain" 
                 />
               ) : (
-                <div className="h-12 sm:h-14 px-4 rounded-lg bg-primary flex items-center justify-center">
-                  <span className="text-primary-foreground font-bold text-2xl">{siteName}</span>
-                </div>
+                <span className="text-primary font-bold text-2xl">{siteName}</span>
+              
               )}
             </Link>
 
