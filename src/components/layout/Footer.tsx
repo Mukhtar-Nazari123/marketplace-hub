@@ -60,45 +60,45 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-foreground text-background">
+    <footer className="bg-[#1a1a1a] text-white">
       {/* Features Bar */}
-      <div className="border-b border-muted-foreground/20">
+      <div className="border-b border-white/10">
         <div className="container py-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-cyan/20 flex items-center justify-center">
-                <Truck className="h-6 w-6 text-cyan" />
+              <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+                <Truck className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <h4 className="font-semibold">{t.footer.freeShipping}</h4>
-                <p className="text-sm text-muted-foreground">{t.footer.ordersOver}</p>
+                <h4 className="font-semibold text-white">{t.footer.freeShipping}</h4>
+                <p className="text-sm text-[#b6b6b6]">{t.footer.ordersOver}</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-orange/20 flex items-center justify-center">
-                <Shield className="h-6 w-6 text-orange" />
+              <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+                <Shield className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <h4 className="font-semibold">{t.footer.securePayment}</h4>
-                <p className="text-sm text-muted-foreground">{t.footer.protected}</p>
+                <h4 className="font-semibold text-white">{t.footer.securePayment}</h4>
+                <p className="text-sm text-[#b6b6b6]">{t.footer.protected}</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-cyan/20 flex items-center justify-center">
-                <Headphones className="h-6 w-6 text-cyan" />
+              <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+                <Headphones className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <h4 className="font-semibold">{t.footer.support}</h4>
-                <p className="text-sm text-muted-foreground">{t.footer.dedicatedHelp}</p>
+                <h4 className="font-semibold text-white">{t.footer.support}</h4>
+                <p className="text-sm text-[#b6b6b6]">{t.footer.dedicatedHelp}</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-orange/20 flex items-center justify-center">
-                <CreditCard className="h-6 w-6 text-orange" />
+              <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+                <CreditCard className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <h4 className="font-semibold">{t.footer.easyReturns}</h4>
-                <p className="text-sm text-muted-foreground">{t.footer.daysReturn}</p>
+                <h4 className="font-semibold text-white">{t.footer.easyReturns}</h4>
+                <p className="text-sm text-[#b6b6b6]">{t.footer.daysReturn}</p>
               </div>
             </div>
           </div>
@@ -112,18 +112,18 @@ const Footer = () => {
           <div>
             <Link to="/" className="flex items-center gap-2 mb-4">
               {logoUrl ? (
-                <img src={logoUrl} alt={siteName} className="w-10 h-10 rounded-lg object-contain border-2 border-orange" />
+                <img src={logoUrl} alt={siteName} className="w-10 h-10 rounded-lg object-contain" />
               ) : (
-                <div className="w-10 h-10 rounded-lg bg-orange border-2 border-orange flex items-center justify-center">
-                  <span className="text-accent-foreground font-bold text-xl">{siteName.charAt(0)}</span>
+                <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
+                  <span className="text-primary-foreground font-bold text-xl">{siteName.charAt(0)}</span>
                 </div>
               )}
               <div>
-                <h3 className="font-display text-xl font-bold">{siteName}</h3>
-                <p className="text-xs text-muted-foreground -mt-1">{t.footer.onlineStore}</p>
+                <h3 className="font-display text-xl font-bold text-primary">{siteName}</h3>
+                <p className="text-xs text-[#b6b6b6] -mt-1">{t.footer.onlineStore}</p>
               </div>
             </Link>
-            <p className="text-muted-foreground text-sm mb-4">{t.footer.description}</p>
+            <p className="text-[#b6b6b6] text-sm mb-4">{t.footer.description}</p>
             <div className="flex gap-3">
               {socialLinks?.map((link) => {
                 const IconComponent = ICON_MAP[link.icon] || Globe;
@@ -133,7 +133,7 @@ const Footer = () => {
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-10 h-10 rounded-full bg-background/10 flex items-center justify-center hover:bg-cyan transition-colors"
+                    className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-[#b6b6b6] hover:bg-primary hover:text-white transition-colors"
                   >
                     <IconComponent className="h-5 w-5" />
                   </a>
@@ -144,11 +144,11 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-display font-bold text-lg mb-4">{t.footer.quickLinks}</h4>
+            <h4 className="font-display font-bold text-lg mb-4 text-white">{t.footer.quickLinks}</h4>
             <ul className="space-y-2">
               {quickLinks.map((link) => (
                 <li key={link.label}>
-                  <Link to={link.href} className="text-muted-foreground hover:text-cyan transition-colors text-sm">
+                  <Link to={link.href} className="text-[#b6b6b6] hover:text-primary transition-colors text-sm">
                     {link.label}
                   </Link>
                 </li>
@@ -158,11 +158,11 @@ const Footer = () => {
 
           {/* Customer Service */}
           <div>
-            <h4 className="font-display font-bold text-lg mb-4">{t.footer.customerService}</h4>
+            <h4 className="font-display font-bold text-lg mb-4 text-white">{t.footer.customerService}</h4>
             <ul className="space-y-2">
               {customerLinks.map((link) => (
                 <li key={link.label}>
-                  <Link to={link.href} className="text-muted-foreground hover:text-cyan transition-colors text-sm">
+                  <Link to={link.href} className="text-[#b6b6b6] hover:text-primary transition-colors text-sm">
                     {link.label}
                   </Link>
                 </li>
@@ -172,20 +172,20 @@ const Footer = () => {
 
           {/* Newsletter */}
           <div>
-            <h4 className="font-display font-bold text-lg mb-4">{t.footer.newsletter}</h4>
-            <p className="text-muted-foreground text-sm mb-4">{t.footer.subscribeText}</p>
+            <h4 className="font-display font-bold text-lg mb-4 text-white">{t.footer.newsletter}</h4>
+            <p className="text-[#b6b6b6] text-sm mb-4">{t.footer.subscribeText}</p>
             <NewsletterForm variant="compact" />
             <div className="mt-6 space-y-2">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Phone className="h-4 w-4 text-cyan" />
+              <div className="flex items-center gap-2 text-sm text-[#b6b6b6]">
+                <Phone className="h-4 w-4 text-primary" />
                 <span dir="ltr">{contactPhone}</span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Mail className="h-4 w-4 text-cyan" />
+              <div className="flex items-center gap-2 text-sm text-[#b6b6b6]">
+                <Mail className="h-4 w-4 text-primary" />
                 <span dir="ltr">{contactEmail}</span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <MapPin className="h-4 w-4 text-cyan" />
+              <div className="flex items-center gap-2 text-sm text-[#b6b6b6]">
+                <MapPin className="h-4 w-4 text-primary" />
                 <span>{address}</span>
               </div>
             </div>
@@ -194,10 +194,10 @@ const Footer = () => {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-muted-foreground/20">
+      <div className="border-t border-white/10">
         <div className="container py-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-[#b6b6b6]">
               © {isRTL ? "۱۴۰۳" : "2024"} {siteName}. {t.footer.allRightsReserved}
             </p>
             <div className="flex items-center gap-4">

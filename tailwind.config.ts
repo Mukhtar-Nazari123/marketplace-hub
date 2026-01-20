@@ -18,8 +18,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'Vazirmatn', 'system-ui', 'sans-serif'],
+        display: ['Inter', 'Vazirmatn', 'system-ui', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -65,6 +65,12 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Brand colors - Primary Red and Neutral Grey
+        brand: {
+          primary: "hsl(var(--brand-primary))",
+          neutral: "hsl(var(--brand-neutral))",
+        },
+        // Legacy support - map to brand primary
         cyan: {
           DEFAULT: "hsl(var(--cyan))",
           light: "hsl(var(--cyan-light))",
@@ -91,6 +97,7 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       boxShadow: {
+        'glow-primary': 'var(--shadow-glow-primary)',
         'glow-cyan': 'var(--shadow-glow-cyan)',
         'glow-orange': 'var(--shadow-glow-orange)',
       },
@@ -124,8 +131,8 @@ export default {
           to: { opacity: "1", transform: "scale(1)" },
         },
         "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 20px hsl(33 100% 50% / 0.3)" },
-          "50%": { boxShadow: "0 0 30px hsl(33 100% 50% / 0.5)" },
+          "0%, 100%": { boxShadow: "0 0 20px hsl(354 85% 52% / 0.3)" },
+          "50%": { boxShadow: "0 0 30px hsl(354 85% 52% / 0.5)" },
         },
       },
       animation: {

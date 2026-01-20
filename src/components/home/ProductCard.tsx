@@ -104,19 +104,19 @@ const ProductCard = ({
 
   return (
     <div
-      className="group relative bg-card rounded-xl border border-border overflow-hidden hover-lift h-full flex flex-col"
+      className="group relative bg-background rounded-xl border border-muted-foreground/30 overflow-hidden hover-lift h-full flex flex-col"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Badges - Show multiple badges */}
+      {/* Badges - Red badges */}
       <div className={`absolute top-3 z-10 flex flex-col gap-1 ${isRTL ? 'right-3' : 'left-3'}`}>
-        {/* New badge - based on isNew prop or legacy badge prop */}
+        {/* New badge */}
         {(isNew || badge === "new") && (
           <Badge variant="new" className="text-xs">
             {t.product.new}
           </Badge>
         )}
-        {/* Discount badge - show if discount exists */}
+        {/* Discount badge - Red with percentage */}
         {discount && discount > 0 && (
           <Badge variant="sale" className="text-xs">
             -{discount}{isRTL ? '٪' : '%'}
@@ -137,21 +137,21 @@ const ProductCard = ({
           className={cn(
             `absolute top-3 z-10 w-8 h-8 rounded-full backdrop-blur-sm flex items-center justify-center transition-colors ${isRTL ? 'left-3' : 'right-3'}`,
             isWishlisted 
-              ? "bg-red-500 text-white" 
-              : "bg-card/80 hover:bg-orange hover:text-accent-foreground"
+              ? "bg-primary text-white" 
+              : "bg-background/80 text-muted-foreground hover:bg-primary hover:text-white"
           )}
         >
           <Heart className={cn("h-4 w-4", isWishlisted && "fill-current")} />
         </button>
       )}
 
-      {/* Image - Fixed aspect ratio */}
+      {/* Image - Fixed aspect ratio 1:1 */}
       <Link to={`/products/${id}`} className="block flex-shrink-0">
         <div className="relative aspect-square overflow-hidden">
           {image ? (
             <img src={image} alt={name} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
           ) : (
-            <div className="w-full h-full bg-secondary/50 flex items-center justify-center">
+            <div className="w-full h-full bg-muted flex items-center justify-center">
               <ShoppingCart className="h-10 w-10 text-muted-foreground" />
             </div>
           )}
@@ -163,7 +163,6 @@ const ProductCard = ({
             }`}
           >
             <Button 
-              variant="cyan" 
               size="icon" 
               className="rounded-full h-9 w-9"
               onClick={handleAddToCart}
@@ -180,32 +179,32 @@ const ProductCard = ({
         </div>
       </Link>
 
-      {/* Content - Flex grow to fill remaining space */}
+      {/* Content */}
       <div className="p-4 flex flex-col flex-grow">
-        {/* Rating - Fixed height */}
+        {/* Rating */}
         <div className="h-5 mb-2 flex-shrink-0">
           <CompactRating rating={rating} reviewCount={reviews} size="sm" />
         </div>
 
-        {/* Name - Fixed height with truncation */}
+        {/* Name */}
         <Link to={`/products/${id}`} className="flex-shrink-0">
-          <h3 className="font-medium text-foreground h-11 line-clamp-2 group-hover:text-cyan transition-colors overflow-hidden">
+          <h3 className="font-medium text-foreground h-11 line-clamp-2 group-hover:text-primary transition-colors overflow-hidden">
             {name}
           </h3>
         </Link>
 
-        {/* Price - Fixed height container */}
+        {/* Price - Red for main price, grey strikethrough for original */}
         <div className="h-7 flex items-center gap-2 flex-shrink-0 mt-2">
           {originalPrice && (
             <span className="text-sm text-muted-foreground line-through truncate">
               {formatPrice(originalPrice)} {currencySymbol}
             </span>
           )}
-          <span className="text-lg font-bold text-orange truncate">{formatPrice(price)} {currencySymbol}</span>
+          <span className="text-lg font-bold text-primary truncate">{formatPrice(price)} {currencySymbol}</span>
           <Badge variant="outline" className="text-xs ml-auto flex-shrink-0">{currency}</Badge>
         </div>
 
-        {/* Countdown - Fixed height reserved space */}
+        {/* Countdown - Red numbers, grey labels */}
         <div className="h-14 mt-auto flex-shrink-0">
           {showDealCountdown ? (
             <DealCountdown dealEndAt={dealEndAt} dealStartAt={dealStartAt} />
@@ -213,17 +212,17 @@ const ProductCard = ({
             // Legacy static countdown support
             <div className="flex items-center justify-center gap-1 bg-foreground text-background rounded-lg p-2 h-full">
               <div className="text-center">
-                <span className="font-bold text-lg">{isRTL ? countdown.hours.toString().padStart(2, "0").replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]) : countdown.hours.toString().padStart(2, "0")}</span>
+                <span className="font-bold text-lg text-primary">{isRTL ? countdown.hours.toString().padStart(2, "0").replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]) : countdown.hours.toString().padStart(2, "0")}</span>
                 <p className="text-[10px] uppercase opacity-70">{t.product.hours}</p>
               </div>
               <span className="font-bold">:</span>
               <div className="text-center">
-                <span className="font-bold text-lg">{isRTL ? countdown.minutes.toString().padStart(2, "0").replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]) : countdown.minutes.toString().padStart(2, "0")}</span>
+                <span className="font-bold text-lg text-primary">{isRTL ? countdown.minutes.toString().padStart(2, "0").replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]) : countdown.minutes.toString().padStart(2, "0")}</span>
                 <p className="text-[10px] uppercase opacity-70">{t.product.minutes}</p>
               </div>
               <span className="font-bold">:</span>
               <div className="text-center">
-                <span className="font-bold text-lg">{isRTL ? countdown.seconds.toString().padStart(2, "0").replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]) : countdown.seconds.toString().padStart(2, "0")}</span>
+                <span className="font-bold text-lg text-primary">{isRTL ? countdown.seconds.toString().padStart(2, "0").replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]) : countdown.seconds.toString().padStart(2, "0")}</span>
                 <p className="text-[10px] uppercase opacity-70">{t.product.seconds}</p>
               </div>
             </div>

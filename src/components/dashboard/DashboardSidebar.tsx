@@ -15,42 +15,14 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import {
-  LayoutDashboard,
-  Users,
-  Package,
-  ShoppingCart,
-  BadgeCheck,
-  Image,
-  Tag,
-  FileText,
-  Settings,
-  LogOut,
-  Store,
-  Globe,
-  User,
-  MapPin,
-  Heart,
-  CreditCard,
-  BarChart3,
-  Plus,
-  Home,
-  Star,
-  Bell,
+  LayoutDashboard, Users, Package, ShoppingCart, BadgeCheck, Image, Tag, FileText, Settings, LogOut, Store, Globe, User, MapPin, Heart, CreditCard, BarChart3, Plus, Home, Star, Bell,
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useNotifications } from '@/hooks/useNotifications';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useState } from 'react';
 
@@ -64,7 +36,6 @@ export const DashboardSidebar = () => {
   const { state } = useSidebar();
   const isCollapsed = state === 'collapsed';
 
-  // Format unread count for display
   const formatUnreadCount = (count: number): string => {
     if (count > 15) return isRTL ? '۱۵+' : '15+';
     if (isRTL) {
@@ -74,7 +45,6 @@ export const DashboardSidebar = () => {
     return count.toString();
   };
 
-  // Admin navigation items
   const adminMainNavItems = [
     { title: t.admin.dashboard, icon: LayoutDashboard, url: '/dashboard/admin', showBadge: false },
     { title: t.admin.users.title, icon: Users, url: '/dashboard/users', showBadge: false },
@@ -93,7 +63,6 @@ export const DashboardSidebar = () => {
     { title: t.admin.settings.title, icon: Settings, url: '/dashboard/settings', showBadge: false },
   ];
 
-  // Seller navigation items (shared dashboard)
   const sellerNavItems = [
     { title: isRTL ? 'داشبورد' : 'Dashboard', icon: LayoutDashboard, url: '/dashboard/seller', showBadge: false },
     { title: isRTL ? 'اعلان‌ها' : 'Notifications', icon: Bell, url: '/dashboard/notifications', showBadge: true },
@@ -105,7 +74,6 @@ export const DashboardSidebar = () => {
     { title: isRTL ? 'افزودن محصول' : 'Add Product', icon: Plus, url: '/dashboard/seller/products/new', showBadge: false },
   ];
 
-  // Buyer navigation items (shared dashboard)
   const buyerNavItems = [
     { title: isRTL ? 'داشبورد' : 'Dashboard', icon: LayoutDashboard, url: '/dashboard/buyer', showBadge: false },
     { title: isRTL ? 'اعلان‌ها' : 'Notifications', icon: Bell, url: '/dashboard/notifications', showBadge: true },
@@ -117,35 +85,18 @@ export const DashboardSidebar = () => {
     { title: isRTL ? 'روش‌های پرداخت' : 'Payment Methods', icon: CreditCard, url: '/dashboard/buyer/payments', showBadge: false },
   ];
 
-  const handleLogout = async () => {
-    await signOut();
-    navigate('/login');
-  };
-
-  const toggleLanguage = () => {
-    setLanguage(language === 'fa' ? 'en' : 'fa');
-  };
-
+  const handleLogout = async () => { await signOut(); navigate('/login'); };
+  const toggleLanguage = () => { setLanguage(language === 'fa' ? 'en' : 'fa'); };
   const isActive = (url: string) => {
-    if (url === '/dashboard/admin' && role === 'admin') {
-      return location.pathname === '/dashboard/admin';
-    }
+    if (url === '/dashboard/admin' && role === 'admin') return location.pathname === '/dashboard/admin';
     return location.pathname.startsWith(url);
   };
-
   const getRoleLabel = () => {
     if (role === 'admin') return isRTL ? 'مدیر' : 'Admin';
     if (role === 'seller') return isRTL ? 'فروشنده' : 'Seller';
     if (role === 'buyer') return isRTL ? 'خریدار' : 'Buyer';
     return isRTL ? 'کاربر' : 'User';
   };
-
-  const logoutText = isRTL ? 'خروج' : 'Logout';
-  const confirmLogoutText = isRTL ? 'تأیید خروج' : 'Confirm Logout';
-  const logoutConfirmMessage = isRTL 
-    ? 'آیا مطمئن هستید که می‌خواهید از حساب خود خارج شوید؟' 
-    : 'Are you sure you want to logout?';
-  const cancelText = isRTL ? 'انصراف' : 'Cancel';
 
   const renderNavItems = (items: typeof sellerNavItems, label?: string) => (
     <SidebarGroup>
@@ -154,21 +105,14 @@ export const DashboardSidebar = () => {
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuItem key={item.url}>
-              <SidebarMenuButton
-                asChild
-                isActive={isActive(item.url)}
-                tooltip={item.title}
-                className="transition-all duration-200 hover:translate-x-1"
-              >
+              <SidebarMenuButton asChild isActive={isActive(item.url)} tooltip={item.title} className={`transition-all duration-200 ${isActive(item.url) ? 'text-primary border-l-2 border-primary' : 'text-sidebar-foreground'}`}>
                 <button onClick={() => navigate(item.url)} className="w-full flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <item.icon className="h-4 w-4 shrink-0 transition-transform duration-200 group-hover:scale-110" />
+                    <item.icon className={`h-4 w-4 shrink-0 ${isActive(item.url) ? 'text-primary' : 'text-muted-foreground'}`} />
                     {!isCollapsed && <span>{item.title}</span>}
                   </div>
                   {item.showBadge && unreadCount > 0 && !isCollapsed && (
-                    <Badge 
-                      className="bg-orange-500 hover:bg-orange-600 text-white text-xs font-medium px-2 py-0.5 min-w-[20px] h-5 flex items-center justify-center rounded-full shadow-sm"
-                    >
+                    <Badge className="bg-primary text-primary-foreground text-xs px-2 py-0.5 min-w-[20px] h-5 flex items-center justify-center rounded-full">
                       {formatUnreadCount(unreadCount)}
                     </Badge>
                   )}
@@ -182,19 +126,17 @@ export const DashboardSidebar = () => {
   );
 
   return (
-    <Sidebar collapsible="icon" side={isRTL ? 'right' : 'left'} className="border-border/50">
-      <SidebarHeader className="border-b border-border/50">
+    <Sidebar collapsible="icon" side={isRTL ? 'right' : 'left'} className="border-sidebar-border bg-sidebar">
+      <SidebarHeader className="border-b border-sidebar-border">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent group">
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/70 text-primary-foreground shadow-lg transition-transform group-hover:scale-105">
+            <SidebarMenuButton size="lg">
+              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                 <Store className="size-4" />
               </div>
               {!isCollapsed && (
                 <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="font-semibold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
-                    {role === 'admin' ? t.admin.panelTitle : (isRTL ? 'داشبورد' : 'Dashboard')}
-                  </span>
+                  <span className="font-semibold text-foreground">{role === 'admin' ? t.admin.panelTitle : (isRTL ? 'داشبورد' : 'Dashboard')}</span>
                   <span className="text-xs text-muted-foreground">{getRoleLabel()}</span>
                 </div>
               )}
@@ -204,44 +146,21 @@ export const DashboardSidebar = () => {
       </SidebarHeader>
       
       <SidebarContent>
-        {/* Admin Navigation */}
-        {role === 'admin' && (
-          <>
-            {renderNavItems(adminMainNavItems, t.admin.main)}
-            {renderNavItems(adminContentNavItems, t.admin.content)}
-            {renderNavItems(adminSettingsNavItems, t.admin.system)}
-          </>
-        )}
-
-        {/* Seller Navigation */}
+        {role === 'admin' && <>{renderNavItems(adminMainNavItems, t.admin.main)}{renderNavItems(adminContentNavItems, t.admin.content)}{renderNavItems(adminSettingsNavItems, t.admin.system)}</>}
         {role === 'seller' && renderNavItems(sellerNavItems)}
-
-        {/* Buyer Navigation */}
         {role === 'buyer' && renderNavItems(buyerNavItems)}
-
-        {/* Home & Language Switcher */}
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {/* Return to Home */}
               <SidebarMenuItem>
-                <SidebarMenuButton 
-                  onClick={() => navigate('/')} 
-                  tooltip={isRTL ? 'صفحه اصلی' : 'Home'}
-                  className="transition-all duration-200 hover:translate-x-1"
-                >
-                  <Home className="shrink-0 transition-transform duration-200 hover:scale-110" />
+                <SidebarMenuButton onClick={() => navigate('/')} tooltip={isRTL ? 'صفحه اصلی' : 'Home'}>
+                  <Home className="shrink-0 text-muted-foreground" />
                   {!isCollapsed && <span>{isRTL ? 'صفحه اصلی' : 'Home'}</span>}
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              {/* Language Switcher */}
               <SidebarMenuItem>
-                <SidebarMenuButton 
-                  onClick={toggleLanguage} 
-                  tooltip={language === 'fa' ? 'English' : 'دری'}
-                  className="transition-all duration-200 hover:translate-x-1"
-                >
-                  <Globe className="shrink-0 transition-transform duration-200 hover:rotate-12" />
+                <SidebarMenuButton onClick={toggleLanguage} tooltip={language === 'fa' ? 'English' : 'دری'}>
+                  <Globe className="shrink-0 text-muted-foreground" />
                   {!isCollapsed && <span>{language === 'fa' ? 'English' : 'دری'}</span>}
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -250,48 +169,33 @@ export const DashboardSidebar = () => {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-border/50">
+      <SidebarFooter className="border-t border-sidebar-border">
         <SidebarMenu>
           <SidebarMenuItem>
             <div className={`flex items-center gap-3 px-2 py-2 ${isCollapsed ? 'justify-center' : ''}`}>
-              <Avatar className="h-9 w-9 shrink-0 ring-2 ring-primary/20 transition-all hover:ring-primary/40">
-                <AvatarFallback className="bg-gradient-to-br from-primary to-primary/60 text-primary-foreground font-medium">
-                  {user?.email?.charAt(0).toUpperCase() || 'U'}
-                </AvatarFallback>
+              <Avatar className="h-9 w-9 shrink-0 ring-2 ring-primary/20">
+                <AvatarFallback className="bg-primary text-primary-foreground font-medium">{user?.email?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
               </Avatar>
               {!isCollapsed && (
                 <>
                   <div className={`grid flex-1 text-sm leading-tight min-w-0 ${isRTL ? 'text-right' : 'text-left'}`}>
                     <span className="truncate font-semibold">{getRoleLabel()}</span>
-                    <span className="truncate text-xs text-muted-foreground">
-                      {user?.email}
-                    </span>
+                    <span className="truncate text-xs text-muted-foreground">{user?.email}</span>
                   </div>
                   <AlertDialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
                     <AlertDialogTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="shrink-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all duration-200"
-                      >
+                      <Button variant="ghost" size="icon" className="shrink-0 text-muted-foreground hover:text-primary hover:bg-primary/10">
                         <LogOut className="h-4 w-4" />
                       </Button>
                     </AlertDialogTrigger>
-                    <AlertDialogContent className="animate-scale-in">
+                    <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>{confirmLogoutText}</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          {logoutConfirmMessage}
-                        </AlertDialogDescription>
+                        <AlertDialogTitle>{isRTL ? 'تأیید خروج' : 'Confirm Logout'}</AlertDialogTitle>
+                        <AlertDialogDescription>{isRTL ? 'آیا مطمئن هستید که می‌خواهید از حساب خود خارج شوید؟' : 'Are you sure you want to logout?'}</AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter className={isRTL ? 'flex-row-reverse gap-2' : ''}>
-                        <AlertDialogCancel>{cancelText}</AlertDialogCancel>
-                        <AlertDialogAction 
-                          onClick={handleLogout}
-                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                        >
-                          {logoutText}
-                        </AlertDialogAction>
+                        <AlertDialogCancel>{isRTL ? 'انصراف' : 'Cancel'}</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleLogout}>{isRTL ? 'خروج' : 'Logout'}</AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>

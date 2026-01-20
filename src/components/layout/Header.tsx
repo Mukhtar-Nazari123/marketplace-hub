@@ -82,29 +82,29 @@ const Header = () => {
 
   return (
     <>
-      <header className="bg-card border-b border-border shadow-sm">
+      <header className="bg-background border-b border-muted-foreground/20 shadow-sm sticky top-0 z-50">
         <div className="container py-4">
           <div className="flex items-center justify-between gap-4">
-            {/* Logo */}
+            {/* Logo - Red color */}
             <Link to="/" className="flex items-center gap-2 flex-shrink-0">
               {logoUrl ? (
                 <img 
                   src={logoUrl} 
                   alt={siteName} 
-                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg object-contain border-2 border-orange flex-shrink-0" 
+                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg object-contain flex-shrink-0" 
                 />
               ) : (
-                <div className="w-10 h-10 rounded-lg bg-orange border-2 border-orange flex items-center justify-center flex-shrink-0">
-                  <span className="text-accent-foreground font-bold text-xl">{siteName.charAt(0)}</span>
+                <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center flex-shrink-0">
+                  <span className="text-primary-foreground font-bold text-xl">{siteName.charAt(0)}</span>
                 </div>
               )}
               <div className="hidden sm:block">
-                <h1 className="font-display text-xl font-bold text-foreground">{siteName}</h1>
+                <h1 className="font-display text-xl font-bold text-primary">{siteName}</h1>
                 <p className="text-xs text-muted-foreground -mt-1">{t.footer.onlineStore}</p>
               </div>
             </Link>
 
-            {/* Search Bar */}
+            {/* Search Bar - Red accent on focus */}
             <div className="flex-1 max-w-2xl hidden md:flex">
               <form onSubmit={handleSearch} className="relative w-full">
                 <Input
@@ -113,12 +113,11 @@ const Header = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className={`w-full h-11 rounded-full border-2 border-border focus:border-cyan transition-colors ${isRTL ? "pr-4 pl-24 text-right" : "pl-4 pr-24 text-left"}`}
+                  className={`w-full h-11 rounded-full border border-muted-foreground/30 focus:border-primary transition-colors ${isRTL ? "pr-4 pl-24 text-right" : "pl-4 pr-24 text-left"}`}
                   dir={isRTL ? "rtl" : "ltr"}
                 />
                 <Button
                   type="submit"
-                  variant="cyan"
                   size="sm"
                   className={`absolute top-1/2 -translate-y-1/2 rounded-full px-6 ${isRTL ? "left-1" : "right-1"}`}
                 >
@@ -138,7 +137,7 @@ const Header = () => {
                     variant="ghost"
                     size="icon"
                     onClick={toggleTheme}
-                    className="transition-all duration-300 hover:bg-primary/10 hover:scale-110"
+                    className="transition-all duration-300 hover:bg-muted"
                     aria-label={
                       theme === "dark" ? (isRTL ? "حالت روشن" : "Light mode") : isRTL ? "حالت تاریک" : "Dark mode"
                     }
@@ -146,7 +145,7 @@ const Header = () => {
                     {theme === "dark" ? (
                       <Sun className="h-5 w-5 text-warning" />
                     ) : (
-                      <Moon className="h-5 w-5 text-primary" />
+                      <Moon className="h-5 w-5 text-muted-foreground" />
                     )}
                   </Button>
                 </TooltipTrigger>
@@ -160,10 +159,10 @@ const Header = () => {
                 <TooltipTrigger asChild>
                   <Link to="/dashboard/buyer/wishlist">
                     <Button variant="ghost" size="icon" className="relative">
-                      <Heart className="h-5 w-5" />
+                      <Heart className="h-5 w-5 text-muted-foreground" />
                       {wishlistCount > 0 && (
                         <span
-                          className={`absolute -top-1 h-5 w-5 rounded-full bg-destructive text-destructive-foreground text-xs flex items-center justify-center font-bold ${isRTL ? "-right-1" : "-left-1"}`}
+                          className={`absolute -top-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-bold ${isRTL ? "-right-1" : "-left-1"}`}
                         >
                           {formatCount(wishlistCount > 99 ? 99 : wishlistCount)}
                         </span>
@@ -174,13 +173,13 @@ const Header = () => {
                 <TooltipContent>{isRTL ? "لیست علاقه‌مندی" : "Wishlist"}</TooltipContent>
               </Tooltip>
 
-              {/* Cart */}
+              {/* Cart - Red badge */}
               <Link to="/cart">
                 <Button variant="ghost" size="icon" className="relative">
-                  <ShoppingCart className="h-5 w-5" />
+                  <ShoppingCart className="h-5 w-5 text-muted-foreground" />
                   {itemCount > 0 && (
                     <span
-                      className={`absolute -top-1 h-5 w-5 rounded-full bg-orange text-accent-foreground text-xs flex items-center justify-center font-bold ${isRTL ? "-right-1" : "-left-1"}`}
+                      className={`absolute -top-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-bold ${isRTL ? "-right-1" : "-left-1"}`}
                     >
                       {formatCount(itemCount > 99 ? 99 : itemCount)}
                     </span>
@@ -192,14 +191,14 @@ const Header = () => {
               {user ? (
                 <div className="flex items-center gap-1 sm:gap-2">
 
-                  {/* Dashboard Link */}
+                  {/* Dashboard Link - Red icon */}
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Link to={getDashboardLink()} className="flex">
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="relative transition-all duration-300 hover:bg-primary/10 hover:scale-110"
+                          className="relative transition-all duration-300 hover:bg-primary/10"
                           aria-label={getDashboardLabel()}
                         >
                           <LayoutDashboard className="h-5 w-5 text-primary" />
@@ -217,10 +216,10 @@ const Header = () => {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="transition-all duration-300 hover:bg-destructive/10 hover:scale-110"
+                            className="transition-all duration-300 hover:bg-primary/10"
                             aria-label={isRTL ? "خروج" : "Logout"}
                           >
-                            <LogOut className="h-5 w-5 text-destructive" />
+                            <LogOut className="h-5 w-5 text-muted-foreground hover:text-primary" />
                           </Button>
                         </AlertDialogTrigger>
                       </TooltipTrigger>
@@ -236,10 +235,10 @@ const Header = () => {
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter className={isRTL ? "flex-row-reverse gap-2" : ""}>
-                        <AlertDialogCancel>{isRTL ? "انصراف" : "Cancel"}</AlertDialogCancel>
+                        <AlertDialogCancel className="border-muted-foreground/30">{isRTL ? "انصراف" : "Cancel"}</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={handleLogout}
-                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          className="bg-primary text-primary-foreground hover:bg-primary/90"
                         >
                           {isRTL ? "خروج" : "Logout"}
                         </AlertDialogAction>
@@ -279,12 +278,11 @@ const Header = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
-                className={`w-full h-10 rounded-full border-2 border-border ${isRTL ? "pr-4 pl-20 text-right" : "pl-4 pr-20 text-left"}`}
+                className={`w-full h-10 rounded-full border border-muted-foreground/30 focus:border-primary ${isRTL ? "pr-4 pl-20 text-right" : "pl-4 pr-20 text-left"}`}
                 dir={isRTL ? "rtl" : "ltr"}
               />
               <Button
                 type="submit"
-                variant="cyan"
                 size="sm"
                 className={`absolute top-1/2 -translate-y-1/2 rounded-full px-4 ${isRTL ? "left-1" : "right-1"}`}
               >
