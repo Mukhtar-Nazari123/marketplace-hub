@@ -85,23 +85,19 @@ const Header = () => {
       <header className="bg-background border-b border-muted-foreground/20 shadow-sm sticky top-0 z-50">
         <div className="container py-4">
           <div className="flex items-center justify-between gap-4">
-            {/* Logo - Red color */}
-            <Link to="/" className="flex items-center gap-2 flex-shrink-0">
+            {/* Logo - Only image */}
+            <Link to="/" className="flex-shrink-0">
               {logoUrl ? (
                 <img 
                   src={logoUrl} 
                   alt={siteName} 
-                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg object-contain flex-shrink-0" 
+                  className="h-10 sm:h-12 w-auto object-contain" 
                 />
               ) : (
-                <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center flex-shrink-0">
-                  <span className="text-primary-foreground font-bold text-xl">{siteName.charAt(0)}</span>
+                <div className="h-10 sm:h-12 px-3 rounded-lg bg-primary flex items-center justify-center">
+                  <span className="text-primary-foreground font-bold text-xl">{siteName}</span>
                 </div>
               )}
-              <div className="hidden sm:block">
-                <h1 className="font-display text-xl font-bold text-primary">{siteName}</h1>
-                <p className="text-xs text-muted-foreground -mt-1">{t.footer.onlineStore}</p>
-              </div>
             </Link>
 
             {/* Search Bar - Red accent on focus */}
