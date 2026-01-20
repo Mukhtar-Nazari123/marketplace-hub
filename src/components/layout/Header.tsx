@@ -94,8 +94,7 @@ const Header = () => {
               <form onSubmit={handleSearch} className="relative w-full">
                 <Input type="text" placeholder={t.header.searchPlaceholder} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} onKeyDown={handleKeyDown} className={`w-full h-11 rounded-full border border-muted-foreground/30 focus:border-primary transition-colors ${isRTL ? "pr-4 pl-24 text-right" : "pl-4 pr-24 text-left"}`} dir={isRTL ? "rtl" : "ltr"} />
                 <Button type="submit" size="sm" className={`absolute top-1/2 -translate-y-1/2 rounded-full px-4 ${isRTL ? "left-1" : "right-1"}`}>
-                  <Search className={`h-4 w-4 ${isRTL ? "ml-1" : "mr-1"}`} />
-                  
+                  <Search className={`h-3.5 w-3.5 ${isRTL ? "ml-1" : "mr-1"}`} />
                 </Button>
               </form>
             </div>
@@ -202,7 +201,7 @@ const Header = () => {
             <form onSubmit={handleSearch} className="relative w-full">
               <Input type="text" placeholder={t.header.searchPlaceholder} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} onKeyDown={handleKeyDown} className={`w-full h-10 rounded-full border border-muted-foreground/30 focus:border-primary ${isRTL ? "pr-4 pl-20 text-right" : "pl-4 pr-20 text-left"}`} dir={isRTL ? "rtl" : "ltr"} />
               <Button type="submit" size="sm" className={`absolute top-1/2 -translate-y-1/2 rounded-full px-3 ${isRTL ? "left-1" : "right-1"}`}>
-                <Search className="h-4 w-4" />
+                <Search className="h-3.5 w-3.5" />
               </Button>
             </form>
           </div>
