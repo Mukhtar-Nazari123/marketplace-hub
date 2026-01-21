@@ -23,11 +23,11 @@ const TopBar = () => {
 
   return (
     <TooltipProvider>
-      <div className="bg-foreground text-background py-2 text-sm" dir={isRTL ? "rtl" : "ltr"}>
+      <div className="bg-[#b6b6b6] text-black py-2 text-sm" dir={isRTL ? "rtl" : "ltr"}>
         <div className="container flex items-center justify-between">
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2">
-              <Phone className="h-4 w-4 text-cyan" />
+              <Phone className="h-4 w-4 text-[#eb1d31]" />
               <span>
                 {t.topBar.callUs} {phone}
               </span>
@@ -37,9 +37,9 @@ const TopBar = () => {
                 <TooltipTrigger asChild>
                   <button 
                     onClick={toggleLanguage} 
-                    className="flex items-center gap-1 hover:text-cyan transition-colors p-1"
+                    className="flex items-center gap-1 hover:text-[#eb1d31] transition-colors p-1"
                   >
-                    <Globe className="h-4 w-4" />
+                    <Globe className="h-4 w-4 text-[#eb1d31]" />
                     <span className="text-xs hidden sm:inline">{language === "fa" ? "دری" : "EN"}</span>
                   </button>
                 </TooltipTrigger>
@@ -52,14 +52,14 @@ const TopBar = () => {
           <div className="flex items-center gap-4">
             {/* Notification Bell - Only for buyers and sellers */}
             {user && (role === 'buyer' || role === 'seller') && (
-              <div className="[&_button]:text-background [&_button:hover]:text-cyan [&_button]:h-8 [&_button]:w-8">
+              <div className="[&_button]:text-[#eb1d31] [&_button:hover]:text-[#eb1d31]/80 [&_button]:h-8 [&_button]:w-8">
                 <NotificationBell />
               </div>
             )}
             <Tooltip>
               <TooltipTrigger asChild>
-                <Link to="/dashboard/profile" className="hover:text-cyan transition-colors p-1">
-                  <User className="h-4 w-4" />
+                <Link to="/dashboard/profile" className="hover:text-[#eb1d31] transition-colors p-1">
+                  <User className="h-4 w-4 text-[#eb1d31]" />
                 </Link>
               </TooltipTrigger>
               <TooltipContent>
