@@ -1,43 +1,98 @@
-import { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useMemo, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useLanguage } from '@/lib/i18n';
-import { blogPosts } from '@/data/mockData';
+import { useBlogs, useRecentBlogs } from '@/hooks/useBlogs';
 import TopBar from '@/components/layout/TopBar';
 import Header from '@/components/layout/Header';
 import Navigation from '@/components/layout/Navigation';
 import Footer from '@/components/layout/Footer';
 import StickyNavbar from '@/components/layout/StickyNavbar';
+import BlogCard from '@/components/blog/BlogCard';
+import BlogCardSkeleton from '@/components/blog/BlogCardSkeleton';
+import BlogSidebar from '@/components/blog/BlogSidebar';
+import BlogPagination from '@/components/blog/BlogPagination';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, ChevronRight, Search, Calendar, User } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
 
 const Blog = () => {
   const { t, language, isRTL } = useLanguage();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Get params from URL
+  const categorySlug = searchParams.get('category');
+  const searchQuery = searchParams.get('q') || '';
+  const currentPage = parseInt(searchParams.get('page') || '1', 10);
+  
+  const [localSearch, setLocalSearch] = useState(searchQuery);
 
-  const categories = useMemo(() => {
-    const cats = new Set(blogPosts.map(p => p.category));
-    return Array.from(cats);
-  }, []);
+  // Fetch blogs with filters
+  const { blogs, categories, loading, totalPages } = useBlogs({
+    categorySlug,
+    searchQuery,
+    page: currentPage,
+    pageSize: 6,
+  });
 
+  // Fetch recent blogs for sidebar
+  const { blogs: recentBlogs, loading: recentLoading } = useRecentBlogs(5);
+
+  // Get all unique tags from blogs
   const allTags = useMemo(() => {
-    const tags = new Set(blogPosts.flatMap(p => p.tags));
-    return Array.from(tags);
-  }, []);
-
-  const filteredPosts = useMemo(() => {
-    return blogPosts.filter(post => {
-      const matchesSearch =
-        post.title[language].toLowerCase().includes(searchQuery.toLowerCase()) ||
-        post.excerpt[language].toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory = !selectedCategory || post.category === selectedCategory;
-      return matchesSearch && matchesCategory;
+    const tags = new Set<string>();
+    blogs.forEach(blog => {
+      const blogTags = isRTL && blog.tags_fa?.length > 0 ? blog.tags_fa : blog.tags;
+      blogTags?.forEach(tag => tags.add(tag));
     });
-  }, [searchQuery, selectedCategory, language]);
+    return Array.from(tags);
+  }, [blogs, isRTL]);
+
+  // Handle search submit
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const params = new URLSearchParams(searchParams);
+    if (localSearch.trim()) {
+      params.set('q', localSearch.trim());
+    } else {
+      params.delete('q');
+    }
+    params.delete('page');
+    setSearchParams(params);
+  };
+
+  // Handle category change
+  const handleCategoryChange = (slug: string | null) => {
+    const params = new URLSearchParams(searchParams);
+    if (slug) {
+      params.set('category', slug);
+    } else {
+      params.delete('category');
+    }
+    params.delete('page');
+    setSearchParams(params);
+  };
+
+  // Handle page change
+  const handlePageChange = (page: number) => {
+    const params = new URLSearchParams(searchParams);
+    if (page > 1) {
+      params.set('page', page.toString());
+    } else {
+      params.delete('page');
+    }
+    setSearchParams(params);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Sync local search with URL
+  useEffect(() => {
+    setLocalSearch(searchQuery);
+  }, [searchQuery]);
 
   return (
     <div className="min-h-screen bg-background">
+      {/* SEO Meta */}
+      <title>{isRTL ? 'وبلاگ - یکتابازار' : 'Blog - YektaBazar'}</title>
+      
       {/* Auto-hide Sticky Navbar */}
       <StickyNavbar>
         <TopBar />
@@ -70,150 +125,99 @@ const Blog = () => {
 
       <section className="py-12">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col lg:flex-row gap-8">
+          <div className={`flex flex-col lg:flex-row gap-8 ${isRTL ? 'lg:flex-row-reverse' : ''}`}>
             {/* Main Content */}
             <main className="flex-1">
               {/* Search */}
-              <div className="relative mb-8">
+              <form onSubmit={handleSearch} className="relative mb-8">
                 <Search className={`absolute top-1/2 -translate-y-1/2 text-muted-foreground ${isRTL ? 'right-3' : 'left-3'}`} size={20} />
                 <Input
                   type="search"
                   placeholder={t.blog.searchPlaceholder}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  value={localSearch}
+                  onChange={(e) => setLocalSearch(e.target.value)}
                   className={`${isRTL ? 'pr-10' : 'pl-10'}`}
                 />
-              </div>
+              </form>
+
+              {/* Active Filters */}
+              {(categorySlug || searchQuery) && (
+                <div className="mb-6 flex flex-wrap gap-2 items-center">
+                  <span className="text-sm text-muted-foreground">
+                    {isRTL ? 'فیلترها:' : 'Filters:'}
+                  </span>
+                  {categorySlug && (
+                    <button
+                      onClick={() => handleCategoryChange(null)}
+                      className="inline-flex items-center gap-1 bg-primary/10 text-primary text-sm px-3 py-1 rounded-full hover:bg-primary/20"
+                    >
+                      {categories.find(c => c.slug === categorySlug)?.name || categorySlug}
+                      <span className="ml-1">×</span>
+                    </button>
+                  )}
+                  {searchQuery && (
+                    <button
+                      onClick={() => {
+                        setLocalSearch('');
+                        const params = new URLSearchParams(searchParams);
+                        params.delete('q');
+                        setSearchParams(params);
+                      }}
+                      className="inline-flex items-center gap-1 bg-primary/10 text-primary text-sm px-3 py-1 rounded-full hover:bg-primary/20"
+                    >
+                      "{searchQuery}"
+                      <span className="ml-1">×</span>
+                    </button>
+                  )}
+                </div>
+              )}
 
               {/* Posts Grid */}
-              {filteredPosts.length > 0 ? (
+              {loading ? (
                 <div className="grid md:grid-cols-2 gap-6">
-                  {filteredPosts.map((post) => (
-                    <article
-                      key={post.id}
-                      className="bg-card rounded-2xl overflow-hidden shadow-sm border border-border hover:shadow-lg transition-shadow group"
-                    >
-                      <Link to={`/blog/${post.slug}`}>
-                        <div className="aspect-video overflow-hidden">
-                          <img
-                            src={post.image}
-                            alt={post.title[language]}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                        </div>
-                      </Link>
-                      <div className="p-6">
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
-                          <span className="flex items-center gap-1">
-                            <Calendar size={14} />
-                            {post.date}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <User size={14} />
-                            {post.author}
-                          </span>
-                        </div>
-                        <Link to={`/blog/${post.slug}`}>
-                          <h2 className="text-xl font-bold text-foreground hover:text-primary transition-colors mb-3">
-                            {post.title[language]}
-                          </h2>
-                        </Link>
-                        <p className="text-muted-foreground mb-4 line-clamp-2">
-                          {post.excerpt[language]}
-                        </p>
-                        <div className="flex items-center justify-between">
-                          <div className="flex gap-2">
-                            {post.tags.slice(0, 2).map((tag) => (
-                              <Badge key={tag} variant="secondary" className="text-xs">
-                                {tag}
-                              </Badge>
-                            ))}
-                          </div>
-                          <Link
-                            to={`/blog/${post.slug}`}
-                            className="text-primary font-medium hover:underline flex items-center gap-1"
-                          >
-                            {t.blog.readMore}
-                            {isRTL ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
-                          </Link>
-                        </div>
-                      </div>
-                    </article>
+                  {[...Array(6)].map((_, i) => (
+                    <BlogCardSkeleton key={i} />
                   ))}
                 </div>
+              ) : blogs.length > 0 ? (
+                <>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {blogs.map((blog) => (
+                      <BlogCard key={blog.id} blog={blog} />
+                    ))}
+                  </div>
+                  
+                  {/* Pagination */}
+                  <BlogPagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                </>
               ) : (
-                <div className="text-center py-12">
-                  <p className="text-muted-foreground">{t.blog.noResults}</p>
+                <div className="text-center py-16">
+                  <div className="text-6xl mb-4">📝</div>
+                  <p className="text-xl text-muted-foreground mb-2">
+                    {t.blog.noResults}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {isRTL 
+                      ? 'هیچ مقاله‌ای با این فیلترها یافت نشد' 
+                      : 'No articles found with these filters'}
+                  </p>
                 </div>
               )}
             </main>
 
             {/* Sidebar */}
-            <aside className="w-full lg:w-80 space-y-6">
-              {/* Categories */}
-              <div className="bg-card rounded-2xl p-6 shadow-sm border border-border">
-                <h3 className="font-bold text-foreground mb-4">{t.blog.categories}</h3>
-                <div className="space-y-2">
-                  <button
-                    className={`block w-full text-right p-2 rounded-lg transition-colors ${
-                      !selectedCategory ? 'bg-primary/10 text-primary' : 'hover:bg-muted'
-                    }`}
-                    onClick={() => setSelectedCategory(null)}
-                  >
-                    {isRTL ? 'همه' : 'All'}
-                  </button>
-                  {categories.map((cat) => (
-                    <button
-                      key={cat}
-                      className={`block w-full text-right p-2 rounded-lg transition-colors ${
-                        selectedCategory === cat ? 'bg-primary/10 text-primary' : 'hover:bg-muted'
-                      }`}
-                      onClick={() => setSelectedCategory(cat)}
-                    >
-                      {cat}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Recent Posts */}
-              <div className="bg-card rounded-2xl p-6 shadow-sm border border-border">
-                <h3 className="font-bold text-foreground mb-4">{t.blog.recentPosts}</h3>
-                <div className="space-y-4">
-                  {blogPosts.slice(0, 3).map((post) => (
-                    <Link
-                      key={post.id}
-                      to={`/blog/${post.slug}`}
-                      className="flex gap-3 group"
-                    >
-                      <img
-                        src={post.image}
-                        alt={post.title[language]}
-                        className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
-                      />
-                      <div>
-                        <h4 className="font-medium text-foreground group-hover:text-primary transition-colors line-clamp-2 text-sm">
-                          {post.title[language]}
-                        </h4>
-                        <span className="text-xs text-muted-foreground">{post.date}</span>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-
-              {/* Tags */}
-              <div className="bg-card rounded-2xl p-6 shadow-sm border border-border">
-                <h3 className="font-bold text-foreground mb-4">{t.blog.tags}</h3>
-                <div className="flex flex-wrap gap-2">
-                  {allTags.map((tag) => (
-                    <Badge key={tag} variant="outline" className="cursor-pointer hover:bg-primary/10">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            </aside>
+            <BlogSidebar
+              categories={categories}
+              recentBlogs={recentBlogs}
+              selectedCategory={categorySlug}
+              onCategorySelect={handleCategoryChange}
+              allTags={allTags}
+              loading={loading || recentLoading}
+            />
           </div>
         </div>
       </section>

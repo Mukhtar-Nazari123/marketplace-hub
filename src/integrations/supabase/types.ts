@@ -161,6 +161,134 @@ export type Database = {
         }
         Relationships: []
       }
+      blog_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          description_fa: string | null
+          id: string
+          is_active: boolean
+          name: string
+          name_fa: string | null
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          description_fa?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          name_fa?: string | null
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          description_fa?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          name_fa?: string | null
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      blogs: {
+        Row: {
+          author_name: string
+          author_name_fa: string | null
+          category_id: string | null
+          content: string | null
+          content_fa: string | null
+          cover_image_url: string | null
+          created_at: string
+          excerpt: string | null
+          excerpt_fa: string | null
+          id: string
+          is_featured: boolean
+          is_published: boolean
+          meta_description: string | null
+          meta_description_fa: string | null
+          meta_title: string | null
+          meta_title_fa: string | null
+          published_at: string | null
+          slug: string
+          tags: string[] | null
+          tags_fa: string[] | null
+          title: string
+          title_fa: string | null
+          updated_at: string
+          views_count: number
+        }
+        Insert: {
+          author_name?: string
+          author_name_fa?: string | null
+          category_id?: string | null
+          content?: string | null
+          content_fa?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          excerpt?: string | null
+          excerpt_fa?: string | null
+          id?: string
+          is_featured?: boolean
+          is_published?: boolean
+          meta_description?: string | null
+          meta_description_fa?: string | null
+          meta_title?: string | null
+          meta_title_fa?: string | null
+          published_at?: string | null
+          slug: string
+          tags?: string[] | null
+          tags_fa?: string[] | null
+          title: string
+          title_fa?: string | null
+          updated_at?: string
+          views_count?: number
+        }
+        Update: {
+          author_name?: string
+          author_name_fa?: string | null
+          category_id?: string | null
+          content?: string | null
+          content_fa?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          excerpt?: string | null
+          excerpt_fa?: string | null
+          id?: string
+          is_featured?: boolean
+          is_published?: boolean
+          meta_description?: string | null
+          meta_description_fa?: string | null
+          meta_title?: string | null
+          meta_title_fa?: string | null
+          published_at?: string | null
+          slug?: string
+          tags?: string[] | null
+          tags_fa?: string[] | null
+          title?: string
+          title_fa?: string | null
+          updated_at?: string
+          views_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blogs_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "blog_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cart: {
         Row: {
           created_at: string
@@ -1399,6 +1527,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_blog_views: { Args: { blog_id: string }; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "moderator" | "buyer" | "seller"
