@@ -66,6 +66,7 @@ interface Product {
   category?: {
     id: string;
     name: string;
+    name_fa?: string | null;
     slug: string;
   } | null;
   seller?: {
@@ -119,7 +120,7 @@ const ProductDetail = () => {
           .select(
             `
             *,
-            category:categories(id, name, slug)
+            category:categories(id, name, name_fa, slug)
           `
           )
           .eq('status', 'active');
@@ -149,7 +150,7 @@ const ProductDetail = () => {
             .from('products')
             .select(`
               *,
-              category:categories(id, name, slug)
+              category:categories(id, name, name_fa, slug)
             `)
             .eq('status', 'active')
             .eq('category_id', data.category_id)
@@ -331,7 +332,7 @@ const ProductDetail = () => {
                   to={`/products?category=${product.category.slug}`} 
                   className="text-muted-foreground hover:text-primary"
                 >
-                  {product.category.name}
+                  {isRTL && product.category.name_fa ? product.category.name_fa : product.category.name}
                 </Link>
               </>
             )}
@@ -533,7 +534,7 @@ const ProductDetail = () => {
                     to={`/products?category=${product.category.slug}`}
                     className="text-primary hover:underline"
                   >
-                    {product.category.name}
+                    {isRTL && product.category.name_fa ? product.category.name_fa : product.category.name}
                   </Link>
                 </div>
               )}

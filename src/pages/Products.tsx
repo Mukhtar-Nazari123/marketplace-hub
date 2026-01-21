@@ -144,7 +144,7 @@ const Products = () => {
     if (filterType === 'sale') return t.filters.discount;
     if (categorySlug) {
       const category = rootCategories.find(c => c.slug === categorySlug);
-      return category?.name || t.product.allProducts;
+      return category ? (isRTL && category.name_fa ? category.name_fa : category.name) : t.product.allProducts;
     }
     return t.product.allProducts;
   };
@@ -248,11 +248,11 @@ const Products = () => {
                       {category.image_url && (
                         <img
                           src={category.image_url}
-                          alt={category.name}
+                          alt={isRTL && category.name_fa ? category.name_fa : category.name}
                           className="w-8 h-8 rounded-full object-cover"
                         />
                       )}
-                      <span className="text-sm">{category.name}</span>
+                      <span className="text-sm">{isRTL && category.name_fa ? category.name_fa : category.name}</span>
                     </Link>
                   ))}
                 </div>

@@ -190,7 +190,7 @@ const BestSellers = () => {
                       : "text-muted-foreground hover:text-foreground hover:bg-muted"
                   }`}
                 >
-                  {category.name}
+                  {isRTL && category.name_fa ? category.name_fa : category.name}
                 </Link>
               ))
             ) : (
