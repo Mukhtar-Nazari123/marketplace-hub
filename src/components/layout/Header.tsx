@@ -228,7 +228,14 @@ const Header = () => {
                     </AlertDialogContent>
                   </AlertDialog>
                 </div>
-              ) : null}
+              ) : (
+                <Link to="/login" className="hidden sm:flex items-center">
+                  <div className={`text-sm ${isRTL ? "text-right" : "text-left"}`}>
+                    <p className="text-muted-foreground">{t.header.signIn}</p>
+                    <p className="font-medium text-foreground">{t.header.welcomeGuest}</p>
+                  </div>
+                </Link>
+              )}
 
               {/* Mobile Menu Button */}
               <Button
