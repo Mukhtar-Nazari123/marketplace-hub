@@ -56,7 +56,6 @@ const Footer = () => {
     { label: t.footer.wishlist, href: "/dashboard/buyer/wishlist" },
     { label: t.footer.returns, href: "/returns" },
     { label: t.footer.shippingInfo, href: "/dashboard/buyer/orders" },
-    { label: t.footer.giftCards, href: "/gift-cards" },
   ];
 
   return (
