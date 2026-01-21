@@ -548,8 +548,9 @@ const TeamTab = ({ isRTL }: { isRTL: boolean }) => {
                 label={isRTL ? 'تصویر' : 'Photo'}
                 value={formData.photo_url}
                 onChange={(url) => setFormData({ ...formData, photo_url: url })}
-                folder="about-team"
                 bucket="site-assets"
+                folder="team-photos"
+                placeholder={isRTL ? 'تصویر عضو تیم را انتخاب کنید' : 'Select team member photo'}
               />
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
