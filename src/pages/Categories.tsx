@@ -67,6 +67,11 @@ const Categories = () => {
 
   const currentCategory = selectedCategorySlug ? getCategoryBySlug(selectedCategorySlug) : undefined;
   const currentSubcategory = selectedSubcategorySlug ? getSubcategoryBySlug(selectedSubcategorySlug) : undefined;
+
+  const getLocalizedName = (item?: { name: string; name_fa?: string | null } | null) => {
+    if (!item) return '';
+    return isRTL && item.name_fa ? item.name_fa : item.name;
+  };
   
   // Memoize subcategories to prevent infinite re-renders
   const subcategories = useMemo(() => {
@@ -262,13 +267,13 @@ const Categories = () => {
             {currentCategory && (
               <>
                 {isRTL ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
-                <span className="text-primary">{currentCategory.name}</span>
+                <span className="text-primary">{getLocalizedName(currentCategory)}</span>
               </>
             )}
             {currentSubcategory && (
               <>
                 {isRTL ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
-                <span className="text-primary">{currentSubcategory.name}</span>
+                <span className="text-primary">{getLocalizedName(currentSubcategory)}</span>
               </>
             )}
           </div>
@@ -300,7 +305,7 @@ const Categories = () => {
                             : 'hover:bg-muted'
                         }`}
                       >
-                        <span className="text-sm">{cat.name}</span>
+                        <span className="text-sm">{getLocalizedName(cat)}</span>
                         {isRTL ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
                       </Link>
                       {selectedCategorySlug === cat.slug && cat.subcategories && cat.subcategories.length > 0 && (
@@ -315,7 +320,7 @@ const Categories = () => {
                                   : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                               }`}
                             >
-                              {sub.name}
+                              {getLocalizedName(sub)}
                             </Link>
                           ))}
                         </div>
@@ -339,7 +344,9 @@ const Categories = () => {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
               <div>
                 <h1 className="text-2xl font-bold text-foreground">
-                  {currentSubcategory?.name || currentCategory?.name || t.categories.allCategories}
+                  {(currentSubcategory && getLocalizedName(currentSubcategory)) ||
+                    (currentCategory && getLocalizedName(currentCategory)) ||
+                    t.categories.allCategories}
                 </h1>
                 <p className="text-muted-foreground">
                   {filteredProducts.length} {isRTL ? 'محصول' : 'products'}
@@ -386,6 +393,7 @@ const Categories = () => {
                     {rootCategories.map((cat) => {
                       const productImage = categoryImages.get(cat.id);
                       const displayImage = cat.image_url || productImage;
+                      const catLabel = getLocalizedName(cat);
                       
                       return (
                         <Link
@@ -396,7 +404,7 @@ const Categories = () => {
                           {displayImage ? (
                             <img
                               src={displayImage}
-                              alt={cat.name}
+                              alt={catLabel}
                               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                             />
                           ) : (
@@ -406,7 +414,7 @@ const Categories = () => {
                           )}
                           <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                           <div className="absolute bottom-0 left-0 right-0 p-4">
-                            <h3 className="text-white font-bold text-lg">{cat.name}</h3>
+                            <h3 className="text-white font-bold text-lg">{catLabel}</h3>
                             <p className="text-white/70 text-sm">
                               {cat.subcategories?.length || 0} {t.categories.subcategories}
                             </p>
