@@ -32,6 +32,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Skeleton } from '@/components/ui/skeleton';
+import ImageUpload from '@/components/admin/ImageUpload';
 import { Plus, Search, Edit, Trash2, Eye, EyeOff, Star } from 'lucide-react';
 
 interface BlogCategory {
@@ -542,11 +543,13 @@ const AdminBlogs = () => {
 
               {/* Cover Image */}
               <div className="space-y-2 md:col-span-2">
-                <Label>{isRTL ? 'تصویر کاور' : 'Cover Image URL'}</Label>
-                <Input
+                <ImageUpload
+                  label={isRTL ? 'تصویر کاور' : 'Cover Image'}
                   value={formData.cover_image_url}
-                  onChange={(e) => setFormData({ ...formData, cover_image_url: e.target.value })}
-                  placeholder="https://..."
+                  onChange={(url) => setFormData({ ...formData, cover_image_url: url })}
+                  placeholder={isRTL ? 'کلیک کنید برای آپلود تصویر' : 'Click to upload image'}
+                  folder="blog-covers"
+                  bucket="site-assets"
                 />
               </div>
 
