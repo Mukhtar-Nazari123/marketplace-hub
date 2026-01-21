@@ -127,9 +127,6 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
 
           {/* Special Offers */}
           <div className="mt-6 p-4 bg-gradient-to-r from-orange/10 to-cyan/10 rounded-lg">
-            <Badge variant="hot" className="animate-pulse mb-2">
-              {t.nav.blackFriday}
-            </Badge>
             <p className="text-sm text-muted-foreground">
               {t.nav.specialOffer}
             </p>
