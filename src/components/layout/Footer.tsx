@@ -192,7 +192,7 @@ const Footer = () => {
         <div className="container py-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-sm text-[#b6b6b6]">
-              © {isRTL ? "۱۴۰۳" : "2024"} {siteName}. {t.footer.allRightsReserved}
+              © {isRTL ? "۱۴۰۴" : "2025"} {siteName}. {t.footer.allRightsReserved}
             </p>
             <div className="flex items-center gap-4">
               <img
