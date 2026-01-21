@@ -93,7 +93,7 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
                       className="block px-4 py-3 hover:bg-orange/10 hover:text-orange transition-colors border-b border-border last:border-b-0"
                       onClick={onClose}
                     >
-                      {category.name}
+                      {isRTL && category.name_fa ? category.name_fa : category.name}
                     </Link>
                   ))
                 ) : (

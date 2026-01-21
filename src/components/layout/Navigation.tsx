@@ -56,7 +56,7 @@ const Navigation = () => {
                       style={{ animationDelay: `${index * 50}ms` }}
                       onClick={() => setIsCategoryOpen(false)}
                     >
-                      {category.name}
+                      {isRTL && category.name_fa ? category.name_fa : category.name}
                     </Link>
                   ))
                 ) : (
