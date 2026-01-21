@@ -94,9 +94,6 @@ const Navigation = () => {
             <Link to="/products?filter=sale" className="text-sm text-muted-foreground hover:text-primary transition-colors">
               {t.nav.specialOffer}
             </Link>
-            <Badge variant="hot" className="animate-pulse">
-              {t.nav.blackFriday}
-            </Badge>
           </div>
         </div>
       </div>
