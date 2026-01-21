@@ -102,7 +102,7 @@ const Header = () => {
                 <Button
                   type="submit"
                   size="sm"
-                  className={`absolute top-1/2 -translate-y-1/2 rounded-full px-4 hover:scale-100 active:scale-100 ${isRTL ? "left-1" : "right-1"}`}
+                  className={`absolute top-1/2 -translate-y-1/2 rounded-full px-4 hover:translate-y-[-50%] active:translate-y-[-50%] hover:scale-100 active:scale-100 ${isRTL ? "left-1" : "right-1"}`}
                 >
                   <Search className={`h-3.5 w-3.5 ${isRTL ? "ml-1" : "mr-1"}`} />
                 </Button>
@@ -265,7 +265,7 @@ const Header = () => {
               <Button
                 type="submit"
                 size="sm"
-                className={`absolute top-1/2 -translate-y-1/2 rounded-full px-3 hover:scale-100 active:scale-100 ${isRTL ? "left-1" : "right-1"}`}
+                className={`absolute top-1/2 -translate-y-1/2 rounded-full px-3 hover:translate-y-[-50%] active:translate-y-[-50%] hover:scale-100 active:scale-100 ${isRTL ? "left-1" : "right-1"}`}
               >
                 <Search className="h-3.5 w-3.5" />
               </Button>
