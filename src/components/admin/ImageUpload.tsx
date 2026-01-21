@@ -12,9 +12,10 @@ interface ImageUploadProps {
   onChange: (url: string) => void;
   placeholder?: string;
   folder?: string;
+  bucket?: string;
 }
 
-const ImageUpload = ({ label, value, onChange, placeholder, folder = 'banners' }: ImageUploadProps) => {
+const ImageUpload = ({ label, value, onChange, placeholder, folder = 'banners', bucket = 'seller-assets' }: ImageUploadProps) => {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -40,13 +41,13 @@ const ImageUpload = ({ label, value, onChange, placeholder, folder = 'banners' }
       const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('seller-assets')
+        .from(bucket)
         .upload(fileName, file, { upsert: true });
 
       if (uploadError) throw uploadError;
 
       const { data: { publicUrl } } = supabase.storage
-        .from('seller-assets')
+        .from(bucket)
         .getPublicUrl(fileName);
 
       onChange(publicUrl);
