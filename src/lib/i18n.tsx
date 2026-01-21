@@ -228,6 +228,9 @@ export const translations = {
       noResults: "مقاله‌ای یافت نشد",
       publishedOn: "منتشر شده در",
       by: "توسط",
+      backToBlog: "بازگشت به وبلاگ",
+      views: "بازدید",
+      share: "اشتراک‌گذاری",
     },
     
     // Admin - Comprehensive translations
@@ -769,6 +772,9 @@ export const translations = {
       noResults: "No articles found",
       publishedOn: "Published on",
       by: "By",
+      backToBlog: "Back to Blog",
+      views: "views",
+      share: "Share",
     },
     
     // Admin - Comprehensive translations
