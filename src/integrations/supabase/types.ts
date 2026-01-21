@@ -14,6 +14,183 @@ export type Database = {
   }
   public: {
     Tables: {
+      about_awards: {
+        Row: {
+          created_at: string
+          description_en: string | null
+          description_fa: string | null
+          icon_or_image: string | null
+          id: string
+          is_active: boolean
+          priority: number
+          title_en: string
+          title_fa: string | null
+          updated_at: string
+          year: number | null
+        }
+        Insert: {
+          created_at?: string
+          description_en?: string | null
+          description_fa?: string | null
+          icon_or_image?: string | null
+          id?: string
+          is_active?: boolean
+          priority?: number
+          title_en: string
+          title_fa?: string | null
+          updated_at?: string
+          year?: number | null
+        }
+        Update: {
+          created_at?: string
+          description_en?: string | null
+          description_fa?: string | null
+          icon_or_image?: string | null
+          id?: string
+          is_active?: boolean
+          priority?: number
+          title_en?: string
+          title_fa?: string | null
+          updated_at?: string
+          year?: number | null
+        }
+        Relationships: []
+      }
+      about_sections: {
+        Row: {
+          content_en: string | null
+          content_fa: string | null
+          created_at: string
+          description_en: string | null
+          description_fa: string | null
+          icon: string | null
+          id: string
+          is_active: boolean
+          priority: number
+          section_key: string
+          start_year: number | null
+          title_en: string
+          title_fa: string | null
+          updated_at: string
+        }
+        Insert: {
+          content_en?: string | null
+          content_fa?: string | null
+          created_at?: string
+          description_en?: string | null
+          description_fa?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          priority?: number
+          section_key: string
+          start_year?: number | null
+          title_en: string
+          title_fa?: string | null
+          updated_at?: string
+        }
+        Update: {
+          content_en?: string | null
+          content_fa?: string | null
+          created_at?: string
+          description_en?: string | null
+          description_fa?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean
+          priority?: number
+          section_key?: string
+          start_year?: number | null
+          title_en?: string
+          title_fa?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      about_team_members: {
+        Row: {
+          created_at: string
+          description_en: string | null
+          description_fa: string | null
+          id: string
+          is_active: boolean
+          name_en: string
+          name_fa: string | null
+          photo_url: string | null
+          priority: number
+          role_en: string
+          role_fa: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description_en?: string | null
+          description_fa?: string | null
+          id?: string
+          is_active?: boolean
+          name_en: string
+          name_fa?: string | null
+          photo_url?: string | null
+          priority?: number
+          role_en: string
+          role_fa?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description_en?: string | null
+          description_fa?: string | null
+          id?: string
+          is_active?: boolean
+          name_en?: string
+          name_fa?: string | null
+          photo_url?: string | null
+          priority?: number
+          role_en?: string
+          role_fa?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      about_values: {
+        Row: {
+          created_at: string
+          description_en: string | null
+          description_fa: string | null
+          icon: string
+          id: string
+          is_active: boolean
+          priority: number
+          title_en: string
+          title_fa: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description_en?: string | null
+          description_fa?: string | null
+          icon?: string
+          id?: string
+          is_active?: boolean
+          priority?: number
+          title_en: string
+          title_fa?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description_en?: string | null
+          description_fa?: string | null
+          icon?: string
+          id?: string
+          is_active?: boolean
+          priority?: number
+          title_en?: string
+          title_fa?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       admin_logs: {
         Row: {
           action: string
