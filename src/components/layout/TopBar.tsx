@@ -23,7 +23,7 @@ const TopBar = () => {
 
   return (
     <TooltipProvider>
-      <div className="bg-[#b6b6b6] text-black py-2 text-sm" dir={isRTL ? "rtl" : "ltr"}>
+      <div className="bg-[#b6b6b6] text-black py-1 text-sm" dir={isRTL ? "rtl" : "ltr"}>
         <div className="container flex items-center justify-between">
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2">
