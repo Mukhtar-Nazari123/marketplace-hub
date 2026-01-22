@@ -117,20 +117,31 @@ const SellerProductView = () => {
   };
 
   const metadata = product?.metadata || {};
-  const images = product?.images || [];
+  const productImages = product?.images || [];
   const priceUSD = (metadata.priceUSD as number) || 0;
   const discountPriceUSD = (metadata.discountPriceUSD as number) || null;
   const productCurrency = product?.currency || 'AFN';
+  const videoUrl = metadata.videoUrl as string | undefined;
+
+  // Build gallery items: video first (if exists), then images
+  type GalleryItem = { type: 'video'; url: string } | { type: 'image'; url: string };
+  const galleryItems: GalleryItem[] = [];
+  if (videoUrl) {
+    galleryItems.push({ type: 'video', url: videoUrl });
+  }
+  productImages.forEach((img) => {
+    galleryItems.push({ type: 'image', url: img });
+  });
 
   const nextImage = () => {
-    if (images.length > 0) {
-      setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    if (galleryItems.length > 0) {
+      setCurrentImageIndex((prev) => (prev + 1) % galleryItems.length);
     }
   };
 
   const prevImage = () => {
-    if (images.length > 0) {
-      setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+    if (galleryItems.length > 0) {
+      setCurrentImageIndex((prev) => (prev - 1 + galleryItems.length) % galleryItems.length);
     }
   };
 
@@ -189,18 +200,30 @@ const SellerProductView = () => {
 
         {/* Main Content */}
         <div className="grid lg:grid-cols-2 gap-8">
-          {/* Image Gallery */}
+          {/* Image/Video Gallery */}
           <div className="space-y-4">
             <Card className="overflow-hidden">
               <div className="relative aspect-square bg-muted">
-                {images.length > 0 ? (
+                {galleryItems.length > 0 ? (
                   <>
-                    <img
-                      src={images[currentImageIndex]}
-                      alt={product.name}
-                      className="w-full h-full object-cover"
-                    />
-                    {images.length > 1 && (
+                    {galleryItems[currentImageIndex]?.type === 'video' ? (
+                      <video
+                        controls
+                        autoPlay
+                        className="w-full h-full object-contain bg-black"
+                        poster={productImages[0]}
+                      >
+                        <source src={galleryItems[currentImageIndex].url} type="video/mp4" />
+                        {isRTL ? 'مرورگر شما از ویدیو پشتیبانی نمی‌کند.' : 'Your browser does not support the video tag.'}
+                      </video>
+                    ) : (
+                      <img
+                        src={galleryItems[currentImageIndex]?.url || '/placeholder.svg'}
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+                    {galleryItems.length > 1 && (
                       <>
                         <Button
                           variant="secondary"
@@ -225,7 +248,7 @@ const SellerProductView = () => {
                           {isRTL ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
                         </Button>
                         <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-background/80 backdrop-blur-sm rounded-full px-3 py-1 text-sm">
-                          {currentImageIndex + 1} / {images.length}
+                          {currentImageIndex + 1} / {galleryItems.length}
                         </div>
                       </>
                     )}
@@ -239,43 +262,36 @@ const SellerProductView = () => {
             </Card>
 
             {/* Thumbnails */}
-            {images.length > 1 && (
+            {galleryItems.length > 1 && (
               <div className="flex gap-2 overflow-x-auto pb-2">
-                {images.map((img, index) => (
+                {galleryItems.map((item, index) => (
                   <button
                     key={index}
                     onClick={() => setCurrentImageIndex(index)}
                     className={cn(
-                      "w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-all",
+                      "w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-all relative",
                       currentImageIndex === index
                         ? "border-primary ring-2 ring-primary/30"
                         : "border-transparent hover:border-muted-foreground/30"
                     )}
                   >
-                    <img src={img} alt="" className="w-full h-full object-cover" />
+                    {item.type === 'video' ? (
+                      <>
+                        <img 
+                          src={productImages[0] || '/placeholder.svg'} 
+                          alt="" 
+                          className="w-full h-full object-cover opacity-70" 
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                          <Video className="h-6 w-6 text-white" />
+                        </div>
+                      </>
+                    ) : (
+                      <img src={item.url} alt="" className="w-full h-full object-cover" />
+                    )}
                   </button>
                 ))}
               </div>
-            )}
-
-            {/* Video */}
-            {metadata.videoUrl && (
-              <Card className="p-4">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-                  <Video className="h-4 w-4" />
-                  <span>{isRTL ? 'ویدیوی محصول' : 'Product Video'}</span>
-                </div>
-                <div className="rounded-lg overflow-hidden border border-border bg-muted">
-                  <video
-                    controls
-                    className="w-full max-h-[250px] object-contain"
-                    poster={images[0]}
-                  >
-                    <source src={metadata.videoUrl as string} type="video/mp4" />
-                    {isRTL ? 'مرورگر شما از ویدیو پشتیبانی نمی‌کند.' : 'Your browser does not support the video tag.'}
-                  </video>
-                </div>
-              </Card>
             )}
           </div>
 

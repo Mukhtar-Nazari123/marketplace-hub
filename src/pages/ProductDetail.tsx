@@ -264,7 +264,19 @@ const ProductDetail = () => {
     );
   }
 
-  const images = product.images?.length ? product.images : ['/placeholder.svg'];
+  const productImages = product.images?.length ? product.images : ['/placeholder.svg'];
+  const videoUrl = product.metadata?.videoUrl;
+  
+  // Build gallery items: video first (if exists), then images
+  type GalleryItem = { type: 'video'; url: string } | { type: 'image'; url: string };
+  const galleryItems: GalleryItem[] = [];
+  if (videoUrl) {
+    galleryItems.push({ type: 'video', url: videoUrl });
+  }
+  productImages.forEach((img) => {
+    galleryItems.push({ type: 'image', url: img });
+  });
+  
   const discount = getDiscount();
   const currencySymbol = getCurrencySymbol();
   const isNew = new Date(product.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
@@ -303,7 +315,6 @@ const ProductDetail = () => {
   if (attributes.countryOfOrigin) specifications[isRTL ? 'کشور سازنده' : 'Country of Origin'] = String(attributes.countryOfOrigin);
   
   const stockPerSize = product.metadata?.stockPerSize || {};
-  const videoUrl = product.metadata?.videoUrl;
 
   return (
     <div className="min-h-screen bg-background">
@@ -344,14 +355,26 @@ const ProductDetail = () => {
 
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          {/* Image Gallery */}
+          {/* Image/Video Gallery */}
           <div className="space-y-4">
             <div className="relative aspect-square rounded-xl overflow-hidden bg-muted border border-border">
-              <img
-                src={images[selectedImage]}
-                alt={product.name}
-                className="w-full h-full object-cover"
-              />
+              {galleryItems[selectedImage]?.type === 'video' ? (
+                <video
+                  controls
+                  autoPlay
+                  className="w-full h-full object-contain bg-black"
+                  poster={productImages[0]}
+                >
+                  <source src={galleryItems[selectedImage].url} type="video/mp4" />
+                  {isRTL ? 'مرورگر شما از ویدیو پشتیبانی نمی‌کند.' : 'Your browser does not support the video tag.'}
+                </video>
+              ) : (
+                <img
+                  src={galleryItems[selectedImage]?.url || productImages[0]}
+                  alt={product.name}
+                  className="w-full h-full object-cover"
+                />
+              )}
               {discount > 0 && (
                 <Badge variant="destructive" className="absolute top-4 left-4 text-lg px-3 py-1">
                   -{discount}%
@@ -368,39 +391,32 @@ const ProductDetail = () => {
                 </Badge>
               )}
             </div>
-            {images.length > 1 && (
+            {galleryItems.length > 1 && (
               <div className="flex gap-2 overflow-x-auto pb-2">
-                {images.map((img, idx) => (
+                {galleryItems.map((item, idx) => (
                   <button
                     key={idx}
                     onClick={() => setSelectedImage(idx)}
-                    className={`w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-colors ${
+                    className={`w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-colors relative ${
                       selectedImage === idx ? 'border-primary' : 'border-border'
                     }`}
                   >
-                    <img src={img} alt="" className="w-full h-full object-cover" />
+                    {item.type === 'video' ? (
+                      <>
+                        <img 
+                          src={productImages[0]} 
+                          alt="" 
+                          className="w-full h-full object-cover opacity-70" 
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                          <Play className="h-6 w-6 text-white fill-white" />
+                        </div>
+                      </>
+                    ) : (
+                      <img src={item.url} alt="" className="w-full h-full object-cover" />
+                    )}
                   </button>
                 ))}
-              </div>
-            )}
-
-            {/* Product Video */}
-            {videoUrl && (
-              <div className="space-y-2">
-                <h4 className="font-medium flex items-center gap-2">
-                  <Play size={18} className="text-primary" />
-                  {isRTL ? 'ویدیو محصول' : 'Product Video'}
-                </h4>
-                <div className="rounded-xl overflow-hidden border border-border bg-muted">
-                  <video
-                    controls
-                    className="w-full max-h-[300px] object-contain"
-                    poster={images[0]}
-                  >
-                    <source src={videoUrl} type="video/mp4" />
-                    {isRTL ? 'مرورگر شما از ویدیو پشتیبانی نمی‌کند.' : 'Your browser does not support the video tag.'}
-                  </video>
-                </div>
               </div>
             )}
           </div>

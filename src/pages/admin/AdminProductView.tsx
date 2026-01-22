@@ -186,6 +186,20 @@ const AdminProductView = () => {
   // Use product.currency from database first, then fallback to metadata
   const currency = (product as any)?.currency || metadata?.currency || 'AFN';
   const CurrencyIcon = currency === 'AFN' ? Banknote : DollarSign;
+  const videoUrl = metadata?.videoUrl;
+  const productImages = product?.images || [];
+  
+  // Build gallery items: video first (if exists), then images
+  type GalleryItem = { type: 'video'; url: string } | { type: 'image'; url: string };
+  const galleryItems: GalleryItem[] = [];
+  if (videoUrl) {
+    galleryItems.push({ type: 'video', url: videoUrl });
+  }
+  productImages.forEach((img) => {
+    galleryItems.push({ type: 'image', url: img });
+  });
+  
+  const [selectedMediaIndex, setSelectedMediaIndex] = useState(0);
 
   if (isLoading) {
     return (
@@ -271,37 +285,68 @@ const AdminProductView = () => {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">
-          {/* Images Section */}
+          {/* Images/Video Gallery Section */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <ImageIcon className="h-5 w-5 text-primary" />
-                {isRTL ? 'تصاویر محصول' : 'Product Images'}
+                {isRTL ? 'رسانه محصول' : 'Product Media'}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {product.images && product.images.length > 0 ? (
+              {galleryItems.length > 0 ? (
                 <div className="space-y-4">
-                  {/* Main Image */}
+                  {/* Main Display */}
                   <div className="aspect-square rounded-xl overflow-hidden border bg-muted">
-                    <img
-                      src={product.images[0]}
-                      alt={product.name}
-                      className="w-full h-full object-cover"
-                    />
+                    {galleryItems[selectedMediaIndex]?.type === 'video' ? (
+                      <video
+                        controls
+                        autoPlay
+                        className="w-full h-full object-contain bg-black"
+                        poster={productImages[0]}
+                      >
+                        <source src={galleryItems[selectedMediaIndex].url} type="video/mp4" />
+                        {isRTL ? 'مرورگر شما از ویدیو پشتیبانی نمی‌کند.' : 'Your browser does not support the video tag.'}
+                      </video>
+                    ) : (
+                      <img
+                        src={galleryItems[selectedMediaIndex]?.url || '/placeholder.svg'}
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
                   </div>
                   
                   {/* Thumbnails */}
-                  {product.images.length > 1 && (
-                    <div className="grid grid-cols-4 gap-2">
-                      {product.images.slice(1, 5).map((img, idx) => (
-                        <div key={idx} className="aspect-square rounded-lg overflow-hidden border bg-muted">
-                          <img
-                            src={img}
-                            alt={`${product.name} ${idx + 2}`}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
+                  {galleryItems.length > 1 && (
+                    <div className="flex gap-2 overflow-x-auto pb-2">
+                      {galleryItems.map((item, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => setSelectedMediaIndex(idx)}
+                          className={`w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-all relative ${
+                            selectedMediaIndex === idx ? 'border-primary ring-2 ring-primary/30' : 'border-border hover:border-muted-foreground/50'
+                          }`}
+                        >
+                          {item.type === 'video' ? (
+                            <>
+                              <img 
+                                src={productImages[0] || '/placeholder.svg'} 
+                                alt="" 
+                                className="w-full h-full object-cover opacity-70" 
+                              />
+                              <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                                <Play className="h-5 w-5 text-white fill-white" />
+                              </div>
+                            </>
+                          ) : (
+                            <img
+                              src={item.url}
+                              alt={`${product.name} ${idx}`}
+                              className="w-full h-full object-cover"
+                            />
+                          )}
+                        </button>
                       ))}
                     </div>
                   )}
@@ -316,30 +361,6 @@ const AdminProductView = () => {
               )}
             </CardContent>
           </Card>
-
-          {/* Video Section */}
-          {metadata?.videoUrl && (
-            <Card className="lg:col-span-2">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Play className="h-5 w-5 text-primary" />
-                  {isRTL ? 'ویدیوی محصول' : 'Product Video'}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="rounded-xl overflow-hidden border bg-muted max-w-2xl mx-auto">
-                  <video
-                    controls
-                    className="w-full max-h-[400px] object-contain"
-                    poster={product.images?.[0]}
-                  >
-                    <source src={metadata.videoUrl} type="video/mp4" />
-                    {isRTL ? 'مرورگر شما از ویدیو پشتیبانی نمی‌کند.' : 'Your browser does not support the video tag.'}
-                  </video>
-                </div>
-              </CardContent>
-            </Card>
-          )}
 
           {/* Product Info */}
           <div className="space-y-6">
