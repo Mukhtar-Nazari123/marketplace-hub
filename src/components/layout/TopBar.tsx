@@ -29,7 +29,7 @@ const TopBar = () => {
             <div className="flex items-center gap-2">
               <Phone className="h-5 w-5 text-[#eb1d31]" />
               <span>
-                {t.topBar.callUs} {phone}
+                {t.topBar.callUs} <span dir="ltr" className="inline-block">{phone}</span>
               </span>
             </div>
             <div className="flex items-center gap-4">
