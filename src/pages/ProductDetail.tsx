@@ -657,8 +657,15 @@ const ProductDetail = () => {
           </div>
         </div>
 
-        {/* Tabs */}
-        <Tabs defaultValue="description" className="mb-12">
+        {/* Tabs - default to specifications if no description but specs exist */}
+        <Tabs 
+          defaultValue={
+            !product.description && (Object.keys(specifications).length > 0 || technicalSpecsString)
+              ? "specifications"
+              : "description"
+          } 
+          className="mb-12"
+        >
           <TabsList className="w-full justify-start border-b rounded-none bg-transparent h-auto p-0 flex-wrap">
             <TabsTrigger
               value="description"
