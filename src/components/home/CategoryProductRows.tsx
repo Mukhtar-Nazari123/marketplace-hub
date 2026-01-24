@@ -154,28 +154,6 @@ const CategoryRow = ({ category, isRTL, t }: CategoryRowProps) => {
             {isRTL ? <ArrowLeft className="h-3 w-3" /> : <ArrowRight className="h-3 w-3" />}
           </Link>
         </div>
-        
-        {/* Scroll Arrows - Desktop only */}
-        <div className="hidden md:flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-8 w-8 rounded-full"
-            onClick={() => scroll(isRTL ? "right" : "left")}
-            disabled={!showLeftArrow}
-          >
-            {isRTL ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-8 w-8 rounded-full"
-            onClick={() => scroll(isRTL ? "left" : "right")}
-            disabled={!showRightArrow}
-          >
-            {isRTL ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-          </Button>
-        </div>
       </div>
 
       {/* Horizontal Scroll Container */}
