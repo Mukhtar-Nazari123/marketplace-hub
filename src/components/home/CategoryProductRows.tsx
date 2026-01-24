@@ -30,8 +30,8 @@ const CategoryRow = ({ category, isRTL, t }: CategoryRowProps) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(true);
 
   const productIds = products.map((p) => p.id);
   const { getRating } = useProductRatings(productIds);
@@ -61,38 +61,27 @@ const CategoryRow = ({ category, isRTL, t }: CategoryRowProps) => {
     }
   };
 
-  const updateScrollButtons = () => {
+  const updateArrowVisibility = () => {
     const container = scrollContainerRef.current;
     if (!container) return;
 
     const { scrollLeft, scrollWidth, clientWidth } = container;
-    const hasOverflow = scrollWidth > clientWidth;
-    
-    if (isRTL) {
-      // RTL scrolling is reversed (scrollLeft is negative or 0)
-      const maxScroll = scrollWidth - clientWidth;
-      setCanScrollLeft(Math.abs(scrollLeft) > 10);
-      setCanScrollRight(hasOverflow && Math.abs(scrollLeft) < maxScroll - 10);
-    } else {
-      setCanScrollLeft(scrollLeft > 10);
-      setCanScrollRight(hasOverflow && scrollLeft < scrollWidth - clientWidth - 10);
-    }
+    const isAtStart = isRTL ? scrollLeft >= -10 : scrollLeft <= 10;
+    const isAtEnd = isRTL 
+      ? scrollLeft <= -(scrollWidth - clientWidth - 10)
+      : scrollLeft >= scrollWidth - clientWidth - 10;
+
+    setShowLeftArrow(!isAtStart);
+    setShowRightArrow(!isAtEnd);
   };
 
   useEffect(() => {
-    // Delay to ensure DOM is fully rendered with product cards
-    const timeoutId = setTimeout(updateScrollButtons, 100);
     const container = scrollContainerRef.current;
-    if (container) {
-      container.addEventListener("scroll", updateScrollButtons);
-      window.addEventListener("resize", updateScrollButtons);
-      return () => {
-        clearTimeout(timeoutId);
-        container.removeEventListener("scroll", updateScrollButtons);
-        window.removeEventListener("resize", updateScrollButtons);
-      };
-    }
-    return () => clearTimeout(timeoutId);
+    if (!container) return;
+
+    updateArrowVisibility();
+    container.addEventListener("scroll", updateArrowVisibility);
+    return () => container.removeEventListener("scroll", updateArrowVisibility);
   }, [products, isRTL]);
 
   const scroll = (direction: "left" | "right") => {
@@ -100,14 +89,11 @@ const CategoryRow = ({ category, isRTL, t }: CategoryRowProps) => {
     if (!container) return;
 
     const scrollAmount = 300;
-    const actualDirection = isRTL 
-      ? (direction === "left" ? "right" : "left") 
-      : direction;
-    
-    container.scrollBy({
-      left: actualDirection === "left" ? -scrollAmount : scrollAmount,
-      behavior: "smooth",
-    });
+    const newScrollLeft = direction === "left"
+      ? container.scrollLeft - scrollAmount
+      : container.scrollLeft + scrollAmount;
+
+    container.scrollTo({ left: newScrollLeft, behavior: "smooth" });
   };
 
   const getProductCardData = (product: Product) => {
@@ -175,8 +161,8 @@ const CategoryRow = ({ category, isRTL, t }: CategoryRowProps) => {
             variant="outline"
             size="icon"
             className="h-8 w-8 rounded-full"
-            onClick={() => scroll("left")}
-            disabled={isRTL ? !canScrollRight : !canScrollLeft}
+            onClick={() => scroll(isRTL ? "right" : "left")}
+            disabled={!showLeftArrow}
           >
             {isRTL ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           </Button>
@@ -184,8 +170,8 @@ const CategoryRow = ({ category, isRTL, t }: CategoryRowProps) => {
             variant="outline"
             size="icon"
             className="h-8 w-8 rounded-full"
-            onClick={() => scroll("right")}
-            disabled={isRTL ? !canScrollLeft : !canScrollRight}
+            onClick={() => scroll(isRTL ? "left" : "right")}
+            disabled={!showRightArrow}
           >
             {isRTL ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
           </Button>
@@ -198,8 +184,8 @@ const CategoryRow = ({ category, isRTL, t }: CategoryRowProps) => {
         <Button
           variant="secondary"
           size="icon"
-          className={`absolute ${isRTL ? 'right-0' : 'left-0'} top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full shadow-lg bg-background/90 backdrop-blur-sm border border-border hover:bg-background transition-opacity duration-200 hidden md:flex ${(isRTL ? canScrollRight : canScrollLeft) ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-          onClick={() => scroll("left")}
+          className={`absolute ${isRTL ? 'right-0' : 'left-0'} top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full shadow-lg bg-background/90 backdrop-blur-sm border border-border hover:bg-background transition-opacity duration-200 hidden md:flex ${showLeftArrow ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+          onClick={() => scroll(isRTL ? "right" : "left")}
         >
           {isRTL ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
         </Button>
@@ -208,8 +194,8 @@ const CategoryRow = ({ category, isRTL, t }: CategoryRowProps) => {
         <Button
           variant="secondary"
           size="icon"
-          className={`absolute ${isRTL ? 'left-0' : 'right-0'} top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full shadow-lg bg-background/90 backdrop-blur-sm border border-border hover:bg-background transition-opacity duration-200 hidden md:flex ${(isRTL ? canScrollLeft : canScrollRight) ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-          onClick={() => scroll("right")}
+          className={`absolute ${isRTL ? 'left-0' : 'right-0'} top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full shadow-lg bg-background/90 backdrop-blur-sm border border-border hover:bg-background transition-opacity duration-200 hidden md:flex ${showRightArrow ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+          onClick={() => scroll(isRTL ? "left" : "right")}
         >
           {isRTL ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
         </Button>
