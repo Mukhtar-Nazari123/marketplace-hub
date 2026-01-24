@@ -66,28 +66,33 @@ const CategoryRow = ({ category, isRTL, t }: CategoryRowProps) => {
     if (!container) return;
 
     const { scrollLeft, scrollWidth, clientWidth } = container;
+    const hasOverflow = scrollWidth > clientWidth;
     
     if (isRTL) {
-      // RTL scrolling is reversed
-      setCanScrollLeft(scrollLeft < -10);
-      setCanScrollRight(scrollLeft > -(scrollWidth - clientWidth - 10));
+      // RTL scrolling is reversed (scrollLeft is negative or 0)
+      const maxScroll = scrollWidth - clientWidth;
+      setCanScrollLeft(Math.abs(scrollLeft) > 10);
+      setCanScrollRight(hasOverflow && Math.abs(scrollLeft) < maxScroll - 10);
     } else {
       setCanScrollLeft(scrollLeft > 10);
-      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
+      setCanScrollRight(hasOverflow && scrollLeft < scrollWidth - clientWidth - 10);
     }
   };
 
   useEffect(() => {
-    updateScrollButtons();
+    // Delay to ensure DOM is fully rendered with product cards
+    const timeoutId = setTimeout(updateScrollButtons, 100);
     const container = scrollContainerRef.current;
     if (container) {
       container.addEventListener("scroll", updateScrollButtons);
       window.addEventListener("resize", updateScrollButtons);
       return () => {
+        clearTimeout(timeoutId);
         container.removeEventListener("scroll", updateScrollButtons);
         window.removeEventListener("resize", updateScrollButtons);
       };
     }
+    return () => clearTimeout(timeoutId);
   }, [products, isRTL]);
 
   const scroll = (direction: "left" | "right") => {
