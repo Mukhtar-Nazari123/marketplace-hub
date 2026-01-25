@@ -1,10 +1,11 @@
-import { X, Package, Grid3X3, Zap, BookOpen, Phone, Info, LayoutDashboard, LogOut } from "lucide-react";
+import { X, Package, Grid3X3, Zap, BookOpen, Phone, Info, LayoutDashboard, LogOut, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/lib/i18n";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { useAuth } from "@/hooks/useAuth";
+import { useTheme } from "next-themes";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,7 +27,12 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
   const { t, isRTL } = useLanguage();
   const { siteName, logoUrl } = useSiteSettings();
   const { user, role, signOut } = useAuth();
+  const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
+
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
+  };
 
   // Get dashboard link based on role
   const getDashboardLink = () => {
@@ -121,10 +127,10 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
             </p>
           </div>
 
-          {/* User Actions - Dashboard & Logout at bottom (only for logged in users) */}
-          {user && (
-            <div className="mt-6 pt-4 border-t border-border space-y-1">
-              {/* Dashboard Link */}
+          {/* User Actions - Dashboard, Theme Toggle & Logout at bottom */}
+          <div className="mt-6 pt-4 border-t border-border space-y-1">
+            {/* Dashboard Link - Only for logged in users */}
+            {user && (
               <Link
                 to={getDashboardLink()}
                 className="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
@@ -133,8 +139,23 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
                 <LayoutDashboard className="h-5 w-5" />
                 <span className="font-medium">{getDashboardLabel()}</span>
               </Link>
+            )}
 
-              {/* Logout Button */}
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-foreground hover:bg-secondary transition-colors"
+            >
+              {theme === "dark" ? (
+                <Sun className="h-5 w-5 text-warning" />
+              ) : (
+                <Moon className="h-5 w-5 text-muted-foreground" />
+              )}
+              <span>{theme === "dark" ? (isRTL ? "حالت روشن" : "Light mode") : (isRTL ? "حالت تاریک" : "Dark mode")}</span>
+            </button>
+
+            {/* Logout Button - Only for logged in users */}
+            {user && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <button
@@ -166,8 +187,8 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
-            </div>
-          )}
+            )}
+          </div>
         </nav>
       </div>
     </>
