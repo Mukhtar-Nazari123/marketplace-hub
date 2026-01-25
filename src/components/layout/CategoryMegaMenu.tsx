@@ -53,11 +53,11 @@ const CategoryMegaMenu = () => {
       {/* Mega Menu Dropdown */}
       {isOpen && (
         <div 
-          className={`absolute top-full z-50 bg-background border border-muted-foreground/20 shadow-2xl rounded-b-lg animate-fade-in flex ${isRTL ? 'right-0 flex-row-reverse' : 'left-0'}`}
+          className={`absolute top-full z-50 bg-background border border-muted-foreground/20 shadow-2xl rounded-b-lg animate-fade-in flex ${isRTL ? 'right-0' : 'left-0'}`}
           style={{ minWidth: '700px' }}
           dir={isRTL ? 'rtl' : 'ltr'}
         >
-          {/* Main Categories Panel - Right side in RTL, Left side in LTR */}
+          {/* Main Categories Panel - Right side in RTL (due to dir=rtl), Left side in LTR */}
           <div className={`w-64 border-muted-foreground/10 bg-muted/30 ${isRTL ? 'border-l' : 'border-r'}`}>
             {loading ? (
               <div className="p-4 space-y-2">
