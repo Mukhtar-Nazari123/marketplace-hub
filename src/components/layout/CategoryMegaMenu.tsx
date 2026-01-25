@@ -58,7 +58,7 @@ const CategoryMegaMenu = () => {
           dir={isRTL ? 'rtl' : 'ltr'}
         >
           {/* Main Categories Panel - Right side in RTL (due to dir=rtl), Left side in LTR */}
-          <div className={`w-64 border-muted-foreground/10 bg-muted/30 ${isRTL ? 'border-l' : 'border-r'}`}>
+          <div className={`w-64 border-muted-foreground/10 bg-muted/30 max-h-[400px] overflow-y-auto scrollbar-thin ${isRTL ? 'border-l' : 'border-r'}`}>
             {loading ? (
               <div className="p-4 space-y-2">
                 {[...Array(8)].map((_, i) => (
@@ -101,7 +101,7 @@ const CategoryMegaMenu = () => {
 
           {/* Right Panel - Subcategories Grid (Left side in RTL) */}
           {/* Subcategories Panel - Left side in RTL, Right side in LTR */}
-          <div className="flex-1 p-6 min-h-[400px]">
+          <div className="flex-1 p-6 max-h-[400px] overflow-y-auto scrollbar-thin">
             {activeCategory ? (
               <>
                 {/* Category Title */}
@@ -164,18 +164,6 @@ const CategoryMegaMenu = () => {
                     {isRTL ? 'زیرمجموعه‌ای موجود نیست' : 'No subcategories available'}
                   </div>
                 )}
-
-                {/* View All Link */}
-                <div className={`mt-6 pt-4 border-t border-muted-foreground/10 ${isRTL ? 'text-left' : 'text-right'}`}>
-                  <Link
-                    to={`/categories?category=${activeCategory.slug}`}
-                    className="text-sm text-primary hover:underline font-medium inline-flex items-center gap-1"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    {isRTL ? 'مشاهده همه' : 'View All'}
-                    {isRTL ? <ChevronLeft className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
-                  </Link>
-                </div>
               </>
             ) : (
               <div className="flex items-center justify-center h-full text-muted-foreground">
