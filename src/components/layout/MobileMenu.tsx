@@ -1,13 +1,10 @@
-import { X, ChevronDown, Package, Grid3X3, Zap, BookOpen, Phone, Info, LayoutDashboard, LogOut } from "lucide-react";
+import { X, Package, Grid3X3, Zap, BookOpen, Phone, Info, LayoutDashboard, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/lib/i18n";
-import { useCategories } from "@/hooks/useCategories";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { useAuth } from "@/hooks/useAuth";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,14 +23,10 @@ interface MobileMenuProps {
 }
 
 const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
-  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const { t, isRTL } = useLanguage();
-  const { getRootCategories, loading } = useCategories();
   const { siteName, logoUrl } = useSiteSettings();
   const { user, role, signOut } = useAuth();
   const navigate = useNavigate();
-
-  const rootCategories = getRootCategories();
 
   // Get dashboard link based on role
   const getDashboardLink = () => {
@@ -99,46 +92,7 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
 
         {/* Navigation */}
         <nav className="p-4">
-          {/* Category Dropdown */}
-          <div className="mb-4">
-            <button
-              onClick={() => setIsCategoryOpen(!isCategoryOpen)}
-              className="flex items-center justify-between w-full px-4 py-3 bg-orange rounded-lg text-accent-foreground font-semibold"
-            >
-              <span className="flex items-center gap-2">
-                <Grid3X3 className="h-5 w-5" />
-                {t.nav.category}
-              </span>
-              <ChevronDown className={`h-4 w-4 transition-transform ${isCategoryOpen ? 'rotate-180' : ''}`} />
-            </button>
-            
-            {isCategoryOpen && (
-              <div className="mt-2 bg-secondary rounded-lg overflow-hidden">
-                {loading ? (
-                  <div className="p-4 space-y-2">
-                    {[...Array(4)].map((_, i) => (
-                      <Skeleton key={i} className="h-8 w-full" />
-                    ))}
-                  </div>
-                ) : rootCategories.length > 0 ? (
-                  rootCategories.map((category) => (
-                    <Link
-                      key={category.id}
-                      to={`/categories?category=${category.slug}`}
-                      className="block px-4 py-3 hover:bg-orange/10 hover:text-orange transition-colors border-b border-border last:border-b-0"
-                      onClick={onClose}
-                    >
-                      {isRTL && category.name_fa ? category.name_fa : category.name}
-                    </Link>
-                  ))
-                ) : (
-                  <div className="px-4 py-3 text-muted-foreground text-sm">
-                    {isRTL ? 'دسته‌بندی موجود نیست' : 'No categories available'}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+          {/* Nav Links */}
 
           {/* Nav Links */}
           <div className="space-y-1">
