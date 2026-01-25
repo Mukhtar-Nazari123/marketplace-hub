@@ -99,56 +99,6 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
 
         {/* Navigation */}
         <nav className="p-4">
-          {/* User Actions - Dashboard & Logout (only for logged in users) */}
-          {user && (
-            <div className="mb-4 space-y-1">
-              {/* Dashboard Link */}
-              <Link
-                to={getDashboardLink()}
-                className="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
-                onClick={onClose}
-              >
-                <LayoutDashboard className="h-5 w-5" />
-                <span className="font-medium">{getDashboardLabel()}</span>
-              </Link>
-
-              {/* Logout Button */}
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <button
-                    className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
-                  >
-                    <LogOut className="h-5 w-5" />
-                    <span>{isRTL ? "خروج" : "Logout"}</span>
-                  </button>
-                </AlertDialogTrigger>
-                <AlertDialogContent dir={isRTL ? "rtl" : "ltr"}>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>{isRTL ? "خروج از حساب" : "Logout"}</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      {isRTL
-                        ? "آیا مطمئن هستید که می‌خواهید از حساب خود خارج شوید؟"
-                        : "Are you sure you want to logout from your account?"}
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter className={isRTL ? "flex-row-reverse gap-2" : ""}>
-                    <AlertDialogCancel className="border-muted-foreground/30">
-                      {isRTL ? "انصراف" : "Cancel"}
-                    </AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={handleLogout}
-                      className="bg-primary text-primary-foreground hover:bg-primary/90"
-                    >
-                      {isRTL ? "خروج" : "Logout"}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-
-              <div className="border-b border-border my-3" />
-            </div>
-          )}
-
           {/* Category Dropdown */}
           <div className="mb-4">
             <button
@@ -216,6 +166,54 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
               {t.nav.specialOffer}
             </p>
           </div>
+
+          {/* User Actions - Dashboard & Logout at bottom (only for logged in users) */}
+          {user && (
+            <div className="mt-6 pt-4 border-t border-border space-y-1">
+              {/* Dashboard Link */}
+              <Link
+                to={getDashboardLink()}
+                className="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                onClick={onClose}
+              >
+                <LayoutDashboard className="h-5 w-5" />
+                <span className="font-medium">{getDashboardLabel()}</span>
+              </Link>
+
+              {/* Logout Button */}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <button
+                    className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+                  >
+                    <LogOut className="h-5 w-5" />
+                    <span>{isRTL ? "خروج" : "Logout"}</span>
+                  </button>
+                </AlertDialogTrigger>
+                <AlertDialogContent dir={isRTL ? "rtl" : "ltr"}>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>{isRTL ? "خروج از حساب" : "Logout"}</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {isRTL
+                        ? "آیا مطمئن هستید که می‌خواهید از حساب خود خارج شوید؟"
+                        : "Are you sure you want to logout from your account?"}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter className={isRTL ? "flex-row-reverse gap-2" : ""}>
+                    <AlertDialogCancel className="border-muted-foreground/30">
+                      {isRTL ? "انصراف" : "Cancel"}
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleLogout}
+                      className="bg-primary text-primary-foreground hover:bg-primary/90"
+                    >
+                      {isRTL ? "خروج" : "Logout"}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+          )}
         </nav>
       </div>
     </>
