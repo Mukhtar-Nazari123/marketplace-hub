@@ -36,6 +36,7 @@ import {
   Mail,
   Share2,
   Zap,
+  FolderTree,
   Bell,
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -81,6 +82,7 @@ export const AdminSidebar = () => {
   ];
 
   const contentNavItems = [
+    { title: isRTL ? 'دسته‌بندی‌ها' : 'Categories', icon: FolderTree, url: '/dashboard/categories' },
     { title: isRTL ? 'وبلاگ' : 'Blog', icon: FileText, url: '/dashboard/blogs' },
     { title: isRTL ? 'درباره ما' : 'About Page', icon: FileText, url: '/dashboard/about' },
     { title: isRTL ? 'تخفیف‌های روزانه' : "Today's Deals", icon: Zap, url: '/dashboard/deals' },
