@@ -5,7 +5,7 @@ import Footer from "@/components/layout/Footer";
 import StickyNavbar from "@/components/layout/StickyNavbar";
 import HeroSection from "@/components/home/HeroSection";
 import TodayDeals from "@/components/home/TodayDeals";
-
+import CategoryGrid from "@/components/home/CategoryGrid";
 import BestSellers from "@/components/home/BestSellers";
 import CategoryBanners from "@/components/home/CategoryBanners";
 import CategoryProductRows from "@/components/home/CategoryProductRows";
@@ -25,6 +25,9 @@ const Index = () => {
       <main className="flex-1">
         {/* Hero Section */}
         <HeroSection />
+
+        {/* Category Grid - Temu Style */}
+        <CategoryGrid />
 
         {/* Today's Deals */}
         <TodayDeals />

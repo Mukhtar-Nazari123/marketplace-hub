@@ -62,6 +62,7 @@ import AdminSocialLinks from "./pages/admin/AdminSocialLinks";
 import AdminNotifications from "./pages/admin/AdminNotifications";
 import AdminBlogs from "./pages/admin/AdminBlogs";
 import AdminAbout from "./pages/admin/AdminAbout";
+import AdminCategories from "./pages/admin/AdminCategories";
 import Notifications from "./pages/dashboard/Notifications";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 
@@ -149,6 +150,7 @@ const App = () => (
                       <Route path="/dashboard/deals" element={<AdminDeals />} />
                       <Route path="/dashboard/blogs" element={<AdminBlogs />} />
                       <Route path="/dashboard/about" element={<AdminAbout />} />
+                      <Route path="/dashboard/categories" element={<AdminCategories />} />
                       <Route path="/dashboard/admin/notifications" element={<AdminNotifications />} />
                       <Route path="/dashboard/admin/products/:id" element={<AdminProductView />} />
                       <Route path="/dashboard/admin/orders/:id" element={<AdminOrderDetail />} />
