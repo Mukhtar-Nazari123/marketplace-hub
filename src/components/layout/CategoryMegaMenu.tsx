@@ -53,11 +53,12 @@ const CategoryMegaMenu = () => {
       {/* Mega Menu Dropdown */}
       {isOpen && (
         <div 
-          className={`absolute top-full z-50 bg-background border border-muted-foreground/20 shadow-2xl rounded-b-lg animate-fade-in flex ${isRTL ? 'left-0' : 'left-0'}`}
+          className={`absolute top-full z-50 bg-background border border-muted-foreground/20 shadow-2xl rounded-b-lg animate-fade-in flex ${isRTL ? 'right-0 flex-row-reverse' : 'left-0'}`}
           style={{ minWidth: '700px' }}
+          dir={isRTL ? 'rtl' : 'ltr'}
         >
-          {/* Left Panel - Main Categories (Right side in RTL) */}
-          <div className={`w-64 border-muted-foreground/10 bg-muted/30 ${isRTL ? 'order-2 border-l' : 'order-1 border-r'}`}>
+          {/* Main Categories Panel - Right side in RTL, Left side in LTR */}
+          <div className={`w-64 border-muted-foreground/10 bg-muted/30 ${isRTL ? 'border-l' : 'border-r'}`}>
             {loading ? (
               <div className="p-4 space-y-2">
                 {[...Array(8)].map((_, i) => (
@@ -99,7 +100,8 @@ const CategoryMegaMenu = () => {
           </div>
 
           {/* Right Panel - Subcategories Grid (Left side in RTL) */}
-          <div className={`flex-1 p-6 min-h-[400px] ${isRTL ? 'order-1' : 'order-2'}`}>
+          {/* Subcategories Panel - Left side in RTL, Right side in LTR */}
+          <div className="flex-1 p-6 min-h-[400px]">
             {activeCategory ? (
               <>
                 {/* Category Title */}
