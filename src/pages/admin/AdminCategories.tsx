@@ -573,7 +573,7 @@ const AdminCategories = () => {
 
         {/* Create/Edit Dialog */}
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="max-w-lg">
+          <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {editingItem 
@@ -584,6 +584,11 @@ const AdminCategories = () => {
                       ? (isRTL ? 'زیردسته‌بندی جدید' : 'New Subcategory')
                       : (isRTL ? 'دسته‌بندی جدید' : 'New Category'))}
               </DialogTitle>
+              <p className="text-sm text-muted-foreground">
+                {isSubcategory
+                  ? (isRTL ? 'اطلاعات زیردسته‌بندی را وارد کنید' : 'Enter subcategory details')
+                  : (isRTL ? 'اطلاعات دسته‌بندی را وارد کنید' : 'Enter category details')}
+              </p>
             </DialogHeader>
 
             <div className="space-y-4">
