@@ -111,14 +111,14 @@ const Header = () => {
 
             {/* Actions */}
             <div className="flex items-center gap-1 sm:gap-2 md:gap-4">
-              {/* Theme Toggle */}
+              {/* Theme Toggle - Hidden on mobile, shown in hamburger menu */}
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={toggleTheme}
-                    className="transition-all duration-300 hover:bg-muted"
+                    className="hidden lg:flex transition-all duration-300 hover:bg-muted"
                     aria-label={
                       theme === "dark" ? (isRTL ? "حالت روشن" : "Light mode") : isRTL ? "حالت تاریک" : "Dark mode"
                     }
