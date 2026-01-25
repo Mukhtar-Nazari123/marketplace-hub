@@ -268,21 +268,25 @@ const AdminCategories = () => {
   };
 
   const handleDelete = async (item: Category | Subcategory, isSubcat: boolean) => {
-    if (!isSubcat) {
-      // Check if category has subcategories
-      const childCount = subcategories.filter(s => s.category_id === item.id).length;
-      if (childCount > 0) {
-        toast.error(
-          isRTL 
-            ? `این دسته‌بندی ${childCount} زیردسته دارد. ابتدا آنها را حذف کنید` 
-            : `This category has ${childCount} subcategories. Delete them first`
-        );
-        return;
-      }
-    }
-
     try {
       if (isSubcat) {
+        // Check if subcategory has products
+        const { count: productCount, error: countError } = await supabase
+          .from('products')
+          .select('id', { count: 'exact', head: true })
+          .eq('subcategory_id', item.id);
+
+        if (countError) throw countError;
+
+        if (productCount && productCount > 0) {
+          toast.error(
+            isRTL 
+              ? `این زیردسته‌بندی ${productCount} محصول دارد. ابتدا آنها را حذف یا منتقل کنید` 
+              : `This subcategory has ${productCount} products. Move or delete them first`
+          );
+          return;
+        }
+
         const { error } = await supabase
           .from('subcategories')
           .delete()
@@ -290,6 +294,34 @@ const AdminCategories = () => {
         if (error) throw error;
         toast.success(isRTL ? 'زیردسته‌بندی حذف شد' : 'Subcategory deleted');
       } else {
+        // Check if category has subcategories
+        const childCount = subcategories.filter(s => s.category_id === item.id).length;
+        if (childCount > 0) {
+          toast.error(
+            isRTL 
+              ? `این دسته‌بندی ${childCount} زیردسته دارد. ابتدا آنها را حذف کنید` 
+              : `This category has ${childCount} subcategories. Delete them first`
+          );
+          return;
+        }
+
+        // Check if category has products
+        const { count: productCount, error: countError } = await supabase
+          .from('products')
+          .select('id', { count: 'exact', head: true })
+          .eq('category_id', item.id);
+
+        if (countError) throw countError;
+
+        if (productCount && productCount > 0) {
+          toast.error(
+            isRTL 
+              ? `این دسته‌بندی ${productCount} محصول دارد. ابتدا آنها را حذف یا منتقل کنید` 
+              : `This category has ${productCount} products. Move or delete them first`
+          );
+          return;
+        }
+
         const { error } = await supabase
           .from('categories')
           .delete()
@@ -298,9 +330,17 @@ const AdminCategories = () => {
         toast.success(isRTL ? 'دسته‌بندی حذف شد' : 'Category deleted');
       }
       fetchData();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting:', error);
-      toast.error(isRTL ? 'خطا در حذف' : 'Error deleting');
+      if (error.code === '23503') {
+        toast.error(
+          isRTL 
+            ? 'این آیتم توسط محصولات استفاده می‌شود و قابل حذف نیست' 
+            : 'This item is used by products and cannot be deleted'
+        );
+      } else {
+        toast.error(isRTL ? 'خطا در حذف' : 'Error deleting');
+      }
     }
   };
 
