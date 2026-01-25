@@ -1,12 +1,24 @@
-import { X, ChevronDown, Package, Grid3X3, Zap, BookOpen, Phone, Info } from "lucide-react";
+import { X, ChevronDown, Package, Grid3X3, Zap, BookOpen, Phone, Info, LayoutDashboard, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/lib/i18n";
 import { useCategories } from "@/hooks/useCategories";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { useAuth } from "@/hooks/useAuth";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -18,8 +30,31 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
   const { t, isRTL } = useLanguage();
   const { getRootCategories, loading } = useCategories();
   const { siteName, logoUrl } = useSiteSettings();
+  const { user, role, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const rootCategories = getRootCategories();
+
+  // Get dashboard link based on role
+  const getDashboardLink = () => {
+    if (!role) return "/dashboard";
+    if (role === "admin") return "/dashboard/admin";
+    if (role === "seller") return "/dashboard/seller";
+    return "/dashboard/buyer";
+  };
+
+  const getDashboardLabel = () => {
+    if (role === "admin") return isRTL ? "داشبورد مدیر" : "Admin Dashboard";
+    if (role === "seller") return isRTL ? "داشبورد فروشنده" : "Seller Dashboard";
+    if (role === "buyer") return isRTL ? "داشبورد خریدار" : "Buyer Dashboard";
+    return isRTL ? "داشبورد" : "Dashboard";
+  };
+
+  const handleLogout = async () => {
+    await signOut();
+    onClose();
+    navigate("/login");
+  };
 
   const navLinks = [
     { label: t.nav.products, icon: Package, href: "/products" },
@@ -64,6 +99,56 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
 
         {/* Navigation */}
         <nav className="p-4">
+          {/* User Actions - Dashboard & Logout (only for logged in users) */}
+          {user && (
+            <div className="mb-4 space-y-1">
+              {/* Dashboard Link */}
+              <Link
+                to={getDashboardLink()}
+                className="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                onClick={onClose}
+              >
+                <LayoutDashboard className="h-5 w-5" />
+                <span className="font-medium">{getDashboardLabel()}</span>
+              </Link>
+
+              {/* Logout Button */}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <button
+                    className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+                  >
+                    <LogOut className="h-5 w-5" />
+                    <span>{isRTL ? "خروج" : "Logout"}</span>
+                  </button>
+                </AlertDialogTrigger>
+                <AlertDialogContent dir={isRTL ? "rtl" : "ltr"}>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>{isRTL ? "خروج از حساب" : "Logout"}</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {isRTL
+                        ? "آیا مطمئن هستید که می‌خواهید از حساب خود خارج شوید؟"
+                        : "Are you sure you want to logout from your account?"}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter className={isRTL ? "flex-row-reverse gap-2" : ""}>
+                    <AlertDialogCancel className="border-muted-foreground/30">
+                      {isRTL ? "انصراف" : "Cancel"}
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleLogout}
+                      className="bg-primary text-primary-foreground hover:bg-primary/90"
+                    >
+                      {isRTL ? "خروج" : "Logout"}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+
+              <div className="border-b border-border my-3" />
+            </div>
+          )}
+
           {/* Category Dropdown */}
           <div className="mb-4">
             <button

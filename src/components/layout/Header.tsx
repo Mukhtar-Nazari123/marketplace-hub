@@ -168,9 +168,9 @@ const Header = () => {
                 </Button>
               </Link>
 
-              {/* Account / Dashboard / Logout */}
+              {/* Account / Dashboard / Logout - Hidden on mobile, shown on lg+ */}
               {user ? (
-                <div className="flex items-center gap-1 sm:gap-2">
+                <div className="hidden lg:flex items-center gap-1 sm:gap-2">
                   {/* Dashboard Link - Red icon */}
                   <Tooltip>
                     <TooltipTrigger asChild>
