@@ -26,9 +26,10 @@ const MobileCategoryBar = () => {
 
   return (
     <div className="lg:hidden bg-background border-b border-muted-foreground/20" dir={isRTL ? 'rtl' : 'ltr'}>
-      <ScrollArea className="w-full whitespace-nowrap">
-        <div className={`flex gap-1 px-2 py-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
-          {/* All Categories Link */}
+      <div className="container">
+        <ScrollArea className="w-full whitespace-nowrap">
+          <div className={`flex gap-1 py-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            {/* All Categories Link */}
           <Link
             to="/categories"
             className="flex-shrink-0 px-3 py-1.5 text-sm font-semibold text-foreground border-b-2 border-primary"
@@ -46,9 +47,10 @@ const MobileCategoryBar = () => {
               {isRTL && category.name_fa ? category.name_fa : category.name}
             </Link>
           ))}
-        </div>
-        <ScrollBar orientation="horizontal" className="h-2.5" />
-      </ScrollArea>
+          </div>
+          <ScrollBar orientation="horizontal" className="h-2.5" />
+        </ScrollArea>
+      </div>
     </div>
   );
 };
