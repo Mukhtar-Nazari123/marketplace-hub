@@ -4,7 +4,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import TopBar from '@/components/layout/TopBar';
 import Header from '@/components/layout/Header';
 import Navigation from '@/components/layout/Navigation';
 import Footer from '@/components/layout/Footer';
@@ -39,7 +38,6 @@ const SellerProfileChoice = () => {
     <div className={cn("min-h-screen flex flex-col bg-background", isRTL && "rtl")}>
       {/* Auto-hide Sticky Navbar */}
       <StickyNavbar>
-        <TopBar />
         <Header />
         <Navigation />
       </StickyNavbar>

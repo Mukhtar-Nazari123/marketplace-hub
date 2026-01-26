@@ -6,7 +6,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { useCart } from '@/hooks/useCart';
 import { useWishlist } from '@/hooks/useWishlist';
 import { useProductRating, useProductRatings } from '@/hooks/useProductRatings';
-import TopBar from '@/components/layout/TopBar';
 import Header from '@/components/layout/Header';
 import Navigation from '@/components/layout/Navigation';
 import Footer from '@/components/layout/Footer';
@@ -230,7 +229,6 @@ const ProductDetail = () => {
       <div className="min-h-screen bg-background">
         {/* Auto-hide Sticky Navbar */}
         <StickyNavbar>
-          <TopBar />
           <Header />
           <Navigation />
         </StickyNavbar>
@@ -320,7 +318,6 @@ const ProductDetail = () => {
     <div className="min-h-screen bg-background">
       {/* Auto-hide Sticky Navbar */}
       <StickyNavbar>
-        <TopBar />
         <Header />
         <Navigation />
       </StickyNavbar>

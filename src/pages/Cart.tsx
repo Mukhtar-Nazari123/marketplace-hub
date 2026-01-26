@@ -2,7 +2,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/lib/i18n';
 import { useCart } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
-import TopBar from '@/components/layout/TopBar';
 import Header from '@/components/layout/Header';
 import Navigation from '@/components/layout/Navigation';
 import Footer from '@/components/layout/Footer';
@@ -152,7 +151,6 @@ const Cart = () => {
       <div className="min-h-screen bg-background">
         {/* Auto-hide Sticky Navbar */}
         <StickyNavbar>
-          <TopBar />
           <Header />
           <Navigation />
         </StickyNavbar>
@@ -168,7 +166,6 @@ const Cart = () => {
     <div className="min-h-screen bg-background">
       {/* Auto-hide Sticky Navbar */}
       <StickyNavbar>
-        <TopBar />
         <Header />
         <Navigation />
       </StickyNavbar>

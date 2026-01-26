@@ -8,7 +8,6 @@ import { PersonalInfoStep } from '@/components/seller/steps/PersonalInfoStep';
 import { StoreDetailsStep } from '@/components/seller/steps/StoreDetailsStep';
 import { PoliciesStep } from '@/components/seller/steps/PoliciesStep';
 import { ReviewStep } from '@/components/seller/steps/ReviewStep';
-import TopBar from '@/components/layout/TopBar';
 import Header from '@/components/layout/Header';
 import Navigation from '@/components/layout/Navigation';
 import Footer from '@/components/layout/Footer';
@@ -288,7 +287,6 @@ const SellerProfileComplete = () => {
     <div className={cn("min-h-screen flex flex-col bg-background", isRTL && "rtl")}>
       {/* Auto-hide Sticky Navbar */}
       <StickyNavbar>
-        <TopBar />
         <Header />
         <Navigation />
       </StickyNavbar>

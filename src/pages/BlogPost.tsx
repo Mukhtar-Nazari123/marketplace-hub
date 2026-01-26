@@ -1,7 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
 import { useLanguage } from '@/lib/i18n';
 import { useBlogBySlug, useRecentBlogs } from '@/hooks/useBlogs';
-import TopBar from '@/components/layout/TopBar';
 import Header from '@/components/layout/Header';
 import Navigation from '@/components/layout/Navigation';
 import Footer from '@/components/layout/Footer';
@@ -84,7 +83,6 @@ const BlogPost = () => {
     return (
       <div className="min-h-screen bg-background">
         <StickyNavbar>
-          <TopBar />
           <Header />
           <Navigation />
         </StickyNavbar>
@@ -124,7 +122,6 @@ const BlogPost = () => {
     return (
       <div className="min-h-screen bg-background">
         <StickyNavbar>
-          <TopBar />
           <Header />
           <Navigation />
         </StickyNavbar>
@@ -160,7 +157,6 @@ const BlogPost = () => {
       
       {/* Auto-hide Sticky Navbar */}
       <StickyNavbar>
-        <TopBar />
         <Header />
         <Navigation />
       </StickyNavbar>
