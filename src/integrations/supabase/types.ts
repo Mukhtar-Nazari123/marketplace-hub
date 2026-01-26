@@ -643,6 +643,7 @@ export type Database = {
       }
       hero_banners: {
         Row: {
+          background_color: string | null
           background_image: string | null
           badge_text: string | null
           badge_text_fa: string | null
@@ -662,6 +663,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          background_color?: string | null
           background_image?: string | null
           badge_text?: string | null
           badge_text_fa?: string | null
@@ -681,6 +683,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          background_color?: string | null
           background_image?: string | null
           badge_text?: string | null
           badge_text_fa?: string | null
