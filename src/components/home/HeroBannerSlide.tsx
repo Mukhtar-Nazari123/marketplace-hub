@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Headphones } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 import { useNavigate } from "react-router-dom";
 import { HeroBanner } from "@/hooks/useHeroBanners";
@@ -28,41 +28,31 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
     }
   };
 
+  // Determine background style
+  const backgroundStyle: React.CSSProperties = banner.background_color
+    ? { backgroundColor: banner.background_color }
+    : {};
+
   return (
-    <div className="lg:col-span-2 relative rounded-2xl overflow-hidden min-h-[280px] sm:min-h-[350px] lg:min-h-[500px] animate-fade-in">
-      {/* Background: image, color, or gradient fallback */}
-      {banner.background_image ? (
-        <img src={banner.background_image} alt="" className="absolute inset-0 w-full h-full object-cover" />
-      ) : banner.background_color ? (
-        <div className="absolute inset-0" style={{ backgroundColor: banner.background_color }} />
-      ) : (
+    <div
+      className="lg:col-span-2 relative rounded-2xl overflow-hidden min-h-[280px] sm:min-h-[350px] lg:min-h-[500px] animate-fade-in"
+      style={backgroundStyle}
+    >
+      {/* Gradient fallback when no background color */}
+      {!banner.background_color && !banner.background_image && (
         <div className="absolute inset-0 gradient-hero" />
       )}
 
-      {/* Overlay gradient for text readability */}
+      {/* Content Container - Split layout */}
       <div
-        className={`absolute inset-0 ${isRTL ? "bg-gradient-to-l from-foreground/95 via-foreground/80 to-foreground/40" : "bg-gradient-to-r from-foreground/95 via-foreground/80 to-foreground/40"}`}
-      />
-
-      {/* Decorative Elements - only show when no background image */}
-      {!banner.background_image && (
-        <>
-          <div
-            className={`absolute top-10 w-32 sm:w-64 h-32 sm:h-64 bg-cyan/20 rounded-full blur-3xl ${isRTL ? "right-4 sm:right-10" : "left-4 sm:left-10"}`}
-          />
-          <div
-            className={`absolute bottom-10 w-24 sm:w-48 h-24 sm:h-48 bg-orange/20 rounded-full blur-3xl ${isRTL ? "right-4 sm:right-10" : "left-4 sm:left-10"}`}
-          />
-        </>
-      )}
-
-      {/* Content Container */}
-      <div
-        className={`relative z-10 h-full flex flex-col md:flex-row items-center justify-center md:justify-between px-4 sm:px-8 lg:px-16 py-6 md:py-0 gap-4 md:gap-8 flex-row-reverse`}
+        className={`relative z-10 h-full flex items-center ${
+          isRTL ? "flex-row-reverse" : "flex-row"
+        }`}
       >
+        {/* Text Content - Left Side (or Right for RTL) */}
         <div
-          className={`w-full md:max-w-md flex flex-col justify-center
-          ${isRTL ? "items-start text-right" : "items-start text-left"}`}
+          className={`flex-1 flex flex-col justify-center px-6 sm:px-10 lg:px-16 py-8
+            ${isRTL ? "items-end text-right" : "items-start text-left"}`}
         >
           {badgeText && (
             <Badge variant="sale" className="w-fit mb-3 md:mb-4 text-xs sm:text-sm px-3 sm:px-4 py-1">
@@ -70,18 +60,23 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
             </Badge>
           )}
 
-          <h2 className="font-display text-2xl sm:text-3xl lg:text-5xl font-bold text-background mb-2 md:mb-4 leading-tight">
+          <h2 className="font-display text-2xl sm:text-3xl lg:text-5xl font-bold text-white mb-2 md:mb-4 leading-tight drop-shadow-lg">
             {title}
           </h2>
 
           {description && (
-            <p className="text-background/70 mb-4 md:mb-6 text-sm sm:text-base lg:text-lg line-clamp-2 md:line-clamp-none">
+            <p className="text-white/90 mb-4 md:mb-6 text-sm sm:text-base lg:text-lg line-clamp-2 md:line-clamp-none drop-shadow">
               {description}
             </p>
           )}
 
           {ctaText && (
-            <Button variant="orange" size="default" className="w-fit group md:text-base" onClick={handleCtaClick}>
+            <Button
+              variant="orange"
+              size="default"
+              className="w-fit group md:text-base shadow-lg"
+              onClick={handleCtaClick}
+            >
               {ctaText}
               <ArrowLeft
                 className={`h-4 w-4 md:h-5 md:w-5 transition-transform ${
@@ -91,21 +86,48 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
             </Button>
           )}
         </div>
-        {/* Icon/Image - Hidden on mobile, shown on md+ */}
-        <div className="flex-shrink-0 hidden md:block">
-          {banner.icon_image ? (
-            <div className="w-32 h-32 lg:w-72 lg:h-72 rounded-full bg-gradient-to-br from-cyan/30 to-orange/30 flex items-center justify-center animate-float overflow-hidden">
-              <img src={banner.icon_image} alt="" className="w-full h-full object-contain p-4" />
-            </div>
-          ) : (
-            <div className="w-32 h-32 lg:w-72 lg:h-72 rounded-full bg-gradient-to-br from-cyan/30 to-orange/30 flex items-center justify-center animate-float opacity-80">
-              <Headphones className="w-16 h-16 lg:w-36 lg:h-36 text-background/50" />
-            </div>
-          )}
-        </div>
 
-        {/* Text Content */}
+        {/* Image Section - Right Side (or Left for RTL) */}
+        <div className="flex-1 relative h-full hidden md:block">
+          {banner.background_image ? (
+            <img
+              src={banner.background_image}
+              alt=""
+              className={`absolute inset-0 w-full h-full object-cover object-center ${
+                isRTL ? "object-left" : "object-right"
+              }`}
+            />
+          ) : banner.icon_image ? (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-48 h-48 lg:w-72 lg:h-72 rounded-full bg-white/10 flex items-center justify-center animate-float overflow-hidden">
+                <img src={banner.icon_image} alt="" className="w-full h-full object-contain p-6" />
+              </div>
+            </div>
+          ) : null}
+        </div>
       </div>
+
+      {/* Mobile Image - Show below content on mobile */}
+      {(banner.background_image || banner.icon_image) && (
+        <div className="md:hidden absolute inset-0 pointer-events-none">
+          {banner.background_image ? (
+            <>
+              <div className={`absolute inset-0 ${isRTL ? 'bg-gradient-to-l' : 'bg-gradient-to-r'} from-transparent via-transparent to-black/20`} />
+              <img
+                src={banner.background_image}
+                alt=""
+                className="absolute right-0 top-0 h-full w-1/2 object-cover object-center opacity-50"
+              />
+            </>
+          ) : banner.icon_image ? (
+            <div className={`absolute ${isRTL ? 'left-4' : 'right-4'} top-1/2 -translate-y-1/2`}>
+              <div className="w-24 h-24 rounded-full bg-white/10 flex items-center justify-center overflow-hidden">
+                <img src={banner.icon_image} alt="" className="w-full h-full object-contain p-2" />
+              </div>
+            </div>
+          ) : null}
+        </div>
+      )}
     </div>
   );
 };
