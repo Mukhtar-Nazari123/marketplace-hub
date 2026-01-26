@@ -14,6 +14,7 @@ export interface HeroBanner {
   cta_text_fa: string | null;
   cta_link: string | null;
   background_image: string | null;
+  background_color: string | null;
   icon_image: string | null;
   highlight_words: string[] | null;
   is_active: boolean;
@@ -33,6 +34,7 @@ export interface HeroBannerInput {
   cta_text_fa?: string | null;
   cta_link?: string | null;
   background_image?: string | null;
+  background_color?: string | null;
   icon_image?: string | null;
   highlight_words?: string[] | null;
   is_active?: boolean;

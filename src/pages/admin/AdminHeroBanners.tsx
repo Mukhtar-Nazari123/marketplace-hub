@@ -32,6 +32,7 @@ const AdminHeroBanners = () => {
     cta_text_fa: 'خرید کنید',
     cta_link: '',
     background_image: '',
+    background_color: '',
     icon_image: '',
     is_active: true,
     display_order: 0,
@@ -49,6 +50,7 @@ const AdminHeroBanners = () => {
       cta_text_fa: 'خرید کنید',
       cta_link: '',
       background_image: '',
+      background_color: '',
       icon_image: '',
       is_active: true,
       display_order: 0,
@@ -70,6 +72,7 @@ const AdminHeroBanners = () => {
         cta_text_fa: banner.cta_text_fa || 'خرید کنید',
         cta_link: banner.cta_link || '',
         background_image: banner.background_image || '',
+        background_color: banner.background_color || '',
         icon_image: banner.icon_image || '',
         is_active: banner.is_active,
         display_order: banner.display_order,
@@ -223,6 +226,26 @@ const AdminHeroBanners = () => {
                           value={formData.cta_link || ''}
                           onChange={(e) => setFormData({ ...formData, cta_link: e.target.value })}
                         />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="background_color">Background Color</Label>
+                        <div className="flex gap-2">
+                          <Input
+                            id="background_color"
+                            type="color"
+                            className="w-14 h-10 p-1 cursor-pointer"
+                            value={formData.background_color || '#ffffff'}
+                            onChange={(e) => setFormData({ ...formData, background_color: e.target.value })}
+                          />
+                          <Input
+                            placeholder="e.g. #eb1d31 or leave empty"
+                            value={formData.background_color || ''}
+                            onChange={(e) => setFormData({ ...formData, background_color: e.target.value })}
+                          />
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Used when no background image is set
+                        </p>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <ImageUpload
