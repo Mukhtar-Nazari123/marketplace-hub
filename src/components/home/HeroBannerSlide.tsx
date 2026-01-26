@@ -30,9 +30,11 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
 
   return (
     <div className="lg:col-span-2 relative rounded-2xl overflow-hidden min-h-[280px] sm:min-h-[350px] lg:min-h-[500px] animate-fade-in">
-      {/* Background: image or gradient fallback */}
+      {/* Background: image, color, or gradient fallback */}
       {banner.background_image ? (
         <img src={banner.background_image} alt="" className="absolute inset-0 w-full h-full object-cover" />
+      ) : banner.background_color ? (
+        <div className="absolute inset-0" style={{ backgroundColor: banner.background_color }} />
       ) : (
         <div className="absolute inset-0 gradient-hero" />
       )}
