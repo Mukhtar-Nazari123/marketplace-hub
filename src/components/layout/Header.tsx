@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import MobileMenu from "./MobileMenu";
 import { useTheme } from "next-themes";
+import LanguageSwitcher from "./LanguageSwitcher";
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -111,6 +112,11 @@ const Header = () => {
 
             {/* Actions */}
             <div className="flex items-center gap-1 sm:gap-2 md:gap-4">
+              {/* Language Switcher */}
+              <div className="hidden sm:flex">
+                <LanguageSwitcher />
+              </div>
+
               {/* Theme Toggle - Hidden on mobile, shown in hamburger menu */}
               <Tooltip>
                 <TooltipTrigger asChild>
