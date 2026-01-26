@@ -1,4 +1,3 @@
-import TopBar from "@/components/layout/TopBar";
 import Header from "@/components/layout/Header";
 import Navigation from "@/components/layout/Navigation";
 import MobileCategoryBar from "@/components/layout/MobileCategoryBar";
@@ -9,14 +8,12 @@ import TodayDeals from "@/components/home/TodayDeals";
 import BestSellers from "@/components/home/BestSellers";
 import CategoryBanners from "@/components/home/CategoryBanners";
 import CategoryProductRows from "@/components/home/CategoryProductRows";
-import HomeBannerList from "@/components/home/HomeBannerList";
 
 const Index = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* Auto-hide Sticky Navbar */}
       <StickyNavbar>
-        <TopBar />
         <Header />
         <MobileCategoryBar />
         <Navigation />
