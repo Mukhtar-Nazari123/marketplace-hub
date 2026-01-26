@@ -1,4 +1,5 @@
 import { Search, ShoppingCart, User, Menu, LayoutDashboard, LogOut, Moon, Sun, Heart } from "lucide-react";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
@@ -174,6 +175,11 @@ const Header = () => {
                     )}
                   </Button>
                 </Link>
+              )}
+
+              {/* Notifications - Only visible when logged in */}
+              {user && (role === 'buyer' || role === 'seller') && (
+                <NotificationBell />
               )}
 
               {/* Account / Dashboard / Logout - Hidden on mobile, shown on lg+ */}
