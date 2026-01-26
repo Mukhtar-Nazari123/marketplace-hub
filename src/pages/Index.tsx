@@ -1,6 +1,7 @@
 import TopBar from "@/components/layout/TopBar";
 import Header from "@/components/layout/Header";
 import Navigation from "@/components/layout/Navigation";
+import MobileCategoryBar from "@/components/layout/MobileCategoryBar";
 import Footer from "@/components/layout/Footer";
 import StickyNavbar from "@/components/layout/StickyNavbar";
 import HeroSection from "@/components/home/HeroSection";
@@ -18,6 +19,7 @@ const Index = () => {
         <TopBar />
         <Header />
         <Navigation />
+        <MobileCategoryBar />
       </StickyNavbar>
 
       {/* Main Content */}
