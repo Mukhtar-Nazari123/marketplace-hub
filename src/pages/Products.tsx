@@ -5,7 +5,6 @@ import { useProducts, formatProductForDisplay } from '@/hooks/useProducts';
 import { useCategories } from '@/hooks/useCategories';
 import ProductFilters, { FilterState } from '@/components/ui/ProductFilters';
 import ProductGrid from '@/components/products/ProductGrid';
-import TopBar from '@/components/layout/TopBar';
 import Header from '@/components/layout/Header';
 import Navigation from '@/components/layout/Navigation';
 import Footer from '@/components/layout/Footer';
@@ -153,7 +152,6 @@ const Products = () => {
     <div className="min-h-screen bg-background">
       {/* Auto-hide Sticky Navbar */}
       <StickyNavbar>
-        <TopBar />
         <Header />
         <Navigation />
       </StickyNavbar>
