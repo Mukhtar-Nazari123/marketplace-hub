@@ -30,12 +30,6 @@ const Index = () => {
         {/* Today's Deals */}
         <TodayDeals />
 
-        {/* Promotional Home Banners */}
-        <section className="py-8">
-          <div className="container">
-            <HomeBannerList />
-          </div>
-        </section>
 
         {/* Category Product Rows - Horizontal Scrolling */}
         <CategoryProductRows />

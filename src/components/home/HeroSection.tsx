@@ -30,16 +30,6 @@ const HeroSection = () => {
               </p>
             </div>}
 
-          {/* Promo Cards - Row below hero */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-            {promoLoading ? <>
-                <PromoCardSkeleton />
-                <PromoCardSkeleton />
-                <PromoCardSkeleton />
-              </> : promoCards.length === 0 ? <div className="col-span-full flex items-center justify-center min-h-[120px] text-muted-foreground text-sm">
-                {isRTL ? "کارت تبلیغاتی وجود ندارد" : "No promotions available"}
-              </div> : promoCards.map((card, index) => <PromoCard key={card.id} card={card} index={index} />)}
-          </div>
         </div>
       </div>
     </section>;
