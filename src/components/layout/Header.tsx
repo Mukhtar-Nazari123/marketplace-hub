@@ -140,11 +140,11 @@ const Header = () => {
                 </TooltipContent>
               </Tooltip>
 
-              {/* Wishlist - Only visible when logged in */}
+              {/* Wishlist - Only visible when logged in, hidden on mobile/tablet */}
               {user && (
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Link to="/dashboard/buyer/wishlist">
+                    <Link to="/dashboard/buyer/wishlist" className="hidden lg:block">
                       <Button variant="ghost" size="icon" className="relative">
                         <Heart className="h-5 w-5 text-muted-foreground" />
                         {wishlistCount > 0 && (
@@ -161,9 +161,9 @@ const Header = () => {
                 </Tooltip>
               )}
 
-              {/* Cart - Only visible when logged in */}
+              {/* Cart - Only visible when logged in, hidden on mobile/tablet */}
               {user && (
-                <Link to="/cart">
+                <Link to="/cart" className="hidden lg:block">
                   <Button variant="ghost" size="icon" className="relative">
                     <ShoppingCart className="h-5 w-5 text-muted-foreground" />
                     {itemCount > 0 && (
