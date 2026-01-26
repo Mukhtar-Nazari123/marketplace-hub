@@ -18,8 +18,8 @@ const Index = () => {
       <StickyNavbar>
         <TopBar />
         <Header />
-        <Navigation />
         <MobileCategoryBar />
+        <Navigation />
       </StickyNavbar>
 
       {/* Main Content */}

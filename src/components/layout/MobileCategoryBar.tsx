@@ -47,7 +47,7 @@ const MobileCategoryBar = () => {
             </Link>
           ))}
         </div>
-        <ScrollBar orientation="horizontal" className="h-1" />
+        <ScrollBar orientation="horizontal" className="h-2.5" />
       </ScrollArea>
     </div>
   );
