@@ -65,7 +65,7 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
           ${isRTL ? "items-start text-right" : "items-start text-left"}`}
         >
           {badgeText && (
-            <Badge variant="sale" className="w-fit mb-3 md:mb-4 text-xs sm:text-sm px-3 sm:px-4 py-1">
+            <Badge variant="sale" className="w-fit mb-3 md:mb-4 mt-4 md:mt-8 lg:mt-0 text-xs sm:text-sm px-3 sm:px-4 py-1">
               {badgeText}
             </Badge>
           )}
