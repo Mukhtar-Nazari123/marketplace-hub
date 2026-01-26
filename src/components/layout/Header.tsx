@@ -113,9 +113,7 @@ const Header = () => {
             {/* Actions */}
             <div className="flex items-center gap-1 sm:gap-2 md:gap-4">
               {/* Language Switcher */}
-              <div className="hidden sm:flex">
-                <LanguageSwitcher />
-              </div>
+              <LanguageSwitcher />
 
               {/* Theme Toggle - Hidden on mobile, shown in hamburger menu */}
               <Tooltip>
