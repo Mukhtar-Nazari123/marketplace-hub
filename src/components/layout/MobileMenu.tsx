@@ -87,7 +87,7 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
       />
       
       {/* Menu Panel */}
-      <div className={`fixed top-0 h-full w-80 max-w-[85vw] bg-card z-50 lg:hidden shadow-xl overflow-y-auto ${isRTL ? 'right-0 animate-slide-in-right' : 'left-0 animate-slide-in-left'}`}>
+      <div className={`fixed top-0 h-full w-72 max-w-[75vw] bg-card z-50 lg:hidden shadow-xl overflow-y-auto ${isRTL ? 'right-0 animate-slide-in-right' : 'left-0 animate-slide-in-left'}`}>
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border">
           <Link to="/" className="flex-shrink-0" onClick={onClose}>
