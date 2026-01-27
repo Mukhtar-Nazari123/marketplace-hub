@@ -156,26 +156,17 @@ const ProductCard = ({
             </div>
           )}
 
-          {/* Quick Actions */}
-          <div
-            className={`absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 transition-all duration-300 ${
-              isHovered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-            }`}
+          {/* Quick View Icon - Top Right on Hover */}
+          <button
+            className={cn(
+              `absolute top-3 z-10 w-8 h-8 rounded-full backdrop-blur-sm flex items-center justify-center transition-all duration-300 bg-background/80 text-muted-foreground hover:bg-primary hover:text-white ${isRTL ? 'left-12' : 'right-12'}`,
+              isHovered ? "opacity-100" : "opacity-0"
+            )}
           >
-            <Button 
-              size="icon" 
-              className="rounded-full h-9 w-9"
-              onClick={handleAddToCart}
-              disabled={isAddingToCart}
-            >
-              <ShoppingCart className={cn("h-4 w-4", isAddingToCart && "animate-pulse")} />
-            </Button>
-            <Button variant="secondary" size="icon" className="rounded-full h-9 w-9" asChild>
-              <Link to={`/products/${id}`}>
-                <Eye className="h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
+            <Link to={`/products/${id}`}>
+              <Eye className="h-4 w-4" />
+            </Link>
+          </button>
         </div>
       </Link>
 
@@ -206,29 +197,41 @@ const ProductCard = ({
         </div>
 
         {/* Countdown - Red numbers, grey labels */}
-        <div className="h-14 mt-auto flex-shrink-0">
-          {showDealCountdown ? (
-            <DealCountdown dealEndAt={dealEndAt} dealStartAt={dealStartAt} />
-          ) : countdown ? (
-            // Legacy static countdown support
-            <div className="flex items-center justify-center gap-1 bg-foreground text-background rounded-lg p-2 h-full">
-              <div className="text-center">
-                <span className="font-bold text-lg text-primary">{isRTL ? countdown.hours.toString().padStart(2, "0").replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]) : countdown.hours.toString().padStart(2, "0")}</span>
-                <p className="text-[10px] uppercase opacity-70">{t.product.hours}</p>
+        {(showDealCountdown || countdown) && (
+          <div className="h-14 mt-2 flex-shrink-0">
+            {showDealCountdown ? (
+              <DealCountdown dealEndAt={dealEndAt} dealStartAt={dealStartAt} />
+            ) : countdown ? (
+              // Legacy static countdown support
+              <div className="flex items-center justify-center gap-1 bg-foreground text-background rounded-lg p-2 h-full">
+                <div className="text-center">
+                  <span className="font-bold text-lg text-primary">{isRTL ? countdown.hours.toString().padStart(2, "0").replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]) : countdown.hours.toString().padStart(2, "0")}</span>
+                  <p className="text-[10px] uppercase opacity-70">{t.product.hours}</p>
+                </div>
+                <span className="font-bold">:</span>
+                <div className="text-center">
+                  <span className="font-bold text-lg text-primary">{isRTL ? countdown.minutes.toString().padStart(2, "0").replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]) : countdown.minutes.toString().padStart(2, "0")}</span>
+                  <p className="text-[10px] uppercase opacity-70">{t.product.minutes}</p>
+                </div>
+                <span className="font-bold">:</span>
+                <div className="text-center">
+                  <span className="font-bold text-lg text-primary">{isRTL ? countdown.seconds.toString().padStart(2, "0").replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]) : countdown.seconds.toString().padStart(2, "0")}</span>
+                  <p className="text-[10px] uppercase opacity-70">{t.product.seconds}</p>
+                </div>
               </div>
-              <span className="font-bold">:</span>
-              <div className="text-center">
-                <span className="font-bold text-lg text-primary">{isRTL ? countdown.minutes.toString().padStart(2, "0").replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]) : countdown.minutes.toString().padStart(2, "0")}</span>
-                <p className="text-[10px] uppercase opacity-70">{t.product.minutes}</p>
-              </div>
-              <span className="font-bold">:</span>
-              <div className="text-center">
-                <span className="font-bold text-lg text-primary">{isRTL ? countdown.seconds.toString().padStart(2, "0").replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[parseInt(d)]) : countdown.seconds.toString().padStart(2, "0")}</span>
-                <p className="text-[10px] uppercase opacity-70">{t.product.seconds}</p>
-              </div>
-            </div>
-          ) : null}
-        </div>
+            ) : null}
+          </div>
+        )}
+
+        {/* Add to Cart Button - Always visible at bottom */}
+        <Button 
+          className="w-full mt-auto pt-2"
+          onClick={handleAddToCart}
+          disabled={isAddingToCart}
+        >
+          <ShoppingCart className={cn("h-4 w-4 mr-2", isAddingToCart && "animate-pulse")} />
+          {isRTL ? "افزودن به سبد" : "Add to Cart"}
+        </Button>
       </div>
     </div>
   );
