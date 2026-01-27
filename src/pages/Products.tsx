@@ -1,40 +1,40 @@
-import { useState, useMemo, useEffect } from 'react';
-import { Link, useSearchParams, useNavigate } from 'react-router-dom';
-import { useLanguage } from '@/lib/i18n';
-import { useProducts, formatProductForDisplay } from '@/hooks/useProducts';
-import { useCategories } from '@/hooks/useCategories';
-import { FilterState } from '@/components/ui/ProductFilters';
-import FilterBar from '@/components/products/FilterBar';
-import Header from '@/components/layout/Header';
-import Navigation from '@/components/layout/Navigation';
-import Footer from '@/components/layout/Footer';
-import StickyNavbar from '@/components/layout/StickyNavbar';
-import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Sparkles, Loader2, Search, Heart, ShoppingCart, Eye } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useProductRatings } from '@/hooks/useProductRatings';
-import CompactRating from '@/components/ui/CompactRating';
-import { useCart } from '@/hooks/useCart';
-import { useWishlist } from '@/hooks/useWishlist';
-import { useAuth } from '@/hooks/useAuth';
-import { cn } from '@/lib/utils';
+import { useState, useMemo, useEffect } from "react";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
+import { useLanguage } from "@/lib/i18n";
+import { useProducts, formatProductForDisplay } from "@/hooks/useProducts";
+import { useCategories } from "@/hooks/useCategories";
+import { FilterState } from "@/components/ui/ProductFilters";
+import FilterBar from "@/components/products/FilterBar";
+import Header from "@/components/layout/Header";
+import Navigation from "@/components/layout/Navigation";
+import Footer from "@/components/layout/Footer";
+import StickyNavbar from "@/components/layout/StickyNavbar";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight, Sparkles, Loader2, Search, Heart, ShoppingCart, Eye } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useProductRatings } from "@/hooks/useProductRatings";
+import CompactRating from "@/components/ui/CompactRating";
+import { useCart } from "@/hooks/useCart";
+import { useWishlist } from "@/hooks/useWishlist";
+import { useAuth } from "@/hooks/useAuth";
+import { cn } from "@/lib/utils";
 
 const Products = () => {
   const { t, language, isRTL } = useLanguage();
   const [searchParams] = useSearchParams();
-  const filterType = searchParams.get('filter'); // 'new', 'sale'
-  const categorySlug = searchParams.get('category');
-  const searchQuery = searchParams.get('search');
+  const filterType = searchParams.get("filter"); // 'new', 'sale'
+  const categorySlug = searchParams.get("category");
+  const searchQuery = searchParams.get("search");
 
   // Pass search query to backend
-  const { products: dbProducts, loading } = useProducts({ 
-    status: 'active',
-    search: searchQuery || undefined
+  const { products: dbProducts, loading } = useProducts({
+    status: "active",
+    search: searchQuery || undefined,
   });
   const { getRootCategories } = useCategories();
 
-  const [sortBy, setSortBy] = useState('latest');
+  const [sortBy, setSortBy] = useState("latest");
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState<FilterState>({
     priceRange: [0, 500000],
@@ -59,58 +59,56 @@ const Products = () => {
 
     // Filter by category slug
     if (categorySlug) {
-      result = result.filter(p => p.category === categorySlug);
+      result = result.filter((p) => p.category === categorySlug);
     }
 
     // Filter by type
-    if (filterType === 'new') {
-      result = result.filter(p => p.isNew);
-    } else if (filterType === 'sale') {
-      result = result.filter(p => p.discount && p.discount > 0);
+    if (filterType === "new") {
+      result = result.filter((p) => p.isNew);
+    } else if (filterType === "sale") {
+      result = result.filter((p) => p.discount && p.discount > 0);
     }
 
     // Apply price range filter
-    result = result.filter(
-      p => p.price >= filters.priceRange[0] && p.price <= filters.priceRange[1]
-    );
+    result = result.filter((p) => p.price >= filters.priceRange[0] && p.price <= filters.priceRange[1]);
 
     // Filter by rating
     if (filters.rating > 0) {
-      result = result.filter(p => p.rating >= filters.rating);
+      result = result.filter((p) => p.rating >= filters.rating);
     }
 
     // Filter by brands
     if (filters.brands.length > 0) {
-      result = result.filter(p => filters.brands.includes(p.brand));
+      result = result.filter((p) => filters.brands.includes(p.brand));
     }
 
     // Filter by categories
     if (filters.categories.length > 0) {
-      result = result.filter(p => filters.categories.includes(p.category));
+      result = result.filter((p) => filters.categories.includes(p.category));
     }
 
     // Filter by stock
     if (filters.inStock) {
-      result = result.filter(p => p.inStock);
+      result = result.filter((p) => p.inStock);
     }
 
     // Filter by sale
     if (filters.onSale) {
-      result = result.filter(p => p.discount && p.discount > 0);
+      result = result.filter((p) => p.discount && p.discount > 0);
     }
 
     // Sort
     switch (sortBy) {
-      case 'price-low':
+      case "price-low":
         result.sort((a, b) => a.price - b.price);
         break;
-      case 'price-high':
+      case "price-high":
         result.sort((a, b) => b.price - a.price);
         break;
-      case 'popularity':
+      case "popularity":
         result.sort((a, b) => b.reviewCount - a.reviewCount);
         break;
-      case 'latest':
+      case "latest":
       default:
         result.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
         break;
@@ -125,24 +123,19 @@ const Products = () => {
   }, [categorySlug, filterType, filters, sortBy, searchQuery]);
 
   const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
-  const paginatedProducts = filteredProducts.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+  const paginatedProducts = filteredProducts.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
-  const productIds = useMemo(() => paginatedProducts.map(p => p.id), [paginatedProducts]);
+  const productIds = useMemo(() => paginatedProducts.map((p) => p.id), [paginatedProducts]);
   const { getRating } = useProductRatings(productIds);
 
   const getTitle = () => {
     if (searchQuery && searchQuery.trim()) {
-      return isRTL 
-        ? `نتایج جستجو برای "${searchQuery}"` 
-        : `Search results for "${searchQuery}"`;
+      return isRTL ? `نتایج جستجو برای "${searchQuery}"` : `Search results for "${searchQuery}"`;
     }
-    if (filterType === 'new') return t.product.newProducts;
-    if (filterType === 'sale') return t.filters.discount;
+    if (filterType === "new") return t.product.newProducts;
+    if (filterType === "sale") return t.filters.discount;
     if (categorySlug) {
-      const category = rootCategories.find(c => c.slug === categorySlug);
+      const category = rootCategories.find((c) => c.slug === categorySlug);
       return category ? (isRTL && category.name_fa ? category.name_fa : category.name) : t.product.allProducts;
     }
     return t.product.allProducts;
@@ -150,7 +143,7 @@ const Products = () => {
 
   // Extract unique brands from products
   const availableBrands = useMemo(() => {
-    const brands = products.map(p => p.brand).filter(Boolean);
+    const brands = products.map((p) => p.brand).filter(Boolean);
     return [...new Set(brands)];
   }, [products]);
 
@@ -171,21 +164,21 @@ const Products = () => {
           if (cat) {
             window.location.href = `/products?category=${cat}`;
           } else {
-            window.location.href = '/products';
+            window.location.href = "/products";
           }
         }}
         availableBrands={availableBrands}
         selectedBrand={filters.brands[0] || null}
         onBrandChange={(brand) => {
-          setFilters(prev => ({
+          setFilters((prev) => ({
             ...prev,
-            brands: brand ? [brand] : []
+            brands: brand ? [brand] : [],
           }));
         }}
       />
 
       {/* Hero Banner for New Products */}
-      {filterType === 'new' && (
+      {filterType === "new" && (
         <div className="bg-gradient-to-r from-primary to-cyan-400 py-12">
           <div className="container mx-auto px-4 text-center">
             <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur px-4 py-2 rounded-full mb-4">
@@ -193,16 +186,16 @@ const Products = () => {
               <span className="text-white font-medium">{t.product.newProducts}</span>
             </div>
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-              {isRTL ? 'جدیدترین محصولات فروشگاه' : 'Latest Store Products'}
+              {isRTL ? "جدیدترین محصولات فروشگاه" : "Latest Store Products"}
             </h1>
             <p className="text-white/80">
-              {isRTL ? 'بهترین و جدیدترین محصولات را کشف کنید' : 'Discover the best and newest products'}
+              {isRTL ? "بهترین و جدیدترین محصولات را کشف کنید" : "Discover the best and newest products"}
             </p>
           </div>
         </div>
       )}
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-1">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
           <div>
@@ -211,10 +204,10 @@ const Products = () => {
               {loading ? (
                 <span className="inline-flex items-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  {isRTL ? 'در حال جستجو...' : 'Searching...'}
+                  {isRTL ? "در حال جستجو..." : "Searching..."}
                 </span>
               ) : (
-                `${filteredProducts.length} ${isRTL ? 'محصول' : 'products'}`
+                `${filteredProducts.length} ${isRTL ? "محصول" : "products"}`
               )}
             </p>
           </div>
@@ -240,22 +233,21 @@ const Products = () => {
               <Search className="h-12 w-12 text-muted-foreground" />
             </div>
             <h3 className="text-lg font-semibold text-foreground mb-2">
-              {isRTL ? 'محصولی یافت نشد' : 'No products found'}
+              {isRTL ? "محصولی یافت نشد" : "No products found"}
             </h3>
             <p className="text-muted-foreground max-w-md">
-              {searchQuery 
-                ? (isRTL 
-                    ? `نتیجه‌ای برای "${searchQuery}" پیدا نشد. لطفاً عبارت دیگری را جستجو کنید.`
-                    : `No results found for "${searchQuery}". Try a different search term.`)
-                : (isRTL 
-                    ? 'محصولی با فیلترهای انتخاب شده یافت نشد.'
-                    : 'No products match the selected filters.')
-              }
+              {searchQuery
+                ? isRTL
+                  ? `نتیجه‌ای برای "${searchQuery}" پیدا نشد. لطفاً عبارت دیگری را جستجو کنید.`
+                  : `No results found for "${searchQuery}". Try a different search term.`
+                : isRTL
+                  ? "محصولی با فیلترهای انتخاب شده یافت نشد."
+                  : "No products match the selected filters."}
             </p>
             {searchQuery && (
               <Link to="/products">
                 <Button variant="outline" className="mt-4">
-                  {isRTL ? 'مشاهده همه محصولات' : 'View all products'}
+                  {isRTL ? "مشاهده همه محصولات" : "View all products"}
                 </Button>
               </Link>
             )}
@@ -275,14 +267,14 @@ const Products = () => {
               variant="outline"
               size="sm"
               disabled={currentPage === 1}
-              onClick={() => setCurrentPage(p => p - 1)}
+              onClick={() => setCurrentPage((p) => p - 1)}
             >
               {isRTL ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
             </Button>
             {[...Array(Math.min(totalPages, 5))].map((_, i) => (
               <Button
                 key={i}
-                variant={currentPage === i + 1 ? 'cyan' : 'outline'}
+                variant={currentPage === i + 1 ? "cyan" : "outline"}
                 size="sm"
                 onClick={() => setCurrentPage(i + 1)}
               >
@@ -293,7 +285,7 @@ const Products = () => {
               variant="outline"
               size="sm"
               disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage(p => p + 1)}
+              onClick={() => setCurrentPage((p) => p + 1)}
             >
               {isRTL ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
             </Button>
@@ -334,13 +326,13 @@ const ProductCard = ({ product, getRating }: ProductCardProps) => {
   const navigate = useNavigate();
 
   const isWishlisted = isInWishlist(product.id);
-  const isBuyer = role === 'buyer';
-  const currencySymbol = product.currencySymbol || (product.currency === 'USD' ? '$' : 'AFN');
-  
+  const isBuyer = role === "buyer";
+  const currencySymbol = product.currencySymbol || (product.currency === "USD" ? "$" : "AFN");
+
   const { averageRating, reviewCount } = getRating(product.id);
 
   const getName = () => {
-    if (typeof product.name === 'string') return product.name;
+    if (typeof product.name === "string") return product.name;
     return product.name[language] || product.name.en;
   };
 
@@ -348,7 +340,7 @@ const ProductCard = ({ product, getRating }: ProductCardProps) => {
     e.preventDefault();
     e.stopPropagation();
     if (!user) {
-      navigate('/login');
+      navigate("/login");
       return;
     }
     setIsAddingToCart(true);
@@ -360,7 +352,7 @@ const ProductCard = ({ product, getRating }: ProductCardProps) => {
     e.preventDefault();
     e.stopPropagation();
     if (!user) {
-      navigate('/login');
+      navigate("/login");
       return;
     }
     await toggleWishlist(product.id);
@@ -376,23 +368,23 @@ const ProductCard = ({ product, getRating }: ProductCardProps) => {
       <div className="relative aspect-square overflow-hidden flex-shrink-0">
         <Link to={`/products/${product.slug}`}>
           <img
-            src={product.images[0] || '/placeholder.svg'}
+            src={product.images[0] || "/placeholder.svg"}
             alt={getName()}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
         </Link>
 
         {/* Badges */}
-        <div className={`absolute top-2 ${isRTL ? 'right-2' : 'left-2'} flex flex-col gap-1`}>
-          {product.isNew && <Badge variant="new">{isRTL ? 'جدید' : 'New'}</Badge>}
-          {product.isHot && <Badge variant="hot">{isRTL ? 'داغ' : 'Hot'}</Badge>}
+        <div className={`absolute top-2 ${isRTL ? "right-2" : "left-2"} flex flex-col gap-1`}>
+          {product.isNew && <Badge variant="new">{isRTL ? "جدید" : "New"}</Badge>}
+          {product.isHot && <Badge variant="hot">{isRTL ? "داغ" : "Hot"}</Badge>}
           {product.discount && product.discount > 0 && <Badge variant="sale">-{product.discount}%</Badge>}
         </div>
 
         {/* Quick Actions */}
         <div
-          className={`absolute top-2 ${isRTL ? 'left-2' : 'right-2'} flex flex-col gap-2 transition-all duration-300 ${
-            isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'
+          className={`absolute top-2 ${isRTL ? "left-2" : "right-2"} flex flex-col gap-2 transition-all duration-300 ${
+            isHovered ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4"
           }`}
         >
           {(!user || isBuyer) && (
@@ -400,9 +392,9 @@ const ProductCard = ({ product, getRating }: ProductCardProps) => {
               onClick={handleWishlistToggle}
               className={cn(
                 "p-2 rounded-full transition-colors shadow-md",
-                isWishlisted 
-                  ? "bg-primary text-white" 
-                  : "bg-white/90 dark:bg-gray-800/90 hover:bg-primary hover:text-white"
+                isWishlisted
+                  ? "bg-primary text-white"
+                  : "bg-white/90 dark:bg-gray-800/90 hover:bg-primary hover:text-white",
               )}
             >
               <Heart size={18} className={isWishlisted ? "fill-current" : ""} />
@@ -422,11 +414,13 @@ const ProductCard = ({ product, getRating }: ProductCardProps) => {
         {/* Price */}
         <div className="flex items-baseline gap-1.5 flex-shrink-0 mb-1">
           <span className="text-sm sm:text-base md:text-lg font-bold text-primary truncate">
-            {product.currency === 'USD' ? '$' : ''}{product.price.toLocaleString()} {product.currency !== 'USD' ? currencySymbol : ''}
+            {product.currency === "USD" ? "$" : ""}
+            {product.price.toLocaleString()} {product.currency !== "USD" ? currencySymbol : ""}
           </span>
           {product.originalPrice && product.originalPrice !== product.price && (
             <span className="text-[10px] sm:text-xs text-muted-foreground line-through truncate">
-              {product.currency === 'USD' ? '$' : ''}{product.originalPrice.toLocaleString()}
+              {product.currency === "USD" ? "$" : ""}
+              {product.originalPrice.toLocaleString()}
             </span>
           )}
         </div>
@@ -445,15 +439,15 @@ const ProductCard = ({ product, getRating }: ProductCardProps) => {
 
         {/* Add to Cart */}
         <div className="mt-auto pt-2 flex-shrink-0">
-          <Button 
-            variant="cyan" 
-            size="sm" 
+          <Button
+            variant="cyan"
+            size="sm"
             className="w-full gap-2 text-xs"
             onClick={handleAddToCart}
             disabled={isAddingToCart}
           >
-            <ShoppingCart size={14} className={isAddingToCart ? 'animate-pulse' : ''} />
-            {isRTL ? 'افزودن' : 'Add'}
+            <ShoppingCart size={14} className={isAddingToCart ? "animate-pulse" : ""} />
+            {isRTL ? "افزودن" : "Add"}
           </Button>
         </div>
       </div>
