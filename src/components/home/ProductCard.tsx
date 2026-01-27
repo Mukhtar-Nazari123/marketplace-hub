@@ -130,20 +130,34 @@ const ProductCard = ({
         )}
       </div>
 
-      {/* Wishlist Button */}
-      {(!user || isBuyer) && (
-        <button 
-          onClick={handleWishlistToggle}
+      {/* Top Right Actions - Wishlist & Quick View */}
+      <div className={`absolute top-3 z-10 flex flex-col gap-2 ${isRTL ? 'left-3' : 'right-3'}`}>
+        {/* Wishlist Button */}
+        {(!user || isBuyer) && (
+          <button 
+            onClick={handleWishlistToggle}
+            className={cn(
+              "w-8 h-8 rounded-full backdrop-blur-sm flex items-center justify-center transition-colors",
+              isWishlisted 
+                ? "bg-primary text-white" 
+                : "bg-background/80 text-muted-foreground hover:bg-primary hover:text-white"
+            )}
+          >
+            <Heart className={cn("h-4 w-4", isWishlisted && "fill-current")} />
+          </button>
+        )}
+
+        {/* Quick View Icon - Appears on Hover */}
+        <Link 
+          to={`/products/${id}`}
           className={cn(
-            `absolute top-3 z-10 w-8 h-8 rounded-full backdrop-blur-sm flex items-center justify-center transition-colors ${isRTL ? 'left-3' : 'right-3'}`,
-            isWishlisted 
-              ? "bg-primary text-white" 
-              : "bg-background/80 text-muted-foreground hover:bg-primary hover:text-white"
+            "w-8 h-8 rounded-full backdrop-blur-sm flex items-center justify-center transition-all duration-300 bg-background/80 text-muted-foreground hover:bg-primary hover:text-white",
+            isHovered ? "opacity-100" : "opacity-0"
           )}
         >
-          <Heart className={cn("h-4 w-4", isWishlisted && "fill-current")} />
-        </button>
-      )}
+          <Eye className="h-4 w-4" />
+        </Link>
+      </div>
 
       {/* Image - Fixed aspect ratio 1:1 */}
       <Link to={`/products/${id}`} className="block flex-shrink-0">
@@ -155,18 +169,6 @@ const ProductCard = ({
               <ShoppingCart className="h-10 w-10 text-muted-foreground" />
             </div>
           )}
-
-          {/* Quick View Icon - Top Right on Hover */}
-          <button
-            className={cn(
-              `absolute top-3 z-10 w-8 h-8 rounded-full backdrop-blur-sm flex items-center justify-center transition-all duration-300 bg-background/80 text-muted-foreground hover:bg-primary hover:text-white ${isRTL ? 'left-12' : 'right-12'}`,
-              isHovered ? "opacity-100" : "opacity-0"
-            )}
-          >
-            <Link to={`/products/${id}`}>
-              <Eye className="h-4 w-4" />
-            </Link>
-          </button>
         </div>
       </Link>
 
