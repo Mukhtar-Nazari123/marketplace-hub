@@ -142,7 +142,7 @@ const DiscoverProducts = () => {
   }
 
   return (
-    <section className="py-8 bg-background">
+    <section className="py-1 bg-background">
       <div className="container">
         {/* Section Header */}
         <div className="mb-6">
