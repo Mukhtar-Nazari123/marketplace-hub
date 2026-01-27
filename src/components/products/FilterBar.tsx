@@ -92,10 +92,7 @@ const FilterBar = ({
         className="container mx-auto px-4 py-3 overflow-x-auto scrollbar-none"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
-        <div className={cn(
-          "flex items-center gap-2",
-          isRTL ? "flex-row-reverse" : "flex-row"
-        )}>
+        <div className="flex items-center gap-2">
           {/* Filter Icon */}
           <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted/50 border border-border flex-shrink-0">
             <SlidersHorizontal size={16} className="text-muted-foreground" />
