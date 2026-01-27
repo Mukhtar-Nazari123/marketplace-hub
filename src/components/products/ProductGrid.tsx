@@ -206,34 +206,33 @@ const ProductCard = ({ product, getRating }: ProductCardInternalProps) => {
       </div>
 
       {/* Content - Flex grow to fill remaining space */}
-      <div className="p-4 flex flex-col flex-grow">
-        {/* Name - Fixed height with truncation */}
+      <div className="p-3 md:p-4 flex flex-col flex-grow">
+        {/* Price - Primary visual element */}
+        <div className="flex items-baseline gap-1.5 flex-shrink-0 mb-1.5">
+          <span className="text-base sm:text-lg md:text-xl font-bold text-primary truncate">
+            {product.currency === 'USD' ? '$' : ''}{product.price.toLocaleString()} {product.currency !== 'USD' ? currencySymbol : ''}
+          </span>
+          {product.originalPrice && product.originalPrice !== product.price && (
+            <span className="text-[10px] sm:text-xs text-muted-foreground line-through truncate">
+              {product.currency === 'USD' ? '$' : ''}{product.originalPrice.toLocaleString()}
+            </span>
+          )}
+        </div>
+
+        {/* Name - Single line, truncated */}
         <Link to={`/products/${product.slug}`} className="flex-shrink-0">
-          <h3 className="font-medium text-foreground hover:text-primary transition-colors h-11 line-clamp-2 overflow-hidden mb-2">
+          <h3 className="text-xs sm:text-sm text-foreground truncate hover:text-primary transition-colors">
             {getProductName(product.name, language)}
           </h3>
         </Link>
 
-        {/* Rating - Fixed height */}
-        <div className="h-5 mb-2 flex-shrink-0">
+        {/* Rating - Tertiary element */}
+        <div className="h-4 mt-1.5 flex-shrink-0">
           <CompactRating rating={averageRating} reviewCount={reviewCount} size="sm" />
         </div>
 
-        {/* Price - Fixed height container */}
-        <div className="h-7 flex items-center gap-2 mb-3 flex-shrink-0">
-          {product.originalPrice && product.originalPrice !== product.price && (
-            <span className="text-sm text-muted-foreground line-through truncate">
-              {product.currency === 'USD' ? '$' : ''}{product.originalPrice.toLocaleString()} {product.currency !== 'USD' ? currencySymbol : ''}
-            </span>
-          )}
-          <span className="text-lg font-bold text-orange truncate">
-            {product.currency === 'USD' ? '$' : ''}{product.price.toLocaleString()} {product.currency !== 'USD' ? currencySymbol : ''}
-          </span>
-          <Badge variant="outline" className="text-xs ml-auto flex-shrink-0">{product.currency || 'AFN'}</Badge>
-        </div>
-
         {/* Add to Cart - Push to bottom */}
-        <div className="mt-auto flex-shrink-0">
+        <div className="mt-auto pt-2 flex-shrink-0">
           <Button 
             variant="cyan" 
             size="sm" 
@@ -312,14 +311,27 @@ const ProductListItem = ({ product, getRating }: ProductCardInternalProps) => {
       </div>
 
       {/* Content */}
-      <div className="flex-1 p-4 flex flex-col">
+      <div className="flex-1 p-3 md:p-4 flex flex-col">
+        {/* Price - Primary visual element */}
+        <div className="flex items-baseline gap-2 mb-1.5">
+          <span className="text-lg sm:text-xl md:text-2xl font-bold text-primary">
+            {product.currency === 'USD' ? '$' : ''}{product.price.toLocaleString()} {product.currency !== 'USD' ? currencySymbol : ''}
+          </span>
+          {product.originalPrice && product.originalPrice !== product.price && (
+            <span className="text-xs sm:text-sm text-muted-foreground line-through">
+              {product.currency === 'USD' ? '$' : ''}{product.originalPrice.toLocaleString()}
+            </span>
+          )}
+        </div>
+
+        {/* Name - Single line, truncated */}
         <Link to={`/products/${product.slug}`}>
-          <h3 className="font-medium text-lg text-foreground hover:text-primary transition-colors mb-2">
+          <h3 className="text-sm sm:text-base text-foreground truncate hover:text-primary transition-colors mb-1">
             {getProductName(product.name, language)}
           </h3>
         </Link>
 
-        <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
+        <p className="text-xs text-muted-foreground mb-1.5 line-clamp-1">
           {getProductDescription(product.description, language)}
         </p>
 
@@ -328,17 +340,6 @@ const ProductListItem = ({ product, getRating }: ProductCardInternalProps) => {
         </div>
 
         <div className="mt-auto flex items-center justify-between">
-          <div className="flex items-center gap-2 flex-wrap">
-            {product.originalPrice && product.originalPrice !== product.price && (
-              <span className="text-sm text-muted-foreground line-through">
-                {product.currency === 'USD' ? '$' : ''}{product.originalPrice.toLocaleString()} {product.currency !== 'USD' ? currencySymbol : ''}
-              </span>
-            )}
-            <span className="text-xl font-bold text-orange">
-              {product.currency === 'USD' ? '$' : ''}{product.price.toLocaleString()} {product.currency !== 'USD' ? currencySymbol : ''}
-            </span>
-            <Badge variant="outline" className="text-xs">{product.currency || 'AFN'}</Badge>
-          </div>
           <div className="flex gap-2">
             {(!user || isBuyer) && (
               <Button 
