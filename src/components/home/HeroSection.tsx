@@ -21,7 +21,7 @@ const HeroSection = () => {
   // Get the first active banner for now (carousel-ready for future)
   const activeBanner = heroBanners[0];
   return <section className="relative w-full overflow-hidden">
-      <div className="container px-4 sm:px-6 lg:px-8 pt-1 pb-4 sm:pb-6 lg:pb-8">
+      <div className="container px-4 sm:px-6 lg:px-8 pt-1 pb-2 sm:pb-3 lg:pb-4">
         <div className="flex flex-col gap-4 sm:gap-6">
           {/* Main Hero - Full Width */}
           {heroLoading ? <HeroBannerSkeleton /> : activeBanner ? <HeroBannerSlide banner={activeBanner} /> : <div className="relative rounded-xl sm:rounded-2xl overflow-hidden bg-muted min-h-[200px] sm:min-h-[280px] lg:min-h-[350px] flex items-center justify-center">
