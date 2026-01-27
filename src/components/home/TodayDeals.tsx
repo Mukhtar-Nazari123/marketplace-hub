@@ -143,7 +143,7 @@ const TodayDeals = () => {
   }
 
   return (
-    <section className="py-2 pt-1 bg-background">
+    <section className="py-1 bg-background">
       <div className="container">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
