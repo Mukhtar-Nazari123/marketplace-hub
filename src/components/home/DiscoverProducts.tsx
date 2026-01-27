@@ -49,10 +49,10 @@ const DiscoverProducts = () => {
       if (error) throw error;
 
       const newProducts = (data as Product[]) || [];
-      
+
       // Shuffle products for random appearance
       const shuffled = [...newProducts].sort(() => Math.random() - 0.5);
-      
+
       if (append) {
         setProducts((prev) => [...prev, ...shuffled]);
       } else {
@@ -117,7 +117,7 @@ const DiscoverProducts = () => {
 
   if (isLoading) {
     return (
-      <section className="py-8 bg-background">
+      <section className="py-1 bg-background">
         <div className="container">
           <div className="mb-6">
             <Skeleton className="h-8 w-48 mb-2" />
@@ -150,10 +150,9 @@ const DiscoverProducts = () => {
             {isRTL ? "کشف محصولات" : "Discover Products"}
           </h2>
           <p className="text-sm text-muted-foreground">
-            {isRTL 
+            {isRTL
               ? "محصولات محبوب و پرطرفدار از تمام دسته‌بندی‌ها را کاوش کنید"
-              : "Explore popular and trending items from all categories"
-            }
+              : "Explore popular and trending items from all categories"}
           </p>
         </div>
 
@@ -173,20 +172,16 @@ const DiscoverProducts = () => {
         {/* Load More Button */}
         {hasMore && (
           <div className="flex justify-center mt-8">
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={loadMore}
-              disabled={isLoadingMore}
-              className="min-w-[200px]"
-            >
+            <Button variant="outline" size="lg" onClick={loadMore} disabled={isLoadingMore} className="min-w-[200px]">
               {isLoadingMore ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
                   {isRTL ? "در حال بارگذاری..." : "Loading..."}
                 </>
+              ) : isRTL ? (
+                "نمایش بیشتر"
               ) : (
-                isRTL ? "نمایش بیشتر" : "Load More"
+                "Load More"
               )}
             </Button>
           </div>
