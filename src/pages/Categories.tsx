@@ -1,25 +1,24 @@
-import { useState, useMemo, useEffect } from 'react';
-import { Link, useSearchParams, useNavigate } from 'react-router-dom';
-import { useLanguage } from '@/lib/i18n';
-import { useCategories } from '@/hooks/useCategories';
-import { supabase } from '@/integrations/supabase/client';
-import { FilterState } from '@/components/ui/ProductFilters';
-import FilterBar from '@/components/products/FilterBar';
-import Header from '@/components/layout/Header';
-import Navigation from '@/components/layout/Navigation';
-import Footer from '@/components/layout/Footer';
-import StickyNavbar from '@/components/layout/StickyNavbar';
-import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Package, Heart, ShoppingCart, Eye } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useProductRatings } from '@/hooks/useProductRatings';
-import CompactRating from '@/components/ui/CompactRating';
-import { useCart } from '@/hooks/useCart';
-import { useWishlist } from '@/hooks/useWishlist';
-import { useAuth } from '@/hooks/useAuth';
-import { cn } from '@/lib/utils';
-
+import { useState, useMemo, useEffect } from "react";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
+import { useLanguage } from "@/lib/i18n";
+import { useCategories } from "@/hooks/useCategories";
+import { supabase } from "@/integrations/supabase/client";
+import { FilterState } from "@/components/ui/ProductFilters";
+import FilterBar from "@/components/products/FilterBar";
+import Header from "@/components/layout/Header";
+import Navigation from "@/components/layout/Navigation";
+import Footer from "@/components/layout/Footer";
+import StickyNavbar from "@/components/layout/StickyNavbar";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight, Package, Heart, ShoppingCart, Eye } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useProductRatings } from "@/hooks/useProductRatings";
+import CompactRating from "@/components/ui/CompactRating";
+import { useCart } from "@/hooks/useCart";
+import { useWishlist } from "@/hooks/useWishlist";
+import { useAuth } from "@/hooks/useAuth";
+import { cn } from "@/lib/utils";
 
 interface DbProduct {
   id: string;
@@ -38,13 +37,19 @@ interface DbProduct {
 const Categories = () => {
   const { t, language, isRTL } = useLanguage();
   const [searchParams] = useSearchParams();
-  const selectedCategorySlug = searchParams.get('category');
-  const selectedSubcategorySlug = searchParams.get('subcategory');
+  const selectedCategorySlug = searchParams.get("category");
+  const selectedSubcategorySlug = searchParams.get("subcategory");
 
-  const { getRootCategories, getCategoryBySlug, getSubcategoryBySlug, getSubcategories, loading: categoriesLoading } = useCategories();
+  const {
+    getRootCategories,
+    getCategoryBySlug,
+    getSubcategoryBySlug,
+    getSubcategories,
+    loading: categoriesLoading,
+  } = useCategories();
   const rootCategories = getRootCategories();
-  
-  const [sortBy, setSortBy] = useState('latest');
+
+  const [sortBy, setSortBy] = useState("latest");
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState<FilterState>({
     priceRange: [0, 150000],
@@ -64,10 +69,10 @@ const Categories = () => {
   const ITEMS_PER_PAGE = 24;
 
   const getLocalizedName = (item?: { name: string; name_fa?: string | null } | null) => {
-    if (!item) return '';
+    if (!item) return "";
     return isRTL && item.name_fa ? item.name_fa : item.name;
   };
-  
+
   // Memoize subcategories to prevent infinite re-renders
   const subcategories = useMemo(() => {
     return currentCategory ? getSubcategories(currentCategory.id) : [];
@@ -77,29 +82,29 @@ const Categories = () => {
   useEffect(() => {
     const fetchCategoryImages = async () => {
       if (rootCategories.length === 0) return;
-      
+
       try {
         const imageMap = new Map<string, string>();
-        
+
         // Fetch one product per category
         for (const cat of rootCategories) {
           const { data } = await supabase
-            .from('products')
-            .select('images')
-            .eq('category_id', cat.id)
-            .eq('status', 'active')
-            .not('images', 'is', null)
+            .from("products")
+            .select("images")
+            .eq("category_id", cat.id)
+            .eq("status", "active")
+            .not("images", "is", null)
             .limit(1)
             .maybeSingle();
-          
+
           if (data?.images && data.images.length > 0) {
             imageMap.set(cat.id, data.images[0]);
           }
         }
-        
+
         setCategoryImages(imageMap);
       } catch (error) {
-        console.error('Error fetching category images:', error);
+        console.error("Error fetching category images:", error);
       }
     };
 
@@ -114,26 +119,28 @@ const Categories = () => {
       setProductsLoading(true);
       try {
         let query = supabase
-          .from('products')
-          .select('id, name, slug, price, compare_at_price, images, category_id, quantity, is_featured, metadata, currency')
-          .eq('status', 'active');
+          .from("products")
+          .select(
+            "id, name, slug, price, compare_at_price, images, category_id, quantity, is_featured, metadata, currency",
+          )
+          .eq("status", "active");
 
         if (currentCategory) {
           if (currentSubcategory) {
             // Filter by subcategory_id when a subcategory is selected
-            query = query.eq('subcategory_id', currentSubcategory.id);
+            query = query.eq("subcategory_id", currentSubcategory.id);
           } else {
             // Filter by category_id when only category is selected
-            query = query.eq('category_id', currentCategory.id);
+            query = query.eq("category_id", currentCategory.id);
           }
         }
 
-        const { data, error } = await query.order('created_at', { ascending: false });
+        const { data, error } = await query.order("created_at", { ascending: false });
 
         if (error) throw error;
         setDbProducts((data || []) as DbProduct[]);
       } catch (error) {
-        console.error('Error fetching products:', error);
+        console.error("Error fetching products:", error);
       } finally {
         setProductsLoading(false);
       }
@@ -151,22 +158,22 @@ const Categories = () => {
 
   // Convert DB products to display format
   const displayProducts = useMemo(() => {
-    return dbProducts.map(p => {
+    return dbProducts.map((p) => {
       const metadata = p.metadata as { brand?: string } | null;
       // Use currency from database column (primary source)
-      const currency = p.currency || 'AFN';
-      
+      const currency = p.currency || "AFN";
+
       // Determine effective prices: lower price is the sale price, higher is original
       const hasComparePrice = p.compare_at_price && p.compare_at_price !== p.price;
       let effectivePrice = p.price;
       let effectiveOriginalPrice: number | undefined = undefined;
-      
+
       if (hasComparePrice) {
         // Always use the lower value as the sale price, higher as original (strikethrough)
         effectivePrice = Math.min(p.price, p.compare_at_price!);
         effectiveOriginalPrice = Math.max(p.price, p.compare_at_price!);
       }
-      
+
       const discount = effectiveOriginalPrice
         ? Math.round(((effectiveOriginalPrice - effectivePrice) / effectiveOriginalPrice) * 100)
         : undefined;
@@ -177,10 +184,10 @@ const Categories = () => {
         slug: p.slug,
         price: effectivePrice,
         originalPrice: effectiveOriginalPrice,
-        images: p.images || ['/placeholder.svg'],
-        category: currentCategory?.slug || '',
+        images: p.images || ["/placeholder.svg"],
+        category: currentCategory?.slug || "",
         subcategory: currentSubcategory?.slug,
-        brand: metadata?.brand || '',
+        brand: metadata?.brand || "",
         rating: 0,
         reviewCount: 0,
         inStock: p.quantity > 0,
@@ -188,9 +195,9 @@ const Categories = () => {
         isHot: false,
         discount,
         currency,
-        currencySymbol: currency === 'USD' ? '$' : 'AFN',
-        seller: { id: '', name: '', rating: 0, productCount: 0, avatar: '' },
-        description: { fa: '', en: '' },
+        currencySymbol: currency === "USD" ? "$" : "AFN",
+        seller: { id: "", name: "", rating: 0, productCount: 0, avatar: "" },
+        description: { fa: "", en: "" },
         specifications: [],
       };
     });
@@ -200,37 +207,35 @@ const Categories = () => {
     let result = [...displayProducts];
 
     // Filter by price range
-    result = result.filter(
-      p => p.price >= filters.priceRange[0] && p.price <= filters.priceRange[1]
-    );
+    result = result.filter((p) => p.price >= filters.priceRange[0] && p.price <= filters.priceRange[1]);
 
     // Filter by rating
     if (filters.rating > 0) {
-      result = result.filter(p => p.rating >= filters.rating);
+      result = result.filter((p) => p.rating >= filters.rating);
     }
 
     // Filter by stock
     if (filters.inStock) {
-      result = result.filter(p => p.inStock);
+      result = result.filter((p) => p.inStock);
     }
 
     // Filter by sale
     if (filters.onSale) {
-      result = result.filter(p => p.discount && p.discount > 0);
+      result = result.filter((p) => p.discount && p.discount > 0);
     }
 
     // Sort
     switch (sortBy) {
-      case 'price-low':
+      case "price-low":
         result.sort((a, b) => a.price - b.price);
         break;
-      case 'price-high':
+      case "price-high":
         result.sort((a, b) => b.price - a.price);
         break;
-      case 'popularity':
+      case "popularity":
         result.sort((a, b) => b.reviewCount - a.reviewCount);
         break;
-      case 'latest':
+      case "latest":
       default:
         result.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
         break;
@@ -240,12 +245,9 @@ const Categories = () => {
   }, [displayProducts, filters, sortBy]);
 
   const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
-  const paginatedProducts = filteredProducts.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+  const paginatedProducts = filteredProducts.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
-  const productIds = useMemo(() => paginatedProducts.map(p => p.id), [paginatedProducts]);
+  const productIds = useMemo(() => paginatedProducts.map((p) => p.id), [paginatedProducts]);
   const { getRating } = useProductRatings(productIds);
 
   const isLoading = categoriesLoading || productsLoading;
@@ -267,12 +269,12 @@ const Categories = () => {
           if (cat) {
             window.location.href = `/categories?category=${cat}`;
           } else {
-            window.location.href = '/categories';
+            window.location.href = "/categories";
           }
         }}
       />
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-1">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
           <div>
@@ -282,7 +284,7 @@ const Categories = () => {
                 t.categories.allCategories}
             </h1>
             <p className="text-muted-foreground">
-              {filteredProducts.length} {isRTL ? 'محصول' : 'products'}
+              {filteredProducts.length} {isRTL ? "محصول" : "products"}
             </p>
           </div>
         </div>
@@ -302,7 +304,7 @@ const Categories = () => {
                   const productImage = categoryImages.get(cat.id);
                   const displayImage = cat.image_url || productImage;
                   const catLabel = getLocalizedName(cat);
-                  
+
                   return (
                     <Link
                       key={cat.id}
@@ -335,7 +337,7 @@ const Categories = () => {
               <div className="text-center py-12">
                 <Package className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
                 <p className="text-muted-foreground">
-                  {isRTL ? 'هنوز دسته‌بندی‌ای وجود ندارد' : 'No categories available yet'}
+                  {isRTL ? "هنوز دسته‌بندی‌ای وجود ندارد" : "No categories available yet"}
                 </p>
               </div>
             )}
@@ -362,12 +364,10 @@ const Categories = () => {
               <Package className="h-12 w-12 text-muted-foreground" />
             </div>
             <h3 className="text-lg font-semibold text-foreground mb-2">
-              {isRTL ? 'محصولی یافت نشد' : 'No products found'}
+              {isRTL ? "محصولی یافت نشد" : "No products found"}
             </h3>
             <p className="text-muted-foreground max-w-md">
-              {isRTL 
-                ? 'محصولی در این دسته‌بندی موجود نیست.'
-                : 'No products available in this category.'}
+              {isRTL ? "محصولی در این دسته‌بندی موجود نیست." : "No products available in this category."}
             </p>
           </div>
         ) : (
@@ -385,14 +385,14 @@ const Categories = () => {
               variant="outline"
               size="sm"
               disabled={currentPage === 1}
-              onClick={() => setCurrentPage(p => p - 1)}
+              onClick={() => setCurrentPage((p) => p - 1)}
             >
               {isRTL ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
             </Button>
             {[...Array(Math.min(totalPages, 5))].map((_, i) => (
               <Button
                 key={i}
-                variant={currentPage === i + 1 ? 'cyan' : 'outline'}
+                variant={currentPage === i + 1 ? "cyan" : "outline"}
                 size="sm"
                 onClick={() => setCurrentPage(i + 1)}
               >
@@ -403,7 +403,7 @@ const Categories = () => {
               variant="outline"
               size="sm"
               disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage(p => p + 1)}
+              onClick={() => setCurrentPage((p) => p + 1)}
             >
               {isRTL ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
             </Button>
@@ -444,13 +444,13 @@ const ProductCard = ({ product, getRating }: ProductCardProps) => {
   const navigate = useNavigate();
 
   const isWishlisted = isInWishlist(product.id);
-  const isBuyer = role === 'buyer';
-  const currencySymbol = product.currencySymbol || (product.currency === 'USD' ? '$' : 'AFN');
-  
+  const isBuyer = role === "buyer";
+  const currencySymbol = product.currencySymbol || (product.currency === "USD" ? "$" : "AFN");
+
   const { averageRating, reviewCount } = getRating(product.id);
 
   const getName = () => {
-    if (typeof product.name === 'string') return product.name;
+    if (typeof product.name === "string") return product.name;
     return product.name[language] || product.name.en;
   };
 
@@ -458,7 +458,7 @@ const ProductCard = ({ product, getRating }: ProductCardProps) => {
     e.preventDefault();
     e.stopPropagation();
     if (!user) {
-      navigate('/login');
+      navigate("/login");
       return;
     }
     setIsAddingToCart(true);
@@ -470,7 +470,7 @@ const ProductCard = ({ product, getRating }: ProductCardProps) => {
     e.preventDefault();
     e.stopPropagation();
     if (!user) {
-      navigate('/login');
+      navigate("/login");
       return;
     }
     await toggleWishlist(product.id);
@@ -486,23 +486,23 @@ const ProductCard = ({ product, getRating }: ProductCardProps) => {
       <div className="relative aspect-square overflow-hidden flex-shrink-0">
         <Link to={`/products/${product.slug}`}>
           <img
-            src={product.images[0] || '/placeholder.svg'}
+            src={product.images[0] || "/placeholder.svg"}
             alt={getName()}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
         </Link>
 
         {/* Badges */}
-        <div className={`absolute top-2 ${isRTL ? 'right-2' : 'left-2'} flex flex-col gap-1`}>
-          {product.isNew && <Badge variant="new">{isRTL ? 'جدید' : 'New'}</Badge>}
-          {product.isHot && <Badge variant="hot">{isRTL ? 'داغ' : 'Hot'}</Badge>}
+        <div className={`absolute top-2 ${isRTL ? "right-2" : "left-2"} flex flex-col gap-1`}>
+          {product.isNew && <Badge variant="new">{isRTL ? "جدید" : "New"}</Badge>}
+          {product.isHot && <Badge variant="hot">{isRTL ? "داغ" : "Hot"}</Badge>}
           {product.discount && product.discount > 0 && <Badge variant="sale">-{product.discount}%</Badge>}
         </div>
 
         {/* Quick Actions */}
         <div
-          className={`absolute top-2 ${isRTL ? 'left-2' : 'right-2'} flex flex-col gap-2 transition-all duration-300 ${
-            isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'
+          className={`absolute top-2 ${isRTL ? "left-2" : "right-2"} flex flex-col gap-2 transition-all duration-300 ${
+            isHovered ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4"
           }`}
         >
           {(!user || isBuyer) && (
@@ -510,9 +510,9 @@ const ProductCard = ({ product, getRating }: ProductCardProps) => {
               onClick={handleWishlistToggle}
               className={cn(
                 "p-2 rounded-full transition-colors shadow-md",
-                isWishlisted 
-                  ? "bg-primary text-white" 
-                  : "bg-white/90 dark:bg-gray-800/90 hover:bg-primary hover:text-white"
+                isWishlisted
+                  ? "bg-primary text-white"
+                  : "bg-white/90 dark:bg-gray-800/90 hover:bg-primary hover:text-white",
               )}
             >
               <Heart size={18} className={isWishlisted ? "fill-current" : ""} />
@@ -532,11 +532,13 @@ const ProductCard = ({ product, getRating }: ProductCardProps) => {
         {/* Price */}
         <div className="flex items-baseline gap-1.5 flex-shrink-0 mb-1">
           <span className="text-sm sm:text-base md:text-lg font-bold text-primary truncate">
-            {product.currency === 'USD' ? '$' : ''}{product.price.toLocaleString()} {product.currency !== 'USD' ? currencySymbol : ''}
+            {product.currency === "USD" ? "$" : ""}
+            {product.price.toLocaleString()} {product.currency !== "USD" ? currencySymbol : ""}
           </span>
           {product.originalPrice && product.originalPrice !== product.price && (
             <span className="text-[10px] sm:text-xs text-muted-foreground line-through truncate">
-              {product.currency === 'USD' ? '$' : ''}{product.originalPrice.toLocaleString()}
+              {product.currency === "USD" ? "$" : ""}
+              {product.originalPrice.toLocaleString()}
             </span>
           )}
         </div>
@@ -555,15 +557,15 @@ const ProductCard = ({ product, getRating }: ProductCardProps) => {
 
         {/* Add to Cart */}
         <div className="mt-auto pt-2 flex-shrink-0">
-          <Button 
-            variant="cyan" 
-            size="sm" 
+          <Button
+            variant="cyan"
+            size="sm"
             className="w-full gap-2 text-xs"
             onClick={handleAddToCart}
             disabled={isAddingToCart}
           >
-            <ShoppingCart size={14} className={isAddingToCart ? 'animate-pulse' : ''} />
-            {isRTL ? 'افزودن' : 'Add'}
+            <ShoppingCart size={14} className={isAddingToCart ? "animate-pulse" : ""} />
+            {isRTL ? "افزودن" : "Add"}
           </Button>
         </div>
       </div>
