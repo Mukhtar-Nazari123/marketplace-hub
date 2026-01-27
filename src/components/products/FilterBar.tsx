@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useLanguage } from '@/lib/i18n';
-import { ChevronDown, Check, SlidersHorizontal } from 'lucide-react';
+import { ChevronDown, Check, SlidersHorizontal, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCategories } from '@/hooks/useCategories';
 import {
@@ -85,60 +85,141 @@ const FilterBar = ({
 
   const effectiveColorOptions = colorOptions.length > 0 ? colorOptions : defaultColors;
 
+  // Scroll state
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const updateScrollState = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    const maxScroll = scrollWidth - clientWidth;
+    const buffer = 10;
+    
+    // RTL-aware scroll detection
+    if (isRTL) {
+      setCanScrollRight(Math.abs(scrollLeft) > buffer);
+      setCanScrollLeft(Math.abs(scrollLeft) < maxScroll - buffer);
+    } else {
+      setCanScrollLeft(scrollLeft > buffer);
+      setCanScrollRight(scrollLeft < maxScroll - buffer);
+    }
+  }, [isRTL]);
+
+  useEffect(() => {
+    updateScrollState();
+    const el = scrollRef.current;
+    if (el) {
+      el.addEventListener('scroll', updateScrollState);
+      window.addEventListener('resize', updateScrollState);
+      return () => {
+        el.removeEventListener('scroll', updateScrollState);
+        window.removeEventListener('resize', updateScrollState);
+      };
+    }
+  }, [updateScrollState]);
+
+  const scroll = (direction: 'left' | 'right') => {
+    const el = scrollRef.current;
+    if (!el) return;
+    
+    const scrollAmount = 200;
+    const actualDirection = isRTL 
+      ? (direction === 'left' ? 1 : -1)
+      : (direction === 'left' ? -1 : 1);
+    
+    el.scrollBy({ left: scrollAmount * actualDirection, behavior: 'smooth' });
+  };
+
   return (
     <div className="bg-background border-b border-border sticky top-0 z-30">
-      <div 
-        ref={scrollRef}
-        className="container mx-auto px-4 py-3 overflow-x-auto scrollbar-none"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-      >
-        <div className="flex items-center gap-2">
-          {/* Filter Icon */}
-          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted/50 border border-border flex-shrink-0">
-            <SlidersHorizontal size={16} className="text-muted-foreground" />
+      <div className="container mx-auto px-4 py-3 relative group">
+        {/* Left scroll button */}
+        <button
+          onClick={() => scroll('left')}
+          className={cn(
+            "absolute left-1 top-1/2 -translate-y-1/2 z-10 hidden md:flex",
+            "w-8 h-8 items-center justify-center rounded-full",
+            "bg-background/95 border border-border shadow-md",
+            "hover:bg-muted transition-all duration-200",
+            "opacity-0 group-hover:opacity-100",
+            !canScrollLeft && "!opacity-0 pointer-events-none"
+          )}
+          aria-label="Scroll left"
+        >
+          <ChevronLeft size={18} className="text-foreground" />
+        </button>
+
+        {/* Right scroll button */}
+        <button
+          onClick={() => scroll('right')}
+          className={cn(
+            "absolute right-1 top-1/2 -translate-y-1/2 z-10 hidden md:flex",
+            "w-8 h-8 items-center justify-center rounded-full",
+            "bg-background/95 border border-border shadow-md",
+            "hover:bg-muted transition-all duration-200",
+            "opacity-0 group-hover:opacity-100",
+            !canScrollRight && "!opacity-0 pointer-events-none"
+          )}
+          aria-label="Scroll right"
+        >
+          <ChevronRight size={18} className="text-foreground" />
+        </button>
+
+        <div 
+          ref={scrollRef}
+          className="overflow-x-auto scrollbar-none"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          <div className="flex items-center gap-2">
+            {/* Filter Icon */}
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted/50 border border-border flex-shrink-0">
+              <SlidersHorizontal size={16} className="text-muted-foreground" />
+            </div>
+            {/* Sort By */}
+            <FilterPill
+              label={isRTL ? 'ترتیب' : 'Sort by'}
+              options={sortOptions}
+              selectedValue={selectedSort}
+              onSelect={(value) => onSortChange?.(value)}
+              isRTL={isRTL}
+            />
+
+            {/* Category */}
+            {!categoriesLoading && categoryOptions.length > 0 && (
+              <FilterPill
+                label={isRTL ? 'دسته‌بندی' : 'Category'}
+                options={categoryOptions}
+                selectedValue={selectedCategory}
+                onSelect={(value) => onCategoryChange?.(value === selectedCategory ? null : value)}
+                isRTL={isRTL}
+                allowClear
+              />
+            )}
+
+            {/* Brand */}
+            {brandOptions.length > 0 && (
+              <FilterPill
+                label={isRTL ? 'برند' : 'Brand'}
+                options={brandOptions}
+                selectedValue={selectedBrand}
+                onSelect={(value) => onBrandChange?.(value === selectedBrand ? null : value)}
+                isRTL={isRTL}
+                allowClear
+              />
+            )}
+
+            {/* Color */}
+            <FilterPill
+              label={isRTL ? 'رنگ' : 'Color'}
+              options={effectiveColorOptions}
+              selectedValue={selectedColor}
+              onSelect={(value) => onColorChange?.(value === selectedColor ? null : value)}
+              isRTL={isRTL}
+              allowClear
+            />
           </div>
-          {/* Sort By */}
-          <FilterPill
-            label={isRTL ? 'ترتیب' : 'Sort by'}
-            options={sortOptions}
-            selectedValue={selectedSort}
-            onSelect={(value) => onSortChange?.(value)}
-            isRTL={isRTL}
-          />
-
-          {/* Category */}
-          {!categoriesLoading && categoryOptions.length > 0 && (
-            <FilterPill
-              label={isRTL ? 'دسته‌بندی' : 'Category'}
-              options={categoryOptions}
-              selectedValue={selectedCategory}
-              onSelect={(value) => onCategoryChange?.(value === selectedCategory ? null : value)}
-              isRTL={isRTL}
-              allowClear
-            />
-          )}
-
-          {/* Brand */}
-          {brandOptions.length > 0 && (
-            <FilterPill
-              label={isRTL ? 'برند' : 'Brand'}
-              options={brandOptions}
-              selectedValue={selectedBrand}
-              onSelect={(value) => onBrandChange?.(value === selectedBrand ? null : value)}
-              isRTL={isRTL}
-              allowClear
-            />
-          )}
-
-          {/* Color */}
-          <FilterPill
-            label={isRTL ? 'رنگ' : 'Color'}
-            options={effectiveColorOptions}
-            selectedValue={selectedColor}
-            onSelect={(value) => onColorChange?.(value === selectedColor ? null : value)}
-            isRTL={isRTL}
-            allowClear
-          />
         </div>
       </div>
     </div>
