@@ -67,7 +67,7 @@ const CategoryRow = ({ category, isRTL, t }: CategoryRowProps) => {
 
     const { scrollLeft, scrollWidth, clientWidth } = container;
     const isAtStart = isRTL ? scrollLeft >= -10 : scrollLeft <= 10;
-    const isAtEnd = isRTL 
+    const isAtEnd = isRTL
       ? scrollLeft <= -(scrollWidth - clientWidth - 10)
       : scrollLeft >= scrollWidth - clientWidth - 10;
 
@@ -89,9 +89,8 @@ const CategoryRow = ({ category, isRTL, t }: CategoryRowProps) => {
     if (!container) return;
 
     const scrollAmount = 300;
-    const newScrollLeft = direction === "left"
-      ? container.scrollLeft - scrollAmount
-      : container.scrollLeft + scrollAmount;
+    const newScrollLeft =
+      direction === "left" ? container.scrollLeft - scrollAmount : container.scrollLeft + scrollAmount;
 
     container.scrollTo({ left: newScrollLeft, behavior: "smooth" });
   };
@@ -146,11 +145,11 @@ const CategoryRow = ({ category, isRTL, t }: CategoryRowProps) => {
           <h3 className="font-display font-bold text-xl text-foreground">
             {isRTL && category.name_fa ? category.name_fa : category.name}
           </h3>
-          <Link 
-            to={`/products?category=${category.slug}`} 
+          <Link
+            to={`/products?category=${category.slug}`}
             className="text-sm text-muted-foreground hover:text-cyan flex items-center gap-1 transition-colors"
           >
-            {t.deals.seeAll} 
+            {t.deals.seeAll}
             {isRTL ? <ArrowLeft className="h-3 w-3" /> : <ArrowRight className="h-3 w-3" />}
           </Link>
         </div>
@@ -162,7 +161,7 @@ const CategoryRow = ({ category, isRTL, t }: CategoryRowProps) => {
         <Button
           variant="secondary"
           size="icon"
-          className={`absolute ${isRTL ? 'right-0' : 'left-0'} top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full shadow-lg bg-background/90 backdrop-blur-sm border border-border hover:bg-background transition-opacity duration-200 hidden md:flex ${showLeftArrow ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+          className={`absolute ${isRTL ? "right-0" : "left-0"} top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full shadow-lg bg-background/90 backdrop-blur-sm border border-border hover:bg-background transition-opacity duration-200 hidden md:flex ${showLeftArrow ? "opacity-100" : "opacity-0 pointer-events-none"}`}
           onClick={() => scroll(isRTL ? "right" : "left")}
         >
           {isRTL ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
@@ -172,7 +171,7 @@ const CategoryRow = ({ category, isRTL, t }: CategoryRowProps) => {
         <Button
           variant="secondary"
           size="icon"
-          className={`absolute ${isRTL ? 'left-0' : 'right-0'} top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full shadow-lg bg-background/90 backdrop-blur-sm border border-border hover:bg-background transition-opacity duration-200 hidden md:flex ${showRightArrow ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+          className={`absolute ${isRTL ? "left-0" : "right-0"} top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full shadow-lg bg-background/90 backdrop-blur-sm border border-border hover:bg-background transition-opacity duration-200 hidden md:flex ${showRightArrow ? "opacity-100" : "opacity-0 pointer-events-none"}`}
           onClick={() => scroll(isRTL ? "left" : "right")}
         >
           {isRTL ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
@@ -181,33 +180,31 @@ const CategoryRow = ({ category, isRTL, t }: CategoryRowProps) => {
         <div
           ref={scrollContainerRef}
           className="flex gap-4 overflow-x-auto scroll-smooth scrollbar-hide pb-2 px-1"
-          style={{ 
-            scrollbarWidth: "none", 
+          style={{
+            scrollbarWidth: "none",
             msOverflowStyle: "none",
-            WebkitOverflowScrolling: "touch"
+            WebkitOverflowScrolling: "touch",
           }}
         >
-          {isLoading ? (
-            [...Array(5)].map((_, index) => (
-              <div key={index} className="flex-shrink-0 w-48 md:w-56">
-                <div className="space-y-3">
-                  <Skeleton className="aspect-square rounded-lg" />
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
+          {isLoading
+            ? [...Array(5)].map((_, index) => (
+                <div key={index} className="flex-shrink-0 w-48 md:w-56">
+                  <div className="space-y-3">
+                    <Skeleton className="aspect-square rounded-lg" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                  </div>
                 </div>
-              </div>
-            ))
-          ) : (
-            products.map((product, index) => (
-              <div
-                key={product.id}
-                className="flex-shrink-0 w-48 md:w-56 opacity-0 animate-fade-in-up"
-                style={{ animationDelay: `${index * 50}ms`, animationFillMode: "forwards" }}
-              >
-                <ProductCard {...getProductCardData(product)} />
-              </div>
-            ))
-          )}
+              ))
+            : products.map((product, index) => (
+                <div
+                  key={product.id}
+                  className="flex-shrink-0 w-48 md:w-56 opacity-0 animate-fade-in-up"
+                  style={{ animationDelay: `${index * 50}ms`, animationFillMode: "forwards" }}
+                >
+                  <ProductCard {...getProductCardData(product)} />
+                </div>
+              ))}
         </div>
       </div>
     </div>
@@ -285,14 +282,14 @@ const CategoryProductRows = () => {
   }
 
   return (
-    <section className="py-12 bg-background">
+    <section className="py-1 bg-background">
       <div className="container">
         <div className="mb-8">
           <h2 className="font-display font-bold text-2xl text-foreground">
             {isRTL ? "خرید بر اساس دسته‌بندی" : "Shop by Category"}
           </h2>
         </div>
-        
+
         {categoriesWithProducts.map((category) => (
           <CategoryRow key={category.id} category={category} isRTL={isRTL} t={t} />
         ))}
