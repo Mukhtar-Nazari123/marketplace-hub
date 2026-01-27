@@ -5,10 +5,11 @@ import { useLanguage } from '@/lib/i18n';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
-import { Heart, ShoppingCart, Trash2, Package } from 'lucide-react';
+import { Heart, Package } from 'lucide-react';
+import ProductCard from '@/components/home/ProductCard';
+import { useProductRatings } from '@/hooks/useProductRatings';
 
 interface WishlistItem {
   id: string;
@@ -18,9 +19,13 @@ interface WishlistItem {
     id: string;
     name: string;
     price: number;
+    compare_at_price: number | null;
     images: string[] | null;
     status: string;
     quantity: number;
+    is_featured: boolean;
+    currency: string;
+    created_at: string;
   } | null;
 }
 
@@ -32,7 +37,12 @@ const Wishlist = () => {
 
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [removingIds, setRemovingIds] = useState<Set<string>>(new Set());
+
+  // Get product IDs for ratings
+  const productIds = wishlist
+    .filter(item => item.product !== null)
+    .map(item => item.product!.id);
+  const { getRating } = useProductRatings(productIds);
 
   useEffect(() => {
     if (!authLoading && user) {
@@ -54,9 +64,13 @@ const Wishlist = () => {
           id,
           name,
           price,
+          compare_at_price,
           images,
           status,
-          quantity
+          quantity,
+          is_featured,
+          currency,
+          created_at
         )
       `)
       .eq('user_id', user.id)
@@ -75,59 +89,50 @@ const Wishlist = () => {
     setLoading(false);
   };
 
-  const removeFromWishlist = async (wishlistId: string) => {
-    setRemovingIds(prev => new Set(prev).add(wishlistId));
-
-    const { error } = await supabase
-      .from('wishlist')
-      .delete()
-      .eq('id', wishlistId);
-
-    if (error) {
-      toast({
-        title: isRTL ? 'خطا' : 'Error',
-        description: isRTL ? 'خطا در حذف از علاقه‌مندی‌ها' : 'Failed to remove from wishlist',
-        variant: 'destructive',
-      });
-    } else {
-      setWishlist(prev => prev.filter(item => item.id !== wishlistId));
-      toast({
-        title: isRTL ? 'حذف شد' : 'Removed',
-        description: isRTL ? 'محصول از علاقه‌مندی‌ها حذف شد' : 'Product removed from wishlist',
-      });
-    }
-
-    setRemovingIds(prev => {
-      const newSet = new Set(prev);
-      newSet.delete(wishlistId);
-      return newSet;
-    });
-  };
-
-  const addToCart = (productName: string) => {
-    // Placeholder for cart functionality
-    toast({
-      title: isRTL ? 'به سبد اضافه شد' : 'Added to Cart',
-      description: isRTL ? `${productName} به سبد خرید اضافه شد` : `${productName} added to cart`,
-    });
-  };
-
   const texts = {
     title: isRTL ? 'علاقه‌مندی‌ها' : 'Wishlist',
     description: isRTL ? 'محصولات مورد علاقه شما' : 'Your favorite products',
     empty: isRTL ? 'لیست علاقه‌مندی‌های شما خالی است' : 'Your wishlist is empty',
     emptyDesc: isRTL ? 'محصولات مورد علاقه خود را به لیست اضافه کنید' : 'Add your favorite products to the list',
     browseProducts: isRTL ? 'مشاهده محصولات' : 'Browse Products',
-    addToCart: isRTL ? 'افزودن به سبد' : 'Add to Cart',
-    remove: isRTL ? 'حذف' : 'Remove',
-    outOfStock: isRTL ? 'ناموجود' : 'Out of Stock',
-    unavailable: isRTL ? 'محصول ناموجود است' : 'Product unavailable',
   };
 
-  const formatPrice = (price: number) => {
-    return isRTL 
-      ? `${price.toLocaleString('fa-IR')} افغانی`
-      : `${price.toLocaleString()} AFN`;
+  const getProductCardData = (product: WishlistItem['product']) => {
+    if (!product) return null;
+
+    const currency = (product.currency as "AFN" | "USD") || "AFN";
+    const hasDiscount = product.compare_at_price && product.compare_at_price !== product.price;
+    let originalPrice: number | undefined;
+    let currentPrice = product.price;
+    let discount: number | undefined;
+
+    if (hasDiscount) {
+      if (product.compare_at_price! > product.price) {
+        originalPrice = product.compare_at_price!;
+        currentPrice = product.price;
+      } else {
+        originalPrice = product.price;
+        currentPrice = product.compare_at_price!;
+      }
+      discount = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
+    }
+
+    const isNew = new Date(product.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const { averageRating, reviewCount } = getRating(product.id);
+
+    return {
+      id: product.id,
+      name: product.name,
+      price: currentPrice,
+      originalPrice,
+      rating: averageRating,
+      reviews: reviewCount,
+      isNew,
+      isHot: product.is_featured,
+      discount,
+      image: product.images?.[0],
+      currency,
+    };
   };
 
   return (
@@ -138,19 +143,13 @@ const Wishlist = () => {
     >
       <div className="space-y-4 sm:space-y-6 animate-fade-in">
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
-            {[...Array(4)].map((_, i) => (
-              <Card key={i}>
-                <CardContent className="p-3 sm:p-4 space-y-3 sm:space-y-4">
-                  <Skeleton className="w-full h-32 sm:h-40 rounded-lg" />
-                  <Skeleton className="h-5 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
-                  <div className="flex gap-2">
-                    <Skeleton className="h-10 sm:h-9 flex-1" />
-                    <Skeleton className="h-10 sm:h-9 w-10 sm:w-9" />
-                  </div>
-                </CardContent>
-              </Card>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="space-y-3">
+                <Skeleton className="aspect-square rounded-lg" />
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+              </div>
             ))}
           </div>
         ) : wishlist.length === 0 ? (
@@ -166,77 +165,19 @@ const Wishlist = () => {
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
-            {wishlist.map((item) => {
-              const product = item.product;
-              const isAvailable = product && product.status === 'active' && product.quantity > 0;
-              const imageUrl = product?.images?.[0] || '/placeholder.svg';
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
+            {wishlist.map((item, index) => {
+              const cardData = getProductCardData(item.product);
+              if (!cardData) return null;
 
               return (
-                <Card key={item.id} className="group overflow-hidden transition-all hover:shadow-lg">
-                  <CardContent className="p-0">
-                    {/* Product Image */}
-                    <div className="relative aspect-square overflow-hidden bg-muted">
-                      <img
-                        src={imageUrl}
-                        alt={product?.name || ''}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = '/placeholder.svg';
-                        }}
-                      />
-                      {!isAvailable && product && (
-                        <div className="absolute inset-0 bg-background/80 flex items-center justify-center">
-                          <span className="text-muted-foreground font-medium">
-                            {texts.outOfStock}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Product Info */}
-                    <div className="p-4 space-y-3">
-                      {product ? (
-                        <>
-                          <h3 
-                            className="font-medium text-foreground line-clamp-2 cursor-pointer hover:text-primary transition-colors"
-                            onClick={() => navigate(`/products/${product.id}`)}
-                          >
-                            {product.name}
-                          </h3>
-                          <p className="text-lg font-bold text-primary">
-                            {formatPrice(product.price)}
-                          </p>
-                        </>
-                      ) : (
-                        <p className="text-muted-foreground text-sm">{texts.unavailable}</p>
-                      )}
-
-                      {/* Actions - Touch-friendly */}
-                      <div className="flex gap-2">
-                        <Button
-                          variant="default"
-                          size="sm"
-                          className="flex-1 min-h-[44px]"
-                          disabled={!isAvailable}
-                          onClick={() => product && addToCart(product.name)}
-                        >
-                          <ShoppingCart className={`h-4 w-4 ${isRTL ? 'ml-1' : 'mr-1'}`} />
-                          {texts.addToCart}
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="shrink-0 text-destructive hover:bg-destructive/10 hover:text-destructive min-h-[44px] min-w-[44px]"
-                          disabled={removingIds.has(item.id)}
-                          onClick={() => removeFromWishlist(item.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                <div
+                  key={item.id}
+                  className="opacity-0 animate-fade-in-up"
+                  style={{ animationDelay: `${Math.min(index, 11) * 50}ms`, animationFillMode: "forwards" }}
+                >
+                  <ProductCard {...cardData} />
+                </div>
               );
             })}
           </div>
