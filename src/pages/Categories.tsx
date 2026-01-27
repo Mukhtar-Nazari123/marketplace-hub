@@ -1,18 +1,24 @@
 import { useState, useMemo, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/lib/i18n';
 import { useCategories } from '@/hooks/useCategories';
 import { supabase } from '@/integrations/supabase/client';
-import ProductFilters, { FilterState } from '@/components/ui/ProductFilters';
-import ProductGrid from '@/components/products/ProductGrid';
+import { FilterState } from '@/components/ui/ProductFilters';
 import FilterBar from '@/components/products/FilterBar';
 import Header from '@/components/layout/Header';
 import Navigation from '@/components/layout/Navigation';
 import Footer from '@/components/layout/Footer';
 import StickyNavbar from '@/components/layout/StickyNavbar';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, SlidersHorizontal, X, Package } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Package, Heart, ShoppingCart, Eye } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useProductRatings } from '@/hooks/useProductRatings';
+import CompactRating from '@/components/ui/CompactRating';
+import { useCart } from '@/hooks/useCart';
+import { useWishlist } from '@/hooks/useWishlist';
+import { useAuth } from '@/hooks/useAuth';
+import { cn } from '@/lib/utils';
 
 
 interface DbProduct {
@@ -29,13 +35,8 @@ interface DbProduct {
   currency: string;
 }
 
-interface CategoryImage {
-  category_id: string;
-  image_url: string;
-}
-
 const Categories = () => {
-  const { t, isRTL } = useLanguage();
+  const { t, language, isRTL } = useLanguage();
   const [searchParams] = useSearchParams();
   const selectedCategorySlug = searchParams.get('category');
   const selectedSubcategorySlug = searchParams.get('subcategory');
@@ -43,9 +44,8 @@ const Categories = () => {
   const { getRootCategories, getCategoryBySlug, getSubcategoryBySlug, getSubcategories, loading: categoriesLoading } = useCategories();
   const rootCategories = getRootCategories();
   
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState('latest');
-  const [showFilters, setShowFilters] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState<FilterState>({
     priceRange: [0, 150000],
     rating: 0,
@@ -60,6 +60,8 @@ const Categories = () => {
 
   const currentCategory = selectedCategorySlug ? getCategoryBySlug(selectedCategorySlug) : undefined;
   const currentSubcategory = selectedSubcategorySlug ? getSubcategoryBySlug(selectedSubcategorySlug) : undefined;
+
+  const ITEMS_PER_PAGE = 24;
 
   const getLocalizedName = (item?: { name: string; name_fa?: string | null } | null) => {
     if (!item) return '';
@@ -142,6 +144,11 @@ const Categories = () => {
     }
   }, [currentCategory?.id, currentSubcategory?.id, subcategories, categoriesLoading]);
 
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategorySlug, selectedSubcategorySlug, filters, sortBy]);
+
   // Convert DB products to display format
   const displayProducts = useMemo(() => {
     return dbProducts.map(p => {
@@ -189,11 +196,8 @@ const Categories = () => {
     });
   }, [dbProducts, currentCategory, currentSubcategory]);
 
-  // Only use DB products
-  const allProducts = displayProducts;
-
   const filteredProducts = useMemo(() => {
-    let result = [...allProducts];
+    let result = [...displayProducts];
 
     // Filter by price range
     result = result.filter(
@@ -233,7 +237,16 @@ const Categories = () => {
     }
 
     return result;
-  }, [allProducts, filters, sortBy]);
+  }, [displayProducts, filters, sortBy]);
+
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const productIds = useMemo(() => paginatedProducts.map(p => p.id), [paginatedProducts]);
+  const { getRating } = useProductRatings(productIds);
 
   const isLoading = categoriesLoading || productsLoading;
 
@@ -259,215 +272,301 @@ const Categories = () => {
         }}
       />
 
-      {/* Breadcrumb */}
-      <div className="bg-muted/50 py-3">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center gap-2 text-sm">
-            <Link to="/" className="text-muted-foreground hover:text-primary">
-              {t.pages.home}
-            </Link>
-            {isRTL ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
-            <Link to="/categories" className="text-muted-foreground hover:text-primary">
-              {t.categories.title}
-            </Link>
-            {currentCategory && (
-              <>
-                {isRTL ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
-                <span className="text-primary">{getLocalizedName(currentCategory)}</span>
-              </>
-            )}
-            {currentSubcategory && (
-              <>
-                {isRTL ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
-                <span className="text-primary">{getLocalizedName(currentSubcategory)}</span>
-              </>
-            )}
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">
+              {(currentSubcategory && getLocalizedName(currentSubcategory)) ||
+                (currentCategory && getLocalizedName(currentCategory)) ||
+                t.categories.allCategories}
+            </h1>
+            <p className="text-muted-foreground">
+              {filteredProducts.length} {isRTL ? 'محصول' : 'products'}
+            </p>
           </div>
         </div>
-      </div>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Desktop Sidebar */}
-          <aside className="hidden lg:block w-72 flex-shrink-0">
-            {/* Categories List */}
-            <div className="bg-card rounded-xl p-4 shadow-sm border border-border mb-6">
-              <h3 className="font-bold text-foreground mb-4">{t.categories.allCategories}</h3>
-              {categoriesLoading ? (
-                <div className="space-y-2">
-                  {[...Array(5)].map((_, i) => (
-                    <Skeleton key={i} className="h-10 w-full" />
-                  ))}
-                </div>
-              ) : rootCategories.length > 0 ? (
-                <div className="space-y-2">
-                  {rootCategories.map((cat) => (
-                    <div key={cat.id}>
-                      <Link
-                        to={`/categories?category=${cat.slug}`}
-                        className={`flex items-center justify-between p-2 rounded-lg transition-colors ${
-                          selectedCategorySlug === cat.slug
-                            ? 'bg-primary/10 text-primary'
-                            : 'hover:bg-muted'
-                        }`}
-                      >
-                        <span className="text-sm">{getLocalizedName(cat)}</span>
-                        {isRTL ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
-                      </Link>
-                      {selectedCategorySlug === cat.slug && cat.subcategories && cat.subcategories.length > 0 && (
-                        <div className={`${isRTL ? 'pr-4' : 'pl-4'} mt-1 space-y-1`}>
-                          {cat.subcategories.map((sub) => (
-                            <Link
-                              key={sub.id}
-                              to={`/categories?category=${cat.slug}&subcategory=${sub.slug}`}
-                              className={`block p-2 text-sm rounded-lg transition-colors ${
-                                selectedSubcategorySlug === sub.slug
-                                  ? 'bg-primary/10 text-primary'
-                                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                              }`}
-                            >
-                              {getLocalizedName(sub)}
-                            </Link>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-muted-foreground">
-                  {isRTL ? 'دسته‌بندی موجود نیست' : 'No categories available'}
-                </p>
-              )}
-            </div>
-
-            <ProductFilters onFilterChange={setFilters} />
-          </aside>
-
-          {/* Main Content */}
-          <main className="flex-1">
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">
-                  {(currentSubcategory && getLocalizedName(currentSubcategory)) ||
-                    (currentCategory && getLocalizedName(currentCategory)) ||
-                    t.categories.allCategories}
-                </h1>
-                <p className="text-muted-foreground">
-                  {filteredProducts.length} {isRTL ? 'محصول' : 'products'}
-                </p>
-              </div>
-
-              <div className="flex items-center gap-3">
-                {/* Mobile Filter Button */}
-                <Button
-                  variant="outline"
-                  className="lg:hidden gap-2"
-                  onClick={() => setShowFilters(true)}
-                >
-                  <SlidersHorizontal size={18} />
-                  {t.filters.title}
-                </Button>
-              </div>
-            </div>
-
-            {/* Category Cards (when no category selected) */}
-            {!selectedCategorySlug && (
-              <div className="mb-8">
-                {categoriesLoading ? (
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {[...Array(4)].map((_, i) => (
-                      <Skeleton key={i} className="aspect-square rounded-xl" />
-                    ))}
-                  </div>
-                ) : rootCategories.length > 0 ? (
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {rootCategories.map((cat) => {
-                      const productImage = categoryImages.get(cat.id);
-                      const displayImage = cat.image_url || productImage;
-                      const catLabel = getLocalizedName(cat);
-                      
-                      return (
-                        <Link
-                          key={cat.id}
-                          to={`/categories?category=${cat.slug}`}
-                          className="group relative aspect-square rounded-xl overflow-hidden bg-gradient-to-br from-primary/10 to-primary/5 border border-border"
-                        >
-                          {displayImage ? (
-                            <img
-                              src={displayImage}
-                              alt={catLabel}
-                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <Package className="h-16 w-16 text-muted-foreground" />
-                            </div>
-                          )}
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                          <div className="absolute bottom-0 left-0 right-0 p-4">
-                            <h3 className="text-white font-bold text-lg">{catLabel}</h3>
-                            <p className="text-white/70 text-sm">
-                              {cat.subcategories?.length || 0} {t.categories.subcategories}
-                            </p>
-                          </div>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="text-center py-12">
-                    <Package className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                    <p className="text-muted-foreground">
-                      {isRTL ? 'هنوز دسته‌بندی‌ای وجود ندارد' : 'No categories available yet'}
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Products Grid */}
-            {isLoading ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {[...Array(8)].map((_, i) => (
-                  <div key={i} className="space-y-3">
-                    <Skeleton className="aspect-square rounded-lg" />
-                    <Skeleton className="h-4 w-3/4" />
-                    <Skeleton className="h-4 w-1/2" />
-                  </div>
+        {/* Category Cards (when no category selected) */}
+        {!selectedCategorySlug && (
+          <div className="mb-8">
+            {categoriesLoading ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
+                {[...Array(6)].map((_, i) => (
+                  <Skeleton key={i} className="aspect-square rounded-xl" />
                 ))}
               </div>
+            ) : rootCategories.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
+                {rootCategories.map((cat) => {
+                  const productImage = categoryImages.get(cat.id);
+                  const displayImage = cat.image_url || productImage;
+                  const catLabel = getLocalizedName(cat);
+                  
+                  return (
+                    <Link
+                      key={cat.id}
+                      to={`/categories?category=${cat.slug}`}
+                      className="group relative aspect-square rounded-xl overflow-hidden bg-gradient-to-br from-primary/10 to-primary/5 border border-border"
+                    >
+                      {displayImage ? (
+                        <img
+                          src={displayImage}
+                          alt={catLabel}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Package className="h-16 w-16 text-muted-foreground" />
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                      <div className="absolute bottom-0 left-0 right-0 p-3">
+                        <h3 className="text-white font-bold text-sm sm:text-base">{catLabel}</h3>
+                        <p className="text-white/70 text-xs">
+                          {cat.subcategories?.length || 0} {t.categories.subcategories}
+                        </p>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
             ) : (
-              <ProductGrid
-                products={filteredProducts}
-                viewMode={viewMode}
-                onViewModeChange={setViewMode}
-              />
+              <div className="text-center py-12">
+                <Package className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+                <p className="text-muted-foreground">
+                  {isRTL ? 'هنوز دسته‌بندی‌ای وجود ندارد' : 'No categories available yet'}
+                </p>
+              </div>
             )}
-          </main>
+          </div>
+        )}
+
+        {/* Products Grid - Full Width like Discover Products */}
+        {isLoading ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
+            {[...Array(12)].map((_, i) => (
+              <div key={i} className="bg-card rounded-xl border border-border overflow-hidden">
+                <Skeleton className="aspect-square w-full" />
+                <div className="p-3 space-y-2">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                  <Skeleton className="h-8 w-full" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : paginatedProducts.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mb-4">
+              <Package className="h-12 w-12 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-semibold text-foreground mb-2">
+              {isRTL ? 'محصولی یافت نشد' : 'No products found'}
+            </h3>
+            <p className="text-muted-foreground max-w-md">
+              {isRTL 
+                ? 'محصولی در این دسته‌بندی موجود نیست.'
+                : 'No products available in this category.'}
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
+            {paginatedProducts.map((product) => (
+              <ProductCard key={product.id} product={product} getRating={getRating} />
+            ))}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {!isLoading && totalPages > 1 && (
+          <div className="flex justify-center gap-2 mt-8">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(p => p - 1)}
+            >
+              {isRTL ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+            </Button>
+            {[...Array(Math.min(totalPages, 5))].map((_, i) => (
+              <Button
+                key={i}
+                variant={currentPage === i + 1 ? 'cyan' : 'outline'}
+                size="sm"
+                onClick={() => setCurrentPage(i + 1)}
+              >
+                {i + 1}
+              </Button>
+            ))}
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage(p => p + 1)}
+            >
+              {isRTL ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
+            </Button>
+          </div>
+        )}
+      </div>
+
+      <Footer />
+    </div>
+  );
+};
+
+// Inline ProductCard component for the grid
+interface ProductCardProps {
+  product: {
+    id: string;
+    name: { fa: string; en: string } | string;
+    slug: string;
+    price: number;
+    originalPrice?: number;
+    images: string[];
+    isNew?: boolean;
+    isHot?: boolean;
+    discount?: number;
+    currency?: string;
+    currencySymbol?: string;
+  };
+  getRating: (id: string) => { averageRating: number; reviewCount: number };
+}
+
+const ProductCard = ({ product, getRating }: ProductCardProps) => {
+  const { language, isRTL } = useLanguage();
+  const [isHovered, setIsHovered] = useState(false);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const { addToCart } = useCart();
+  const { isInWishlist, toggleWishlist } = useWishlist();
+  const { user, role } = useAuth();
+  const navigate = useNavigate();
+
+  const isWishlisted = isInWishlist(product.id);
+  const isBuyer = role === 'buyer';
+  const currencySymbol = product.currencySymbol || (product.currency === 'USD' ? '$' : 'AFN');
+  
+  const { averageRating, reviewCount } = getRating(product.id);
+
+  const getName = () => {
+    if (typeof product.name === 'string') return product.name;
+    return product.name[language] || product.name.en;
+  };
+
+  const handleAddToCart = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    setIsAddingToCart(true);
+    await addToCart(product.id);
+    setIsAddingToCart(false);
+  };
+
+  const handleWishlistToggle = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    await toggleWishlist(product.id);
+  };
+
+  return (
+    <div
+      className="group bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300 h-full flex flex-col"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Image */}
+      <div className="relative aspect-square overflow-hidden flex-shrink-0">
+        <Link to={`/products/${product.slug}`}>
+          <img
+            src={product.images[0] || '/placeholder.svg'}
+            alt={getName()}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+        </Link>
+
+        {/* Badges */}
+        <div className={`absolute top-2 ${isRTL ? 'right-2' : 'left-2'} flex flex-col gap-1`}>
+          {product.isNew && <Badge variant="new">{isRTL ? 'جدید' : 'New'}</Badge>}
+          {product.isHot && <Badge variant="hot">{isRTL ? 'داغ' : 'Hot'}</Badge>}
+          {product.discount && product.discount > 0 && <Badge variant="sale">-{product.discount}%</Badge>}
+        </div>
+
+        {/* Quick Actions */}
+        <div
+          className={`absolute top-2 ${isRTL ? 'left-2' : 'right-2'} flex flex-col gap-2 transition-all duration-300 ${
+            isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'
+          }`}
+        >
+          {(!user || isBuyer) && (
+            <button
+              onClick={handleWishlistToggle}
+              className={cn(
+                "p-2 rounded-full transition-colors shadow-md",
+                isWishlisted 
+                  ? "bg-primary text-white" 
+                  : "bg-white/90 dark:bg-gray-800/90 hover:bg-primary hover:text-white"
+              )}
+            >
+              <Heart size={18} className={isWishlisted ? "fill-current" : ""} />
+            </button>
+          )}
+          <Link
+            to={`/products/${product.slug}`}
+            className="p-2 bg-white/90 dark:bg-gray-800/90 rounded-full hover:bg-primary hover:text-white transition-colors shadow-md"
+          >
+            <Eye size={18} />
+          </Link>
         </div>
       </div>
 
-      {/* Mobile Filters Drawer */}
-      {showFilters && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setShowFilters(false)} />
-          <div className={`absolute top-0 bottom-0 ${isRTL ? 'right-0' : 'left-0'} w-80 bg-background overflow-y-auto animate-slide-in-right`}>
-            <div className="p-4 border-b border-border flex items-center justify-between">
-              <h3 className="font-bold">{t.filters.title}</h3>
-              <Button variant="ghost" size="icon" onClick={() => setShowFilters(false)}>
-                <X size={20} />
-              </Button>
-            </div>
-            <div className="p-4">
-              <ProductFilters onFilterChange={(f) => { setFilters(f); setShowFilters(false); }} />
-            </div>
-          </div>
+      {/* Content */}
+      <div className="p-2 md:p-3 flex flex-col flex-grow">
+        {/* Price */}
+        <div className="flex items-baseline gap-1.5 flex-shrink-0 mb-1">
+          <span className="text-sm sm:text-base md:text-lg font-bold text-primary truncate">
+            {product.currency === 'USD' ? '$' : ''}{product.price.toLocaleString()} {product.currency !== 'USD' ? currencySymbol : ''}
+          </span>
+          {product.originalPrice && product.originalPrice !== product.price && (
+            <span className="text-[10px] sm:text-xs text-muted-foreground line-through truncate">
+              {product.currency === 'USD' ? '$' : ''}{product.originalPrice.toLocaleString()}
+            </span>
+          )}
         </div>
-      )}
 
-      <Footer />
+        {/* Name */}
+        <Link to={`/products/${product.slug}`} className="flex-shrink-0">
+          <h3 className="text-xs sm:text-sm text-foreground truncate hover:text-primary transition-colors">
+            {getName()}
+          </h3>
+        </Link>
+
+        {/* Rating */}
+        <div className="h-4 mt-1 flex-shrink-0">
+          <CompactRating rating={averageRating} reviewCount={reviewCount} size="sm" />
+        </div>
+
+        {/* Add to Cart */}
+        <div className="mt-auto pt-2 flex-shrink-0">
+          <Button 
+            variant="cyan" 
+            size="sm" 
+            className="w-full gap-2 text-xs"
+            onClick={handleAddToCart}
+            disabled={isAddingToCart}
+          >
+            <ShoppingCart size={14} className={isAddingToCart ? 'animate-pulse' : ''} />
+            {isRTL ? 'افزودن' : 'Add'}
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };
