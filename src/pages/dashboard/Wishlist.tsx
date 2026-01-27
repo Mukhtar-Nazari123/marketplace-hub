@@ -143,8 +143,8 @@ const Wishlist = () => {
     >
       <div className="space-y-4 sm:space-y-6 animate-fade-in">
         {loading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
-            {[...Array(6)].map((_, i) => (
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
+            {[...Array(10)].map((_, i) => (
               <div key={i} className="space-y-3">
                 <Skeleton className="aspect-square rounded-lg" />
                 <Skeleton className="h-4 w-3/4" />
@@ -165,7 +165,7 @@ const Wishlist = () => {
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
             {wishlist.map((item, index) => {
               const cardData = getProductCardData(item.product);
               if (!cardData) return null;
