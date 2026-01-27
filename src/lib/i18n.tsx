@@ -150,7 +150,7 @@ export const translations = {
     // Footer
     footer: {
       freeShipping: "ارسال رایگان",
-      ordersOver: "سفارش‌های بالای ۵۰۰۰ افغانی",
+      ordersOver: "سفارش‌های بالای ۱۰۰۰ افغانی",
       securePayment: "پرداخت امن",
       protected: "۱۰۰٪ محافظت شده",
       support: "پشتیبانی ۲۴/۷",
@@ -694,7 +694,7 @@ export const translations = {
     // Footer
     footer: {
       freeShipping: "Free Shipping",
-      ordersOver: "Orders over 5000 AFN",
+      ordersOver: "Orders over 1000 AFN",
       securePayment: "Secure Payment",
       protected: "100% Protected",
       support: "24/7 Support",
