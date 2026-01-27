@@ -180,28 +180,29 @@ const ProductCard = ({
       </Link>
 
       {/* Content */}
-      <div className="p-4 flex flex-col flex-grow">
-        {/* Rating */}
-        <div className="h-5 mb-2 flex-shrink-0">
-          <CompactRating rating={rating} reviewCount={reviews} size="sm" />
+      <div className="p-3 md:p-4 flex flex-col flex-grow">
+        {/* Price - Primary visual element */}
+        <div className="flex items-baseline gap-1.5 flex-shrink-0 mb-1.5">
+          <span className="text-base sm:text-lg md:text-xl font-bold text-primary truncate">
+            {formatPrice(price)} {currencySymbol}
+          </span>
+          {originalPrice && (
+            <span className="text-[10px] sm:text-xs text-muted-foreground line-through truncate">
+              {formatPrice(originalPrice)}
+            </span>
+          )}
         </div>
 
-        {/* Name */}
+        {/* Name - Single line, truncated */}
         <Link to={`/products/${id}`} className="flex-shrink-0">
-          <h3 className="font-medium text-foreground h-11 line-clamp-2 group-hover:text-primary transition-colors overflow-hidden">
+          <h3 className="text-xs sm:text-sm text-foreground truncate group-hover:text-primary transition-colors">
             {name}
           </h3>
         </Link>
 
-        {/* Price - Red for main price, grey strikethrough for original */}
-        <div className="h-7 flex items-center gap-2 flex-shrink-0 mt-2">
-          {originalPrice && (
-            <span className="text-sm text-muted-foreground line-through truncate">
-              {formatPrice(originalPrice)} {currencySymbol}
-            </span>
-          )}
-          <span className="text-lg font-bold text-primary truncate">{formatPrice(price)} {currencySymbol}</span>
-          <Badge variant="outline" className="text-xs ml-auto flex-shrink-0">{currency}</Badge>
+        {/* Rating - Tertiary element */}
+        <div className="h-4 mt-1.5 flex-shrink-0">
+          <CompactRating rating={rating} reviewCount={reviews} size="sm" />
         </div>
 
         {/* Countdown - Red numbers, grey labels */}
