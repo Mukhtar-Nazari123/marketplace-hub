@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useLanguage } from '@/lib/i18n';
-import { ChevronDown, Check } from 'lucide-react';
+import { ChevronDown, Check, SlidersHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCategories } from '@/hooks/useCategories';
 import {
@@ -96,6 +96,10 @@ const FilterBar = ({
           "flex items-center gap-2",
           isRTL ? "flex-row-reverse" : "flex-row"
         )}>
+          {/* Filter Icon */}
+          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted/50 border border-border flex-shrink-0">
+            <SlidersHorizontal size={16} className="text-muted-foreground" />
+          </div>
           {/* Sort By */}
           <FilterPill
             label={isRTL ? 'ترتیب' : 'Sort by'}
