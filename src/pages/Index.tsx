@@ -6,7 +6,6 @@ import StickyNavbar from "@/components/layout/StickyNavbar";
 import HeroSection from "@/components/home/HeroSection";
 import TodayDeals from "@/components/home/TodayDeals";
 import BestSellers from "@/components/home/BestSellers";
-import CategoryBanners from "@/components/home/CategoryBanners";
 import DiscoverProducts from "@/components/home/DiscoverProducts";
 
 const Index = () => {
@@ -32,9 +31,6 @@ const Index = () => {
 
         {/* Discover Products - Mixed categories grid */}
         <DiscoverProducts />
-
-        {/* Category Banners */}
-        <CategoryBanners />
       </main>
 
       {/* Footer */}
