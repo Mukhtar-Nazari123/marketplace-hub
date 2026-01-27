@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Headphones } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 import { useNavigate } from "react-router-dom";
 import { HeroBanner } from "@/hooks/useHeroBanners";
@@ -29,82 +29,96 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
   };
 
   return (
-    <div className="relative rounded-2xl overflow-hidden min-h-[200px] sm:min-h-[280px] lg:min-h-[300px] animate-fade-in">
-      {/* Background: image, color, or gradient fallback */}
-      {banner.background_image ? (
-        <img src={banner.background_image} alt="" className="absolute inset-0 w-full h-full object-cover" />
-      ) : banner.background_color ? (
-        <div className="absolute inset-0" style={{ backgroundColor: banner.background_color }} />
-      ) : (
-        <div className="absolute inset-0 gradient-hero" />
-      )}
-
-      {/* Overlay gradient for text readability */}
-      <div
-        className={`absolute inset-0 ${isRTL ? "bg-gradient-to-l from-foreground/95 via-foreground/80 to-foreground/40" : "bg-gradient-to-r from-foreground/95 via-foreground/80 to-foreground/40"}`}
-      />
-
-      {/* Decorative Elements - only show when no background image */}
-      {!banner.background_image && (
-        <>
-          <div
-            className={`absolute top-10 w-32 sm:w-64 h-32 sm:h-64 bg-cyan/20 rounded-full blur-3xl ${isRTL ? "right-4 sm:right-10" : "left-4 sm:left-10"}`}
+    <div className="hero-container relative overflow-hidden rounded-2xl min-h-[320px] sm:min-h-[380px] lg:min-h-[420px] flex items-center animate-fade-in">
+      
+      {/* Layer 1: Background (Color / Gradient / Image) */}
+      <div className="hero-bg absolute inset-0 z-[1]">
+        {banner.background_image ? (
+          <img 
+            src={banner.background_image} 
+            alt="" 
+            className="w-full h-full object-cover"
           />
-          <div
-            className={`absolute bottom-10 w-24 sm:w-48 h-24 sm:h-48 bg-orange/20 rounded-full blur-3xl ${isRTL ? "right-4 sm:right-10" : "left-4 sm:left-10"}`}
+        ) : banner.background_color ? (
+          <div 
+            className="w-full h-full" 
+            style={{ backgroundColor: banner.background_color }} 
           />
-        </>
-      )}
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-[#0f2027] via-[#203a43] to-[#2c5364]" />
+        )}
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent" />
+      </div>
 
-      {/* Content Container */}
-      <div
-        className={`relative z-10 h-full flex flex-col md:flex-row items-center justify-center md:justify-between px-4 sm:px-8 lg:px-16 py-6 md:py-0 gap-4 md:gap-8 flex-row-reverse`}
-      >
-        <div
-          className={`w-full md:max-w-md flex flex-col justify-center
-          ${isRTL ? "items-start text-right" : "items-start text-left"}`}
+      {/* Layer 2: Product Image with Fade Effect */}
+      {banner.icon_image && (
+        <div 
+          className={`hero-image absolute z-[2] bottom-0 pointer-events-none
+            ${isRTL ? 'left-[5%]' : 'right-[5%]'}
+            max-h-[75%] sm:max-h-[85%] lg:max-h-[90%]
+          `}
+          style={{
+            maskImage: isRTL 
+              ? 'linear-gradient(to right, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)'
+              : 'linear-gradient(to left, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)',
+            WebkitMaskImage: isRTL 
+              ? 'linear-gradient(to right, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)'
+              : 'linear-gradient(to left, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)',
+          }}
         >
-          {badgeText && (
-            <Badge variant="sale" className="w-fit mb-3 md:mb-4 mt-4 md:mt-8 lg:mt-0 text-xs sm:text-sm px-3 sm:px-4 py-1">
-              {badgeText}
-            </Badge>
-          )}
-
-          <h2 className="font-display text-2xl sm:text-3xl lg:text-5xl font-bold text-background mb-2 md:mb-4 leading-tight">
-            {title}
-          </h2>
-
-          {description && (
-            <p className="text-background/70 mb-4 md:mb-6 text-sm sm:text-base lg:text-lg line-clamp-2 md:line-clamp-none">
-              {description}
-            </p>
-          )}
-
-          {ctaText && (
-            <Button variant="orange" size="default" className="w-fit group md:text-base" onClick={handleCtaClick}>
-              {ctaText}
-              <ArrowLeft
-                className={`h-4 w-4 md:h-5 md:w-5 transition-transform ${
-                  isRTL ? "group-hover:-translate-x-1" : "group-hover:translate-x-1 rotate-180"
-                }`}
-              />
-            </Button>
-          )}
+          <img 
+            src={banner.icon_image} 
+            alt="" 
+            className="h-full w-auto object-contain max-h-[240px] sm:max-h-[300px] lg:max-h-[380px]"
+          />
         </div>
-        {/* Icon/Image - Hidden on mobile, shown on md+ */}
-        <div className="flex-shrink-0 hidden md:block">
-          {banner.icon_image ? (
-            <div className="w-32 h-32 lg:w-72 lg:h-72 rounded-full bg-gradient-to-br from-cyan/30 to-orange/30 flex items-center justify-center animate-float overflow-hidden">
-              <img src={banner.icon_image} alt="" className="w-full h-full object-contain p-4" />
-            </div>
-          ) : (
-            <div className="w-32 h-32 lg:w-72 lg:h-72 rounded-full bg-gradient-to-br from-cyan/30 to-orange/30 flex items-center justify-center animate-float opacity-80">
-              <Headphones className="w-16 h-16 lg:w-36 lg:h-36 text-background/50" />
-            </div>
-          )}
-        </div>
+      )}
 
-        {/* Text Content */}
+      {/* Layer 3: Content (Text + CTA) */}
+      <div 
+        className={`hero-content relative z-[3] px-6 sm:px-10 lg:px-16 py-8 max-w-[480px]
+          ${isRTL ? 'mr-auto text-right' : 'ml-0 text-left'}
+        `}
+      >
+        {/* Badge */}
+        {badgeText && (
+          <Badge 
+            variant="sale" 
+            className="mb-4 px-4 py-1.5 text-sm font-semibold rounded-full"
+          >
+            {badgeText}
+          </Badge>
+        )}
+
+        {/* Title */}
+        <h2 className="hero-title text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-extrabold text-white leading-tight mb-3 sm:mb-4">
+          {title}
+        </h2>
+
+        {/* Description */}
+        {description && (
+          <p className="hero-text text-white/85 text-sm sm:text-base lg:text-lg mb-4 sm:mb-6 line-clamp-2 lg:line-clamp-3">
+            {description}
+          </p>
+        )}
+
+        {/* CTA Button */}
+        {ctaText && (
+          <Button 
+            variant="default" 
+            size="lg"
+            className="hero-btn rounded-full font-semibold px-6 sm:px-8 group"
+            onClick={handleCtaClick}
+          >
+            {ctaText}
+            {isRTL ? (
+              <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5 transition-transform group-hover:-translate-x-1" />
+            ) : (
+              <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 transition-transform group-hover:translate-x-1" />
+            )}
+          </Button>
+        )}
       </div>
     </div>
   );
