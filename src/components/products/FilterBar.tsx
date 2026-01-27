@@ -207,12 +207,9 @@ const FilterBar = ({
                 options={categoryOptions}
                 selectedValue={selectedCategory}
                 onSelect={(value) => {
+                  // Toggle: if same category clicked, clear it; otherwise set new category
                   const newCategory = value === selectedCategory ? null : value;
                   onCategoryChange?.(newCategory);
-                  // Clear subcategory when category changes
-                  if (newCategory !== selectedCategory) {
-                    onSubcategoryChange?.(null);
-                  }
                 }}
                 isRTL={isRTL}
                 allowClear
