@@ -5,22 +5,15 @@ import { useProducts, formatProductForDisplay } from '@/hooks/useProducts';
 import { useCategories } from '@/hooks/useCategories';
 import ProductFilters, { FilterState } from '@/components/ui/ProductFilters';
 import ProductGrid from '@/components/products/ProductGrid';
+import FilterBar from '@/components/products/FilterBar';
 import Header from '@/components/layout/Header';
 import Navigation from '@/components/layout/Navigation';
 import Footer from '@/components/layout/Footer';
 import StickyNavbar from '@/components/layout/StickyNavbar';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, SlidersHorizontal, X, Sparkles, Loader2, Search } from 'lucide-react';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-
 const Products = () => {
   const { t, language, isRTL } = useLanguage();
   const [searchParams] = useSearchParams();
@@ -148,6 +141,12 @@ const Products = () => {
     return t.product.allProducts;
   };
 
+  // Extract unique brands from products
+  const availableBrands = useMemo(() => {
+    const brands = products.map(p => p.brand).filter(Boolean);
+    return [...new Set(brands)];
+  }, [products]);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Auto-hide Sticky Navbar */}
@@ -155,6 +154,28 @@ const Products = () => {
         <Header />
         <Navigation />
       </StickyNavbar>
+
+      {/* Temu-Style Filter Bar */}
+      <FilterBar
+        selectedSort={sortBy}
+        onSortChange={setSortBy}
+        selectedCategory={categorySlug}
+        onCategoryChange={(cat) => {
+          if (cat) {
+            window.location.href = `/products?category=${cat}`;
+          } else {
+            window.location.href = '/products';
+          }
+        }}
+        availableBrands={availableBrands}
+        selectedBrand={filters.brands[0] || null}
+        onBrandChange={(brand) => {
+          setFilters(prev => ({
+            ...prev,
+            brands: brand ? [brand] : []
+          }));
+        }}
+      />
 
       {/* Breadcrumb */}
       <div className="bg-muted/50 py-3">
@@ -168,7 +189,6 @@ const Products = () => {
           </div>
         </div>
       </div>
-
       {/* Hero Banner for New Products */}
       {filterType === 'new' && (
         <div className="bg-gradient-to-r from-primary to-cyan-400 py-12">
@@ -292,19 +312,6 @@ const Products = () => {
                   <SlidersHorizontal size={18} />
                   {t.filters.title}
                 </Button>
-
-                {/* Sort */}
-                <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-48">
-                    <SelectValue placeholder={t.filters.sortBy} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="latest">{t.filters.latest}</SelectItem>
-                    <SelectItem value="popularity">{t.filters.popularity}</SelectItem>
-                    <SelectItem value="price-low">{t.filters.priceLowHigh}</SelectItem>
-                    <SelectItem value="price-high">{t.filters.priceHighLow}</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
             </div>
 

@@ -5,6 +5,7 @@ import { useCategories } from '@/hooks/useCategories';
 import { supabase } from '@/integrations/supabase/client';
 import ProductFilters, { FilterState } from '@/components/ui/ProductFilters';
 import ProductGrid from '@/components/products/ProductGrid';
+import FilterBar from '@/components/products/FilterBar';
 import Header from '@/components/layout/Header';
 import Navigation from '@/components/layout/Navigation';
 import Footer from '@/components/layout/Footer';
@@ -12,13 +13,6 @@ import StickyNavbar from '@/components/layout/StickyNavbar';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, SlidersHorizontal, X, Package } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 
 
 interface DbProduct {
@@ -251,6 +245,20 @@ const Categories = () => {
         <Navigation />
       </StickyNavbar>
 
+      {/* Temu-Style Filter Bar */}
+      <FilterBar
+        selectedSort={sortBy}
+        onSortChange={setSortBy}
+        selectedCategory={selectedCategorySlug}
+        onCategoryChange={(cat) => {
+          if (cat) {
+            window.location.href = `/categories?category=${cat}`;
+          } else {
+            window.location.href = '/categories';
+          }
+        }}
+      />
+
       {/* Breadcrumb */}
       <div className="bg-muted/50 py-3">
         <div className="container mx-auto px-4">
@@ -361,19 +369,6 @@ const Categories = () => {
                   <SlidersHorizontal size={18} />
                   {t.filters.title}
                 </Button>
-
-                {/* Sort */}
-                <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-48">
-                    <SelectValue placeholder={t.filters.sortBy} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="latest">{t.filters.latest}</SelectItem>
-                    <SelectItem value="popularity">{t.filters.popularity}</SelectItem>
-                    <SelectItem value="price-low">{t.filters.priceLowHigh}</SelectItem>
-                    <SelectItem value="price-high">{t.filters.priceHighLow}</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
             </div>
 
