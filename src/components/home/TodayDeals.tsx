@@ -68,7 +68,7 @@ const TodayDeals = () => {
 
     const { scrollLeft, scrollWidth, clientWidth } = container;
     const isAtStart = isRTL ? scrollLeft >= -10 : scrollLeft <= 10;
-    const isAtEnd = isRTL 
+    const isAtEnd = isRTL
       ? scrollLeft <= -(scrollWidth - clientWidth - 10)
       : scrollLeft >= scrollWidth - clientWidth - 10;
 
@@ -90,9 +90,8 @@ const TodayDeals = () => {
     if (!container) return;
 
     const scrollAmount = 300;
-    const newScrollLeft = direction === "left"
-      ? container.scrollLeft - scrollAmount
-      : container.scrollLeft + scrollAmount;
+    const newScrollLeft =
+      direction === "left" ? container.scrollLeft - scrollAmount : container.scrollLeft + scrollAmount;
 
     container.scrollTo({ left: newScrollLeft, behavior: "smooth" });
   };
@@ -144,7 +143,7 @@ const TodayDeals = () => {
   }
 
   return (
-    <section className="py-12 pt-1 bg-background">
+    <section className="py-4 pt-1 bg-background">
       <div className="container">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -166,7 +165,7 @@ const TodayDeals = () => {
           <Button
             variant="secondary"
             size="icon"
-            className={`absolute ${isRTL ? 'right-0' : 'left-0'} top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full shadow-lg bg-background/90 backdrop-blur-sm border border-border hover:bg-background transition-opacity duration-200 hidden md:flex ${showLeftArrow ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+            className={`absolute ${isRTL ? "right-0" : "left-0"} top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full shadow-lg bg-background/90 backdrop-blur-sm border border-border hover:bg-background transition-opacity duration-200 hidden md:flex ${showLeftArrow ? "opacity-100" : "opacity-0 pointer-events-none"}`}
             onClick={() => scroll(isRTL ? "right" : "left")}
           >
             {isRTL ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
@@ -176,7 +175,7 @@ const TodayDeals = () => {
           <Button
             variant="secondary"
             size="icon"
-            className={`absolute ${isRTL ? 'left-0' : 'right-0'} top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full shadow-lg bg-background/90 backdrop-blur-sm border border-border hover:bg-background transition-opacity duration-200 hidden md:flex ${showRightArrow ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+            className={`absolute ${isRTL ? "left-0" : "right-0"} top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full shadow-lg bg-background/90 backdrop-blur-sm border border-border hover:bg-background transition-opacity duration-200 hidden md:flex ${showRightArrow ? "opacity-100" : "opacity-0 pointer-events-none"}`}
             onClick={() => scroll(isRTL ? "left" : "right")}
           >
             {isRTL ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
