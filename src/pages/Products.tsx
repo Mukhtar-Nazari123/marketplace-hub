@@ -122,12 +122,12 @@ const Products = () => {
     }
 
     return result;
-  }, [categorySlug, filterType, filters, sortBy, products]);
+  }, [categorySlug, subcategorySlug, filterType, filters, sortBy, products, getSubcategoryBySlug]);
 
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [categorySlug, filterType, filters, sortBy, searchQuery]);
+  }, [categorySlug, subcategorySlug, filterType, filters, sortBy, searchQuery]);
 
   const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
   const paginatedProducts = filteredProducts.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
