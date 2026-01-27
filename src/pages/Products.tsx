@@ -22,9 +22,10 @@ import { cn } from "@/lib/utils";
 
 const Products = () => {
   const { t, language, isRTL } = useLanguage();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const filterType = searchParams.get("filter"); // 'new', 'sale'
   const categorySlug = searchParams.get("category");
+  const subcategorySlug = searchParams.get("subcategory");
   const searchQuery = searchParams.get("search");
 
   // Pass search query to backend
@@ -32,7 +33,7 @@ const Products = () => {
     status: "active",
     search: searchQuery || undefined,
   });
-  const { getRootCategories } = useCategories();
+  const { getRootCategories, getSubcategoryBySlug } = useCategories();
 
   const [sortBy, setSortBy] = useState("latest");
   const [currentPage, setCurrentPage] = useState(1);
@@ -57,8 +58,14 @@ const Products = () => {
   const filteredProducts = useMemo(() => {
     let result = [...products];
 
-    // Filter by category slug
-    if (categorySlug) {
+    // Filter by subcategory first (more specific)
+    if (subcategorySlug) {
+      const subcategory = getSubcategoryBySlug(subcategorySlug);
+      if (subcategory) {
+        result = result.filter((p) => p.subcategory === subcategorySlug);
+      }
+    } else if (categorySlug) {
+      // Filter by category slug only if no subcategory
       result = result.filter((p) => p.category === categorySlug);
     }
 
@@ -161,11 +168,25 @@ const Products = () => {
         onSortChange={setSortBy}
         selectedCategory={categorySlug}
         onCategoryChange={(cat) => {
+          const newParams = new URLSearchParams(searchParams);
           if (cat) {
-            window.location.href = `/products?category=${cat}`;
+            newParams.set("category", cat);
+            newParams.delete("subcategory"); // Clear subcategory when category changes
           } else {
-            window.location.href = "/products";
+            newParams.delete("category");
+            newParams.delete("subcategory");
           }
+          setSearchParams(newParams);
+        }}
+        selectedSubcategory={subcategorySlug}
+        onSubcategoryChange={(sub) => {
+          const newParams = new URLSearchParams(searchParams);
+          if (sub) {
+            newParams.set("subcategory", sub);
+          } else {
+            newParams.delete("subcategory");
+          }
+          setSearchParams(newParams);
         }}
         availableBrands={availableBrands}
         selectedBrand={filters.brands[0] || null}

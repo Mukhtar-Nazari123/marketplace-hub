@@ -10,6 +10,7 @@ export interface DBProduct {
   compare_at_price: number | null;
   images: string[] | null;
   category_id: string | null;
+  subcategory_id: string | null;
   seller_id: string;
   status: string;
   quantity: number;
@@ -26,6 +27,11 @@ export interface DBProduct {
     name: string;
     slug: string;
     parent_id: string | null;
+  } | null;
+  subcategory?: {
+    id: string;
+    name: string;
+    slug: string;
   } | null;
   seller_verification?: {
     business_name: string | null;
@@ -86,7 +92,8 @@ export const useProducts = (options: UseProductsOptions = {}) => {
         .from('products')
         .select(`
           *,
-          category:categories(id, name, slug, parent_id)
+          category:categories(id, name, slug, parent_id),
+          subcategory:subcategories(id, name, slug)
         `)
         .eq('status', status)
         .order('created_at', { ascending: false });
@@ -239,6 +246,8 @@ export const formatProductForDisplay = (product: DBProduct, language: 'fa' | 'en
     images: product.images || ['/placeholder.svg'],
     category: product.category?.slug || '',
     categoryName: product.category?.name || '',
+    subcategory: product.subcategory?.slug || '',
+    subcategoryName: product.subcategory?.name || '',
     brand: metadata.brand || '',
     rating: 0,
     reviewCount: 0,
