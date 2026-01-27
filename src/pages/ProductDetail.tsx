@@ -10,6 +10,7 @@ import Header from '@/components/layout/Header';
 import Navigation from '@/components/layout/Navigation';
 import Footer from '@/components/layout/Footer';
 import StickyNavbar from '@/components/layout/StickyNavbar';
+import ProductCard from '@/components/home/ProductCard';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -733,45 +734,48 @@ const ProductDetail = () => {
             <h2 className="text-2xl font-bold text-foreground mb-6">
               {isRTL ? 'محصولات مرتبط' : 'Related Products'}
             </h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {relatedProducts.map((p) => {
-                // Read currency from database column first, then fallback to metadata
-                const pCurrency = p.currency || p.metadata?.currency || 'AFN';
-                const pSymbol = pCurrency === 'USD' ? '$' : (isRTL ? '؋' : 'AFN');
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
+              {relatedProducts.map((p, index) => {
+                const pCurrency = (p.currency || 'AFN') as 'AFN' | 'USD';
+                const hasDiscount = p.compare_at_price && p.compare_at_price !== p.price;
+                let originalPrice: number | undefined;
+                let currentPrice = p.price;
+                let discountPercent: number | undefined;
+
+                if (hasDiscount) {
+                  if (p.compare_at_price! > p.price) {
+                    originalPrice = p.compare_at_price!;
+                    currentPrice = p.price;
+                  } else {
+                    originalPrice = p.price;
+                    currentPrice = p.compare_at_price!;
+                  }
+                  discountPercent = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
+                }
+
+                const pIsNew = new Date(p.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+                const { averageRating: pRating, reviewCount: pReviews } = getRelatedRating(p.id);
+
                 return (
-                  <Link
+                  <div
                     key={p.id}
-                    to={`/products/${p.slug}`}
-                    className="group bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all"
+                    className="opacity-0 animate-fade-in-up"
+                    style={{ animationDelay: `${Math.min(index, 5) * 50}ms`, animationFillMode: 'forwards' }}
                   >
-                    <div className="aspect-square overflow-hidden bg-muted">
-                      <img
-                        src={p.images?.[0] || '/placeholder.svg'}
-                        alt={p.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-                    <div className="p-4">
-                      <h3 className="font-medium text-foreground line-clamp-2 mb-2">{p.name}</h3>
-                      <CompactRating 
-                        rating={getRelatedRating(p.id).averageRating} 
-                        reviewCount={getRelatedRating(p.id).reviewCount} 
-                        size="sm" 
-                        className="mb-2"
-                      />
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-bold text-primary">
-                          {p.price.toLocaleString()} {pSymbol}
-                        </span>
-                        {p.compare_at_price && p.compare_at_price > p.price && (
-                          <span className="text-sm text-muted-foreground line-through">
-                            {p.compare_at_price.toLocaleString()} {pSymbol}
-                          </span>
-                        )}
-                        <Badge variant="outline" className="text-xs">{pCurrency}</Badge>
-                      </div>
-                    </div>
-                  </Link>
+                    <ProductCard
+                      id={p.id}
+                      name={p.name}
+                      price={currentPrice}
+                      originalPrice={originalPrice}
+                      rating={pRating}
+                      reviews={pReviews}
+                      isNew={pIsNew}
+                      isHot={p.is_featured}
+                      discount={discountPercent}
+                      image={p.images?.[0]}
+                      currency={pCurrency}
+                    />
+                  </div>
                 );
               })}
             </div>
