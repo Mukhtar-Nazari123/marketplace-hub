@@ -173,7 +173,7 @@ const ProductCard = ({
       </Link>
 
       {/* Content */}
-      <div className="p-2 md:p-3 flex flex-col flex-grow">
+      <div className="p-1 md:p-2 flex flex-col flex-grow">
         {/* Price - Primary visual element */}
         <div className="flex items-baseline gap-1.5 flex-shrink-0 mb-1.5">
           <span className="text-base sm:text-lg md:text-xl font-bold text-primary truncate">
