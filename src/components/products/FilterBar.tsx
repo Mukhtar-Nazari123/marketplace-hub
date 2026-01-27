@@ -134,38 +134,38 @@ const FilterBar = ({
 
   return (
     <div className="bg-background border-b border-border sticky top-0 z-30">
-      <div className="container mx-auto px-4 py-3 relative group">
+      <div className="container mx-auto px-4 py-3 relative">
         {/* Left scroll button */}
-        <button
-          onClick={() => scroll('left')}
-          className={cn(
-            "absolute left-1 top-1/2 -translate-y-1/2 z-10 hidden md:flex",
-            "w-8 h-8 items-center justify-center rounded-full",
-            "bg-background/95 border border-border shadow-md",
-            "hover:bg-muted transition-all duration-200",
-            "opacity-0 group-hover:opacity-100",
-            !canScrollLeft && "!opacity-0 pointer-events-none"
-          )}
-          aria-label="Scroll left"
-        >
-          <ChevronLeft size={18} className="text-foreground" />
-        </button>
+        {canScrollLeft && (
+          <button
+            onClick={() => scroll('left')}
+            className={cn(
+              "absolute left-0 md:left-1 top-1/2 -translate-y-1/2 z-20 flex",
+              "w-7 h-7 md:w-8 md:h-8 items-center justify-center rounded-full",
+              "bg-background border border-border shadow-lg",
+              "hover:bg-muted active:scale-95 transition-all duration-200"
+            )}
+            aria-label="Scroll left"
+          >
+            <ChevronLeft size={16} className="text-foreground" />
+          </button>
+        )}
 
         {/* Right scroll button */}
-        <button
-          onClick={() => scroll('right')}
-          className={cn(
-            "absolute right-1 top-1/2 -translate-y-1/2 z-10 hidden md:flex",
-            "w-8 h-8 items-center justify-center rounded-full",
-            "bg-background/95 border border-border shadow-md",
-            "hover:bg-muted transition-all duration-200",
-            "opacity-0 group-hover:opacity-100",
-            !canScrollRight && "!opacity-0 pointer-events-none"
-          )}
-          aria-label="Scroll right"
-        >
-          <ChevronRight size={18} className="text-foreground" />
-        </button>
+        {canScrollRight && (
+          <button
+            onClick={() => scroll('right')}
+            className={cn(
+              "absolute right-0 md:right-1 top-1/2 -translate-y-1/2 z-20 flex",
+              "w-7 h-7 md:w-8 md:h-8 items-center justify-center rounded-full",
+              "bg-background border border-border shadow-lg",
+              "hover:bg-muted active:scale-95 transition-all duration-200"
+            )}
+            aria-label="Scroll right"
+          >
+            <ChevronRight size={16} className="text-foreground" />
+          </button>
+        )}
 
         <div 
           ref={scrollRef}
