@@ -17,10 +17,12 @@ interface FilterOption {
 interface FilterBarProps {
   onSortChange?: (value: string) => void;
   onCategoryChange?: (value: string | null) => void;
+  onSubcategoryChange?: (value: string | null) => void;
   onBrandChange?: (value: string | null) => void;
   onColorChange?: (value: string | null) => void;
   selectedSort?: string;
   selectedCategory?: string | null;
+  selectedSubcategory?: string | null;
   selectedBrand?: string | null;
   selectedColor?: string | null;
   availableBrands?: string[];
@@ -30,20 +32,32 @@ interface FilterBarProps {
 const FilterBar = ({
   onSortChange,
   onCategoryChange,
+  onSubcategoryChange,
   onBrandChange,
   onColorChange,
   selectedSort = 'relevance',
   selectedCategory = null,
+  selectedSubcategory = null,
   selectedBrand = null,
   selectedColor = null,
   availableBrands = [],
   availableColors = [],
 }: FilterBarProps) => {
   const { isRTL } = useLanguage();
-  const { getRootCategories, loading: categoriesLoading } = useCategories();
+  const { getRootCategories, getSubcategories, getCategoryBySlug, loading: categoriesLoading } = useCategories();
   const scrollRef = useRef<HTMLDivElement>(null);
   
   const rootCategories = getRootCategories();
+  
+  // Get subcategories for selected category
+  const selectedCategoryData = selectedCategory ? getCategoryBySlug(selectedCategory) : null;
+  const subcategoriesForCategory = selectedCategoryData ? getSubcategories(selectedCategoryData.id) : [];
+  
+  // Subcategory options
+  const subcategoryOptions: FilterOption[] = subcategoriesForCategory.map(sub => ({
+    value: sub.slug,
+    label: isRTL && sub.name_fa ? sub.name_fa : sub.name,
+  }));
 
   // Sort options
   const sortOptions: FilterOption[] = [
@@ -192,7 +206,26 @@ const FilterBar = ({
                 label={isRTL ? 'دسته‌بندی' : 'Category'}
                 options={categoryOptions}
                 selectedValue={selectedCategory}
-                onSelect={(value) => onCategoryChange?.(value === selectedCategory ? null : value)}
+                onSelect={(value) => {
+                  const newCategory = value === selectedCategory ? null : value;
+                  onCategoryChange?.(newCategory);
+                  // Clear subcategory when category changes
+                  if (newCategory !== selectedCategory) {
+                    onSubcategoryChange?.(null);
+                  }
+                }}
+                isRTL={isRTL}
+                allowClear
+              />
+            )}
+
+            {/* Subcategory - only show when category is selected */}
+            {selectedCategory && subcategoryOptions.length > 0 && (
+              <FilterPill
+                label={isRTL ? 'زیردسته' : 'Subcategory'}
+                options={subcategoryOptions}
+                selectedValue={selectedSubcategory}
+                onSelect={(value) => onSubcategoryChange?.(value === selectedSubcategory ? null : value)}
                 isRTL={isRTL}
                 allowClear
               />
