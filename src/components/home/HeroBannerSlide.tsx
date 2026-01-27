@@ -69,25 +69,25 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
 
       {/* Layer 3: Content (Text + CTA) */}
       <div
-        className={`hero-content relative z-[3] px-6 sm:px-10 lg:px-16 py-8 max-w-[480px]
+        className={`hero-content relative z-[3] px-4 sm:px-8 lg:px-12 py-4 sm:py-5 lg:py-6 max-w-[480px]
           ${isRTL ? "mr-auto text-right" : "ml-0 text-left"}
         `}
       >
         {/* Badge */}
         {badgeText && (
-          <Badge variant="sale" className="mb-4 px-4 py-1.5 text-sm font-semibold rounded-full">
+          <Badge variant="sale" className="mb-2 sm:mb-3 px-3 py-1 text-xs sm:text-sm font-semibold rounded-full">
             {badgeText}
           </Badge>
         )}
 
         {/* Title */}
-        <h2 className="hero-title text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-extrabold text-white leading-tight mb-3 sm:mb-4">
+        <h2 className="hero-title text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-extrabold text-white leading-tight mb-2 sm:mb-3">
           {title}
         </h2>
 
         {/* Description */}
         {description && (
-          <p className="hero-text text-white/85 text-sm sm:text-base lg:text-lg mb-4 sm:mb-6 line-clamp-2 lg:line-clamp-3">
+          <p className="hero-text text-white/85 text-xs sm:text-sm lg:text-base mb-3 sm:mb-4 line-clamp-2">
             {description}
           </p>
         )}
@@ -96,8 +96,8 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
         {ctaText && (
           <Button
             variant="default"
-            size="lg"
-            className="hero-btn rounded-full font-semibold px-6 sm:px-8 group"
+            size="default"
+            className="hero-btn rounded-full font-semibold px-4 sm:px-6 text-sm group"
             onClick={handleCtaClick}
           >
             {ctaText}
