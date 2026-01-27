@@ -3,12 +3,10 @@ import { Button } from "@/components/ui/button";
 import ProductCard from "./ProductCard";
 import { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/lib/i18n";
-import { useCategories } from "@/hooks/useCategories";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProductRatings } from "@/hooks/useProductRatings";
 import { Link } from "react-router-dom";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 interface Product {
   id: string;
@@ -23,53 +21,29 @@ interface Product {
 
 const BestSellers = () => {
   const { t, isRTL } = useLanguage();
-  const { getRootCategories, loading: categoriesLoading } = useCategories();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
 
-  const rootCategories = getRootCategories().slice(0, 5);
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
-
   const productIds = products.map((p) => p.id);
   const { getRating } = useProductRatings(productIds);
 
-  // Set first category as active when categories load
   useEffect(() => {
-    if (rootCategories.length > 0 && !activeCategory) {
-      setActiveCategory(rootCategories[0].slug);
-    }
-  }, [rootCategories, activeCategory]);
+    fetchBestSellers();
+  }, []);
 
-  useEffect(() => {
-    if (activeCategory) {
-      fetchProductsByCategory();
-    }
-  }, [activeCategory]);
-
-  const fetchProductsByCategory = async () => {
-    if (!activeCategory) return;
-    
+  const fetchBestSellers = async () => {
     setIsLoading(true);
     try {
-      // Find the category ID from slug
-      const category = rootCategories.find(c => c.slug === activeCategory);
-      
-      let query = supabase
+      const { data, error } = await supabase
         .from("products")
-        .select("id, name, price, compare_at_price, images, is_featured, currency, created_at, category_id")
+        .select("id, name, price, compare_at_price, images, is_featured, currency, created_at")
         .eq("status", "active")
         .order("is_featured", { ascending: false })
         .order("created_at", { ascending: false })
-        .limit(10);
-
-      if (category) {
-        query = query.eq("category_id", category.id);
-      }
-
-      const { data, error } = await query;
+        .limit(12);
 
       if (error) throw error;
       setProducts((data as Product[]) || []);
@@ -161,42 +135,15 @@ const BestSellers = () => {
   return (
     <section className="py-12 bg-secondary/30">
       <div className="container">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 bg-orange px-4 py-2 rounded-lg">
-              <h2 className="font-display font-bold text-lg text-accent-foreground">
-                {t.bestSellers.weeklyBestSellers}
-              </h2>
-            </div>
-            <Link to="/products" className="text-muted-foreground hover:text-cyan flex items-center gap-1">
-              {t.deals.seeAll} {isRTL ? <ArrowLeft className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
-            </Link>
+        <div className="flex items-center gap-4 mb-8">
+          <div className="flex items-center gap-2 bg-orange px-4 py-2 rounded-lg">
+            <h2 className="font-display font-bold text-lg text-accent-foreground">
+              {t.bestSellers.weeklyBestSellers}
+            </h2>
           </div>
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 lg:pb-0">
-            {categoriesLoading ? (
-              [...Array(4)].map((_, i) => <Skeleton key={i} className="h-10 w-24" />)
-            ) : rootCategories.length > 0 ? (
-              rootCategories.map((category) => (
-                <Link
-                  key={category.id}
-                  to={`/products?category=${category.slug}`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setActiveCategory(category.slug);
-                  }}
-                  className={`px-4 py-2 text-sm font-medium whitespace-nowrap rounded-lg transition-all ${
-                    activeCategory === category.slug
-                      ? "bg-cyan text-primary-foreground"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                  }`}
-                >
-                  {isRTL && category.name_fa ? category.name_fa : category.name}
-                </Link>
-              ))
-            ) : (
-              <span className="text-sm text-muted-foreground">{isRTL ? "دسته‌بندی موجود نیست" : "No categories"}</span>
-            )}
-          </div>
+          <Link to="/products" className="text-muted-foreground hover:text-cyan flex items-center gap-1">
+            {t.deals.seeAll} {isRTL ? <ArrowLeft className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
+          </Link>
         </div>
         <div className="relative group">
           {/* Left Scroll Button - Floating in middle */}

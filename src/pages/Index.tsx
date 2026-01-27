@@ -27,12 +27,11 @@ const Index = () => {
         {/* Today's Deals */}
         <TodayDeals />
 
+        {/* Best Sellers */}
+        <BestSellers />
 
         {/* Category Product Rows - Horizontal Scrolling */}
         <CategoryProductRows />
-
-        {/* Best Sellers */}
-        <BestSellers />
 
         {/* Category Banners */}
         <CategoryBanners />
