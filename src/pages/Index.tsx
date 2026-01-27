@@ -7,7 +7,7 @@ import HeroSection from "@/components/home/HeroSection";
 import TodayDeals from "@/components/home/TodayDeals";
 import BestSellers from "@/components/home/BestSellers";
 import CategoryBanners from "@/components/home/CategoryBanners";
-import CategoryProductRows from "@/components/home/CategoryProductRows";
+import DiscoverProducts from "@/components/home/DiscoverProducts";
 
 const Index = () => {
   return (
@@ -30,8 +30,8 @@ const Index = () => {
         {/* Best Sellers */}
         <BestSellers />
 
-        {/* Category Product Rows - Horizontal Scrolling */}
-        <CategoryProductRows />
+        {/* Discover Products - Mixed categories grid */}
+        <DiscoverProducts />
 
         {/* Category Banners */}
         <CategoryBanners />
