@@ -29,21 +29,13 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
   };
 
   return (
-    <div className="hero-container relative overflow-hidden rounded-2xl min-h-[320px] sm:min-h-[380px] lg:min-h-[420px] flex items-center animate-fade-in">
-      
+    <div className="hero-container relative overflow-hidden rounded-2xl min-h-[200px] sm:min-h-[280px] lg:min-h-[300px] flex items-center animate-fade-in">
       {/* Layer 1: Background (Color / Gradient / Image) */}
       <div className="hero-bg absolute inset-0 z-[1]">
         {banner.background_image ? (
-          <img 
-            src={banner.background_image} 
-            alt="" 
-            className="w-full h-full object-cover"
-          />
+          <img src={banner.background_image} alt="" className="w-full h-full object-cover" />
         ) : banner.background_color ? (
-          <div 
-            className="w-full h-full" 
-            style={{ backgroundColor: banner.background_color }} 
-          />
+          <div className="w-full h-full" style={{ backgroundColor: banner.background_color }} />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-[#0f2027] via-[#203a43] to-[#2c5364]" />
         )}
@@ -53,40 +45,37 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
 
       {/* Layer 2: Product Image with Fade Effect */}
       {banner.icon_image && (
-        <div 
+        <div
           className={`hero-image absolute z-[2] bottom-0 pointer-events-none
-            ${isRTL ? 'left-[5%]' : 'right-[5%]'}
+            ${isRTL ? "left-[5%]" : "right-[5%]"}
             max-h-[75%] sm:max-h-[85%] lg:max-h-[90%]
           `}
           style={{
-            maskImage: isRTL 
-              ? 'linear-gradient(to right, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)'
-              : 'linear-gradient(to left, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)',
-            WebkitMaskImage: isRTL 
-              ? 'linear-gradient(to right, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)'
-              : 'linear-gradient(to left, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)',
+            maskImage: isRTL
+              ? "linear-gradient(to right, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)"
+              : "linear-gradient(to left, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)",
+            WebkitMaskImage: isRTL
+              ? "linear-gradient(to right, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)"
+              : "linear-gradient(to left, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)",
           }}
         >
-          <img 
-            src={banner.icon_image} 
-            alt="" 
+          <img
+            src={banner.icon_image}
+            alt=""
             className="h-full w-auto object-contain max-h-[240px] sm:max-h-[300px] lg:max-h-[380px]"
           />
         </div>
       )}
 
       {/* Layer 3: Content (Text + CTA) */}
-      <div 
+      <div
         className={`hero-content relative z-[3] px-6 sm:px-10 lg:px-16 py-8 max-w-[480px]
-          ${isRTL ? 'mr-auto text-right' : 'ml-0 text-left'}
+          ${isRTL ? "mr-auto text-right" : "ml-0 text-left"}
         `}
       >
         {/* Badge */}
         {badgeText && (
-          <Badge 
-            variant="sale" 
-            className="mb-4 px-4 py-1.5 text-sm font-semibold rounded-full"
-          >
+          <Badge variant="sale" className="mb-4 px-4 py-1.5 text-sm font-semibold rounded-full">
             {badgeText}
           </Badge>
         )}
@@ -105,8 +94,8 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
 
         {/* CTA Button */}
         {ctaText && (
-          <Button 
-            variant="default" 
+          <Button
+            variant="default"
             size="lg"
             className="hero-btn rounded-full font-semibold px-6 sm:px-8 group"
             onClick={handleCtaClick}
