@@ -25,6 +25,8 @@ const TodayDeals = () => {
   const [products, setProducts] = useState<DealProduct[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(true);
 
   const productIds = products.map((p) => p.id);
   const { getRating, loading: ratingsLoading } = useProductRatings(productIds);
@@ -60,16 +62,39 @@ const TodayDeals = () => {
     }
   };
 
-  const scrollLeft = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: isRTL ? 300 : -300, behavior: "smooth" });
-    }
+  const updateArrowVisibility = () => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const { scrollLeft, scrollWidth, clientWidth } = container;
+    const isAtStart = isRTL ? scrollLeft >= -10 : scrollLeft <= 10;
+    const isAtEnd = isRTL 
+      ? scrollLeft <= -(scrollWidth - clientWidth - 10)
+      : scrollLeft >= scrollWidth - clientWidth - 10;
+
+    setShowLeftArrow(!isAtStart);
+    setShowRightArrow(!isAtEnd);
   };
 
-  const scrollRight = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: isRTL ? -300 : 300, behavior: "smooth" });
-    }
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    updateArrowVisibility();
+    container.addEventListener("scroll", updateArrowVisibility);
+    return () => container.removeEventListener("scroll", updateArrowVisibility);
+  }, [products, isRTL]);
+
+  const scroll = (direction: "left" | "right") => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const scrollAmount = 300;
+    const newScrollLeft = direction === "left"
+      ? container.scrollLeft - scrollAmount
+      : container.scrollLeft + scrollAmount;
+
+    container.scrollTo({ left: newScrollLeft, behavior: "smooth" });
   };
 
   const getProductCardData = (product: DealProduct) => {
@@ -133,41 +158,54 @@ const TodayDeals = () => {
               {isRTL ? <ArrowLeft className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
             </Button>
           </div>
-
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="icon" className="rounded-full" onClick={scrollRight}>
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-            <Button variant="outline" size="icon" className="rounded-full" onClick={scrollLeft}>
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-          </div>
         </div>
 
-        {/* Products - Horizontal Scroll */}
-        <div
-          ref={scrollContainerRef}
-          className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 scroll-smooth"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-        >
-          {isLoading
-            ? [...Array(5)].map((_, index) => (
-                <div key={index} className="w-[200px] md:w-[220px] flex-shrink-0 space-y-3">
-                  <Skeleton className="aspect-square rounded-lg" />
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
-                  <Skeleton className="h-14 rounded-lg" />
-                </div>
-              ))
-            : products.map((product, index) => (
-                <div
-                  key={product.id}
-                  className="w-[200px] md:w-[220px] flex-shrink-0 opacity-0 animate-fade-in-up"
-                  style={{ animationDelay: `${index * 100}ms`, animationFillMode: "forwards" }}
-                >
-                  <ProductCard {...getProductCardData(product)} />
-                </div>
-              ))}
+        {/* Products - Horizontal Scroll with Floating Arrows */}
+        <div className="relative group">
+          {/* Left Scroll Button - Floating */}
+          <Button
+            variant="secondary"
+            size="icon"
+            className={`absolute ${isRTL ? 'right-0' : 'left-0'} top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full shadow-lg bg-background/90 backdrop-blur-sm border border-border hover:bg-background transition-opacity duration-200 hidden md:flex ${showLeftArrow ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+            onClick={() => scroll(isRTL ? "right" : "left")}
+          >
+            {isRTL ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
+          </Button>
+
+          {/* Right Scroll Button - Floating */}
+          <Button
+            variant="secondary"
+            size="icon"
+            className={`absolute ${isRTL ? 'left-0' : 'right-0'} top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full shadow-lg bg-background/90 backdrop-blur-sm border border-border hover:bg-background transition-opacity duration-200 hidden md:flex ${showRightArrow ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+            onClick={() => scroll(isRTL ? "left" : "right")}
+          >
+            {isRTL ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+          </Button>
+
+          <div
+            ref={scrollContainerRef}
+            className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 scroll-smooth px-1"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
+            {isLoading
+              ? [...Array(5)].map((_, index) => (
+                  <div key={index} className="w-[200px] md:w-[220px] flex-shrink-0 space-y-3">
+                    <Skeleton className="aspect-square rounded-lg" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                    <Skeleton className="h-14 rounded-lg" />
+                  </div>
+                ))
+              : products.map((product, index) => (
+                  <div
+                    key={product.id}
+                    className="w-[200px] md:w-[220px] flex-shrink-0 opacity-0 animate-fade-in-up"
+                    style={{ animationDelay: `${index * 100}ms`, animationFillMode: "forwards" }}
+                  >
+                    <ProductCard {...getProductCardData(product)} />
+                  </div>
+                ))}
+          </div>
         </div>
       </div>
     </section>
