@@ -26,12 +26,12 @@ const TodayDeals = () => {
   const [isLoading, setIsLoading] = useState(true);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  const productIds = products.map(p => p.id);
+  const productIds = products.map((p) => p.id);
   const { getRating, loading: ratingsLoading } = useProductRatings(productIds);
 
   useEffect(() => {
     fetchActiveDeals();
-    
+
     // Refresh deals every minute to check for expired ones
     const interval = setInterval(fetchActiveDeals, 60000);
     return () => clearInterval(interval);
@@ -40,21 +40,21 @@ const TodayDeals = () => {
   const fetchActiveDeals = async () => {
     try {
       const now = new Date().toISOString();
-      
+
       const { data, error } = await supabase
-        .from('products')
-        .select('id, name, price, compare_at_price, images, currency, created_at, is_deal, deal_start_at, deal_end_at')
-        .eq('status', 'active')
-        .eq('is_deal', true)
-        .lte('deal_start_at', now) // Deal has started
-        .gte('deal_end_at', now)   // Deal hasn't ended
-        .order('deal_end_at', { ascending: true }) // Show soonest expiring first
+        .from("products")
+        .select("id, name, price, compare_at_price, images, currency, created_at, is_deal, deal_start_at, deal_end_at")
+        .eq("status", "active")
+        .eq("is_deal", true)
+        .lte("deal_start_at", now) // Deal has started
+        .gte("deal_end_at", now) // Deal hasn't ended
+        .order("deal_end_at", { ascending: true }) // Show soonest expiring first
         .limit(10);
 
       if (error) throw error;
       setProducts((data as DealProduct[]) || []);
     } catch (error) {
-      console.error('Error fetching deal products:', error);
+      console.error("Error fetching deal products:", error);
     } finally {
       setIsLoading(false);
     }
@@ -62,19 +62,19 @@ const TodayDeals = () => {
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: isRTL ? 300 : -300, behavior: 'smooth' });
+      scrollContainerRef.current.scrollBy({ left: isRTL ? 300 : -300, behavior: "smooth" });
     }
   };
 
   const scrollRight = () => {
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: isRTL ? -300 : 300, behavior: 'smooth' });
+      scrollContainerRef.current.scrollBy({ left: isRTL ? -300 : 300, behavior: "smooth" });
     }
   };
 
   const getProductCardData = (product: DealProduct) => {
-    const currency = (product.currency as 'AFN' | 'USD') || 'AFN';
-    
+    const currency = (product.currency as "AFN" | "USD") || "AFN";
+
     const hasDiscount = product.compare_at_price && product.compare_at_price !== product.price;
     let originalPrice: number | undefined;
     let currentPrice = product.price;
@@ -90,7 +90,7 @@ const TodayDeals = () => {
       }
       discount = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
     }
-    
+
     const isNew = new Date(product.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
     const { averageRating, reviewCount } = getRating(product.id);
@@ -119,7 +119,7 @@ const TodayDeals = () => {
   }
 
   return (
-    <section className="py-12 bg-background">
+    <section className="py-12 pt-1 bg-background">
       <div className="container">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -145,31 +145,29 @@ const TodayDeals = () => {
         </div>
 
         {/* Products - Horizontal Scroll */}
-        <div 
+        <div
           ref={scrollContainerRef}
           className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 scroll-smooth"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          {isLoading ? (
-            [...Array(5)].map((_, index) => (
-              <div key={index} className="w-[200px] md:w-[220px] flex-shrink-0 space-y-3">
-                <Skeleton className="aspect-square rounded-lg" />
-                <Skeleton className="h-4 w-3/4" />
-                <Skeleton className="h-4 w-1/2" />
-                <Skeleton className="h-14 rounded-lg" />
-              </div>
-            ))
-          ) : (
-            products.map((product, index) => (
-              <div
-                key={product.id}
-                className="w-[200px] md:w-[220px] flex-shrink-0 opacity-0 animate-fade-in-up"
-                style={{ animationDelay: `${index * 100}ms`, animationFillMode: "forwards" }}
-              >
-                <ProductCard {...getProductCardData(product)} />
-              </div>
-            ))
-          )}
+          {isLoading
+            ? [...Array(5)].map((_, index) => (
+                <div key={index} className="w-[200px] md:w-[220px] flex-shrink-0 space-y-3">
+                  <Skeleton className="aspect-square rounded-lg" />
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                  <Skeleton className="h-14 rounded-lg" />
+                </div>
+              ))
+            : products.map((product, index) => (
+                <div
+                  key={product.id}
+                  className="w-[200px] md:w-[220px] flex-shrink-0 opacity-0 animate-fade-in-up"
+                  style={{ animationDelay: `${index * 100}ms`, animationFillMode: "forwards" }}
+                >
+                  <ProductCard {...getProductCardData(product)} />
+                </div>
+              ))}
         </div>
       </div>
     </section>
