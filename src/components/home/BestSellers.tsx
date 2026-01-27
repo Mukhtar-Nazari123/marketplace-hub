@@ -103,7 +103,7 @@ const BestSellers = () => {
 
     const { scrollLeft, scrollWidth, clientWidth } = container;
     const isAtStart = isRTL ? scrollLeft >= -10 : scrollLeft <= 10;
-    const isAtEnd = isRTL 
+    const isAtEnd = isRTL
       ? scrollLeft <= -(scrollWidth - clientWidth - 10)
       : scrollLeft >= scrollWidth - clientWidth - 10;
 
@@ -125,9 +125,8 @@ const BestSellers = () => {
     if (!container) return;
 
     const scrollAmount = 300;
-    const newScrollLeft = direction === "left"
-      ? container.scrollLeft - scrollAmount
-      : container.scrollLeft + scrollAmount;
+    const newScrollLeft =
+      direction === "left" ? container.scrollLeft - scrollAmount : container.scrollLeft + scrollAmount;
 
     container.scrollTo({ left: newScrollLeft, behavior: "smooth" });
   };
@@ -137,9 +136,7 @@ const BestSellers = () => {
       <div className="container">
         <div className="flex items-center gap-4 mb-8">
           <div className="flex items-center gap-2 bg-orange px-4 py-2 rounded-lg">
-            <h2 className="font-display font-bold text-lg text-accent-foreground">
-              {t.bestSellers.weeklyBestSellers}
-            </h2>
+            <h2 className="font-display font-bold text-lg text-accent-foreground">{t.bestSellers.weeklyBestSellers}</h2>
           </div>
           <Link to="/products" className="text-muted-foreground hover:text-cyan flex items-center gap-1">
             {t.deals.seeAll} {isRTL ? <ArrowLeft className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
@@ -150,7 +147,7 @@ const BestSellers = () => {
           <Button
             variant="secondary"
             size="icon"
-            className={`absolute ${isRTL ? 'right-0' : 'left-0'} top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full shadow-lg bg-background/90 backdrop-blur-sm border border-border hover:bg-background transition-opacity duration-200 hidden md:flex ${showLeftArrow ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+            className={`absolute ${isRTL ? "right-0" : "left-0"} top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full shadow-lg bg-background/90 backdrop-blur-sm border border-border hover:bg-background transition-opacity duration-200 hidden md:flex ${showLeftArrow ? "opacity-100" : "opacity-0 pointer-events-none"}`}
             onClick={() => scroll(isRTL ? "right" : "left")}
           >
             {isRTL ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
@@ -160,7 +157,7 @@ const BestSellers = () => {
           <Button
             variant="secondary"
             size="icon"
-            className={`absolute ${isRTL ? 'left-0' : 'right-0'} top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full shadow-lg bg-background/90 backdrop-blur-sm border border-border hover:bg-background transition-opacity duration-200 hidden md:flex ${showRightArrow ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+            className={`absolute ${isRTL ? "left-0" : "right-0"} top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full shadow-lg bg-background/90 backdrop-blur-sm border border-border hover:bg-background transition-opacity duration-200 hidden md:flex ${showRightArrow ? "opacity-100" : "opacity-0 pointer-events-none"}`}
             onClick={() => scroll(isRTL ? "left" : "right")}
           >
             {isRTL ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
@@ -168,28 +165,28 @@ const BestSellers = () => {
 
           <div
             ref={scrollContainerRef}
-            className="flex gap-4 pb-4 overflow-x-auto scrollbar-hide"
+            className="flex gap-4 pb-2 overflow-x-auto scrollbar-hide"
             style={{ scrollBehavior: "smooth" }}
           >
-              {isLoading ? (
-                [...Array(6)].map((_, index) => (
-                  <div key={index} className="flex-shrink-0 w-[200px] md:w-[220px] space-y-3">
-                    <Skeleton className="aspect-square rounded-lg" />
-                    <Skeleton className="h-4 w-3/4" />
-                    <Skeleton className="h-4 w-1/2" />
-                  </div>
-                ))
-              ) : products.length > 0 ? (
-                products.map((product, index) => (
-                  <div
-                    key={product.id}
-                    className="flex-shrink-0 w-[200px] md:w-[220px] opacity-0 animate-fade-in-up"
-                    style={{ animationDelay: `${index * 50}ms`, animationFillMode: "forwards" }}
-                  >
-                    <ProductCard {...getProductCardData(product)} />
-                  </div>
-                ))
-              ) : (
+            {isLoading ? (
+              [...Array(6)].map((_, index) => (
+                <div key={index} className="flex-shrink-0 w-[200px] md:w-[220px] space-y-3">
+                  <Skeleton className="aspect-square rounded-lg" />
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                </div>
+              ))
+            ) : products.length > 0 ? (
+              products.map((product, index) => (
+                <div
+                  key={product.id}
+                  className="flex-shrink-0 w-[200px] md:w-[220px] opacity-0 animate-fade-in-up"
+                  style={{ animationDelay: `${index * 50}ms`, animationFillMode: "forwards" }}
+                >
+                  <ProductCard {...getProductCardData(product)} />
+                </div>
+              ))
+            ) : (
               <div className="w-full text-center py-12 text-muted-foreground">
                 {isRTL ? "هنوز محصولی فعال نشده است" : "No active products yet"}
               </div>
