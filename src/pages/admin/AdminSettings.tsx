@@ -7,19 +7,27 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useLanguage } from '@/lib/i18n';
+import { useLanguage, Language } from '@/lib/i18n';
 import { useSiteSettings, useUpdateSiteSettings, uploadSiteAsset } from '@/hooks/useSiteSettings';
 import { toast } from 'sonner';
 import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react';
 
+const getLabel = (lang: Language, en: string, fa: string, ps: string) => {
+  if (lang === 'ps') return ps;
+  if (lang === 'fa') return fa;
+  return en;
+};
+
 const AdminSettings = () => {
   const { t, language } = useLanguage();
+  const lang = language as Language;
   const { settings, isLoading } = useSiteSettings();
   const updateSettings = useUpdateSiteSettings();
 
   // Branding form state
   const [siteNameEn, setSiteNameEn] = useState('');
   const [siteNameFa, setSiteNameFa] = useState('');
+  const [siteNamePs, setSiteNamePs] = useState('');
   const [logoUrl, setLogoUrl] = useState('');
   const [faviconUrl, setFaviconUrl] = useState('');
   const [logoUploading, setLogoUploading] = useState(false);
@@ -34,6 +42,7 @@ const AdminSettings = () => {
     if (settings) {
       setSiteNameEn(settings.site_name_en);
       setSiteNameFa(settings.site_name_fa);
+      setSiteNamePs(settings.site_name_ps || '');
       setLogoUrl(settings.logo_url || '');
       setFaviconUrl(settings.favicon_url || '');
     }
@@ -44,12 +53,12 @@ const AdminSettings = () => {
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      toast.error(language === 'fa' ? 'لطفاً یک فایل تصویری انتخاب کنید' : 'Please select an image file');
+      toast.error(getLabel(lang, 'Please select an image file', 'لطفاً یک فایل تصویری انتخاب کنید', 'مهرباني وکړئ د عکس فایل وټاکئ'));
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      toast.error(language === 'fa' ? 'حجم تصویر باید کمتر از ۵ مگابایت باشد' : 'Image must be less than 5MB');
+      toast.error(getLabel(lang, 'Image must be less than 5MB', 'حجم تصویر باید کمتر از ۵ مگابایت باشد', 'عکس باید له ۵ میګابایټ څخه کم وي'));
       return;
     }
 
@@ -57,10 +66,10 @@ const AdminSettings = () => {
     try {
       const url = await uploadSiteAsset(file, 'logo');
       setLogoUrl(url);
-      toast.success(language === 'fa' ? 'لوگو با موفقیت آپلود شد' : 'Logo uploaded successfully');
+      toast.success(getLabel(lang, 'Logo uploaded successfully', 'لوگو با موفقیت آپلود شد', 'لوګو په بریالیتوب سره اپلوډ شو'));
     } catch (error) {
       console.error('Logo upload error:', error);
-      toast.error(language === 'fa' ? 'خطا در آپلود لوگو' : 'Failed to upload logo');
+      toast.error(getLabel(lang, 'Failed to upload logo', 'خطا در آپلود لوگو', 'د لوګو اپلوډ ناکام شو'));
     } finally {
       setLogoUploading(false);
       if (logoInputRef.current) logoInputRef.current.value = '';
@@ -72,12 +81,12 @@ const AdminSettings = () => {
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      toast.error(language === 'fa' ? 'لطفاً یک فایل تصویری انتخاب کنید' : 'Please select an image file');
+      toast.error(getLabel(lang, 'Please select an image file', 'لطفاً یک فایل تصویری انتخاب کنید', 'مهرباني وکړئ د عکس فایل وټاکئ'));
       return;
     }
 
     if (file.size > 1 * 1024 * 1024) {
-      toast.error(language === 'fa' ? 'حجم فاویکون باید کمتر از ۱ مگابایت باشد' : 'Favicon must be less than 1MB');
+      toast.error(getLabel(lang, 'Favicon must be less than 1MB', 'حجم فاویکون باید کمتر از ۱ مگابایت باشد', 'فاویکون باید له ۱ میګابایټ څخه کم وي'));
       return;
     }
 
@@ -85,10 +94,10 @@ const AdminSettings = () => {
     try {
       const url = await uploadSiteAsset(file, 'favicon');
       setFaviconUrl(url);
-      toast.success(language === 'fa' ? 'فاویکون با موفقیت آپلود شد' : 'Favicon uploaded successfully');
+      toast.success(getLabel(lang, 'Favicon uploaded successfully', 'فاویکون با موفقیت آپلود شد', 'فاویکون په بریالیتوب سره اپلوډ شو'));
     } catch (error) {
       console.error('Favicon upload error:', error);
-      toast.error(language === 'fa' ? 'خطا در آپلود فاویکون' : 'Failed to upload favicon');
+      toast.error(getLabel(lang, 'Failed to upload favicon', 'خطا در آپلود فاویکون', 'د فاویکون اپلوډ ناکام شو'));
     } finally {
       setFaviconUploading(false);
       if (faviconInputRef.current) faviconInputRef.current.value = '';
@@ -97,7 +106,7 @@ const AdminSettings = () => {
 
   const handleSaveBranding = async () => {
     if (!siteNameEn.trim() || !siteNameFa.trim()) {
-      toast.error(language === 'fa' ? 'نام سایت الزامی است' : 'Site name is required');
+      toast.error(getLabel(lang, 'Site name is required', 'نام سایت الزامی است', 'د سایټ نوم اړین دی'));
       return;
     }
 
@@ -106,40 +115,53 @@ const AdminSettings = () => {
       await updateSettings.mutateAsync({
         site_name_en: siteNameEn.trim(),
         site_name_fa: siteNameFa.trim(),
+        site_name_ps: siteNamePs.trim() || null,
         logo_url: logoUrl || null,
         favicon_url: faviconUrl || null,
       });
-      toast.success(language === 'fa' ? 'تنظیمات برند با موفقیت ذخیره شد' : 'Branding settings saved successfully');
+      toast.success(getLabel(lang, 'Branding settings saved successfully', 'تنظیمات برند با موفقیت ذخیره شد', 'د برانډ تنظیمات په بریالیتوب سره خوندي شول'));
     } catch (error) {
       console.error('Save branding error:', error);
-      toast.error(language === 'fa' ? 'خطا در ذخیره تنظیمات' : 'Failed to save settings');
+      toast.error(getLabel(lang, 'Failed to save settings', 'خطا در ذخیره تنظیمات', 'تنظیمات خوندي کول ناکام شول'));
     } finally {
       setSaving(false);
     }
   };
 
   return (
-    <AdminLayout title={t.admin.settings.title} description={t.admin.settings.description}>
+    <AdminLayout 
+      title={getLabel(lang, 'Settings', 'تنظیمات', 'تنظیمات')} 
+      description={getLabel(lang, 'Manage site settings and configurations', 'مدیریت تنظیمات و پیکربندی‌های سایت', 'د سایټ تنظیمات او ترتیبات اداره کړئ')}
+    >
       <div className="space-y-6 animate-fade-in">
         <Tabs defaultValue="branding" className="space-y-4">
           <TabsList>
             <TabsTrigger value="branding">
-              {language === 'fa' ? 'برندینگ' : 'Branding'}
+              {getLabel(lang, 'Branding', 'برندینگ', 'برانډینګ')}
             </TabsTrigger>
-            <TabsTrigger value="general">{t.admin.settings.tabs.general}</TabsTrigger>
-            <TabsTrigger value="notifications">{t.admin.settings.tabs.notifications}</TabsTrigger>
-            <TabsTrigger value="security">{t.admin.settings.tabs.security}</TabsTrigger>
+            <TabsTrigger value="general">
+              {getLabel(lang, 'General', 'عمومی', 'عمومي')}
+            </TabsTrigger>
+            <TabsTrigger value="notifications">
+              {getLabel(lang, 'Notifications', 'اعلان‌ها', 'خبرتیاوې')}
+            </TabsTrigger>
+            <TabsTrigger value="security">
+              {getLabel(lang, 'Security', 'امنیت', 'امنیت')}
+            </TabsTrigger>
           </TabsList>
 
           {/* Branding Tab */}
           <TabsContent value="branding">
             <Card className="hover-lift">
               <CardHeader>
-                <CardTitle>{language === 'fa' ? 'تنظیمات برندینگ' : 'Branding Settings'}</CardTitle>
+                <CardTitle>{getLabel(lang, 'Branding Settings', 'تنظیمات برندینگ', 'د برانډ تنظیمات')}</CardTitle>
                 <CardDescription>
-                  {language === 'fa' 
-                    ? 'نام سایت، لوگو و فاویکون را از اینجا تنظیم کنید' 
-                    : 'Configure your site name, logo, and favicon'}
+                  {getLabel(
+                    lang, 
+                    'Configure your site name, logo, and favicon', 
+                    'نام سایت، لوگو و فاویکون را از اینجا تنظیم کنید',
+                    'د سایټ نوم، لوګو او فاویکون له دې ځایه تنظیم کړئ'
+                  )}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -152,7 +174,7 @@ const AdminSettings = () => {
                     {/* Site Name English */}
                     <div className="space-y-2">
                       <Label htmlFor="siteNameEn">
-                        {language === 'fa' ? 'نام سایت (انگلیسی)' : 'Site Name (English)'}
+                        {getLabel(lang, 'Site Name (English)', 'نام سایت (انگلیسی)', 'د سایټ نوم (انګلیسي)')}
                       </Label>
                       <Input
                         id="siteNameEn"
@@ -166,7 +188,7 @@ const AdminSettings = () => {
                     {/* Site Name Persian */}
                     <div className="space-y-2">
                       <Label htmlFor="siteNameFa">
-                        {language === 'fa' ? 'نام سایت (فارسی)' : 'Site Name (Persian)'}
+                        {getLabel(lang, 'Site Name (Persian)', 'نام سایت (فارسی)', 'د سایټ نوم (فارسي)')}
                       </Label>
                       <Input
                         id="siteNameFa"
@@ -177,15 +199,32 @@ const AdminSettings = () => {
                       />
                     </div>
 
+                    {/* Site Name Pashto */}
+                    <div className="space-y-2">
+                      <Label htmlFor="siteNamePs">
+                        {getLabel(lang, 'Site Name (Pashto)', 'نام سایت (پشتو)', 'د سایټ نوم (پښتو)')}
+                      </Label>
+                      <Input
+                        id="siteNamePs"
+                        value={siteNamePs}
+                        onChange={(e) => setSiteNamePs(e.target.value)}
+                        placeholder="مارکېټ"
+                        dir="rtl"
+                      />
+                    </div>
+
                     <Separator />
 
                     {/* Logo Upload */}
                     <div className="space-y-2">
-                      <Label>{language === 'fa' ? 'لوگوی سایت' : 'Site Logo'}</Label>
+                      <Label>{getLabel(lang, 'Site Logo', 'لوگوی سایت', 'د سایټ لوګو')}</Label>
                       <p className="text-sm text-muted-foreground">
-                        {language === 'fa' 
-                          ? 'فرمت‌های پیشنهادی: PNG, SVG, WEBP (حداکثر ۵ مگابایت)' 
-                          : 'Recommended formats: PNG, SVG, WEBP (max 5MB)'}
+                        {getLabel(
+                          lang, 
+                          'Recommended formats: PNG, SVG, WEBP (max 5MB)', 
+                          'فرمت‌های پیشنهادی: PNG, SVG, WEBP (حداکثر ۵ مگابایت)',
+                          'وړاندیز شوې بڼې: PNG, SVG, WEBP (اعظمي ۵ میګابایټ)'
+                        )}
                       </p>
                       
                       {logoUrl ? (
@@ -204,7 +243,7 @@ const AdminSettings = () => {
                               disabled={logoUploading}
                             >
                               <Upload className="h-4 w-4 me-1" />
-                              {language === 'fa' ? 'جایگزین' : 'Replace'}
+                              {getLabel(lang, 'Replace', 'جایگزین', 'بدلول')}
                             </Button>
                             <Button
                               type="button"
@@ -227,7 +266,7 @@ const AdminSettings = () => {
                             <>
                               <ImageIcon className="h-8 w-8 text-muted-foreground" />
                               <span className="text-sm text-muted-foreground">
-                                {language === 'fa' ? 'آپلود لوگو' : 'Upload Logo'}
+                                {getLabel(lang, 'Upload Logo', 'آپلود لوگو', 'لوګو اپلوډ کړئ')}
                               </span>
                             </>
                           )}
@@ -246,11 +285,14 @@ const AdminSettings = () => {
 
                     {/* Favicon Upload */}
                     <div className="space-y-2">
-                      <Label>{language === 'fa' ? 'فاویکون (آیکون تب مرورگر)' : 'Favicon (Browser Tab Icon)'}</Label>
+                      <Label>{getLabel(lang, 'Favicon (Browser Tab Icon)', 'فاویکون (آیکون تب مرورگر)', 'فاویکون (د براوزر ټب آیکون)')}</Label>
                       <p className="text-sm text-muted-foreground">
-                        {language === 'fa' 
-                          ? 'فرمت‌های پیشنهادی: ICO, PNG, SVG (۱۶×۱۶ یا ۳۲×۳۲ پیکسل، حداکثر ۱ مگابایت)' 
-                          : 'Recommended formats: ICO, PNG, SVG (16×16 or 32×32 pixels, max 1MB)'}
+                        {getLabel(
+                          lang, 
+                          'Recommended formats: ICO, PNG, SVG (16×16 or 32×32 pixels, max 1MB)', 
+                          'فرمت‌های پیشنهادی: ICO, PNG, SVG (۱۶×۱۶ یا ۳۲×۳۲ پیکسل، حداکثر ۱ مگابایت)',
+                          'وړاندیز شوې بڼې: ICO, PNG, SVG (۱۶×۱۶ یا ۳۲×۳۲ پکسل، اعظمي ۱ میګابایټ)'
+                        )}
                       </p>
                       
                       {faviconUrl ? (
@@ -293,7 +335,7 @@ const AdminSettings = () => {
                             <>
                               <ImageIcon className="h-5 w-5 text-muted-foreground" />
                               <span className="text-[10px] text-muted-foreground">
-                                {language === 'fa' ? 'آپلود' : 'Upload'}
+                                {getLabel(lang, 'Upload', 'آپلود', 'اپلوډ')}
                               </span>
                             </>
                           )}
@@ -318,10 +360,10 @@ const AdminSettings = () => {
                       {saving ? (
                         <>
                           <Loader2 className="h-4 w-4 me-2 animate-spin" />
-                          {language === 'fa' ? 'در حال ذخیره...' : 'Saving...'}
+                          {getLabel(lang, 'Saving...', 'در حال ذخیره...', 'خوندي کېږي...')}
                         </>
                       ) : (
-                        t.admin.settings.saveChanges
+                        getLabel(lang, 'Save Changes', 'ذخیره تغییرات', 'بدلونونه خوندي کړئ')
                       )}
                     </Button>
                   </>
@@ -333,29 +375,36 @@ const AdminSettings = () => {
           <TabsContent value="general">
             <Card className="hover-lift">
               <CardHeader>
-                <CardTitle>{t.admin.settings.general.title}</CardTitle>
-                <CardDescription>{t.admin.settings.general.description}</CardDescription>
+                <CardTitle>{getLabel(lang, 'General Settings', 'تنظیمات عمومی', 'عمومي تنظیمات')}</CardTitle>
+                <CardDescription>
+                  {getLabel(lang, 'Configure general site settings', 'تنظیمات عمومی سایت را پیکربندی کنید', 'د سایټ عمومي تنظیمات تنظیم کړئ')}
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="siteName">{t.admin.settings.general.siteName}</Label>
-                  <Input id="siteName" placeholder={t.admin.settings.general.siteNamePlaceholder} />
+                  <Label htmlFor="siteName">{getLabel(lang, 'Site Name', 'نام سایت', 'د سایټ نوم')}</Label>
+                  <Input id="siteName" placeholder={getLabel(lang, 'My Store', 'فروشگاه من', 'زما پلورنځی')} />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="siteEmail">{t.admin.settings.general.siteEmail}</Label>
+                  <Label htmlFor="siteEmail">{getLabel(lang, 'Site Email', 'ایمیل سایت', 'د سایټ بریښنالیک')}</Label>
                   <Input id="siteEmail" type="email" placeholder="admin@store.com" />
                 </div>
                 <Separator />
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>{t.admin.settings.general.maintenanceMode}</Label>
+                    <Label>{getLabel(lang, 'Maintenance Mode', 'حالت تعمیر و نگهداری', 'د ساتنې حالت')}</Label>
                     <p className="text-sm text-muted-foreground">
-                      {t.admin.settings.general.maintenanceDescription}
+                      {getLabel(
+                        lang,
+                        'Enable maintenance mode to temporarily disable the site',
+                        'حالت تعمیر را فعال کنید تا سایت موقتاً غیرفعال شود',
+                        'د ساتنې حالت فعال کړئ ترڅو سایټ په لنډ مهال کې غیر فعال شي'
+                      )}
                     </p>
                   </div>
                   <Switch />
                 </div>
-                <Button className="hover-scale">{t.admin.settings.saveChanges}</Button>
+                <Button className="hover-scale">{getLabel(lang, 'Save Changes', 'ذخیره تغییرات', 'بدلونونه خوندي کړئ')}</Button>
               </CardContent>
             </Card>
           </TabsContent>
@@ -363,38 +412,55 @@ const AdminSettings = () => {
           <TabsContent value="notifications">
             <Card className="hover-lift">
               <CardHeader>
-                <CardTitle>{t.admin.settings.notifications.title}</CardTitle>
-                <CardDescription>{t.admin.settings.notifications.description}</CardDescription>
+                <CardTitle>{getLabel(lang, 'Notification Settings', 'تنظیمات اعلان‌ها', 'د خبرتیاوو تنظیمات')}</CardTitle>
+                <CardDescription>
+                  {getLabel(lang, 'Configure notification preferences', 'تنظیمات اعلان‌ها را پیکربندی کنید', 'د خبرتیاوو غوره توبونه تنظیم کړئ')}
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>{t.admin.settings.notifications.newOrders}</Label>
+                    <Label>{getLabel(lang, 'New Order Notifications', 'اعلان سفارشات جدید', 'د نویو امرونو خبرتیاوې')}</Label>
                     <p className="text-sm text-muted-foreground">
-                      {t.admin.settings.notifications.newOrdersDescription}
+                      {getLabel(
+                        lang,
+                        'Receive notifications for new orders',
+                        'برای سفارشات جدید اعلان دریافت کنید',
+                        'د نویو امرونو لپاره خبرتیاوې ترلاسه کړئ'
+                      )}
                     </p>
                   </div>
                   <Switch defaultChecked />
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>{t.admin.settings.notifications.newRegistrations}</Label>
+                    <Label>{getLabel(lang, 'New User Registrations', 'ثبت‌نام کاربران جدید', 'د نویو کاروونکو راجستر')}</Label>
                     <p className="text-sm text-muted-foreground">
-                      {t.admin.settings.notifications.newRegistrationsDescription}
+                      {getLabel(
+                        lang,
+                        'Receive notifications for new user registrations',
+                        'برای ثبت‌نام کاربران جدید اعلان دریافت کنید',
+                        'د نویو کاروونکو راجستر لپاره خبرتیاوې ترلاسه کړئ'
+                      )}
                     </p>
                   </div>
                   <Switch defaultChecked />
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>{t.admin.settings.notifications.verificationRequests}</Label>
+                    <Label>{getLabel(lang, 'Seller Verification Requests', 'درخواست‌های تأیید فروشنده', 'د پلورونکي تایید غوښتنې')}</Label>
                     <p className="text-sm text-muted-foreground">
-                      {t.admin.settings.notifications.verificationRequestsDescription}
+                      {getLabel(
+                        lang,
+                        'Receive notifications for seller verification requests',
+                        'برای درخواست‌های تأیید فروشنده اعلان دریافت کنید',
+                        'د پلورونکي تایید غوښتنو لپاره خبرتیاوې ترلاسه کړئ'
+                      )}
                     </p>
                   </div>
                   <Switch defaultChecked />
                 </div>
-                <Button className="hover-scale">{t.admin.settings.saveChanges}</Button>
+                <Button className="hover-scale">{getLabel(lang, 'Save Changes', 'ذخیره تغییرات', 'بدلونونه خوندي کړئ')}</Button>
               </CardContent>
             </Card>
           </TabsContent>
@@ -402,29 +468,41 @@ const AdminSettings = () => {
           <TabsContent value="security">
             <Card className="hover-lift">
               <CardHeader>
-                <CardTitle>{t.admin.settings.security.title}</CardTitle>
-                <CardDescription>{t.admin.settings.security.description}</CardDescription>
+                <CardTitle>{getLabel(lang, 'Security Settings', 'تنظیمات امنیتی', 'امنیتي تنظیمات')}</CardTitle>
+                <CardDescription>
+                  {getLabel(lang, 'Configure security settings', 'تنظیمات امنیتی را پیکربندی کنید', 'امنیتي تنظیمات تنظیم کړئ')}
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>{t.admin.settings.security.twoFactor}</Label>
+                    <Label>{getLabel(lang, 'Two-Factor Authentication', 'احراز هویت دو مرحله‌ای', 'دوه مرحلې تصدیق')}</Label>
                     <p className="text-sm text-muted-foreground">
-                      {t.admin.settings.security.twoFactorDescription}
+                      {getLabel(
+                        lang,
+                        'Require two-factor authentication for admin accounts',
+                        'احراز هویت دو مرحله‌ای برای حساب‌های ادمین اجباری شود',
+                        'د ادمین حسابونو لپاره دوه مرحلې تصدیق اړین کړئ'
+                      )}
                     </p>
                   </div>
                   <Switch />
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>{t.admin.settings.security.activityLog}</Label>
+                    <Label>{getLabel(lang, 'Activity Log', 'گزارش فعالیت‌ها', 'د فعالیتونو راپور')}</Label>
                     <p className="text-sm text-muted-foreground">
-                      {t.admin.settings.security.activityLogDescription}
+                      {getLabel(
+                        lang,
+                        'Keep a log of admin activities',
+                        'گزارش فعالیت‌های ادمین را نگه دارید',
+                        'د ادمین فعالیتونو راپور وساتئ'
+                      )}
                     </p>
                   </div>
                   <Switch defaultChecked />
                 </div>
-                <Button className="hover-scale">{t.admin.settings.saveChanges}</Button>
+                <Button className="hover-scale">{getLabel(lang, 'Save Changes', 'ذخیره تغییرات', 'بدلونونه خوندي کړئ')}</Button>
               </CardContent>
             </Card>
           </TabsContent>

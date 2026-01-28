@@ -1,15 +1,17 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useLanguage } from '@/lib/i18n';
+import { useLanguage, Language } from '@/lib/i18n';
 
 export interface ContactSettings {
   id: string;
   address_en: string | null;
   address_fa: string | null;
+  address_ps: string | null;
   phone: string | null;
   support_email: string | null;
   working_hours_en: string | null;
   working_hours_fa: string | null;
+  working_hours_ps: string | null;
   updated_at: string;
   updated_by: string | null;
   created_at: string;
@@ -17,6 +19,7 @@ export interface ContactSettings {
 
 export const useContactSettings = () => {
   const { language } = useLanguage();
+  const lang = language as Language;
 
   const { data: settings, isLoading, error } = useQuery({
     queryKey: ['contact-settings'],
@@ -33,20 +36,30 @@ export const useContactSettings = () => {
   });
 
   // Get localized values
-  const address = settings
-    ? (language === 'fa' ? settings.address_fa : settings.address_en)
-    : null;
+  const getLocalizedAddress = () => {
+    if (!settings) return lang === 'ps' ? 'کابل، افغانستان' : lang === 'fa' ? 'کابل، افغانستان' : 'Kabul, Afghanistan';
+    if (lang === 'ps') return settings.address_ps || settings.address_fa || settings.address_en;
+    if (lang === 'fa') return settings.address_fa || settings.address_en;
+    return settings.address_en;
+  };
 
-  const workingHours = settings
-    ? (language === 'fa' ? settings.working_hours_fa : settings.working_hours_en)
-    : null;
+  const getLocalizedWorkingHours = () => {
+    if (!settings) {
+      if (lang === 'ps') return 'شنبه - پنجشنبه: ۹:۰۰ سهار - ۶:۰۰ ماښام';
+      if (lang === 'fa') return 'شنبه - پنجشنبه: ۹:۰۰ صبح - ۶:۰۰ عصر';
+      return 'Saturday - Thursday: 9:00 AM - 6:00 PM';
+    }
+    if (lang === 'ps') return settings.working_hours_ps || settings.working_hours_fa || settings.working_hours_en;
+    if (lang === 'fa') return settings.working_hours_fa || settings.working_hours_en;
+    return settings.working_hours_en;
+  };
 
   return {
     settings,
-    address: address || (language === 'fa' ? 'کابل، افغانستان' : 'Kabul, Afghanistan'),
+    address: getLocalizedAddress() || (lang === 'fa' ? 'کابل، افغانستان' : 'Kabul, Afghanistan'),
     phone: settings?.phone || '+93 70 123 4567',
     email: settings?.support_email || 'support@market.af',
-    workingHours: workingHours || (language === 'fa' ? 'شنبه - پنجشنبه: ۹:۰۰ صبح - ۶:۰۰ عصر' : 'Saturday - Thursday: 9:00 AM - 6:00 PM'),
+    workingHours: getLocalizedWorkingHours() || (lang === 'fa' ? 'شنبه - پنجشنبه: ۹:۰۰ صبح - ۶:۰۰ عصر' : 'Saturday - Thursday: 9:00 AM - 6:00 PM'),
     isLoading,
     error,
   };

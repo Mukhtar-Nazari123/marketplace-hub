@@ -1,12 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useLanguage } from '@/lib/i18n';
+import { useLanguage, Language } from '@/lib/i18n';
 import { useEffect } from 'react';
 
 export interface SiteSettings {
   id: string;
   site_name_en: string;
   site_name_fa: string;
+  site_name_ps: string | null;
   logo_url: string | null;
   favicon_url: string | null;
   created_at: string;
@@ -15,6 +16,7 @@ export interface SiteSettings {
 
 export const useSiteSettings = () => {
   const { language } = useLanguage();
+  const lang = language as Language;
   
   const { data: settings, isLoading, error } = useQuery({
     queryKey: ['site-settings'],
@@ -31,9 +33,18 @@ export const useSiteSettings = () => {
   });
 
   // Get localized site name
-  const siteName = settings 
-    ? (language === 'fa' ? settings.site_name_fa : settings.site_name_en)
-    : (language === 'fa' ? 'مارکت' : 'Market');
+  const getSiteName = () => {
+    if (!settings) {
+      if (lang === 'ps') return 'مارکېټ';
+      if (lang === 'fa') return 'مارکت';
+      return 'Market';
+    }
+    if (lang === 'ps') return settings.site_name_ps || settings.site_name_fa || settings.site_name_en;
+    if (lang === 'fa') return settings.site_name_fa || settings.site_name_en;
+    return settings.site_name_en;
+  };
+
+  const siteName = getSiteName();
 
   // Dynamically update favicon
   useEffect(() => {
