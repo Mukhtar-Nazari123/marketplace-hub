@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Bell, CheckCheck, RefreshCw } from "lucide-react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
-import { useLanguage } from "@/lib/i18n";
+import { useLanguage, Language } from "@/lib/i18n";
 import { useAdminNotifications, NotificationType } from "@/hooks/useAdminNotifications";
 import { NotificationCard } from "@/components/admin/notifications/NotificationCard";
 import { NotificationFilters } from "@/components/admin/notifications/NotificationFilters";
@@ -12,8 +12,35 @@ import { cn } from "@/lib/utils";
 
 type FilterType = NotificationType | 'ALL';
 
+// Trilingual translations
+const translations = {
+  pageTitle: { en: 'Notifications', fa: 'اعلان‌ها', ps: 'خبرتیاوې' },
+  pageDescription: { en: 'Manage system notifications', fa: 'مدیریت اعلان‌های سیستم', ps: 'د سیستم خبرتیاوې اداره کړئ' },
+  notificationCenter: { en: 'Notification Center', fa: 'مرکز اعلان‌ها', ps: 'د خبرتیاوو مرکز' },
+  notificationsCount: { 
+    en: (total: number, unread: number) => `${total} notifications (${unread} unread)`,
+    fa: (total: number, unread: number) => `${total} اعلان (${unread} خوانده نشده)`,
+    ps: (total: number, unread: number) => `${total} خبرتیاوې (${unread} نه لوستل شوې)`
+  },
+  refresh: { en: 'Refresh', fa: 'بازخوانی', ps: 'تازه کول' },
+  markAllRead: { en: 'Mark All Read', fa: 'همه خوانده شود', ps: 'ټول لوستل شوي' },
+  filterByType: { en: 'Filter by Type', fa: 'فیلتر بر اساس نوع', ps: 'د ډول له مخې فلټر' },
+  allNotifications: { en: 'All Notifications', fa: 'همه اعلان‌ها', ps: 'ټولې خبرتیاوې' },
+  newProducts: { en: 'New Products', fa: 'محصولات جدید', ps: 'نوي محصولات' },
+  newOrders: { en: 'New Orders', fa: 'سفارشات جدید', ps: 'نوې امرونه' },
+  newStores: { en: 'New Stores', fa: 'فروشگاه‌های جدید', ps: 'نوې پلورنځي' },
+  clickToViewDetails: { en: 'Click to view details', fa: 'کلیک کنید تا جزئیات را ببینید', ps: 'د جزیاتو لیدلو لپاره کلیک وکړئ' },
+  noNotifications: { en: 'No notifications', fa: 'اعلانی وجود ندارد', ps: 'هیڅ خبرتیا نشته' },
+  noNotificationsDesc: { 
+    en: 'When new events occur, they will appear here', 
+    fa: 'وقتی رویداد جدیدی اتفاق بیفتد، اینجا نمایش داده می‌شود',
+    ps: 'کله چې نوي پیښې رامنځته شي، دلته به ښکاره شي'
+  },
+};
+
 const AdminNotifications = () => {
-  const { isRTL } = useLanguage();
+  const { isRTL, language } = useLanguage();
+  const lang = language as Language;
   const [filter, setFilter] = useState<FilterType>('ALL');
   const { 
     notifications, 
@@ -25,10 +52,30 @@ const AdminNotifications = () => {
     isMarkingAllAsRead
   } = useAdminNotifications(filter);
 
+  const t = (key: keyof typeof translations) => {
+    const value = translations[key];
+    if (typeof value === 'object' && 'en' in value && typeof value.en === 'string') {
+      return (value as Record<Language, string>)[lang] || value.en;
+    }
+    return '';
+  };
+
+  const getFilterTitle = () => {
+    switch (filter) {
+      case 'ALL': return t('allNotifications');
+      case 'NEW_PRODUCT': return t('newProducts');
+      case 'NEW_ORDER': return t('newOrders');
+      case 'NEW_STORE': return t('newStores');
+      default: return t('allNotifications');
+    }
+  };
+
+  const notificationsCountText = translations.notificationsCount[lang](notifications.length, unreadCount);
+
   return (
     <AdminLayout
-      title={isRTL ? "اعلان‌ها" : "Notifications"}
-      description={isRTL ? "مدیریت اعلان‌های سیستم" : "Manage system notifications"}
+      title={t('pageTitle')}
+      description={t('pageDescription')}
     >
       <div className="space-y-6" dir={isRTL ? "rtl" : "ltr"}>
         {/* Header Actions */}
@@ -47,13 +94,10 @@ const AdminNotifications = () => {
             </div>
             <div>
               <h2 className="text-2xl font-bold text-foreground">
-                {isRTL ? 'مرکز اعلان‌ها' : 'Notification Center'}
+                {t('notificationCenter')}
               </h2>
               <p className="text-sm text-muted-foreground">
-                {isRTL 
-                  ? `${notifications.length} اعلان (${unreadCount} خوانده نشده)`
-                  : `${notifications.length} notifications (${unreadCount} unread)`
-                }
+                {notificationsCountText}
               </p>
             </div>
           </div>
@@ -66,7 +110,7 @@ const AdminNotifications = () => {
               className={cn("gap-2", isRTL && "flex-row-reverse")}
             >
               <RefreshCw className="h-4 w-4" />
-              {isRTL ? 'بازخوانی' : 'Refresh'}
+              {t('refresh')}
             </Button>
             {unreadCount > 0 && (
               <Button
@@ -77,7 +121,7 @@ const AdminNotifications = () => {
                 className={cn("gap-2", isRTL && "flex-row-reverse")}
               >
                 <CheckCheck className="h-4 w-4" />
-                {isRTL ? 'همه خوانده شود' : 'Mark All Read'}
+                {t('markAllRead')}
               </Button>
             )}
           </div>
@@ -87,7 +131,7 @@ const AdminNotifications = () => {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className={cn("text-lg", isRTL && "text-right")}>
-              {isRTL ? 'فیلتر بر اساس نوع' : 'Filter by Type'}
+              {t('filterByType')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -99,20 +143,10 @@ const AdminNotifications = () => {
         <Card>
           <CardHeader>
             <CardTitle className={cn(isRTL && "text-right")}>
-              {filter === 'ALL' 
-                ? (isRTL ? 'همه اعلان‌ها' : 'All Notifications')
-                : filter === 'NEW_PRODUCT'
-                  ? (isRTL ? 'محصولات جدید' : 'New Products')
-                  : filter === 'NEW_ORDER'
-                    ? (isRTL ? 'سفارشات جدید' : 'New Orders')
-                    : (isRTL ? 'فروشگاه‌های جدید' : 'New Stores')
-              }
+              {getFilterTitle()}
             </CardTitle>
             <CardDescription className={cn(isRTL && "text-right")}>
-              {isRTL 
-                ? 'کلیک کنید تا جزئیات را ببینید'
-                : 'Click to view details'
-              }
+              {t('clickToViewDetails')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -133,13 +167,10 @@ const AdminNotifications = () => {
               <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
                 <Bell className="h-16 w-16 mb-4 opacity-30" />
                 <h3 className="text-lg font-medium mb-1">
-                  {isRTL ? 'اعلانی وجود ندارد' : 'No notifications'}
+                  {t('noNotifications')}
                 </h3>
                 <p className="text-sm">
-                  {isRTL 
-                    ? 'وقتی رویداد جدیدی اتفاق بیفتد، اینجا نمایش داده می‌شود'
-                    : 'When new events occur, they will appear here'
-                  }
+                  {t('noNotificationsDesc')}
                 </p>
               </div>
             ) : (
