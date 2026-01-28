@@ -1109,6 +1109,59 @@ export type Database = {
         }
         Relationships: []
       }
+      product_translations: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_complete: boolean | null
+          language: string
+          meta_description: string | null
+          meta_title: string | null
+          name: string | null
+          product_id: string
+          short_description: string | null
+          specifications: Json | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_complete?: boolean | null
+          language: string
+          meta_description?: string | null
+          meta_title?: string | null
+          name?: string | null
+          product_id: string
+          short_description?: string | null
+          specifications?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_complete?: boolean | null
+          language?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          name?: string | null
+          product_id?: string
+          short_description?: string | null
+          specifications?: Json | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_translations_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           barcode: string | null

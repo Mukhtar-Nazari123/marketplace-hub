@@ -52,6 +52,7 @@ import SellerProductView from "./pages/dashboard/SellerProductView";
 import SellerOrders from "./pages/dashboard/SellerOrders";
 import SellerAnalytics from "./pages/dashboard/SellerAnalytics";
 import SellerReviews from "./pages/dashboard/SellerReviews";
+import SellerTranslations from "./pages/dashboard/SellerTranslations";
 import Wishlist from "./pages/dashboard/Wishlist";
 import BuyerReviews from "./pages/dashboard/BuyerReviews";
 import AdminReviews from "./pages/admin/AdminReviews";
@@ -123,6 +124,7 @@ const App = () => (
                         <Route path="seller/orders" element={<SellerOrders />} />
                         <Route path="seller/reviews" element={<SellerReviews />} />
                         <Route path="seller/analytics" element={<SellerAnalytics />} />
+                        <Route path="seller/translations" element={<SellerTranslations />} />
                         <Route path="seller/products/new" element={<AddProduct />} />
                         <Route path="seller/products/edit/:id" element={<EditProduct />} />
                         <Route path="seller/products/view/:id" element={<SellerProductView />} />
