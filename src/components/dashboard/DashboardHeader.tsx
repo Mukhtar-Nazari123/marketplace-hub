@@ -37,10 +37,17 @@ interface DashboardHeaderProps {
 
 export const DashboardHeader = ({ title, description, onMobileMenuToggle, isMobile }: DashboardHeaderProps) => {
   const { user, signOut } = useAuth();
-  const { t, isRTL } = useLanguage();
+  const { t, isRTL, language } = useLanguage();
   const navigate = useNavigate();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [isDark, setIsDark] = useState(false);
+
+  // Helper for trilingual labels
+  const getLabel = (en: string, fa: string, ps: string) => {
+    if (language === 'ps') return ps;
+    if (language === 'fa') return fa;
+    return en;
+  };
 
   useEffect(() => {
     const isDarkMode = document.documentElement.classList.contains('dark');
@@ -59,14 +66,20 @@ export const DashboardHeader = ({ title, description, onMobileMenuToggle, isMobi
     navigate('/login');
   };
 
-  const logoutText = isRTL ? 'خروج' : 'Logout';
-  const confirmLogoutText = isRTL ? 'تأیید خروج' : 'Confirm Logout';
-  const logoutConfirmMessage = isRTL 
-    ? 'آیا مطمئن هستید که می‌خواهید از حساب خود خارج شوید؟' 
-    : 'Are you sure you want to logout?';
-  const cancelText = isRTL ? 'انصراف' : 'Cancel';
-  const profileText = isRTL ? 'پروفایل' : 'Profile';
-  const settingsText = isRTL ? 'تنظیمات' : 'Settings';
+  const logoutText = getLabel('Logout', 'خروج', 'وتل');
+  const confirmLogoutText = getLabel('Confirm Logout', 'تأیید خروج', 'د وتلو تایید');
+  const logoutConfirmMessage = getLabel(
+    'Are you sure you want to logout?',
+    'آیا مطمئن هستید که می‌خواهید از حساب خود خارج شوید؟',
+    'ایا تاسو ډاډه یاست چې غواړئ له خپل حساب څخه ووځئ؟'
+  );
+  const cancelText = getLabel('Cancel', 'انصراف', 'لغوه');
+  const profileText = getLabel('Profile', 'پروفایل', 'پروفایل');
+  const settingsText = getLabel('Settings', 'تنظیمات', 'ترتیبات');
+  const homeTooltip = getLabel('Return to Home', 'بازگشت به خانه', 'کور ته بیرته');
+  const lightModeText = getLabel('Light Mode', 'حالت روشن', 'روښانه حالت');
+  const darkModeText = getLabel('Dark Mode', 'حالت تاریک', 'تیاره حالت');
+  const homeText = getLabel('Home', 'صفحه اصلی', 'کور');
 
   return (
     <header className={`flex h-14 sm:h-16 shrink-0 items-center justify-between gap-2 border-b bg-card/50 backdrop-blur-sm px-3 sm:px-4 sticky top-0 z-40 transition-all duration-300 ${isRTL ? 'flex-row-reverse' : ''}`}>
@@ -118,7 +131,7 @@ export const DashboardHeader = ({ title, description, onMobileMenuToggle, isMobi
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            {isRTL ? 'بازگشت به خانه' : 'Return to Home'}
+            {homeTooltip}
           </TooltipContent>
         </Tooltip>
 
@@ -139,7 +152,7 @@ export const DashboardHeader = ({ title, description, onMobileMenuToggle, isMobi
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            {isDark ? (isRTL ? 'حالت روشن' : 'Light Mode') : (isRTL ? 'حالت تاریک' : 'Dark Mode')}
+            {isDark ? lightModeText : darkModeText}
           </TooltipContent>
         </Tooltip>
 
@@ -189,7 +202,7 @@ export const DashboardHeader = ({ title, description, onMobileMenuToggle, isMobi
               className="cursor-pointer transition-colors min-h-[44px] sm:hidden"
             >
               <Home className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-              {isRTL ? 'صفحه اصلی' : 'Home'}
+              {homeText}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <AlertDialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
