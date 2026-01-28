@@ -188,7 +188,7 @@ const BestSellers = () => {
               ))
             ) : (
               <div className="w-full text-center py-12 text-muted-foreground">
-                {isRTL ? "هنوز محصولی فعال نشده است" : "No active products yet"}
+                {t.common.noProducts}
               </div>
             )}
           </div>

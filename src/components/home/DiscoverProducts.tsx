@@ -21,7 +21,7 @@ interface Product {
 const PRODUCTS_PER_PAGE = 12;
 
 const DiscoverProducts = () => {
-  const { t, isRTL } = useLanguage();
+  const { t, isRTL, language } = useLanguage();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -141,18 +141,24 @@ const DiscoverProducts = () => {
     return null;
   }
 
+  // Localized text
+  const texts = {
+    en: { title: "Discover Products", subtitle: "Explore popular and trending items from all categories", loadMore: "Load More", loading: "Loading..." },
+    fa: { title: "کشف محصولات", subtitle: "محصولات محبوب و پرطرفدار از تمام دسته‌بندی‌ها را کاوش کنید", loadMore: "نمایش بیشتر", loading: "در حال بارگذاری..." },
+    ps: { title: "محصولات کشف کړئ", subtitle: "له ټولو کټګوریو څخه مشهور او ترنډي توکي وپلټئ", loadMore: "نور وښایاست", loading: "پورته کیږي..." }
+  };
+  const localText = texts[language as keyof typeof texts] || texts.en;
+
   return (
     <section className="py-1 bg-background">
       <div className="container">
         {/* Section Header */}
         <div className="mb-6">
           <h2 className="font-display font-bold text-2xl text-foreground mb-1">
-            {isRTL ? "کشف محصولات" : "Discover Products"}
+            {localText.title}
           </h2>
           <p className="text-sm text-muted-foreground">
-            {isRTL
-              ? "محصولات محبوب و پرطرفدار از تمام دسته‌بندی‌ها را کاوش کنید"
-              : "Explore popular and trending items from all categories"}
+            {localText.subtitle}
           </p>
         </div>
 
@@ -176,12 +182,10 @@ const DiscoverProducts = () => {
               {isLoadingMore ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  {isRTL ? "در حال بارگذاری..." : "Loading..."}
+                  {localText.loading}
                 </>
-              ) : isRTL ? (
-                "نمایش بیشتر"
               ) : (
-                "Load More"
+                localText.loadMore
               )}
             </Button>
           </div>
