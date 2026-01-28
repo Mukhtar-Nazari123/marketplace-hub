@@ -269,12 +269,12 @@ const Notifications = () => {
                     {/* Content */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
-                        <div>
+                      <div>
                           <p className={`font-medium ${!notification.is_read ? 'text-foreground' : 'text-muted-foreground'}`}>
-                            {isRTL ? notification.title_fa : notification.title_en}
+                            {language === 'ps' ? (notification.title_ps || notification.title_fa) : (language === 'fa' ? notification.title_fa : notification.title_en)}
                           </p>
                           <p className="text-sm text-muted-foreground mt-1">
-                            {isRTL ? notification.message_fa : notification.message_en}
+                            {language === 'ps' ? (notification.message_ps || notification.message_fa) : (language === 'fa' ? notification.message_fa : notification.message_en)}
                           </p>
                         </div>
                         <Badge variant={getTypeBadgeVariant(notification.type)} className="flex-shrink-0">

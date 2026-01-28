@@ -20,8 +20,10 @@ export interface Notification {
   type: string;
   title_en: string;
   title_fa: string;
+  title_ps: string | null;
   message_en: string;
   message_fa: string;
+  message_ps: string | null;
   related_entity_type: string | null;
   related_entity_id: string | null;
   order_id: string | null;
