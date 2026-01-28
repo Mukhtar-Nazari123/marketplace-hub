@@ -48,6 +48,52 @@ import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import type { Json } from '@/integrations/supabase/types';
 
+// Trilingual translations
+const translations = {
+  pageTitle: { en: 'Orders', fa: 'سفارشات', ps: 'امرونه' },
+  pageDescription: { en: 'Manage customer orders', fa: 'مدیریت سفارشات مشتریان', ps: 'د پیرودونکو امرونه اداره کړئ' },
+  totalOrders: { en: 'Total Orders', fa: 'کل سفارشات', ps: 'ټول امرونه' },
+  pending: { en: 'Pending', fa: 'در انتظار', ps: 'تر کتنې لاندې' },
+  shipped: { en: 'Shipped', fa: 'ارسال شده', ps: 'لیږل شوی' },
+  delivered: { en: 'Delivered', fa: 'تحویل شده', ps: 'تحویل شوی' },
+  filterByStatus: { en: 'Filter by status', fa: 'فیلتر وضعیت', ps: 'د حالت فلتر' },
+  allOrders: { en: 'All Orders', fa: 'همه سفارشات', ps: 'ټول امرونه' },
+  refresh: { en: 'Refresh', fa: 'بروزرسانی', ps: 'تازه کول' },
+  noOrdersFound: { en: 'No orders found', fa: 'سفارشی یافت نشد', ps: 'هیڅ امر ونه موندل شو' },
+  noOrdersWithStatus: { en: 'No orders with this status', fa: 'سفارشی با این وضعیت وجود ندارد', ps: 'د دې حالت سره هیڅ امر نشته' },
+  noOrdersYet: { en: "You haven't received any orders yet", fa: 'هنوز سفارشی دریافت نکرده‌اید', ps: 'تاسو لا تر اوسه هیڅ امر نه دی ترلاسه کړی' },
+  orderStatus: { en: 'Order Status', fa: 'وضعیت سفارش', ps: 'د امر حالت' },
+  nextStep: { en: 'Next step', fa: 'مرحله بعد', ps: 'راتلونکی ګام' },
+  completed: { en: 'Completed', fa: 'تکمیل شده', ps: 'بشپړ شو' },
+  rejectOrder: { en: 'Reject Order', fa: 'رد سفارش', ps: 'امر رد کړئ' },
+  confirmAndContinue: { en: 'Confirm & Continue', fa: 'تایید و ادامه', ps: 'تایید او ادامه' },
+  rejected: { en: 'Rejected', fa: 'رد شده', ps: 'رد شوی' },
+  orderRejected: { en: 'This order has been rejected', fa: 'این سفارش رد شده است', ps: 'دا امر رد شوی دی' },
+  products: { en: 'Products', fa: 'محصولات', ps: 'محصولات' },
+  deliveryFee: { en: 'Delivery fee', fa: 'هزینه ارسال', ps: 'د لیږد فیس' },
+  shippingAddress: { en: 'Shipping Address', fa: 'آدرس ارسال', ps: 'د لیږد پته' },
+  paymentSummary: { en: 'Payment Summary', fa: 'خلاصه پرداخت', ps: 'د تادیې لنډیز' },
+  subtotal: { en: 'Subtotal', fa: 'جمع محصولات', ps: 'فرعي مجموعه' },
+  shipping: { en: 'Shipping', fa: 'هزینه ارسال', ps: 'لیږل' },
+  total: { en: 'Total', fa: 'مجموع', ps: 'مجموعه' },
+  items: { en: 'items', fa: 'محصول', ps: 'توکي' },
+  noSKU: { en: 'No SKU', fa: 'بدون SKU', ps: 'SKU نشته' },
+  error: { en: 'Error', fa: 'خطا', ps: 'ستونزه' },
+  success: { en: 'Success', fa: 'موفق', ps: 'بریالی' },
+  failedToFetchOrders: { en: 'Failed to fetch orders', fa: 'خطا در دریافت سفارشات', ps: 'د امرونو راوړلو کې ستونزه' },
+  orderStatusUpdated: { en: 'Order status updated successfully', fa: 'وضعیت سفارش بروزرسانی شد', ps: 'د امر حالت په بریالیتوب سره تازه شو' },
+  failedToUpdateStatus: { en: 'Failed to update order status', fa: 'خطا در بروزرسانی وضعیت', ps: 'د حالت تازه کولو کې ستونزه' },
+  orderRejectedSuccess: { en: 'Order has been rejected', fa: 'سفارش رد شد', ps: 'امر رد شو' },
+  failedToReject: { en: 'Failed to reject order', fa: 'خطا در رد سفارش', ps: 'د امر په ردولو کې ستونزه' },
+  status: {
+    pending: { en: 'Pending', fa: 'در انتظار', ps: 'تر کتنې لاندې' },
+    confirmed: { en: 'Confirmed', fa: 'تایید شده', ps: 'تایید شوی' },
+    shipped: { en: 'Shipped', fa: 'ارسال شده', ps: 'لیږل شوی' },
+    delivered: { en: 'Delivered', fa: 'تحویل شده', ps: 'تحویل شوی' },
+    rejected: { en: 'Rejected', fa: 'رد شده', ps: 'رد شوی' },
+  }
+};
+
 interface ShippingAddress {
   name?: string;
   phone?: string;
@@ -87,47 +133,6 @@ interface SellerOrder {
   order_items?: OrderItem[];
 }
 
-// Helper to format SKUs for display
-const formatProductSKUs = (items: OrderItem[] | undefined, isRTL: boolean): string => {
-  if (!items || items.length === 0) return isRTL ? 'بدون SKU' : 'No SKU';
-  
-  const skus = items
-    .map(item => item.product_sku)
-    .filter((sku): sku is string => sku !== null && sku !== undefined && sku.trim() !== '');
-  
-  if (skus.length === 0) return isRTL ? 'بدون SKU' : 'No SKU';
-  if (skus.length === 1) return skus[0];
-  if (skus.length === 2) return skus.join(isRTL ? ' ، ' : ', ');
-  return `${skus[0]}${isRTL ? ' و ' : ', '}+${skus.length - 1}`;
-};
-
-// Helper to calculate totals by currency from order items
-const calculateTotalsByCurrency = (items: OrderItem[] | undefined): { usdTotal: number; afnTotal: number } => {
-  if (!items || items.length === 0) return { usdTotal: 0, afnTotal: 0 };
-  
-  let usdTotal = 0;
-  let afnTotal = 0;
-  
-  items.forEach(item => {
-    const currency = item.product_currency?.toUpperCase() || 'AFN';
-    if (currency === 'USD') {
-      usdTotal += item.total_price;
-    } else {
-      afnTotal += item.total_price;
-    }
-  });
-  
-  return { usdTotal, afnTotal };
-};
-
-const ORDER_STATUSES = [
-  { value: 'pending', label: 'Pending', labelFa: 'در انتظار', color: 'secondary' as const },
-  { value: 'confirmed', label: 'Confirmed', labelFa: 'تایید شده', color: 'default' as const },
-  { value: 'shipped', label: 'Shipped', labelFa: 'ارسال شده', color: 'default' as const },
-  { value: 'delivered', label: 'Delivered', labelFa: 'تحویل شده', color: 'default' as const },
-  { value: 'rejected', label: 'Rejected', labelFa: 'رد شده', color: 'destructive' as const },
-];
-
 const STATUS_SEQUENCE = ['pending', 'confirmed', 'shipped', 'delivered'];
 
 const canRejectOrder = (status: string): boolean => {
@@ -142,13 +147,8 @@ const getNextStatus = (currentStatus: string): string | null => {
   return null;
 };
 
-const getStatusLabel = (status: string, isRTL: boolean) => {
-  const statusConfig = ORDER_STATUSES.find(s => s.value === status);
-  return statusConfig ? (isRTL ? statusConfig.labelFa : statusConfig.label) : status;
-};
-
 const SellerOrders = () => {
-  const { isRTL } = useLanguage();
+  const { isRTL, language } = useLanguage();
   const { user } = useAuth();
   const { toast } = useToast();
   const [orders, setOrders] = useState<SellerOrder[]>([]);
@@ -156,6 +156,67 @@ const SellerOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState<SellerOrder | null>(null);
   const [updatingStatus, setUpdatingStatus] = useState<{ orderId: string; action: 'confirm' | 'reject' } | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>('all');
+
+  const lang = language as 'en' | 'fa' | 'ps';
+
+  // Translation helper
+  const t = (key: keyof typeof translations) => {
+    const value = translations[key];
+    if (typeof value === 'object' && 'en' in value && 'fa' in value && 'ps' in value) {
+      return (value as Record<string, string>)[lang] || (value as Record<string, string>).en;
+    }
+    return key;
+  };
+
+  // Get status label with trilingual support
+  const getStatusLabel = (status: string) => {
+    const statusKey = status as keyof typeof translations.status;
+    if (translations.status[statusKey]) {
+      return translations.status[statusKey][lang] || translations.status[statusKey].en;
+    }
+    return status;
+  };
+
+  // Helper to format SKUs for display
+  const formatProductSKUs = (items: OrderItem[] | undefined): string => {
+    if (!items || items.length === 0) return t('noSKU');
+    
+    const skus = items
+      .map(item => item.product_sku)
+      .filter((sku): sku is string => sku !== null && sku !== undefined && sku.trim() !== '');
+    
+    if (skus.length === 0) return t('noSKU');
+    if (skus.length === 1) return skus[0];
+    if (skus.length === 2) return skus.join(isRTL ? ' ، ' : ', ');
+    return `${skus[0]}${isRTL ? ' و ' : ', '}+${skus.length - 1}`;
+  };
+
+  // Helper to calculate totals by currency from order items
+  const calculateTotalsByCurrency = (items: OrderItem[] | undefined): { usdTotal: number; afnTotal: number } => {
+    if (!items || items.length === 0) return { usdTotal: 0, afnTotal: 0 };
+    
+    let usdTotal = 0;
+    let afnTotal = 0;
+    
+    items.forEach(item => {
+      const currency = item.product_currency?.toUpperCase() || 'AFN';
+      if (currency === 'USD') {
+        usdTotal += item.total_price;
+      } else {
+        afnTotal += item.total_price;
+      }
+    });
+    
+    return { usdTotal, afnTotal };
+  };
+
+  const ORDER_STATUSES = [
+    { value: 'pending', color: 'secondary' as const },
+    { value: 'confirmed', color: 'default' as const },
+    { value: 'shipped', color: 'default' as const },
+    { value: 'delivered', color: 'default' as const },
+    { value: 'rejected', color: 'destructive' as const },
+  ];
 
   const fetchOrders = async () => {
     if (!user) return;
@@ -206,8 +267,8 @@ const SellerOrders = () => {
     } catch (error) {
       console.error('Error fetching seller orders:', error);
       toast({
-        title: isRTL ? 'خطا' : 'Error',
-        description: isRTL ? 'خطا در دریافت سفارشات' : 'Failed to fetch orders',
+        title: t('error'),
+        description: t('failedToFetchOrders'),
         variant: 'destructive',
       });
     } finally {
@@ -236,14 +297,14 @@ const SellerOrders = () => {
       );
 
       toast({
-        title: isRTL ? 'موفق' : 'Success',
-        description: isRTL ? 'وضعیت سفارش بروزرسانی شد' : 'Order status updated successfully',
+        title: t('success'),
+        description: t('orderStatusUpdated'),
       });
     } catch (error) {
       console.error('Error updating order status:', error);
       toast({
-        title: isRTL ? 'خطا' : 'Error',
-        description: isRTL ? 'خطا در بروزرسانی وضعیت' : 'Failed to update order status',
+        title: t('error'),
+        description: t('failedToUpdateStatus'),
         variant: 'destructive',
       });
     } finally {
@@ -268,14 +329,14 @@ const SellerOrders = () => {
       );
 
       toast({
-        title: isRTL ? 'موفق' : 'Success',
-        description: isRTL ? 'سفارش رد شد' : 'Order has been rejected',
+        title: t('success'),
+        description: t('orderRejectedSuccess'),
       });
     } catch (error) {
       console.error('Error rejecting order:', error);
       toast({
-        title: isRTL ? 'خطا' : 'Error',
-        description: isRTL ? 'خطا در رد سفارش' : 'Failed to reject order',
+        title: t('error'),
+        description: t('failedToReject'),
         variant: 'destructive',
       });
     } finally {
@@ -299,11 +360,10 @@ const SellerOrders = () => {
     return (
       <Badge variant={config.color} className="flex items-center gap-1">
         <Icon className="w-3 h-3" />
-        {isRTL ? config.labelFa : config.label}
+        {getStatusLabel(status)}
       </Badge>
     );
   };
-
 
   const filteredOrders = filterStatus === 'all'
     ? orders
@@ -312,8 +372,8 @@ const SellerOrders = () => {
   if (loading) {
     return (
       <DashboardLayout
-        title={isRTL ? 'سفارشات' : 'Orders'}
-        description={isRTL ? 'مدیریت سفارشات مشتریان' : 'Manage customer orders'}
+        title={t('pageTitle')}
+        description={t('pageDescription')}
         allowedRoles={['seller']}
       >
         <div className="space-y-4">
@@ -337,8 +397,8 @@ const SellerOrders = () => {
 
   return (
     <DashboardLayout
-      title={isRTL ? 'سفارشات' : 'Orders'}
-      description={isRTL ? 'مدیریت سفارشات مشتریان' : 'Manage customer orders'}
+      title={t('pageTitle')}
+      description={t('pageDescription')}
       allowedRoles={['seller']}
     >
       <div className="space-y-6">
@@ -353,7 +413,7 @@ const SellerOrders = () => {
                 <div className="min-w-0">
                   <p className="text-lg md:text-2xl font-bold">{orders.length}</p>
                   <p className="text-xs md:text-sm text-muted-foreground truncate">
-                    {isRTL ? 'کل سفارشات' : 'Total Orders'}
+                    {t('totalOrders')}
                   </p>
                 </div>
               </div>
@@ -371,7 +431,7 @@ const SellerOrders = () => {
                     {orders.filter((o) => o.status === 'pending').length}
                   </p>
                   <p className="text-xs md:text-sm text-muted-foreground truncate">
-                    {isRTL ? 'در انتظار' : 'Pending'}
+                    {t('pending')}
                   </p>
                 </div>
               </div>
@@ -389,7 +449,7 @@ const SellerOrders = () => {
                     {orders.filter((o) => o.status === 'shipped').length}
                   </p>
                   <p className="text-xs md:text-sm text-muted-foreground truncate">
-                    {isRTL ? 'ارسال شده' : 'Shipped'}
+                    {t('shipped')}
                   </p>
                 </div>
               </div>
@@ -407,7 +467,7 @@ const SellerOrders = () => {
                     {orders.filter((o) => o.status === 'delivered').length}
                   </p>
                   <p className="text-xs md:text-sm text-muted-foreground truncate">
-                    {isRTL ? 'تحویل شده' : 'Delivered'}
+                    {t('delivered')}
                   </p>
                 </div>
               </div>
@@ -422,13 +482,13 @@ const SellerOrders = () => {
               <div className="flex items-center gap-4">
                 <Select value={filterStatus} onValueChange={setFilterStatus}>
                   <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder={isRTL ? 'فیلتر وضعیت' : 'Filter by status'} />
+                    <SelectValue placeholder={t('filterByStatus')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">{isRTL ? 'همه سفارشات' : 'All Orders'}</SelectItem>
+                    <SelectItem value="all">{t('allOrders')}</SelectItem>
                     {ORDER_STATUSES.map((status) => (
                       <SelectItem key={status.value} value={status.value}>
-                        {isRTL ? status.labelFa : status.label}
+                        {getStatusLabel(status.value)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -436,7 +496,7 @@ const SellerOrders = () => {
               </div>
               <Button variant="outline" onClick={fetchOrders} className="gap-2">
                 <RefreshCw className="w-4 h-4" />
-                {isRTL ? 'بروزرسانی' : 'Refresh'}
+                {t('refresh')}
               </Button>
             </div>
           </CardContent>
@@ -450,16 +510,10 @@ const SellerOrders = () => {
                 <ShoppingBag className="w-10 h-10 text-muted-foreground" />
               </div>
               <h3 className="text-xl font-semibold mb-2">
-                {isRTL ? 'سفارشی یافت نشد' : 'No orders found'}
+                {t('noOrdersFound')}
               </h3>
               <p className="text-muted-foreground max-w-sm">
-                {filterStatus !== 'all'
-                  ? isRTL
-                    ? 'سفارشی با این وضعیت وجود ندارد'
-                    : 'No orders with this status'
-                  : isRTL
-                  ? 'هنوز سفارشی دریافت نکرده‌اید'
-                  : "You haven't received any orders yet"}
+                {filterStatus !== 'all' ? t('noOrdersWithStatus') : t('noOrdersYet')}
               </p>
             </CardContent>
           </Card>
@@ -476,7 +530,7 @@ const SellerOrders = () => {
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2 flex-wrap">
                         <span className="font-mono text-sm bg-primary/10 text-primary px-2 py-1 rounded border border-primary/20">
-                          {formatProductSKUs(order.order_items, isRTL)}
+                          {formatProductSKUs(order.order_items)}
                         </span>
                         {getStatusBadge(order.status)}
                         <Badge variant="outline" className="gap-1">
@@ -518,7 +572,7 @@ const SellerOrders = () => {
                         })()}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        {order.order_items?.length || 0} {isRTL ? 'محصول' : 'items'}
+                        {order.order_items?.length || 0} {t('items')}
                       </p>
                     </div>
                   </div>
@@ -533,20 +587,18 @@ const SellerOrders = () => {
                           <div className="flex flex-col gap-3 sm:gap-4">
                             <div>
                               <h4 className="font-medium mb-1 text-sm sm:text-base">
-                                {isRTL ? 'وضعیت سفارش' : 'Order Status'}
+                                {t('orderStatus')}
                               </h4>
                               <p className="text-xs sm:text-sm text-muted-foreground">
-                                {isRTL
-                                  ? 'مرحله بعد: '
-                                  : 'Next step: '}
+                                {t('nextStep')}: {' '}
                                 <span className="font-medium text-primary">
                                   {getNextStatus(order.status)
-                                    ? getStatusLabel(getNextStatus(order.status)!, isRTL)
-                                    : (isRTL ? 'تکمیل شده' : 'Completed')}
+                                    ? getStatusLabel(getNextStatus(order.status)!)
+                                    : t('completed')}
                                 </span>
                               </p>
                             </div>
-                            {/* Action Buttons - Stack vertically on mobile */}
+                            {/* Action Buttons */}
                             <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                               {canRejectOrder(order.status) && (
                                 <Button
@@ -561,7 +613,7 @@ const SellerOrders = () => {
                                   ) : (
                                     <XCircle className="w-4 h-4" />
                                   )}
-                                  {isRTL ? 'رد سفارش' : 'Reject Order'}
+                                  {t('rejectOrder')}
                                 </Button>
                               )}
                               {getNextStatus(order.status) && order.status !== 'rejected' && (
@@ -576,13 +628,13 @@ const SellerOrders = () => {
                                   ) : (
                                     <CheckCircle className="w-4 h-4" />
                                   )}
-                                  {isRTL ? 'تایید و ادامه' : 'Confirm & Continue'}
+                                  {t('confirmAndContinue')}
                                 </Button>
                               )}
                             </div>
                           </div>
                           
-                          {/* Progress Steps - Horizontal scroll on mobile */}
+                          {/* Progress Steps */}
                           <div className="pt-2 sm:pt-4 overflow-x-auto pb-2">
                             {order.status === 'rejected' ? (
                               <div className="flex items-center justify-center gap-2 py-2 sm:py-4">
@@ -592,61 +644,57 @@ const SellerOrders = () => {
                                   </div>
                                   <div>
                                     <p className="font-medium text-destructive text-sm sm:text-base">
-                                      {isRTL ? 'رد شده' : 'Rejected'}
+                                      {t('rejected')}
                                     </p>
                                     <p className="text-xs text-muted-foreground">
-                                      {isRTL ? 'این سفارش رد شده است' : 'This order has been rejected'}
+                                      {t('orderRejected')}
                                     </p>
                                   </div>
                                 </div>
                               </div>
                             ) : (
-                            <div className="relative flex items-center justify-between min-w-[280px]">
-                              {/* Progress Line Background */}
-                              <div className="absolute top-4 sm:top-5 start-0 end-0 h-0.5 bg-muted" />
-                              
-                              {/* Progress Line Fill */}
-                              <div
-                                className="absolute top-4 sm:top-5 start-0 h-0.5 bg-primary transition-all duration-500"
-                                style={{
-                                  width: `${(STATUS_SEQUENCE.indexOf(order.status) / (STATUS_SEQUENCE.length - 1)) * 100}%`,
-                                }}
-                              />
+                              <div className="relative flex items-center justify-between min-w-[280px]">
+                                <div className="absolute top-4 sm:top-5 start-0 end-0 h-0.5 bg-muted" />
+                                <div
+                                  className="absolute top-4 sm:top-5 start-0 h-0.5 bg-primary transition-all duration-500"
+                                  style={{
+                                    width: `${(STATUS_SEQUENCE.indexOf(order.status) / (STATUS_SEQUENCE.length - 1)) * 100}%`,
+                                  }}
+                                />
 
-                              {/* Steps */}
-                              {ORDER_STATUSES.filter(s => s.value !== 'rejected').map((step, index) => {
-                                const isCompleted = STATUS_SEQUENCE.indexOf(order.status) >= index;
-                                const isCurrent = order.status === step.value;
-                                const icons: Record<string, typeof CheckCircle> = {
-                                  pending: Clock,
-                                  confirmed: CheckCircle,
-                                  shipped: Truck,
-                                  delivered: CheckCircle,
-                                };
-                                const Icon = icons[step.value] || Clock;
+                                {ORDER_STATUSES.filter(s => s.value !== 'rejected').map((step, index) => {
+                                  const isCompleted = STATUS_SEQUENCE.indexOf(order.status) >= index;
+                                  const isCurrent = order.status === step.value;
+                                  const icons: Record<string, typeof CheckCircle> = {
+                                    pending: Clock,
+                                    confirmed: CheckCircle,
+                                    shipped: Truck,
+                                    delivered: CheckCircle,
+                                  };
+                                  const Icon = icons[step.value] || Clock;
 
-                                return (
-                                  <div key={step.value} className="relative flex flex-col items-center z-10">
-                                    <div
-                                      className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-300 border-2 ${
-                                        isCompleted
-                                          ? 'bg-primary text-primary-foreground border-primary'
-                                          : 'bg-background text-muted-foreground border-muted'
-                                      } ${isCurrent ? 'ring-2 sm:ring-4 ring-primary/20 scale-105 sm:scale-110' : ''}`}
-                                    >
-                                      <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                                  return (
+                                    <div key={step.value} className="relative flex flex-col items-center z-10">
+                                      <div
+                                        className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-300 border-2 ${
+                                          isCompleted
+                                            ? 'bg-primary text-primary-foreground border-primary'
+                                            : 'bg-background text-muted-foreground border-muted'
+                                        } ${isCurrent ? 'ring-2 sm:ring-4 ring-primary/20 scale-105 sm:scale-110' : ''}`}
+                                      >
+                                        <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                                      </div>
+                                      <span
+                                        className={`mt-1 sm:mt-2 text-[10px] sm:text-xs font-medium text-center transition-colors whitespace-nowrap ${
+                                          isCompleted ? 'text-primary' : 'text-muted-foreground'
+                                        }`}
+                                      >
+                                        {getStatusLabel(step.value)}
+                                      </span>
                                     </div>
-                                    <span
-                                      className={`mt-1 sm:mt-2 text-[10px] sm:text-xs font-medium text-center transition-colors whitespace-nowrap ${
-                                        isCompleted ? 'text-primary' : 'text-muted-foreground'
-                                      }`}
-                                    >
-                                      {isRTL ? step.labelFa : step.label}
-                                    </span>
-                                  </div>
-                                );
-                              })}
-                            </div>
+                                  );
+                                })}
+                              </div>
                             )}
                           </div>
                         </div>
@@ -658,7 +706,7 @@ const SellerOrders = () => {
                       <div className="space-y-4">
                         <h4 className="font-semibold flex items-center gap-2">
                           <Package className="w-4 h-4" />
-                          {isRTL ? 'محصولات' : 'Products'}
+                          {t('products')}
                         </h4>
                         <div className="space-y-3">
                           {order.order_items.map((item) => (
@@ -687,7 +735,7 @@ const SellerOrders = () => {
                               </div>
                               <div className="text-right space-y-1">
                                 <p className="text-xs text-muted-foreground">
-                                  {isRTL ? 'هزینه ارسال' : 'Delivery fee'}{' '}
+                                  {t('deliveryFee')}{' '}
                                   <span className="font-medium text-foreground">
                                     {formatCurrency(order.delivery_fee, 'AFN', isRTL)}
                                   </span>
@@ -711,7 +759,7 @@ const SellerOrders = () => {
                         <div className="space-y-3">
                           <h4 className="font-semibold flex items-center gap-2">
                             <MapPin className="w-4 h-4" />
-                            {isRTL ? 'آدرس ارسال' : 'Shipping Address'}
+                            {t('shippingAddress')}
                           </h4>
                           <div className="p-4 bg-muted/50 rounded-lg text-sm space-y-2">
                             <div className="flex items-center gap-2">
@@ -741,7 +789,7 @@ const SellerOrders = () => {
                       <div className="space-y-3">
                         <h4 className="font-semibold flex items-center gap-2">
                           <DollarSign className="w-4 h-4" />
-                          {isRTL ? 'خلاصه پرداخت' : 'Payment Summary'}
+                          {t('paymentSummary')}
                         </h4>
                         <div className="p-4 bg-muted/50 rounded-lg text-sm space-y-2">
                           {(() => {
@@ -753,7 +801,7 @@ const SellerOrders = () => {
                               <>
                                 <div className="flex justify-between">
                                   <span className="text-muted-foreground">
-                                    {isRTL ? 'جمع محصولات' : 'Subtotal'}
+                                    {t('subtotal')}
                                   </span>
                                   <span>
                                     {hasMixedCurrency ? (
@@ -769,7 +817,7 @@ const SellerOrders = () => {
                                 <div className="flex justify-between">
                                   <span className="text-muted-foreground flex items-center gap-1">
                                     <Truck className="w-3 h-3" />
-                                    {isRTL ? 'هزینه ارسال' : 'Shipping'}
+                                    {t('shipping')}
                                   </span>
                                   <span>
                                     {formatCurrency(order.delivery_fee, 'AFN', isRTL)}
@@ -777,7 +825,7 @@ const SellerOrders = () => {
                                 </div>
                                 <Separator />
                                 <div className="flex justify-between font-bold text-base">
-                                  <span>{isRTL ? 'مجموع' : 'Total'}</span>
+                                  <span>{t('total')}</span>
                                   <span className="text-primary">
                                     {hasMixedCurrency ? (
                                       <>

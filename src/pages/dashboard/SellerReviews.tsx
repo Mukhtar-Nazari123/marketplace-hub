@@ -21,6 +21,23 @@ import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 
+// Trilingual translations
+const translations = {
+  pageTitle: { en: 'Product Reviews', fa: 'نظرات محصولات', ps: 'د محصولاتو بیاکتنې' },
+  pageDescription: { en: 'View customer reviews about your products', fa: 'مشاهده نظرات خریداران درباره محصولات شما', ps: 'د خپلو محصولاتو په اړه د پیرودونکو بیاکتنې وګورئ' },
+  totalReviews: { en: 'Total Reviews', fa: 'کل نظرات', ps: 'ټولې بیاکتنې' },
+  averageRating: { en: 'Average Rating', fa: 'میانگین امتیاز', ps: 'اوسط درجه' },
+  fiveStarReviews: { en: '5-Star Reviews', fa: 'نظرات ۵ ستاره', ps: 'پنځه ستوري بیاکتنې' },
+  productRatings: { en: 'Product Ratings', fa: 'امتیاز محصولات', ps: 'د محصولاتو درجې' },
+  reviews: { en: 'reviews', fa: 'نظر', ps: 'بیاکتنې' },
+  allReviews: { en: 'All Reviews', fa: 'همه نظرات', ps: 'ټولې بیاکتنې' },
+  searchPlaceholder: { en: 'Search...', fa: 'جستجو...', ps: 'لټون...' },
+  noReviewsFound: { en: 'No reviews found', fa: 'نظری یافت نشد', ps: 'هیڅ بیاکتنه ونه موندل شوه' },
+  noReviewsYet: { en: 'No reviews yet', fa: 'هنوز نظری ثبت نشده', ps: 'لا تر اوسه هیڅ بیاکتنه نشته' },
+  product: { en: 'Product', fa: 'محصول', ps: 'محصول' },
+  buyer: { en: 'Buyer', fa: 'خریدار', ps: 'پیرودونکی' },
+};
+
 interface Review {
   id: string;
   rating: number;
@@ -48,12 +65,23 @@ interface ProductStats {
 }
 
 const SellerReviews = () => {
-  const { isRTL } = useLanguage();
+  const { isRTL, language } = useLanguage();
   const { user } = useAuth();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [productStats, setProductStats] = useState<ProductStats[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const lang = language as 'en' | 'fa' | 'ps';
+
+  // Translation helper
+  const t = (key: keyof typeof translations) => {
+    const value = translations[key];
+    if (typeof value === 'object' && 'en' in value && 'fa' in value && 'ps' in value) {
+      return (value as Record<string, string>)[lang] || (value as Record<string, string>).en;
+    }
+    return key;
+  };
 
   const fetchReviews = async () => {
     if (!user) return;
@@ -149,8 +177,8 @@ const SellerReviews = () => {
   if (loading) {
     return (
       <DashboardLayout
-        title={isRTL ? 'نظرات محصولات' : 'Product Reviews'}
-        description={isRTL ? 'مشاهده نظرات خریداران درباره محصولات شما' : 'View customer reviews about your products'}
+        title={t('pageTitle')}
+        description={t('pageDescription')}
         allowedRoles={['seller']}
       >
         <div className="space-y-4">
@@ -172,8 +200,8 @@ const SellerReviews = () => {
 
   return (
     <DashboardLayout
-      title={isRTL ? 'نظرات محصولات' : 'Product Reviews'}
-      description={isRTL ? 'مشاهده نظرات خریداران درباره محصولات شما' : 'View customer reviews about your products'}
+      title={t('pageTitle')}
+      description={t('pageDescription')}
       allowedRoles={['seller']}
     >
       <div className="space-y-6">
@@ -188,7 +216,7 @@ const SellerReviews = () => {
                 <div className="min-w-0">
                   <p className="text-lg md:text-2xl font-bold">{totalReviews}</p>
                   <p className="text-xs md:text-sm text-muted-foreground truncate">
-                    {isRTL ? 'کل نظرات' : 'Total Reviews'}
+                    {t('totalReviews')}
                   </p>
                 </div>
               </div>
@@ -204,7 +232,7 @@ const SellerReviews = () => {
                 <div className="min-w-0">
                   <p className="text-lg md:text-2xl font-bold">{averageRating}</p>
                   <p className="text-xs md:text-sm text-muted-foreground truncate">
-                    {isRTL ? 'میانگین امتیاز' : 'Average Rating'}
+                    {t('averageRating')}
                   </p>
                 </div>
               </div>
@@ -220,7 +248,7 @@ const SellerReviews = () => {
                 <div className="min-w-0">
                   <p className="text-lg md:text-2xl font-bold">{fiveStarCount}</p>
                   <p className="text-xs md:text-sm text-muted-foreground truncate">
-                    {isRTL ? 'نظرات ۵ ستاره' : '5-Star Reviews'}
+                    {t('fiveStarReviews')}
                   </p>
                 </div>
               </div>
@@ -233,7 +261,7 @@ const SellerReviews = () => {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">
-                {isRTL ? 'امتیاز محصولات' : 'Product Ratings'}
+                {t('productRatings')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -263,7 +291,7 @@ const SellerReviews = () => {
                         <Star className="w-3 h-3 fill-orange text-orange" />
                         <span className="text-sm font-medium">{stat.averageRating}</span>
                         <span className="text-xs text-muted-foreground">
-                          ({stat.reviewCount} {isRTL ? 'نظر' : 'reviews'})
+                          ({stat.reviewCount} {t('reviews')})
                         </span>
                       </div>
                     </div>
@@ -279,7 +307,7 @@ const SellerReviews = () => {
           <CardHeader>
             <div className={cn("flex flex-col sm:flex-row gap-4 justify-between", isRTL && "sm:flex-row-reverse")}>
               <CardTitle className="text-lg">
-                {isRTL ? 'همه نظرات' : 'All Reviews'}
+                {t('allReviews')}
               </CardTitle>
               <div className="relative w-full sm:w-64">
                 <Search className={cn(
@@ -287,10 +315,11 @@ const SellerReviews = () => {
                   isRTL ? "right-3" : "left-3"
                 )} />
                 <Input
-                  placeholder={isRTL ? 'جستجو...' : 'Search...'}
+                  placeholder={t('searchPlaceholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className={cn(isRTL ? "pr-10" : "pl-10")}
+                  className={cn(isRTL ? "pr-10 text-right" : "pl-10")}
+                  dir={isRTL ? 'rtl' : 'ltr'}
                 />
               </div>
             </div>
@@ -300,10 +329,7 @@ const SellerReviews = () => {
               <div className="text-center py-12">
                 <MessageSquare className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
                 <p className="text-muted-foreground">
-                  {searchQuery
-                    ? (isRTL ? 'نظری یافت نشد' : 'No reviews found')
-                    : (isRTL ? 'هنوز نظری ثبت نشده' : 'No reviews yet')
-                  }
+                  {searchQuery ? t('noReviewsFound') : t('noReviewsYet')}
                 </p>
               </div>
             ) : (
@@ -343,7 +369,7 @@ const SellerReviews = () => {
                         <div className={cn("flex items-start justify-between gap-2 mb-2", isRTL && "flex-row-reverse")}>
                           <div>
                             <p className="font-medium text-sm line-clamp-1">
-                              {review.product?.name || (isRTL ? 'محصول' : 'Product')}
+                              {review.product?.name || t('product')}
                             </p>
                             <div className={cn("flex items-center gap-2 mt-1", isRTL && "flex-row-reverse")}>
                               <Avatar className="w-5 h-5">
@@ -352,7 +378,7 @@ const SellerReviews = () => {
                                 </AvatarFallback>
                               </Avatar>
                               <span className="text-xs text-muted-foreground">
-                                {review.buyer?.full_name || (isRTL ? 'خریدار' : 'Buyer')}
+                                {review.buyer?.full_name || t('buyer')}
                               </span>
                             </div>
                           </div>
