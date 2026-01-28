@@ -82,14 +82,67 @@ const STATUS_COLORS: Record<string, string> = {
   cancelled: 'hsl(0 84% 60%)',
 };
 
+// Trilingual translations
+const translations = {
+  pageTitle: { en: 'Analytics', fa: 'آنالیتیکس', ps: 'تحلیلات' },
+  pageDescription: { en: 'Sales statistics and reports', fa: 'آمار و گزارش فروش', ps: 'د پلور احصایې او راپورونه' },
+  // Date range
+  last7Days: { en: 'Last 7 days', fa: '۷ روز گذشته', ps: 'تېرې ۷ ورځې' },
+  last30Days: { en: 'Last 30 days', fa: '۳۰ روز گذشته', ps: 'تېرې ۳۰ ورځې' },
+  last90Days: { en: 'Last 90 days', fa: '۹۰ روز گذشته', ps: 'تېرې ۹۰ ورځې' },
+  // Stats cards
+  totalSales: { en: 'Total Sales (AFN)', fa: 'کل فروش (؋)', ps: 'ټول پلور (؋)' },
+  totalOrders: { en: 'Total Orders', fa: 'کل سفارشات', ps: 'ټول امرونه' },
+  netEarnings: { en: 'Net Earnings (AFN)', fa: 'درآمد خالص (؋)', ps: 'خالص عاید (؋)' },
+  pendingOrders: { en: 'Pending Orders', fa: 'سفارشات در انتظار', ps: 'انتظار کې امرونه' },
+  // Sales trend
+  salesTrend: { en: 'Sales Trend', fa: 'روند فروش', ps: 'د پلور رجحان' },
+  dailySales: { en: 'Daily sales over selected period', fa: 'فروش روزانه در بازه انتخاب شده', ps: 'په ټاکل شوي موده کې ورځنی پلور' },
+  sales: { en: 'Sales', fa: 'فروش', ps: 'پلور' },
+  // Order status
+  orderStatus: { en: 'Order Status', fa: 'وضعیت سفارشات', ps: 'د امر حالت' },
+  orderStatusDistribution: { en: 'Order status distribution', fa: 'توزیع وضعیت سفارشات', ps: 'د امر حالت ویش' },
+  // Top products
+  topSellingProducts: { en: 'Top Selling Products', fa: 'محصولات پرفروش', ps: 'تر ټولو ډېر پلورل شوي محصولات' },
+  byRevenue: { en: 'By revenue', fa: 'بر اساس درآمد', ps: 'د عاید پر بنسټ' },
+  sold: { en: 'sold', fa: 'فروخته شده', ps: 'پلورل شوي' },
+  noSalesYet: { en: 'No sales yet', fa: 'هنوز فروشی ندارید', ps: 'تر اوسه پلور نشته' },
+  // Low stock
+  lowStockAlerts: { en: 'Low Stock Alerts', fa: 'هشدار موجودی', ps: 'د ذخیرې کمښت خبرتیا' },
+  productsLowStock: { en: 'Products running low on stock', fa: 'محصولات با موجودی کم', ps: 'هغه محصولات چې ذخیره یې کمه ده' },
+  allStockSufficient: { en: 'All products have sufficient stock', fa: 'موجودی همه محصولات کافی است', ps: 'ټول محصولات کافي ذخیره لري' },
+  left: { en: 'left', fa: 'عدد', ps: 'پاتې' },
+  // Status labels
+  status: {
+    pending: { en: 'Pending', fa: 'در انتظار', ps: 'انتظار کې' },
+    confirmed: { en: 'Confirmed', fa: 'تایید شده', ps: 'تایید شوی' },
+    shipped: { en: 'Shipped', fa: 'ارسال شده', ps: 'لېږل شوی' },
+    delivered: { en: 'Delivered', fa: 'تحویل شده', ps: 'تحویل شوی' },
+  },
+};
+
+type Language = 'en' | 'fa' | 'ps';
+
 const SellerAnalytics = () => {
-  const { isRTL } = useLanguage();
+  const { isRTL, language } = useLanguage();
+  const lang = (language || 'en') as Language;
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [orders, setOrders] = useState<SellerOrder[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [dateRange, setDateRange] = useState('30');
+
+  // Helper function for translations
+  const t = (key: keyof Omit<typeof translations, 'status'>) => {
+    const translation = translations[key];
+    return (translation as Record<Language, string>)[lang] || (translation as Record<Language, string>).en;
+  };
+
+  const getStatusLabel = (status: string) => {
+    const statusKey = status as keyof typeof translations.status;
+    return translations.status[statusKey]?.[lang] || translations.status[statusKey]?.en || status;
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -219,18 +272,11 @@ const SellerAnalytics = () => {
 
   const getCurrencySymbol = (currency: string) => currency === 'USD' ? '$' : '؋';
 
-  const statusLabels: Record<string, { en: string; fa: string }> = {
-    pending: { en: 'Pending', fa: 'در انتظار' },
-    confirmed: { en: 'Confirmed', fa: 'تایید شده' },
-    shipped: { en: 'Shipped', fa: 'ارسال شده' },
-    delivered: { en: 'Delivered', fa: 'تحویل شده' },
-  };
-
   if (loading) {
     return (
       <DashboardLayout
-        title={isRTL ? 'آنالیتیکس' : 'Analytics'}
-        description={isRTL ? 'آمار و گزارش فروش' : 'Sales statistics and reports'}
+        title={t('pageTitle')}
+        description={t('pageDescription')}
         allowedRoles={['seller']}
       >
         <div className="space-y-4 sm:space-y-6">
@@ -257,8 +303,8 @@ const SellerAnalytics = () => {
 
   return (
     <DashboardLayout
-      title={isRTL ? 'آنالیتیکس' : 'Analytics'}
-      description={isRTL ? 'آمار و گزارش فروش' : 'Sales statistics and reports'}
+      title={t('pageTitle')}
+      description={t('pageDescription')}
       allowedRoles={['seller']}
     >
       <div className="space-y-4 sm:space-y-6">
@@ -269,9 +315,9 @@ const SellerAnalytics = () => {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="7">{isRTL ? '۷ روز گذشته' : 'Last 7 days'}</SelectItem>
-              <SelectItem value="30">{isRTL ? '۳۰ روز گذشته' : 'Last 30 days'}</SelectItem>
-              <SelectItem value="90">{isRTL ? '۹۰ روز گذشته' : 'Last 90 days'}</SelectItem>
+              <SelectItem value="7">{t('last7Days')}</SelectItem>
+              <SelectItem value="30">{t('last30Days')}</SelectItem>
+              <SelectItem value="90">{t('last90Days')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -289,7 +335,7 @@ const SellerAnalytics = () => {
                     {stats.totalSales.toLocaleString()}
                   </p>
                   <p className="text-xs sm:text-sm text-muted-foreground">
-                    {isRTL ? 'کل فروش (؋)' : 'Total Sales (AFN)'}
+                    {t('totalSales')}
                   </p>
                 </div>
               </div>
@@ -305,7 +351,7 @@ const SellerAnalytics = () => {
                 <div className="flex-1 text-center sm:text-start">
                   <p className="text-xl sm:text-3xl font-bold tracking-tight">{stats.totalOrders}</p>
                   <p className="text-xs sm:text-sm text-muted-foreground">
-                    {isRTL ? 'کل سفارشات' : 'Total Orders'}
+                    {t('totalOrders')}
                   </p>
                 </div>
               </div>
@@ -323,7 +369,7 @@ const SellerAnalytics = () => {
                     {stats.netEarnings.toLocaleString()}
                   </p>
                   <p className="text-xs sm:text-sm text-muted-foreground">
-                    {isRTL ? 'درآمد خالص (؋)' : 'Net Earnings (AFN)'}
+                    {t('netEarnings')}
                   </p>
                 </div>
               </div>
@@ -339,7 +385,7 @@ const SellerAnalytics = () => {
                 <div className="flex-1 text-center sm:text-start">
                   <p className="text-xl sm:text-3xl font-bold tracking-tight">{stats.pendingOrders}</p>
                   <p className="text-xs sm:text-sm text-muted-foreground">
-                    {isRTL ? 'سفارشات در انتظار' : 'Pending Orders'}
+                    {t('pendingOrders')}
                   </p>
                 </div>
               </div>
@@ -354,10 +400,10 @@ const SellerAnalytics = () => {
             <CardHeader className="p-4 sm:p-6">
               <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                 <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-                {isRTL ? 'روند فروش' : 'Sales Trend'}
+                {t('salesTrend')}
               </CardTitle>
               <CardDescription className="text-xs sm:text-sm">
-                {isRTL ? 'فروش روزانه در بازه انتخاب شده' : 'Daily sales over selected period'}
+                {t('dailySales')}
               </CardDescription>
             </CardHeader>
             <CardContent className="p-2 sm:p-6 pt-0">
@@ -395,7 +441,7 @@ const SellerAnalytics = () => {
                         boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
                         fontSize: '12px',
                       }}
-                      formatter={(value: number) => [`${value.toLocaleString()} ؋`, isRTL ? 'فروش' : 'Sales']}
+                      formatter={(value: number) => [`${value.toLocaleString()} ؋`, t('sales')]}
                     />
                     <Area
                       type="monotone"
@@ -415,10 +461,10 @@ const SellerAnalytics = () => {
             <CardHeader className="p-4 sm:p-6">
               <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                 <Package className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-                {isRTL ? 'وضعیت سفارشات' : 'Order Status'}
+                {t('orderStatus')}
               </CardTitle>
               <CardDescription className="text-xs sm:text-sm">
-                {isRTL ? 'توزیع وضعیت سفارشات' : 'Order status distribution'}
+                {t('orderStatusDistribution')}
               </CardDescription>
             </CardHeader>
             <CardContent className="p-4 sm:p-6 pt-0 flex-1 flex flex-col">
@@ -457,7 +503,7 @@ const SellerAnalytics = () => {
                       style={{ backgroundColor: status.color }}
                     />
                     <span className="text-muted-foreground truncate">
-                      {isRTL ? statusLabels[status.name]?.fa : statusLabels[status.name]?.en}
+                      {getStatusLabel(status.name)}
                     </span>
                     <span className="font-medium ms-auto">{status.value}</span>
                   </div>
@@ -474,17 +520,17 @@ const SellerAnalytics = () => {
             <CardHeader className="p-4 sm:p-6">
               <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                 <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-                {isRTL ? 'محصولات پرفروش' : 'Top Selling Products'}
+                {t('topSellingProducts')}
               </CardTitle>
               <CardDescription className="text-xs sm:text-sm">
-                {isRTL ? 'بر اساس درآمد' : 'By revenue'}
+                {t('byRevenue')}
               </CardDescription>
             </CardHeader>
             <CardContent className="p-4 sm:p-6 pt-0 flex-1">
               {topProducts.length === 0 ? (
                 <div className="text-center py-6 sm:py-8 text-muted-foreground h-full flex flex-col items-center justify-center">
                   <ShoppingBag className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-3 opacity-50" />
-                  <p className="text-sm sm:text-base">{isRTL ? 'هنوز فروشی ندارید' : 'No sales yet'}</p>
+                  <p className="text-sm sm:text-base">{t('noSalesYet')}</p>
                 </div>
               ) : (
                 <div className="space-y-2 sm:space-y-4">
@@ -499,7 +545,7 @@ const SellerAnalytics = () => {
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-sm sm:text-base truncate">{product.name}</p>
                         <p className="text-xs sm:text-sm text-muted-foreground">
-                          {product.quantity} {isRTL ? 'فروخته شده' : 'sold'}
+                          {product.quantity} {t('sold')}
                         </p>
                       </div>
                       <div className="text-end flex-shrink-0">
@@ -519,17 +565,17 @@ const SellerAnalytics = () => {
             <CardHeader className="p-4 sm:p-6">
               <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                 <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" />
-                {isRTL ? 'هشدار موجودی' : 'Low Stock Alerts'}
+                {t('lowStockAlerts')}
               </CardTitle>
               <CardDescription className="text-xs sm:text-sm">
-                {isRTL ? 'محصولات با موجودی کم' : 'Products running low on stock'}
+                {t('productsLowStock')}
               </CardDescription>
             </CardHeader>
             <CardContent className="p-4 sm:p-6 pt-0 flex-1">
               {lowStockProducts.length === 0 ? (
                 <div className="text-center py-6 sm:py-8 text-muted-foreground h-full flex flex-col items-center justify-center">
                   <CheckCircle className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-3 text-green-500 opacity-70" />
-                  <p className="text-sm sm:text-base">{isRTL ? 'موجودی همه محصولات کافی است' : 'All products have sufficient stock'}</p>
+                  <p className="text-sm sm:text-base">{t('allStockSufficient')}</p>
                 </div>
               ) : (
                 <div className="space-y-2 sm:space-y-3">
@@ -558,7 +604,7 @@ const SellerAnalytics = () => {
                         </p>
                       </div>
                       <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/30 text-xs flex-shrink-0">
-                        {product.quantity} {isRTL ? 'عدد' : 'left'}
+                        {product.quantity} {t('left')}
                       </Badge>
                     </div>
                   ))}
