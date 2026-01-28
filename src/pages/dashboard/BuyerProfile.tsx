@@ -146,14 +146,14 @@ const BuyerProfile = () => {
       if (error) throw error;
 
       toast({
-        title: isRTL ? 'موفقیت' : 'Success',
-        description: isRTL ? 'پروفایل با موفقیت ذخیره شد' : 'Profile saved successfully',
+        title: getLabel('Success', 'موفقیت', 'بریالیتوب'),
+        description: getLabel('Profile saved successfully', 'پروفایل با موفقیت ذخیره شد', 'پروفایل په بریالیتوب سره خوندي شو'),
       });
       setIsEditingProfile(false);
     } catch {
       toast({
-        title: isRTL ? 'خطا' : 'Error',
-        description: isRTL ? 'خطا در ذخیره پروفایل' : 'Failed to save profile',
+        title: getLabel('Error', 'خطا', 'تېروتنه'),
+        description: getLabel('Failed to save profile', 'خطا در ذخیره پروفایل', 'د پروفایل خوندي کولو کې تېروتنه'),
         variant: 'destructive',
       });
     } finally {
@@ -168,8 +168,8 @@ const BuyerProfile = () => {
     // Validate file type
     if (!file.type.startsWith('image/')) {
       toast({
-        title: isRTL ? 'خطا' : 'Error',
-        description: isRTL ? 'لطفاً یک فایل تصویر انتخاب کنید' : 'Please select an image file',
+        title: getLabel('Error', 'خطا', 'تېروتنه'),
+        description: getLabel('Please select an image file', 'لطفاً یک فایل تصویر انتخاب کنید', 'مهرباني وکړئ یو انځور فایل وټاکئ'),
         variant: 'destructive',
       });
       return;
@@ -178,8 +178,8 @@ const BuyerProfile = () => {
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast({
-        title: isRTL ? 'خطا' : 'Error',
-        description: isRTL ? 'حجم تصویر باید کمتر از ۵ مگابایت باشد' : 'Image must be less than 5MB',
+        title: getLabel('Error', 'خطا', 'تېروتنه'),
+        description: getLabel('Image must be less than 5MB', 'حجم تصویر باید کمتر از ۵ مگابایت باشد', 'انځور باید له ۵ میګابایټ څخه کم وي'),
         variant: 'destructive',
       });
       return;
@@ -210,14 +210,14 @@ const BuyerProfile = () => {
 
       setAvatarUrl(publicUrl);
       toast({
-        title: isRTL ? 'موفقیت' : 'Success',
-        description: isRTL ? 'تصویر پروفایل با موفقیت آپلود شد' : 'Profile photo uploaded successfully',
+        title: getLabel('Success', 'موفقیت', 'بریالیتوب'),
+        description: getLabel('Profile photo uploaded successfully', 'تصویر پروفایل با موفقیت آپلود شد', 'د پروفایل انځور په بریالیتوب سره اپلوډ شو'),
       });
     } catch (error) {
       console.error('Avatar upload error:', error);
       toast({
-        title: isRTL ? 'خطا' : 'Error',
-        description: isRTL ? 'خطا در آپلود تصویر' : 'Failed to upload image',
+        title: getLabel('Error', 'خطا', 'تېروتنه'),
+        description: getLabel('Failed to upload image', 'خطا در آپلود تصویر', 'د انځور اپلوډ کولو کې تېروتنه'),
         variant: 'destructive',
       });
     } finally {
@@ -231,8 +231,8 @@ const BuyerProfile = () => {
   const handleChangePassword = async () => {
     if (newPassword !== confirmPassword) {
       toast({
-        title: isRTL ? 'خطا' : 'Error',
-        description: isRTL ? 'رمزهای عبور مطابقت ندارند' : 'Passwords do not match',
+        title: getLabel('Error', 'خطا', 'تېروتنه'),
+        description: getLabel('Passwords do not match', 'رمزهای عبور مطابقت ندارند', 'پاسورډونه سره سمون نه خوري'),
         variant: 'destructive',
       });
       return;
@@ -244,16 +244,16 @@ const BuyerProfile = () => {
       if (error) throw error;
 
       toast({
-        title: isRTL ? 'موفقیت' : 'Success',
-        description: isRTL ? 'رمز عبور با موفقیت تغییر کرد' : 'Password changed successfully',
+        title: getLabel('Success', 'موفقیت', 'بریالیتوب'),
+        description: getLabel('Password changed successfully', 'رمز عبور با موفقیت تغییر کرد', 'پاسورډ په بریالیتوب سره بدل شو'),
       });
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
     } catch {
       toast({
-        title: isRTL ? 'خطا' : 'Error',
-        description: isRTL ? 'خطا در تغییر رمز عبور' : 'Failed to change password',
+        title: getLabel('Error', 'خطا', 'تېروتنه'),
+        description: getLabel('Failed to change password', 'خطا در تغییر رمز عبور', 'د پاسورډ بدلولو کې تېروتنه'),
         variant: 'destructive',
       });
     } finally {
@@ -268,14 +268,14 @@ const BuyerProfile = () => {
       if (error) throw error;
 
       toast({
-        title: isRTL ? 'موفقیت' : 'Success',
-        description: isRTL ? 'ایمیل تأیید به آدرس جدید ارسال شد' : 'Confirmation email sent to new address',
+        title: getLabel('Success', 'موفقیت', 'بریالیتوب'),
+        description: getLabel('Confirmation email sent to new address', 'ایمیل تأیید به آدرس جدید ارسال شد', 'تایید بریښنالیک نوې پتې ته واستول شو'),
       });
       setNewEmail('');
     } catch {
       toast({
-        title: isRTL ? 'خطا' : 'Error',
-        description: isRTL ? 'خطا در تغییر ایمیل' : 'Failed to change email',
+        title: getLabel('Error', 'خطا', 'تېروتنه'),
+        description: getLabel('Failed to change email', 'خطا در تغییر ایمیل', 'د بریښنالیک بدلولو کې تېروتنه'),
         variant: 'destructive',
       });
     } finally {
@@ -301,8 +301,8 @@ const BuyerProfile = () => {
     } catch (err) {
       console.error('Error saving addresses:', err);
       toast({
-        title: isRTL ? 'خطا' : 'Error',
-        description: isRTL ? 'خطا در ذخیره آدرس' : 'Failed to save address',
+        title: getLabel('Error', 'خطا', 'تېروتنه'),
+        description: getLabel('Failed to save address', 'خطا در ذخیره آدرس', 'د پتې خوندي کولو کې تېروتنه'),
         variant: 'destructive',
       });
     } finally {
@@ -328,8 +328,8 @@ const BuyerProfile = () => {
     setIsAddingAddress(false);
     await saveAddressesToDb(updatedAddresses);
     toast({
-      title: isRTL ? 'موفقیت' : 'Success',
-      description: isRTL ? 'آدرس اضافه شد' : 'Address added',
+      title: getLabel('Success', 'موفقیت', 'بریالیتوب'),
+      description: getLabel('Address added', 'آدرس اضافه شد', 'پته اضافه شوه'),
     });
   };
 
@@ -338,8 +338,8 @@ const BuyerProfile = () => {
     setAddresses(updatedAddresses);
     await saveAddressesToDb(updatedAddresses);
     toast({
-      title: isRTL ? 'حذف شد' : 'Deleted',
-      description: isRTL ? 'آدرس حذف شد' : 'Address removed',
+      title: getLabel('Deleted', 'حذف شد', 'لرې شو'),
+      description: getLabel('Address removed', 'آدرس حذف شد', 'پته لرې شوه'),
     });
   };
 
@@ -404,7 +404,7 @@ const BuyerProfile = () => {
                       {personalInfoText}
                     </CardTitle>
                     <CardDescription>
-                      {isRTL ? 'اطلاعات پروفایل خود را مدیریت کنید' : 'Manage your profile information'}
+                      {getLabel('Manage your profile information', 'اطلاعات پروفایل خود را مدیریت کنید', 'د خپل پروفایل معلومات اداره کړئ')}
                     </CardDescription>
                   </div>
                   {!isEditingProfile ? (
@@ -415,7 +415,7 @@ const BuyerProfile = () => {
                       className="transition-all hover:scale-105"
                     >
                       <Edit3 className="h-4 w-4 mr-2" />
-                      {isRTL ? 'ویرایش' : 'Edit'}
+                      {getLabel('Edit', 'ویرایش', 'سمون')}
                     </Button>
                   ) : (
                     <div className="flex gap-2">
@@ -433,7 +433,7 @@ const BuyerProfile = () => {
                         className="transition-all hover:scale-105"
                       >
                         <Save className="h-4 w-4 mr-2" />
-                        {isSavingProfile ? (isRTL ? 'ذخیره...' : 'Saving...') : (isRTL ? 'ذخیره' : 'Save')}
+                        {isSavingProfile ? getLabel('Saving...', 'ذخیره...', 'خوندي کول...') : getLabel('Save', 'ذخیره', 'خوندي کړئ')}
                       </Button>
                     </div>
                   )}
@@ -472,10 +472,10 @@ const BuyerProfile = () => {
                     />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold">{fullName || (isRTL ? 'نام وارد نشده' : 'No name set')}</h3>
+                    <h3 className="text-lg font-semibold">{fullName || getLabel('No name set', 'نام وارد نشده', 'نوم ندی ثبت شوی')}</h3>
                     <p className="text-muted-foreground">{email}</p>
                     <Badge variant="secondary" className="mt-2">
-                      {isRTL ? 'خریدار' : 'Buyer'}
+                      {getLabel('Buyer', 'خریدار', 'پېرودونکی')}
                     </Badge>
                   </div>
                 </div>
@@ -487,7 +487,7 @@ const BuyerProfile = () => {
                   <div className="space-y-2">
                     <Label htmlFor="fullName" className="flex items-center gap-2">
                       <User className="h-4 w-4 text-muted-foreground" />
-                      {isRTL ? 'نام کامل' : 'Full Name'}
+                      {getLabel('Full Name', 'نام کامل', 'بشپړ نوم')}
                     </Label>
                     <Input
                       id="fullName"
@@ -501,7 +501,7 @@ const BuyerProfile = () => {
                   <div className="space-y-2">
                     <Label htmlFor="email" className="flex items-center gap-2">
                       <Mail className="h-4 w-4 text-muted-foreground" />
-                      {isRTL ? 'ایمیل' : 'Email'}
+                      {getLabel('Email', 'ایمیل', 'بریښنالیک')}
                     </Label>
                     <Input
                       id="email"
@@ -514,7 +514,7 @@ const BuyerProfile = () => {
                   <div className="space-y-2 md:col-span-2">
                     <Label htmlFor="phone" className="flex items-center gap-2">
                       <Phone className="h-4 w-4 text-muted-foreground" />
-                      {isRTL ? 'تلفن' : 'Phone'}
+                      {getLabel('Phone', 'تلفن', 'تلیفون')}
                     </Label>
                     <Input
                       id="phone"
@@ -538,15 +538,15 @@ const BuyerProfile = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Lock className="h-5 w-5 text-primary" />
-                  {isRTL ? 'تغییر رمز عبور' : 'Change Password'}
+                  {getLabel('Change Password', 'تغییر رمز عبور', 'پاسورډ بدل کړئ')}
                 </CardTitle>
                 <CardDescription>
-                  {isRTL ? 'رمز عبور جدید انتخاب کنید' : 'Choose a new password'}
+                  {getLabel('Choose a new password', 'رمز عبور جدید انتخاب کنید', 'نوی پاسورډ وټاکئ')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'رمز عبور فعلی' : 'Current Password'}</Label>
+                  <Label>{getLabel('Current Password', 'رمز عبور فعلی', 'اوسنی پاسورډ')}</Label>
                   <div className="relative">
                     <Input
                       type={showCurrentPassword ? 'text' : 'password'}
@@ -564,7 +564,7 @@ const BuyerProfile = () => {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'رمز عبور جدید' : 'New Password'}</Label>
+                  <Label>{getLabel('New Password', 'رمز عبور جدید', 'نوی پاسورډ')}</Label>
                   <div className="relative">
                     <Input
                       type={showNewPassword ? 'text' : 'password'}
@@ -583,7 +583,7 @@ const BuyerProfile = () => {
                   {newPassword && <PasswordStrengthIndicator password={newPassword} isRTL={isRTL} />}
                 </div>
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'تکرار رمز عبور جدید' : 'Confirm New Password'}</Label>
+                  <Label>{getLabel('Confirm New Password', 'تکرار رمز عبور جدید', 'نوی پاسورډ تایید کړئ')}</Label>
                   <Input
                     type="password"
                     value={confirmPassword}
@@ -591,7 +591,7 @@ const BuyerProfile = () => {
                   />
                   {confirmPassword && newPassword !== confirmPassword && (
                     <p className="text-sm text-destructive">
-                      {isRTL ? 'رمزها مطابقت ندارند' : 'Passwords do not match'}
+                      {getLabel('Passwords do not match', 'رمزها مطابقت ندارند', 'پاسورډونه سره سمون نه خوري')}
                     </p>
                   )}
                 </div>
@@ -600,7 +600,7 @@ const BuyerProfile = () => {
                   disabled={isChangingPassword || !newPassword || newPassword !== confirmPassword}
                   className="transition-all hover:scale-105"
                 >
-                  {isChangingPassword ? (isRTL ? 'در حال تغییر...' : 'Changing...') : (isRTL ? 'تغییر رمز عبور' : 'Change Password')}
+                  {isChangingPassword ? getLabel('Changing...', 'در حال تغییر...', 'بدلول...') : getLabel('Change Password', 'تغییر رمز عبور', 'پاسورډ بدل کړئ')}
                 </Button>
               </CardContent>
             </Card>
@@ -610,24 +610,24 @@ const BuyerProfile = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Mail className="h-5 w-5 text-primary" />
-                  {isRTL ? 'تغییر ایمیل' : 'Change Email'}
+                  {getLabel('Change Email', 'تغییر ایمیل', 'بریښنالیک بدل کړئ')}
                 </CardTitle>
                 <CardDescription>
-                  {isRTL ? 'ایمیل جدید وارد کنید' : 'Enter your new email address'}
+                  {getLabel('Enter your new email address', 'ایمیل جدید وارد کنید', 'خپل نوی بریښنالیک پته دننه کړئ')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'ایمیل فعلی' : 'Current Email'}</Label>
+                  <Label>{getLabel('Current Email', 'ایمیل فعلی', 'اوسنی بریښنالیک')}</Label>
                   <Input value={email} disabled className="bg-muted/50" />
                 </div>
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'ایمیل جدید' : 'New Email'}</Label>
+                  <Label>{getLabel('New Email', 'ایمیل جدید', 'نوی بریښنالیک')}</Label>
                   <Input
                     type="email"
                     value={newEmail}
                     onChange={(e) => setNewEmail(e.target.value)}
-                    placeholder={isRTL ? 'ایمیل جدید' : 'New email address'}
+                    placeholder={getLabel('New email address', 'ایمیل جدید', 'نوی بریښنالیک پته')}
                   />
                 </div>
                 <Button 
@@ -635,7 +635,7 @@ const BuyerProfile = () => {
                   disabled={isChangingEmail || !newEmail}
                   className="transition-all hover:scale-105"
                 >
-                  {isChangingEmail ? (isRTL ? 'در حال تغییر...' : 'Changing...') : (isRTL ? 'تغییر ایمیل' : 'Change Email')}
+                  {isChangingEmail ? getLabel('Changing...', 'در حال تغییر...', 'بدلول...') : getLabel('Change Email', 'تغییر ایمیل', 'بریښنالیک بدل کړئ')}
                 </Button>
               </CardContent>
             </Card>
@@ -652,35 +652,35 @@ const BuyerProfile = () => {
                       {addressesText}
                     </CardTitle>
                     <CardDescription>
-                      {isRTL ? 'آدرس‌های ذخیره شده را مدیریت کنید' : 'Manage your saved addresses'}
+                      {getLabel('Manage your saved addresses', 'آدرس‌های ذخیره شده را مدیریت کنید', 'خپلې خوندي شوې پتې اداره کړئ')}
                     </CardDescription>
                   </div>
                   <Dialog open={isAddingAddress} onOpenChange={setIsAddingAddress}>
                     <DialogTrigger asChild>
                       <Button size="sm" className="transition-all hover:scale-105">
                         <Plus className="h-4 w-4 mr-2" />
-                        {isRTL ? 'افزودن آدرس' : 'Add Address'}
+                        {getLabel('Add Address', 'افزودن آدرس', 'پته اضافه کړئ')}
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="animate-scale-in">
                       <DialogHeader>
-                        <DialogTitle>{isRTL ? 'افزودن آدرس جدید' : 'Add New Address'}</DialogTitle>
+                        <DialogTitle>{getLabel('Add New Address', 'افزودن آدرس جدید', 'نوې پته اضافه کړئ')}</DialogTitle>
                         <DialogDescription>
-                          {isRTL ? 'اطلاعات آدرس را وارد کنید' : 'Enter address details'}
+                          {getLabel('Enter address details', 'اطلاعات آدرس را وارد کنید', 'د پتې توضیحات دننه کړئ')}
                         </DialogDescription>
                       </DialogHeader>
                       <div className="space-y-4">
                         <div className="space-y-2">
-                          <Label>{isRTL ? 'عنوان' : 'Title'}</Label>
+                          <Label>{getLabel('Title', 'عنوان', 'سرلیک')}</Label>
                           <Input
                             value={newAddress.title || ''}
                             onChange={(e) => setNewAddress({ ...newAddress, title: e.target.value })}
-                            placeholder={isRTL ? 'مثال: خانه' : 'e.g., Home'}
+                            placeholder={getLabel('e.g., Home', 'مثال: خانه', 'لکه: کور')}
                             dir={isRTL ? 'rtl' : 'ltr'}
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label>{isRTL ? 'آدرس کامل' : 'Full Address'}</Label>
+                          <Label>{getLabel('Full Address', 'آدرس کامل', 'بشپړه پته')}</Label>
                           <Input
                             value={newAddress.fullAddress || ''}
                             onChange={(e) => setNewAddress({ ...newAddress, fullAddress: e.target.value })}
@@ -689,7 +689,7 @@ const BuyerProfile = () => {
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-2">
-                            <Label>{isRTL ? 'شهر' : 'City'}</Label>
+                            <Label>{getLabel('City', 'شهر', 'ښار')}</Label>
                             <Input
                               value={newAddress.city || ''}
                               onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
@@ -697,7 +697,7 @@ const BuyerProfile = () => {
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label>{isRTL ? 'کد پستی' : 'Postal Code'}</Label>
+                            <Label>{getLabel('Postal Code', 'کد پستی', 'پوستي کوډ')}</Label>
                             <Input
                               value={newAddress.postalCode || ''}
                               onChange={(e) => setNewAddress({ ...newAddress, postalCode: e.target.value })}
@@ -707,10 +707,10 @@ const BuyerProfile = () => {
                       </div>
                       <DialogFooter className={isRTL ? 'flex-row-reverse' : ''}>
                         <Button variant="outline" onClick={() => setIsAddingAddress(false)}>
-                          {isRTL ? 'انصراف' : 'Cancel'}
+                          {getLabel('Cancel', 'انصراف', 'لغوه کړئ')}
                         </Button>
                         <Button onClick={handleAddAddress}>
-                          {isRTL ? 'ذخیره' : 'Save'}
+                          {getLabel('Save', 'ذخیره', 'خوندي کړئ')}
                         </Button>
                       </DialogFooter>
                     </DialogContent>
@@ -729,7 +729,7 @@ const BuyerProfile = () => {
                     >
                       {address.isDefault && (
                         <Badge className="absolute top-2 right-2" variant="default">
-                          {isRTL ? 'پیش‌فرض' : 'Default'}
+                          {getLabel('Default', 'پیش‌فرض', 'اصلي')}
                         </Badge>
                       )}
                       <h4 className="font-semibold flex items-center gap-2 mb-2">
@@ -749,7 +749,7 @@ const BuyerProfile = () => {
                             className="text-xs"
                           >
                             <Check className="h-3 w-3 mr-1" />
-                            {isRTL ? 'پیش‌فرض' : 'Set Default'}
+                            {getLabel('Set Default', 'پیش‌فرض', 'اصلي کړئ')}
                           </Button>
                         )}
                         <Button
@@ -777,7 +777,7 @@ const BuyerProfile = () => {
                   {preferencesText}
                 </CardTitle>
                 <CardDescription>
-                  {isRTL ? 'تنظیمات ظاهری و زبان را سفارشی کنید' : 'Customize appearance and language settings'}
+                  {getLabel('Customize appearance and language settings', 'تنظیمات ظاهری و زبان را سفارشی کنید', 'د بڼې او ژبې تنظیمات تنظیم کړئ')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -788,9 +788,9 @@ const BuyerProfile = () => {
                       <Globe className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                      <p className="font-medium">{isRTL ? 'زبان' : 'Language'}</p>
+                      <p className="font-medium">{getLabel('Language', 'زبان', 'ژبه')}</p>
                       <p className="text-sm text-muted-foreground">
-                        {isRTL ? 'زبان نمایش را انتخاب کنید' : 'Choose display language'}
+                        {getLabel('Choose display language', 'زبان نمایش را انتخاب کنید', 'د ښودلو ژبه وټاکئ')}
                       </p>
                     </div>
                   </div>
@@ -811,6 +811,14 @@ const BuyerProfile = () => {
                     >
                       دری
                     </Button>
+                    <Button
+                      variant={language === 'ps' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setLanguage('ps')}
+                      className="transition-all"
+                    >
+                      پښتو
+                    </Button>
                   </div>
                 </div>
 
@@ -821,9 +829,9 @@ const BuyerProfile = () => {
                       {isDarkMode ? <Moon className="h-5 w-5 text-primary" /> : <Sun className="h-5 w-5 text-primary" />}
                     </div>
                     <div>
-                      <p className="font-medium">{isRTL ? 'تم' : 'Theme'}</p>
+                      <p className="font-medium">{getLabel('Theme', 'تم', 'بڼه')}</p>
                       <p className="text-sm text-muted-foreground">
-                        {isDarkMode ? (isRTL ? 'حالت تاریک' : 'Dark Mode') : (isRTL ? 'حالت روشن' : 'Light Mode')}
+                        {isDarkMode ? getLabel('Dark Mode', 'حالت تاریک', 'تیاره بڼه') : getLabel('Light Mode', 'حالت روشن', 'روښانه بڼه')}
                       </p>
                     </div>
                   </div>
@@ -843,9 +851,9 @@ const BuyerProfile = () => {
                       <Mail className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                      <p className="font-medium">{isRTL ? 'اعلان‌های ایمیلی' : 'Email Notifications'}</p>
+                      <p className="font-medium">{getLabel('Email Notifications', 'اعلان‌های ایمیلی', 'بریښنالیک خبرتیاوې')}</p>
                       <p className="text-sm text-muted-foreground">
-                        {isRTL ? 'دریافت اعلان برای سفارشات' : 'Receive order notifications'}
+                        {getLabel('Receive order notifications', 'دریافت اعلان برای سفارشات', 'د امرونو خبرتیاوې ترلاسه کړئ')}
                       </p>
                     </div>
                   </div>
@@ -862,9 +870,9 @@ const BuyerProfile = () => {
                       <Tag className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                      <p className="font-medium">{isRTL ? 'ایمیل‌های تبلیغاتی' : 'Marketing Emails'}</p>
+                      <p className="font-medium">{getLabel('Marketing Emails', 'ایمیل‌های تبلیغاتی', 'بازاریابي بریښنالیکونه')}</p>
                       <p className="text-sm text-muted-foreground">
-                        {isRTL ? 'دریافت پیشنهادات ویژه' : 'Receive special offers'}
+                        {getLabel('Receive special offers', 'دریافت پیشنهادات ویژه', 'ځانګړي وړاندیزونه ترلاسه کړئ')}
                       </p>
                     </div>
                   </div>
