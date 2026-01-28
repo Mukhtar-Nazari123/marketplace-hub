@@ -130,8 +130,12 @@ export const NotificationCard = ({ notification, onMarkAsRead }: NotificationCar
     }
   };
 
-  const title = language === 'fa' ? notification.title_fa : notification.title_en;
-  const message = language === 'fa' ? notification.message_fa : notification.message_en;
+  const title = lang === 'ps' 
+    ? (notification.title_ps || notification.title_fa || notification.title_en) 
+    : (lang === 'fa' ? notification.title_fa : notification.title_en);
+  const message = lang === 'ps' 
+    ? (notification.message_ps || notification.message_fa || notification.message_en) 
+    : (lang === 'fa' ? notification.message_fa : notification.message_en);
 
   return (
     <div
