@@ -80,6 +80,7 @@ export const DashboardHeader = ({ title, description, onMobileMenuToggle, isMobi
   const lightModeText = getLabel('Light Mode', 'حالت روشن', 'روښانه حالت');
   const darkModeText = getLabel('Dark Mode', 'حالت تاریک', 'تیاره حالت');
   const homeText = getLabel('Home', 'صفحه اصلی', 'کور');
+  const toggleSidebarText = getLabel('Toggle Sidebar', 'تغییر نوار کناری', 'سایډبار بدل کړئ');
 
   return (
     <header className={`flex h-14 sm:h-16 shrink-0 items-center justify-between gap-2 border-b bg-card/50 backdrop-blur-sm px-3 sm:px-4 sticky top-0 z-40 transition-all duration-300 ${isRTL ? 'flex-row-reverse' : ''}`}>
@@ -95,7 +96,7 @@ export const DashboardHeader = ({ title, description, onMobileMenuToggle, isMobi
             <Menu className="h-5 w-5" />
           </Button>
         ) : (
-          <SidebarTrigger className={`transition-transform hover:scale-110 shrink-0 ${isRTL ? 'ml-1' : '-mr-1'}`} />
+          <SidebarTrigger tooltipText={toggleSidebarText} className={`transition-transform hover:scale-110 shrink-0 ${isRTL ? 'ml-1' : '-mr-1'}`} />
         )}
         
         <Separator orientation="vertical" className="mx-1 sm:mx-2 h-4 hidden sm:block" />
