@@ -21,10 +21,7 @@ import {
   Package,
   ShoppingCart,
   BadgeCheck,
-  Image,
   Monitor,
-  Tag,
-  LayoutGrid,
   FileText,
   Settings,
   LogOut,
@@ -38,6 +35,8 @@ import {
   Zap,
   FolderTree,
   Bell,
+  Check,
+  Languages,
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -122,25 +121,14 @@ export const AdminSidebar = () => {
     navigate('/login');
   };
 
-  // Language options for cycling
-  const languages: Language[] = ['en', 'fa', 'ps'];
-  const languageNames: Record<Language, string> = {
-    en: 'English',
-    fa: 'دری',
-    ps: 'پښتو',
-  };
+  // Language options with labels
+  const languageOptions: { code: Language; label: string; nativeLabel: string }[] = [
+    { code: 'en', label: 'English', nativeLabel: 'EN' },
+    { code: 'fa', label: 'دری', nativeLabel: 'دری' },
+    { code: 'ps', label: 'پښتو', nativeLabel: 'پښتو' },
+  ];
 
-  const cycleLanguage = () => {
-    const currentIndex = languages.indexOf(lang);
-    const nextIndex = (currentIndex + 1) % languages.length;
-    setLanguage(languages[nextIndex]);
-  };
-
-  const getNextLanguageLabel = () => {
-    const currentIndex = languages.indexOf(lang);
-    const nextIndex = (currentIndex + 1) % languages.length;
-    return languageNames[languages[nextIndex]];
-  };
+  const currentLanguageLabel = languageOptions.find(l => l.code === lang)?.label || 'English';
 
   const isActive = (url: string) => {
     if (url === '/dashboard/admin') {
@@ -245,15 +233,43 @@ export const AdminSidebar = () => {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Language Switcher */}
+        {/* Language Switcher Dropdown */}
         <SidebarGroup>
+          {!isCollapsed && <SidebarGroupLabel>{languageLabel}</SidebarGroupLabel>}
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton onClick={cycleLanguage} tooltip={getNextLanguageLabel()}>
-                  <Globe className="h-4 w-4 shrink-0" />
-                  {!isCollapsed && <span>{getNextLanguageLabel()}</span>}
-                </SidebarMenuButton>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <SidebarMenuButton tooltip={languageLabel}>
+                      <Languages className="h-4 w-4 shrink-0" />
+                      {!isCollapsed && (
+                        <>
+                          <span className="flex-1">{currentLanguageLabel}</span>
+                          <ChevronDown className="h-3 w-3 opacity-50" />
+                        </>
+                      )}
+                    </SidebarMenuButton>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    side={isRTL ? 'left' : 'right'}
+                    align="start"
+                    className="min-w-[140px]"
+                  >
+                    {languageOptions.map((option) => (
+                      <DropdownMenuItem
+                        key={option.code}
+                        onClick={() => setLanguage(option.code)}
+                        className="flex items-center justify-between cursor-pointer"
+                      >
+                        <span>{option.label}</span>
+                        {lang === option.code && (
+                          <Check className="h-4 w-4 text-primary" />
+                        )}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
@@ -293,10 +309,22 @@ export const AdminSidebar = () => {
                 align={isRTL ? 'start' : 'end'}
                 sideOffset={4}
               >
-                <DropdownMenuItem onClick={cycleLanguage}>
-                  <Globe className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                  {getNextLanguageLabel()}
-                </DropdownMenuItem>
+                {languageOptions.map((option) => (
+                  <DropdownMenuItem
+                    key={option.code}
+                    onClick={() => setLanguage(option.code)}
+                    className="flex items-center justify-between cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Globe className="h-4 w-4" />
+                      <span>{option.label}</span>
+                    </div>
+                    {lang === option.code && (
+                      <Check className="h-4 w-4 text-primary" />
+                    )}
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuSeparator />
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
                   <LogOut className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
