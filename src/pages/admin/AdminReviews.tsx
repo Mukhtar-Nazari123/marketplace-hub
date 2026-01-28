@@ -58,8 +58,17 @@ interface Review {
   };
 }
 
+type Language = 'en' | 'fa' | 'ps';
+
+const getLabel = (lang: Language, en: string, fa: string, ps: string) => {
+  if (lang === 'ps') return ps;
+  if (lang === 'fa') return fa;
+  return en;
+};
+
 const AdminReviews = () => {
-  const { t, isRTL } = useLanguage();
+  const { t, isRTL, language } = useLanguage();
+  const lang = language as Language;
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -111,7 +120,7 @@ const AdminReviews = () => {
       setReviews(formattedReviews);
     } catch (error) {
       console.error('Error fetching reviews:', error);
-      toast.error(isRTL ? 'خطا در دریافت نظرات' : 'Error fetching reviews');
+      toast.error(getLabel(lang, 'Error fetching reviews', 'خطا در دریافت نظرات', 'د نظرونو راوړلو کې تېروتنه'));
     } finally {
       setLoading(false);
     }
@@ -134,10 +143,10 @@ const AdminReviews = () => {
       if (error) throw error;
 
       setReviews(prev => prev.filter(r => r.id !== reviewToDelete.id));
-      toast.success(isRTL ? 'نظر حذف شد' : 'Review deleted');
+      toast.success(getLabel(lang, 'Review deleted', 'نظر حذف شد', 'نظر حذف شو'));
     } catch (error) {
       console.error('Error deleting review:', error);
-      toast.error(isRTL ? 'خطا در حذف نظر' : 'Error deleting review');
+      toast.error(getLabel(lang, 'Error deleting review', 'خطا در حذف نظر', 'د نظر په حذفولو کې تېروتنه'));
     } finally {
       setIsDeleting(false);
       setDeleteDialogOpen(false);
@@ -164,7 +173,10 @@ const AdminReviews = () => {
 
   if (loading) {
     return (
-      <AdminLayout title={isRTL ? 'مدیریت نظرات' : 'Review Management'} description={isRTL ? 'نظارت و مدیریت نظرات کاربران' : 'Monitor and manage user reviews'}>
+      <AdminLayout 
+        title={getLabel(lang, 'Review Management', 'مدیریت نظرات', 'د نظرونو مدیریت')} 
+        description={getLabel(lang, 'Monitor and manage user reviews', 'نظارت و مدیریت نظرات کاربران', 'د کاروونکو نظرونه وڅارئ او اداره کړئ')}
+      >
         <div className="space-y-6">
           <div className="grid gap-4 md:grid-cols-3">
             {[1, 2, 3].map((i) => (
@@ -183,7 +195,10 @@ const AdminReviews = () => {
   }
 
   return (
-      <AdminLayout title={isRTL ? 'مدیریت نظرات' : 'Review Management'} description={isRTL ? 'نظارت و مدیریت نظرات کاربران' : 'Monitor and manage user reviews'}>
+      <AdminLayout 
+        title={getLabel(lang, 'Review Management', 'مدیریت نظرات', 'د نظرونو مدیریت')} 
+        description={getLabel(lang, 'Monitor and manage user reviews', 'نظارت و مدیریت نظرات کاربران', 'د کاروونکو نظرونه وڅارئ او اداره کړئ')}
+      >
       <div className="space-y-6">
         {/* Summary Cards */}
         <div className="grid gap-4 md:grid-cols-3">
@@ -196,7 +211,7 @@ const AdminReviews = () => {
                 <div>
                   <p className="text-2xl font-bold">{totalReviews}</p>
                   <p className="text-sm text-muted-foreground">
-                    {isRTL ? 'کل نظرات' : 'Total Reviews'}
+                    {getLabel(lang, 'Total Reviews', 'کل نظرات', 'ټول نظرونه')}
                   </p>
                 </div>
               </div>
@@ -212,7 +227,7 @@ const AdminReviews = () => {
                 <div>
                   <p className="text-2xl font-bold">{averageRating}</p>
                   <p className="text-sm text-muted-foreground">
-                    {isRTL ? 'میانگین امتیاز' : 'Average Rating'}
+                    {getLabel(lang, 'Average Rating', 'میانگین امتیاز', 'اوسط درجه')}
                   </p>
                 </div>
               </div>
@@ -228,7 +243,7 @@ const AdminReviews = () => {
                 <div>
                   <p className="text-2xl font-bold">{lowRatingCount}</p>
                   <p className="text-sm text-muted-foreground">
-                    {isRTL ? 'نظرات کم امتیاز' : 'Low Ratings (1-2★)'}
+                    {getLabel(lang, 'Low Ratings (1-2★)', 'نظرات کم امتیاز', 'ټیټ درجې (۱-۲★)')}
                   </p>
                 </div>
               </div>
@@ -241,7 +256,7 @@ const AdminReviews = () => {
           <CardHeader>
             <div className={cn("flex flex-col sm:flex-row gap-4 justify-between", isRTL && "sm:flex-row-reverse")}>
               <CardTitle className="text-lg">
-                {isRTL ? 'همه نظرات' : 'All Reviews'}
+                {getLabel(lang, 'All Reviews', 'همه نظرات', 'ټول نظرونه')}
               </CardTitle>
               <div className={cn("flex gap-2", isRTL && "flex-row-reverse")}>
                 <div className="relative w-full sm:w-64">
@@ -250,7 +265,7 @@ const AdminReviews = () => {
                     isRTL ? "right-3" : "left-3"
                   )} />
                   <Input
-                    placeholder={isRTL ? 'جستجو...' : 'Search...'}
+                    placeholder={getLabel(lang, 'Search...', 'جستجو...', 'لټون...')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className={cn(isRTL ? "pr-10" : "pl-10")}
@@ -258,10 +273,10 @@ const AdminReviews = () => {
                 </div>
                 <Select value={ratingFilter} onValueChange={setRatingFilter}>
                   <SelectTrigger className="w-32">
-                    <SelectValue placeholder={isRTL ? 'امتیاز' : 'Rating'} />
+                    <SelectValue placeholder={getLabel(lang, 'Rating', 'امتیاز', 'درجه')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">{isRTL ? 'همه' : 'All'}</SelectItem>
+                    <SelectItem value="all">{getLabel(lang, 'All', 'همه', 'ټول')}</SelectItem>
                     <SelectItem value="5">5 ★</SelectItem>
                     <SelectItem value="4">4 ★</SelectItem>
                     <SelectItem value="3">3 ★</SelectItem>
@@ -278,8 +293,8 @@ const AdminReviews = () => {
                 <MessageSquare className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
                 <p className="text-muted-foreground">
                   {searchQuery || ratingFilter !== 'all'
-                    ? (isRTL ? 'نظری یافت نشد' : 'No reviews found')
-                    : (isRTL ? 'هنوز نظری ثبت نشده' : 'No reviews yet')
+                    ? getLabel(lang, 'No reviews found', 'نظری یافت نشد', 'هیڅ نظر ونه موندل شو')
+                    : getLabel(lang, 'No reviews yet', 'هنوز نظری ثبت نشده', 'تر اوسه هیڅ نظر نشته')
                   }
                 </p>
               </div>
@@ -314,11 +329,11 @@ const AdminReviews = () => {
                           <div>
                             <div className={cn("flex items-center gap-2", isRTL && "flex-row-reverse")}>
                               <span className="font-medium text-sm">
-                                {review.buyer?.full_name || (isRTL ? 'کاربر' : 'User')}
+                                {review.buyer?.full_name || getLabel(lang, 'User', 'کاربر', 'کاروونکی')}
                               </span>
                               {review.rating <= 2 && (
                                 <Badge variant="destructive" className="text-xs">
-                                  {isRTL ? 'کم امتیاز' : 'Low Rating'}
+                                  {getLabel(lang, 'Low Rating', 'کم امتیاز', 'ټیټه درجه')}
                                 </Badge>
                               )}
                             </div>
@@ -348,7 +363,7 @@ const AdminReviews = () => {
                         <div className={cn("flex items-center gap-2 mt-2", isRTL && "flex-row-reverse")}>
                           <Package className="w-3 h-3 text-muted-foreground" />
                           <span className="text-xs text-muted-foreground">
-                            {review.product?.name || (isRTL ? 'محصول' : 'Product')}
+                            {review.product?.name || getLabel(lang, 'Product', 'محصول', 'محصول')}
                           </span>
                         </div>
 
@@ -374,24 +389,29 @@ const AdminReviews = () => {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {isRTL ? 'حذف نظر' : 'Delete Review'}
+              {getLabel(lang, 'Delete Review', 'حذف نظر', 'نظر حذف کړئ')}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {isRTL
-                ? 'آیا از حذف این نظر اطمینان دارید؟ این عمل قابل بازگشت نیست.'
-                : 'Are you sure you want to delete this review? This action cannot be undone.'}
+              {getLabel(lang, 
+                'Are you sure you want to delete this review? This action cannot be undone.',
+                'آیا از حذف این نظر اطمینان دارید؟ این عمل قابل بازگشت نیست.',
+                'ایا تاسو ډاډه یاست چې دا نظر حذف کړئ؟ دا عمل نشي بیرته راګرځیدلی.'
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className={isRTL ? "flex-row-reverse gap-2" : ""}>
             <AlertDialogCancel disabled={isDeleting}>
-              {isRTL ? 'انصراف' : 'Cancel'}
+              {getLabel(lang, 'Cancel', 'انصراف', 'لغوه')}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={isDeleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {isDeleting ? (isRTL ? 'در حال حذف...' : 'Deleting...') : (isRTL ? 'حذف' : 'Delete')}
+              {isDeleting 
+                ? getLabel(lang, 'Deleting...', 'در حال حذف...', 'حذفیږي...') 
+                : getLabel(lang, 'Delete', 'حذف', 'حذف')
+              }
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

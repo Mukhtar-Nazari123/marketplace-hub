@@ -75,8 +75,17 @@ interface SellerData {
   verification: SellerVerificationData | null;
 }
 
+type Language = 'en' | 'fa' | 'ps';
+
+const getLabel = (lang: Language, en: string, fa: string, ps: string) => {
+  if (lang === 'ps') return ps;
+  if (lang === 'fa') return fa;
+  return en;
+};
+
 const AdminSellers = () => {
-  const { t, direction, isRTL } = useLanguage();
+  const { t, direction, isRTL, language } = useLanguage();
+  const lang = language as Language;
   const [sellers, setSellers] = useState<SellerData[]>([]);
   const [filteredSellers, setFilteredSellers] = useState<SellerData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -277,7 +286,7 @@ const AdminSellers = () => {
       <Icon className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
       <div className="flex-1 min-w-0">
         <p className="text-xs text-muted-foreground">{label}</p>
-        <p className="text-sm font-medium break-words">{value || (isRTL ? 'مشخص نشده' : 'Not specified')}</p>
+        <p className="text-sm font-medium break-words">{value || getLabel(lang, 'Not specified', 'مشخص نشده', 'مشخص شوی نه دی')}</p>
       </div>
     </div>
   );
@@ -319,12 +328,12 @@ const AdminSellers = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>{isRTL ? 'نام' : 'Name'}</TableHead>
-                    <TableHead>{isRTL ? 'ایمیل' : 'Email'}</TableHead>
-                    <TableHead>{t.admin.sellers.companyName}</TableHead>
-                    <TableHead>{t.admin.sellers.status}</TableHead>
-                    <TableHead>{t.admin.sellers.date}</TableHead>
-                    <TableHead className={isRTL ? 'text-left' : 'text-right'}>{t.admin.sellers.actions}</TableHead>
+                    <TableHead>{getLabel(lang, 'Name', 'نام', 'نوم')}</TableHead>
+                    <TableHead>{getLabel(lang, 'Email', 'ایمیل', 'بریښنالیک')}</TableHead>
+                    <TableHead>{getLabel(lang, 'Company Name', 'نام شرکت', 'د شرکت نوم')}</TableHead>
+                    <TableHead>{getLabel(lang, 'Status', 'وضعیت', 'حالت')}</TableHead>
+                    <TableHead>{getLabel(lang, 'Date', 'تاریخ', 'نیټه')}</TableHead>
+                    <TableHead className={isRTL ? 'text-left' : 'text-right'}>{getLabel(lang, 'Actions', 'عملیات', 'کړنې')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -413,20 +422,20 @@ const AdminSellers = () => {
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <Store className="h-5 w-5" />
-                {isRTL ? 'جزئیات فروشنده' : 'Seller Details'}
+                {getLabel(lang, 'Seller Details', 'جزئیات فروشنده', 'د پلورونکي توضیحات')}
               </DialogTitle>
               <DialogDescription>
-                {isRTL ? 'مشاهده اطلاعات کامل فروشنده' : 'View complete seller information'}
+                {getLabel(lang, 'View complete seller information', 'مشاهده اطلاعات کامل فروشنده', 'د پلورونکي بشپړ معلومات وګورئ')}
               </DialogDescription>
             </DialogHeader>
             
             {selectedSeller && (
               <ScrollArea className="max-h-[60vh] pr-4">
                 <div className="space-y-6">
-                  {/* Status Badge */}
+                   {/* Status Badge */}
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">
-                      {isRTL ? 'وضعیت:' : 'Status:'}
+                      {getLabel(lang, 'Status:', 'وضعیت:', 'حالت:')}
                     </span>
                     {getStatusBadge(selectedSeller.verification?.status || 'pending')}
                   </div>
@@ -435,7 +444,7 @@ const AdminSellers = () => {
                   <div>
                     <h4 className="font-semibold mb-3 flex items-center gap-2">
                       <User className="h-4 w-4" />
-                      {isRTL ? 'اطلاعات شخصی' : 'Personal Information'}
+                      {getLabel(lang, 'Personal Information', 'اطلاعات شخصی', 'شخصي معلومات')}
                     </h4>
                     <Card>
                       <CardContent className="pt-4">
@@ -451,7 +460,7 @@ const AdminSellers = () => {
                             <p className="text-sm text-muted-foreground">{selectedSeller.email}</p>
                           </div>
                         </div>
-                        <InfoRow icon={Phone} label={isRTL ? 'تلفن' : 'Phone'} value={selectedSeller.verification?.phone} />
+                        <InfoRow icon={Phone} label={getLabel(lang, 'Phone', 'تلفن', 'تلیفون')} value={selectedSeller.verification?.phone} />
                       </CardContent>
                     </Card>
                   </div>
@@ -462,18 +471,18 @@ const AdminSellers = () => {
                   <div>
                     <h4 className="font-semibold mb-3 flex items-center gap-2">
                       <Building2 className="h-4 w-4" />
-                      {isRTL ? 'اطلاعات فروشگاه / شرکت' : 'Store / Company Details'}
+                      {getLabel(lang, 'Store / Company Details', 'اطلاعات فروشگاه / شرکت', 'د پلورنځي / شرکت توضیحات')}
                     </h4>
                     <Card>
                       <CardContent className="pt-4 space-y-2">
-                        <InfoRow icon={Store} label={isRTL ? 'نام فروشگاه' : 'Store Name'} value={selectedSeller.verification?.business_name} />
-                        <InfoRow icon={Building2} label={isRTL ? 'نوع کسب‌وکار' : 'Business Type'} value={selectedSeller.verification?.business_type} />
-                        <InfoRow icon={FileText} label={isRTL ? 'توضیحات کسب‌وکار' : 'Business Description'} value={selectedSeller.verification?.business_description} />
-                        <InfoRow icon={Mail} label={isRTL ? 'ایمیل تماس' : 'Contact Email'} value={selectedSeller.verification?.contact_email} />
-                        <InfoRow icon={Phone} label={isRTL ? 'تلفن تماس' : 'Contact Phone'} value={selectedSeller.verification?.contact_phone} />
+                        <InfoRow icon={Store} label={getLabel(lang, 'Store Name', 'نام فروشگاه', 'د پلورنځي نوم')} value={selectedSeller.verification?.business_name} />
+                        <InfoRow icon={Building2} label={getLabel(lang, 'Business Type', 'نوع کسب‌وکار', 'د سوداګرۍ ډول')} value={selectedSeller.verification?.business_type} />
+                        <InfoRow icon={FileText} label={getLabel(lang, 'Business Description', 'توضیحات کسب‌وکار', 'د سوداګرۍ توضیحات')} value={selectedSeller.verification?.business_description} />
+                        <InfoRow icon={Mail} label={getLabel(lang, 'Contact Email', 'ایمیل تماس', 'د اړیکې بریښنالیک')} value={selectedSeller.verification?.contact_email} />
+                        <InfoRow icon={Phone} label={getLabel(lang, 'Contact Phone', 'تلفن تماس', 'د اړیکې تلیفون')} value={selectedSeller.verification?.contact_phone} />
                         <InfoRow 
                           icon={MapPin} 
-                          label={isRTL ? 'آدرس' : 'Address'} 
+                          label={getLabel(lang, 'Address', 'آدرس', 'پته')} 
                           value={selectedSeller.verification?.address 
                             ? (typeof selectedSeller.verification.address === 'object' 
                               ? JSON.stringify(selectedSeller.verification.address) 
@@ -492,13 +501,13 @@ const AdminSellers = () => {
                       <div>
                         <h4 className="font-semibold mb-3 flex items-center gap-2">
                           <Image className="h-4 w-4" />
-                          {isRTL ? 'لوگو و بنر' : 'Logo & Banner'}
+                          {getLabel(lang, 'Logo & Banner', 'لوگو و بنر', 'لوګو او بینر')}
                         </h4>
                         <Card>
                           <CardContent className="pt-4 space-y-4">
                             {selectedSeller.verification?.store_logo && (
                               <div>
-                                <p className="text-xs text-muted-foreground mb-2">{isRTL ? 'لوگو فروشگاه' : 'Store Logo'}</p>
+                                <p className="text-xs text-muted-foreground mb-2">{getLabel(lang, 'Store Logo', 'لوگو فروشگاه', 'د پلورنځي لوګو')}</p>
                                 <img 
                                   src={selectedSeller.verification.store_logo} 
                                   alt="Store Logo" 
@@ -508,7 +517,7 @@ const AdminSellers = () => {
                             )}
                             {selectedSeller.verification?.store_banner && (
                               <div>
-                                <p className="text-xs text-muted-foreground mb-2">{isRTL ? 'بنر فروشگاه' : 'Store Banner'}</p>
+                                <p className="text-xs text-muted-foreground mb-2">{getLabel(lang, 'Store Banner', 'بنر فروشگاه', 'د پلورنځي بینر')}</p>
                                 <img 
                                   src={selectedSeller.verification.store_banner} 
                                   alt="Store Banner" 
@@ -528,20 +537,20 @@ const AdminSellers = () => {
                   <div>
                     <h4 className="font-semibold mb-3 flex items-center gap-2">
                       <FileText className="h-4 w-4" />
-                      {isRTL ? 'سیاست‌ها' : 'Policies'}
+                      {getLabel(lang, 'Policies', 'سیاست‌ها', 'پالیسۍ')}
                     </h4>
                     <Card>
                       <CardContent className="pt-4 space-y-2">
-                        <InfoRow icon={Truck} label={isRTL ? 'سیاست ارسال' : 'Shipping Policy'} value={selectedSeller.verification?.shipping_policy} />
-                        <InfoRow icon={RotateCcw} label={isRTL ? 'سیاست بازگشت' : 'Return Policy'} value={selectedSeller.verification?.return_policy} />
+                        <InfoRow icon={Truck} label={getLabel(lang, 'Shipping Policy', 'سیاست ارسال', 'د لیږلو پالیسي')} value={selectedSeller.verification?.shipping_policy} />
+                        <InfoRow icon={RotateCcw} label={getLabel(lang, 'Return Policy', 'سیاست بازگشت', 'د بیرته ورکولو پالیسي')} value={selectedSeller.verification?.return_policy} />
                         <div className="flex items-center gap-3 py-2">
                           <Store className="h-4 w-4 text-muted-foreground shrink-0" />
                           <div>
-                            <p className="text-xs text-muted-foreground">{isRTL ? 'قابلیت رؤیت فروشگاه' : 'Store Visibility'}</p>
+                            <p className="text-xs text-muted-foreground">{getLabel(lang, 'Store Visibility', 'قابلیت رؤیت فروشگاه', 'د پلورنځي لیدلو وړتیا')}</p>
                             <Badge variant={selectedSeller.verification?.store_visible ? 'default' : 'secondary'}>
                               {selectedSeller.verification?.store_visible 
-                                ? (isRTL ? 'قابل مشاهده' : 'Visible') 
-                                : (isRTL ? 'مخفی' : 'Hidden')
+                                ? getLabel(lang, 'Visible', 'قابل مشاهده', 'لیدلی شي')
+                                : getLabel(lang, 'Hidden', 'مخفی', 'پټ')
                               }
                             </Badge>
                           </div>
@@ -557,7 +566,7 @@ const AdminSellers = () => {
                       <div>
                         <h4 className="font-semibold mb-3 text-destructive flex items-center gap-2">
                           <XCircle className="h-4 w-4" />
-                          {isRTL ? 'دلیل رد' : 'Rejection Reason'}
+                          {getLabel(lang, 'Rejection Reason', 'دلیل رد', 'د ردولو دلیل')}
                         </h4>
                         <Card className="border-destructive/50">
                           <CardContent className="pt-4">
@@ -583,7 +592,7 @@ const AdminSellers = () => {
                     disabled={isSubmitting}
                   >
                     <XCircle className={`h-4 w-4 ${iconMargin}`} />
-                    {isRTL ? 'رد کردن' : 'Reject'}
+                    {getLabel(lang, 'Reject', 'رد کردن', 'ردول')}
                   </Button>
                   <Button
                     variant="default"
@@ -592,12 +601,12 @@ const AdminSellers = () => {
                     disabled={isSubmitting}
                   >
                     <CheckCircle className={`h-4 w-4 ${iconMargin}`} />
-                    {isSubmitting ? (isRTL ? 'در حال تأیید...' : 'Approving...') : (isRTL ? 'تأیید' : 'Approve')}
+                    {isSubmitting ? getLabel(lang, 'Approving...', 'در حال تأیید...', 'تایید کېږي...') : getLabel(lang, 'Approve', 'تأیید', 'تایید')}
                   </Button>
                 </>
               )}
               <Button variant="outline" onClick={() => setIsViewDialogOpen(false)}>
-                {isRTL ? 'بستن' : 'Close'}
+                {getLabel(lang, 'Close', 'بستن', 'بندول')}
               </Button>
             </DialogFooter>
           </DialogContent>
