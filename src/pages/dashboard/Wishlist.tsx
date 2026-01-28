@@ -30,7 +30,7 @@ interface WishlistItem {
 }
 
 const Wishlist = () => {
-  const { isRTL } = useLanguage();
+  const { isRTL, language } = useLanguage();
   const { user, role, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -79,8 +79,8 @@ const Wishlist = () => {
     if (error) {
       console.error('Error fetching wishlist:', error);
       toast({
-        title: isRTL ? 'خطا' : 'Error',
-        description: isRTL ? 'خطا در بارگذاری علاقه‌مندی‌ها' : 'Failed to load wishlist',
+        title: language === 'ps' ? 'تېروتنه' : language === 'fa' ? 'خطا' : 'Error',
+        description: language === 'ps' ? 'د خوښې لیست پورته کولو کې تېروتنه' : language === 'fa' ? 'خطا در بارگذاری علاقه‌مندی‌ها' : 'Failed to load wishlist',
         variant: 'destructive',
       });
     } else {
@@ -90,12 +90,30 @@ const Wishlist = () => {
   };
 
   const texts = {
-    title: isRTL ? 'علاقه‌مندی‌ها' : 'Wishlist',
-    description: isRTL ? 'محصولات مورد علاقه شما' : 'Your favorite products',
-    empty: isRTL ? 'لیست علاقه‌مندی‌های شما خالی است' : 'Your wishlist is empty',
-    emptyDesc: isRTL ? 'محصولات مورد علاقه خود را به لیست اضافه کنید' : 'Add your favorite products to the list',
-    browseProducts: isRTL ? 'مشاهده محصولات' : 'Browse Products',
+    en: {
+      title: 'Wishlist',
+      description: 'Your favorite products',
+      empty: 'Your wishlist is empty',
+      emptyDesc: 'Add your favorite products to the list',
+      browseProducts: 'Browse Products',
+    },
+    fa: {
+      title: 'علاقه‌مندی‌ها',
+      description: 'محصولات مورد علاقه شما',
+      empty: 'لیست علاقه‌مندی‌های شما خالی است',
+      emptyDesc: 'محصولات مورد علاقه خود را به لیست اضافه کنید',
+      browseProducts: 'مشاهده محصولات',
+    },
+    ps: {
+      title: 'د خوښې لیست',
+      description: 'ستاسو خوښې محصولات',
+      empty: 'ستاسو د خوښې لیست خالي دی',
+      emptyDesc: 'خپل خوښ محصولات لیست ته اضافه کړئ',
+      browseProducts: 'محصولات وګورئ',
+    },
   };
+
+  const t = texts[language as keyof typeof texts] || texts.en;
 
   const getProductCardData = (product: WishlistItem['product']) => {
     if (!product) return null;
@@ -137,8 +155,8 @@ const Wishlist = () => {
 
   return (
     <DashboardLayout 
-      title={texts.title} 
-      description={texts.description}
+      title={t.title} 
+      description={t.description}
       allowedRoles={['buyer']}
     >
       <div className="space-y-4 sm:space-y-6 animate-fade-in">
@@ -157,11 +175,11 @@ const Wishlist = () => {
             <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-muted flex items-center justify-center mb-4">
               <Heart className="h-8 w-8 sm:h-10 sm:w-10 text-muted-foreground" />
             </div>
-            <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">{texts.empty}</h3>
-            <p className="text-muted-foreground mb-6 text-sm sm:text-base">{texts.emptyDesc}</p>
+            <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">{t.empty}</h3>
+            <p className="text-muted-foreground mb-6 text-sm sm:text-base">{t.emptyDesc}</p>
             <Button onClick={() => navigate('/products')} className="min-h-[44px]">
               <Package className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-              {texts.browseProducts}
+              {t.browseProducts}
             </Button>
           </div>
         ) : (

@@ -26,6 +26,12 @@ export const translations = {
       signIn: "ورود / ثبت نام",
       welcomeGuest: "خوش آمدید مهمان",
       cart: "سبد خرید",
+      wishlist: "لیست علاقه‌مندی",
+      themeToggle: "تغییر حالت تاریک/روشن",
+      logout: "خروج",
+      logoutTitle: "خروج از حساب",
+      logoutConfirm: "آیا مطمئن هستید که می‌خواهید از حساب خود خارج شوید؟",
+      menu: "منو",
     },
     
     // Top Bar
@@ -573,6 +579,12 @@ export const translations = {
       signIn: "ننوتل / نوم لیکنه",
       welcomeGuest: "ښه راغلاست میلمه",
       cart: "کارټ",
+      wishlist: "د خوښې لیست",
+      themeToggle: "تیاره/رڼا حالت بدل کړئ",
+      logout: "وتل",
+      logoutTitle: "له حساب څخه وتل",
+      logoutConfirm: "ایا تاسو ډاډه یاست چې له خپل حساب څخه وتل غواړئ؟",
+      menu: "مینو",
     },
     
     // Top Bar
@@ -1120,6 +1132,12 @@ export const translations = {
       signIn: "Sign In / Register",
       welcomeGuest: "Welcome Guest",
       cart: "Cart",
+      wishlist: "Wishlist",
+      themeToggle: "Toggle dark/light mode",
+      logout: "Logout",
+      logoutTitle: "Logout",
+      logoutConfirm: "Are you sure you want to logout from your account?",
+      menu: "Menu",
     },
     
     // Top Bar

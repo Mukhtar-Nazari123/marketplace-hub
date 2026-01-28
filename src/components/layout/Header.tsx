@@ -27,7 +27,7 @@ import LanguageSwitcher from "./LanguageSwitcher";
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const { t, isRTL } = useLanguage();
+  const { t, isRTL, language } = useLanguage();
   const { theme, setTheme } = useTheme();
   const { siteName, logoUrl } = useSiteSettings();
   const toggleTheme = () => {
@@ -58,10 +58,14 @@ const Header = () => {
     return "/dashboard/buyer";
   };
   const getDashboardLabel = () => {
-    if (role === "admin") return isRTL ? "داشبورد مدیر" : "Admin Dashboard";
-    if (role === "seller") return isRTL ? "داشبورد فروشنده" : "Seller Dashboard";
-    if (role === "buyer") return isRTL ? "داشبورد خریدار" : "Buyer Dashboard";
-    return isRTL ? "داشبورد" : "Dashboard";
+    const labels = {
+      admin: { en: "Admin Dashboard", fa: "داشبورد مدیر", ps: "اډمین ډشبورډ" },
+      seller: { en: "Seller Dashboard", fa: "داشبورد فروشنده", ps: "پلورونکي ډشبورډ" },
+      buyer: { en: "Buyer Dashboard", fa: "داشبورد خریدار", ps: "پیرودونکي ډشبورډ" },
+      default: { en: "Dashboard", fa: "داشبورد", ps: "ډشبورډ" }
+    };
+    const key = role && labels[role as keyof typeof labels] ? role as keyof typeof labels : 'default';
+    return labels[key][language] || labels[key].en;
   };
   const handleLogout = async () => {
     await signOut();
@@ -124,9 +128,7 @@ const Header = () => {
                     size="icon"
                     onClick={toggleTheme}
                     className="hidden lg:flex transition-all duration-300 hover:bg-muted"
-                    aria-label={
-                      theme === "dark" ? (isRTL ? "حالت روشن" : "Light mode") : isRTL ? "حالت تاریک" : "Dark mode"
-                    }
+                    aria-label={t.header.themeToggle}
                   >
                     {theme === "dark" ? (
                       <Sun className="h-5 w-5 text-warning" />
@@ -136,7 +138,7 @@ const Header = () => {
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  {theme === "dark" ? (isRTL ? "حالت روشن" : "Light mode") : isRTL ? "حالت تاریک" : "Dark mode"}
+                  {t.header.themeToggle}
                 </TooltipContent>
               </Tooltip>
 
@@ -157,7 +159,7 @@ const Header = () => {
                       </Button>
                     </Link>
                   </TooltipTrigger>
-                  <TooltipContent>{isRTL ? "لیست علاقه‌مندی" : "Wishlist"}</TooltipContent>
+                  <TooltipContent>{t.header.wishlist}</TooltipContent>
                 </Tooltip>
               )}
 
@@ -211,32 +213,30 @@ const Header = () => {
                             variant="ghost"
                             size="icon"
                             className="transition-all duration-300 hover:bg-primary/10"
-                            aria-label={isRTL ? "خروج" : "Logout"}
+                            aria-label={t.header.logout}
                           >
                             <LogOut className="h-5 w-5 text-muted-foreground hover:text-primary" />
                           </Button>
                         </AlertDialogTrigger>
                       </TooltipTrigger>
-                      <TooltipContent>{isRTL ? "خروج" : "Logout"}</TooltipContent>
+                      <TooltipContent>{t.header.logout}</TooltipContent>
                     </Tooltip>
                     <AlertDialogContent dir={isRTL ? "rtl" : "ltr"}>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>{isRTL ? "خروج از حساب" : "Logout"}</AlertDialogTitle>
+                        <AlertDialogTitle>{t.header.logoutTitle}</AlertDialogTitle>
                         <AlertDialogDescription>
-                          {isRTL
-                            ? "آیا مطمئن هستید که می‌خواهید از حساب خود خارج شوید؟"
-                            : "Are you sure you want to logout from your account?"}
+                          {t.header.logoutConfirm}
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter className={isRTL ? "flex-row-reverse gap-2" : ""}>
                         <AlertDialogCancel className="border-muted-foreground/30">
-                          {isRTL ? "انصراف" : "Cancel"}
+                          {t.common.cancel}
                         </AlertDialogCancel>
                         <AlertDialogAction
                           onClick={handleLogout}
                           className="bg-primary text-primary-foreground hover:bg-primary/90"
                         >
-                          {isRTL ? "خروج" : "Logout"}
+                          {t.header.logout}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -257,7 +257,7 @@ const Header = () => {
                 size="icon"
                 className="lg:hidden"
                 onClick={() => setIsMenuOpen(true)}
-                aria-label={isRTL ? "منو" : "Menu"}
+                aria-label={t.header.menu}
               >
                 <Menu className="h-5 w-5" />
               </Button>

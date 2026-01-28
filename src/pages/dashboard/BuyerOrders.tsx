@@ -104,11 +104,61 @@ interface Order {
 }
 
 const BuyerOrders = () => {
-  const { isRTL } = useLanguage();
+  const { isRTL, language } = useLanguage();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Localized texts
+  const texts = {
+    en: {
+      title: "My Orders",
+      description: "Track your orders and purchase history",
+      noOrders: "No orders yet",
+      noOrdersDesc: "Your orders will appear here once you make your first purchase.",
+      browseProducts: "Browse Products",
+      totalOrders: "Total Orders",
+      inProgress: "In Progress",
+      delivered: "Delivered",
+      items: "items",
+      sellers: "sellers",
+      seller: "Seller",
+      noSku: "No SKU",
+      product: "product",
+    },
+    fa: {
+      title: "سفارشات من",
+      description: "پیگیری سفارشات و سابقه خرید",
+      noOrders: "هنوز سفارشی ندارید",
+      noOrdersDesc: "با خرید اولین محصول، سفارشات شما در اینجا نمایش داده می‌شود.",
+      browseProducts: "مشاهده محصولات",
+      totalOrders: "کل سفارشات",
+      inProgress: "در حال پردازش",
+      delivered: "تحویل شده",
+      items: "محصول",
+      sellers: "فروشنده",
+      seller: "فروشنده",
+      noSku: "بدون SKU",
+      product: "محصول",
+    },
+    ps: {
+      title: "زما سفارشونه",
+      description: "خپل سفارشونه او پیرود تاریخچه تعقیب کړئ",
+      noOrders: "تر اوسه هیڅ سفارش نشته",
+      noOrdersDesc: "ستاسو سفارشونه به دلته ښکاره شي کله چې تاسو خپل لومړی پیرود وکړئ.",
+      browseProducts: "محصولات وګورئ",
+      totalOrders: "ټول سفارشونه",
+      inProgress: "روان",
+      delivered: "تحویل شوی",
+      items: "توکي",
+      sellers: "پلورونکي",
+      seller: "پلورونکی",
+      noSku: "SKU نشته",
+      product: "محصول",
+    },
+  };
+  const t = texts[language as keyof typeof texts] || texts.en;
 
   const fetchOrders = async () => {
     if (!user) return;
@@ -216,15 +266,16 @@ const BuyerOrders = () => {
         icon: typeof CheckCircle;
         label: string;
         labelFa: string;
+        labelPs: string;
       }
     > = {
-      pending: { variant: "secondary", icon: Clock, label: "Pending", labelFa: "در انتظار" },
-      confirmed: { variant: "default", icon: CheckCircle, label: "Confirmed", labelFa: "تایید شده" },
-      processing: { variant: "default", icon: Package, label: "Processing", labelFa: "در حال پردازش" },
-      shipped: { variant: "default", icon: Truck, label: "Shipped", labelFa: "ارسال شده" },
-      delivered: { variant: "default", icon: CheckCircle, label: "Delivered", labelFa: "تحویل داده شده" },
-      cancelled: { variant: "destructive", icon: XCircle, label: "Cancelled", labelFa: "لغو شده" },
-      rejected: { variant: "destructive", icon: XCircle, label: "Rejected", labelFa: "رد شده" },
+      pending: { variant: "secondary", icon: Clock, label: "Pending", labelFa: "در انتظار", labelPs: "انتظار کې" },
+      confirmed: { variant: "default", icon: CheckCircle, label: "Confirmed", labelFa: "تایید شده", labelPs: "تایید شوی" },
+      processing: { variant: "default", icon: Package, label: "Processing", labelFa: "در حال پردازش", labelPs: "پروسس کې" },
+      shipped: { variant: "default", icon: Truck, label: "Shipped", labelFa: "ارسال شده", labelPs: "لیږل شوی" },
+      delivered: { variant: "default", icon: CheckCircle, label: "Delivered", labelFa: "تحویل داده شده", labelPs: "تحویل شوی" },
+      cancelled: { variant: "destructive", icon: XCircle, label: "Cancelled", labelFa: "لغو شده", labelPs: "لغوه شوی" },
+      rejected: { variant: "destructive", icon: XCircle, label: "Rejected", labelFa: "رد شده", labelPs: "رد شوی" },
     };
 
     const config = statusConfig[status] || {
@@ -232,33 +283,36 @@ const BuyerOrders = () => {
       icon: AlertCircle,
       label: status,
       labelFa: status,
+      labelPs: status,
     };
     const Icon = config.icon;
+    const labelToShow = language === 'ps' ? config.labelPs : language === 'fa' ? config.labelFa : config.label;
 
     return (
       <Badge variant={config.variant} className="flex items-center gap-1">
         <Icon className="w-3 h-3" />
-        {isRTL ? config.labelFa : config.label}
+        {labelToShow}
       </Badge>
     );
   };
 
   const getPaymentStatusBadge = (status: string) => {
-    const config: Record<string, { variant: "default" | "secondary" | "destructive"; label: string; labelFa: string }> =
+    const config: Record<string, { variant: "default" | "secondary" | "destructive"; label: string; labelFa: string; labelPs: string }> =
       {
-        pending: { variant: "secondary", label: "Pending", labelFa: "در انتظار پرداخت" },
-        paid: { variant: "default", label: "Paid", labelFa: "پرداخت شده" },
-        failed: { variant: "destructive", label: "Failed", labelFa: "ناموفق" },
+        pending: { variant: "secondary", label: "Pending", labelFa: "در انتظار پرداخت", labelPs: "تادیه انتظار کې" },
+        paid: { variant: "default", label: "Paid", labelFa: "پرداخت شده", labelPs: "تادیه شوی" },
+        failed: { variant: "destructive", label: "Failed", labelFa: "ناموفق", labelPs: "ناکام" },
       };
 
-    const statusConfig = config[status] || { variant: "secondary" as const, label: status, labelFa: status };
+    const statusConfig = config[status] || { variant: "secondary" as const, label: status, labelFa: status, labelPs: status };
+    const labelToShow = language === 'ps' ? statusConfig.labelPs : language === 'fa' ? statusConfig.labelFa : statusConfig.label;
 
-    return <Badge variant={statusConfig.variant}>{isRTL ? statusConfig.labelFa : statusConfig.label}</Badge>;
+    return <Badge variant={statusConfig.variant}>{labelToShow}</Badge>;
   };
 
   const getSellerName = (sellerId: string, sellerPolicies: SellerPolicy[] | null) => {
     const policy = sellerPolicies?.find((p) => p.seller_id === sellerId);
-    return policy?.seller_name || (isRTL ? "فروشنده" : "Seller");
+    return policy?.seller_name || t.seller;
   };
 
   // Group order items by seller
@@ -281,10 +335,9 @@ const BuyerOrders = () => {
   if (loading) {
     return (
       <DashboardLayout
-        title={isRTL ? "سفارشات من" : "My Orders"}
-        description={isRTL ? "پیگیری سفارشات و سابقه خرید" : "Track your orders and purchase history"}
-        allowedRoles={["buyer"]}
-      >
+        title={t.title}
+        description={t.description}
+        allowedRoles={["buyer"]}>
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
             <Card key={i}>
@@ -308,8 +361,8 @@ const BuyerOrders = () => {
   if (orders.length === 0) {
     return (
       <DashboardLayout
-        title={isRTL ? "سفارشات من" : "My Orders"}
-        description={isRTL ? "پیگیری سفارشات و سابقه خرید" : "Track your orders and purchase history"}
+        title={t.title}
+        description={t.description}
         allowedRoles={["buyer"]}
       >
         <Card className="border-dashed">
@@ -317,14 +370,12 @@ const BuyerOrders = () => {
             <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-6">
               <ShoppingBag className="w-10 h-10 text-muted-foreground" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">{isRTL ? "هنوز سفارشی ندارید" : "No orders yet"}</h3>
+            <h3 className="text-xl font-semibold mb-2">{t.noOrders}</h3>
             <p className="text-muted-foreground mb-6 max-w-sm">
-              {isRTL
-                ? "با خرید اولین محصول، سفارشات شما در اینجا نمایش داده می‌شود."
-                : "Your orders will appear here once you make your first purchase."}
+              {t.noOrdersDesc}
             </p>
             <Button onClick={() => navigate("/products")}>
-              {isRTL ? "مشاهده محصولات" : "Browse Products"}
+              {t.browseProducts}
             </Button>
           </CardContent>
         </Card>
@@ -334,8 +385,8 @@ const BuyerOrders = () => {
 
   return (
     <DashboardLayout
-      title={isRTL ? "سفارشات من" : "My Orders"}
-      description={isRTL ? "پیگیری سفارشات و سابقه خرید" : "Track your orders and purchase history"}
+      title={t.title}
+      description={t.description}
       allowedRoles={["buyer"]}
     >
       <div className="space-y-4 sm:space-y-6">
@@ -349,7 +400,7 @@ const BuyerOrders = () => {
                 </div>
                 <div>
                   <p className="text-xl sm:text-2xl font-bold">{orders.length}</p>
-                  <p className="text-xs sm:text-sm text-muted-foreground">{isRTL ? "کل سفارشات" : "Total Orders"}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">{t.totalOrders}</p>
                 </div>
               </div>
             </CardContent>
@@ -365,7 +416,7 @@ const BuyerOrders = () => {
                   <p className="text-xl sm:text-2xl font-bold">
                     {orders.filter((o) => o.status === "pending" || o.status === "processing").length}
                   </p>
-                  <p className="text-xs sm:text-sm text-muted-foreground">{isRTL ? "در حال پردازش" : "In Progress"}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">{t.inProgress}</p>
                 </div>
               </div>
             </CardContent>
@@ -379,7 +430,7 @@ const BuyerOrders = () => {
                 </div>
                 <div>
                   <p className="text-xl sm:text-2xl font-bold">{orders.filter((o) => o.status === "delivered").length}</p>
-                  <p className="text-xs sm:text-sm text-muted-foreground">{isRTL ? "تحویل شده" : "Delivered"}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">{t.delivered}</p>
                 </div>
               </div>
             </CardContent>
@@ -418,10 +469,10 @@ const BuyerOrders = () => {
                     {/* Order Summary */}
                     <div className="flex items-center justify-between w-full">
                       <span className="text-sm text-muted-foreground">
-                        {order.order_items.length} {isRTL ? "محصول" : "items"}
+                        {order.order_items.length} {t.items}
                         {sellerGroups.length > 1 && (
                           <span className="text-xs ml-1">
-                            ({sellerGroups.length} {isRTL ? "فروشنده" : "sellers"})
+                            ({sellerGroups.length} {t.sellers})
                           </span>
                         )}
                       </span>
