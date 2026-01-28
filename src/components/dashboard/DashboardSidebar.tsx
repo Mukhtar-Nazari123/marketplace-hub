@@ -63,26 +63,32 @@ export const DashboardSidebar = () => {
     { title: t.admin.settings.title, icon: Settings, url: '/dashboard/settings', showBadge: false },
   ];
 
+  const getLabel = (en: string, fa: string, ps: string) => {
+    if (language === 'ps') return ps;
+    if (language === 'fa') return fa;
+    return en;
+  };
+
   const sellerNavItems = [
-    { title: isRTL ? 'داشبورد' : 'Dashboard', icon: LayoutDashboard, url: '/dashboard/seller', showBadge: false },
-    { title: isRTL ? 'اعلان‌ها' : 'Notifications', icon: Bell, url: '/dashboard/notifications', showBadge: true },
-    { title: isRTL ? 'محصولات من' : 'My Products', icon: Package, url: '/dashboard/seller/products', showBadge: false },
-    { title: isRTL ? 'سفارشات' : 'Orders', icon: ShoppingCart, url: '/dashboard/seller/orders', showBadge: false },
-    { title: isRTL ? 'نظرات' : 'Reviews', icon: Star, url: '/dashboard/seller/reviews', showBadge: false },
-    { title: isRTL ? 'آمار فروش' : 'Analytics', icon: BarChart3, url: '/dashboard/seller/analytics', showBadge: false },
-    { title: isRTL ? 'پروفایل' : 'Profile', icon: User, url: '/dashboard/profile', showBadge: false },
-    { title: isRTL ? 'افزودن محصول' : 'Add Product', icon: Plus, url: '/dashboard/seller/products/new', showBadge: false },
+    { title: getLabel('Dashboard', 'داشبورد', 'ډشبورډ'), icon: LayoutDashboard, url: '/dashboard/seller', showBadge: false },
+    { title: getLabel('Notifications', 'اعلان‌ها', 'خبرتیاوې'), icon: Bell, url: '/dashboard/notifications', showBadge: true },
+    { title: getLabel('My Products', 'محصولات من', 'زما محصولات'), icon: Package, url: '/dashboard/seller/products', showBadge: false },
+    { title: getLabel('Orders', 'سفارشات', 'امرونه'), icon: ShoppingCart, url: '/dashboard/seller/orders', showBadge: false },
+    { title: getLabel('Reviews', 'نظرات', 'نظرونه'), icon: Star, url: '/dashboard/seller/reviews', showBadge: false },
+    { title: getLabel('Analytics', 'آمار فروش', 'تحلیلات'), icon: BarChart3, url: '/dashboard/seller/analytics', showBadge: false },
+    { title: getLabel('Profile', 'پروفایل', 'پروفایل'), icon: User, url: '/dashboard/profile', showBadge: false },
+    { title: getLabel('Add Product', 'افزودن محصول', 'محصول اضافه کړئ'), icon: Plus, url: '/dashboard/seller/products/new', showBadge: false },
   ];
 
   const buyerNavItems = [
-    { title: isRTL ? 'داشبورد' : 'Dashboard', icon: LayoutDashboard, url: '/dashboard/buyer', showBadge: false },
-    { title: isRTL ? 'اعلان‌ها' : 'Notifications', icon: Bell, url: '/dashboard/notifications', showBadge: true },
-    { title: isRTL ? 'پروفایل' : 'Profile', icon: User, url: '/dashboard/profile', showBadge: false },
-    { title: isRTL ? 'سفارشات من' : 'My Orders', icon: ShoppingCart, url: '/dashboard/buyer/orders', showBadge: false },
-    { title: isRTL ? 'نظرات من' : 'My Reviews', icon: Star, url: '/dashboard/buyer/reviews', showBadge: false },
-    { title: isRTL ? 'آدرس‌ها' : 'Addresses', icon: MapPin, url: '/dashboard/buyer/addresses', showBadge: false },
-    { title: isRTL ? 'علاقه‌مندی‌ها' : 'Wishlist', icon: Heart, url: '/dashboard/buyer/wishlist', showBadge: false },
-    { title: isRTL ? 'روش‌های پرداخت' : 'Payment Methods', icon: CreditCard, url: '/dashboard/buyer/payments', showBadge: false },
+    { title: getLabel('Dashboard', 'داشبورد', 'ډشبورډ'), icon: LayoutDashboard, url: '/dashboard/buyer', showBadge: false },
+    { title: getLabel('Notifications', 'اعلان‌ها', 'خبرتیاوې'), icon: Bell, url: '/dashboard/notifications', showBadge: true },
+    { title: getLabel('Profile', 'پروفایل', 'پروفایل'), icon: User, url: '/dashboard/profile', showBadge: false },
+    { title: getLabel('My Orders', 'سفارشات من', 'زما امرونه'), icon: ShoppingCart, url: '/dashboard/buyer/orders', showBadge: false },
+    { title: getLabel('My Reviews', 'نظرات من', 'زما نظرونه'), icon: Star, url: '/dashboard/buyer/reviews', showBadge: false },
+    { title: getLabel('Addresses', 'آدرس‌ها', 'پتې'), icon: MapPin, url: '/dashboard/buyer/addresses', showBadge: false },
+    { title: getLabel('Wishlist', 'علاقه‌مندی‌ها', 'خوښې'), icon: Heart, url: '/dashboard/buyer/wishlist', showBadge: false },
+    { title: getLabel('Payment Methods', 'روش‌های پرداخت', 'د تادیې لارې'), icon: CreditCard, url: '/dashboard/buyer/payments', showBadge: false },
   ];
 
   const handleLogout = async () => { await signOut(); navigate('/login'); };
@@ -92,10 +98,10 @@ export const DashboardSidebar = () => {
     return location.pathname.startsWith(url);
   };
   const getRoleLabel = () => {
-    if (role === 'admin') return isRTL ? 'مدیر' : 'Admin';
-    if (role === 'seller') return isRTL ? 'فروشنده' : 'Seller';
-    if (role === 'buyer') return isRTL ? 'خریدار' : 'Buyer';
-    return isRTL ? 'کاربر' : 'User';
+    if (role === 'admin') return getLabel('Admin', 'مدیر', 'اډمین');
+    if (role === 'seller') return getLabel('Seller', 'فروشنده', 'پلورونکی');
+    if (role === 'buyer') return getLabel('Buyer', 'خریدار', 'پیرودونکی');
+    return getLabel('User', 'کاربر', 'کارن');
   };
 
   const renderNavItems = (items: typeof sellerNavItems, label?: string) => (
@@ -136,7 +142,7 @@ export const DashboardSidebar = () => {
               </div>
               {!isCollapsed && (
                 <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="font-semibold text-foreground">{role === 'admin' ? t.admin.panelTitle : (isRTL ? 'داشبورد' : 'Dashboard')}</span>
+                  <span className="font-semibold text-foreground">{role === 'admin' ? t.admin.panelTitle : getLabel('Dashboard', 'داشبورد', 'ډشبورډ')}</span>
                   <span className="text-xs text-muted-foreground">{getRoleLabel()}</span>
                 </div>
               )}
@@ -153,15 +159,15 @@ export const DashboardSidebar = () => {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton onClick={() => navigate('/')} tooltip={isRTL ? 'صفحه اصلی' : 'Home'}>
+                <SidebarMenuButton onClick={() => navigate('/')} tooltip={getLabel('Home', 'صفحه اصلی', 'کور پاڼه')}>
                   <Home className="shrink-0 text-muted-foreground" />
-                  {!isCollapsed && <span>{isRTL ? 'صفحه اصلی' : 'Home'}</span>}
+                  {!isCollapsed && <span>{getLabel('Home', 'صفحه اصلی', 'کور پاڼه')}</span>}
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton onClick={toggleLanguage} tooltip={language === 'fa' ? 'English' : 'دری'}>
+                <SidebarMenuButton onClick={toggleLanguage} tooltip={language === 'en' ? 'دری' : 'English'}>
                   <Globe className="shrink-0 text-muted-foreground" />
-                  {!isCollapsed && <span>{language === 'fa' ? 'English' : 'دری'}</span>}
+                  {!isCollapsed && <span>{language === 'en' ? 'دری' : 'English'}</span>}
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
@@ -190,12 +196,12 @@ export const DashboardSidebar = () => {
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>{isRTL ? 'تأیید خروج' : 'Confirm Logout'}</AlertDialogTitle>
-                        <AlertDialogDescription>{isRTL ? 'آیا مطمئن هستید که می‌خواهید از حساب خود خارج شوید؟' : 'Are you sure you want to logout?'}</AlertDialogDescription>
+                        <AlertDialogTitle>{getLabel('Confirm Logout', 'تأیید خروج', 'د وتلو تایید')}</AlertDialogTitle>
+                        <AlertDialogDescription>{getLabel('Are you sure you want to logout?', 'آیا مطمئن هستید که می‌خواهید از حساب خود خارج شوید؟', 'ایا تاسو ډاډه یاست چې غواړئ له خپل حساب څخه ووځئ؟')}</AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter className={isRTL ? 'flex-row-reverse gap-2' : ''}>
-                        <AlertDialogCancel>{isRTL ? 'انصراف' : 'Cancel'}</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleLogout}>{isRTL ? 'خروج' : 'Logout'}</AlertDialogAction>
+                        <AlertDialogCancel>{getLabel('Cancel', 'انصراف', 'لغوه')}</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleLogout}>{getLabel('Logout', 'خروج', 'وتل')}</AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>
