@@ -214,7 +214,7 @@ export const useProducts = (options: UseProductsOptions = {}) => {
 };
 
 // Helper to convert DB product to display format
-export const formatProductForDisplay = (product: DBProduct, language: 'fa' | 'en' = 'en') => {
+export const formatProductForDisplay = (product: DBProduct, language: 'fa' | 'en' | 'ps' = 'en') => {
   const metadata = product.metadata || {};
   // Read currency from database column first (primary source)
   const currency = product.currency || 'AFN';
