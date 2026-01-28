@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLanguage } from "@/lib/i18n";
+import { useLanguage, Language } from "@/lib/i18n";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Plus, Pencil, Trash2, GripVertical, Facebook, Twitter, Instagram, Youtube, Linkedin, Github, Globe } from "lucide-react";
 import { useAllSocialLinks, useCreateSocialLink, useUpdateSocialLink, useDeleteSocialLink, SocialLink } from "@/hooks/useSocialLinks";
 import { Skeleton } from "@/components/ui/skeleton";
+
+const getLabel = (lang: Language, en: string, fa: string, ps: string) => {
+  if (lang === 'ps') return ps;
+  if (lang === 'fa') return fa;
+  return en;
+};
 
 const PLATFORM_OPTIONS = [
   { value: "facebook", label: "Facebook", icon: Facebook },
@@ -29,7 +35,8 @@ const getIconComponent = (iconName: string) => {
 };
 
 const AdminSocialLinks = () => {
-  const { isRTL } = useLanguage();
+  const { language } = useLanguage();
+  const lang = language as Language;
   const { data: socialLinks, isLoading } = useAllSocialLinks();
   const createMutation = useCreateSocialLink();
   const updateMutation = useUpdateSocialLink();
@@ -112,45 +119,58 @@ const AdminSocialLinks = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm(isRTL ? "آیا مطمئن هستید؟" : "Are you sure you want to delete this link?")) {
+    const confirmMessage = getLabel(
+      lang,
+      "Are you sure you want to delete this link?",
+      "آیا مطمئن هستید؟",
+      "ایا تاسو ډاډه یاست چې غواړئ دا لینک حذف کړئ؟"
+    );
+    if (confirm(confirmMessage)) {
       await deleteMutation.mutateAsync(id);
     }
   };
 
   return (
-    <AdminLayout title={isRTL ? "لینک‌های شبکه‌های اجتماعی" : "Social Links"}>
+    <AdminLayout 
+      title={getLabel(lang, "Social Links", "لینک‌های شبکه‌های اجتماعی", "ټولنیز رسنیو لینکونه")}
+    >
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">
-              {isRTL ? "لینک‌های شبکه‌های اجتماعی" : "Social Links"}
+              {getLabel(lang, "Social Links", "لینک‌های شبکه‌های اجتماعی", "ټولنیز رسنیو لینکونه")}
             </h1>
             <p className="text-muted-foreground mt-1">
-              {isRTL ? "مدیریت لینک‌های شبکه‌های اجتماعی در فوتر سایت" : "Manage social media links displayed in the website footer"}
+              {getLabel(
+                lang,
+                "Manage social media links displayed in the website footer",
+                "مدیریت لینک‌های شبکه‌های اجتماعی در فوتر سایت",
+                "په ویب پاڼې فوټر کې د ټولنیزو رسنیو لینکونه اداره کړئ"
+              )}
             </p>
           </div>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button onClick={() => handleOpenDialog()}>
                 <Plus className="h-4 w-4 me-2" />
-                {isRTL ? "افزودن لینک" : "Add Link"}
+                {getLabel(lang, "Add Link", "افزودن لینک", "لینک اضافه کړئ")}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>
                   {editingLink 
-                    ? (isRTL ? "ویرایش لینک" : "Edit Link")
-                    : (isRTL ? "افزودن لینک جدید" : "Add New Link")
+                    ? getLabel(lang, "Edit Link", "ویرایش لینک", "لینک سمول")
+                    : getLabel(lang, "Add New Link", "افزودن لینک جدید", "نوی لینک اضافه کړئ")
                   }
                 </DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label>{isRTL ? "پلتفرم" : "Platform"}</Label>
+                  <Label>{getLabel(lang, "Platform", "پلتفرم", "پلیټفارم")}</Label>
                   <Select value={formData.platform} onValueChange={handlePlatformChange}>
                     <SelectTrigger>
-                      <SelectValue placeholder={isRTL ? "انتخاب پلتفرم" : "Select platform"} />
+                      <SelectValue placeholder={getLabel(lang, "Select platform", "انتخاب پلتفرم", "پلیټفارم غوره کړئ")} />
                     </SelectTrigger>
                     <SelectContent>
                       {PLATFORM_OPTIONS.map((option) => (
@@ -166,7 +186,7 @@ const AdminSocialLinks = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>{isRTL ? "آدرس URL" : "URL"}</Label>
+                  <Label>{getLabel(lang, "URL", "آدرس URL", "URL پته")}</Label>
                   <Input
                     type="url"
                     value={formData.url}
@@ -178,7 +198,7 @@ const AdminSocialLinks = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>{isRTL ? "ترتیب نمایش" : "Display Order"}</Label>
+                  <Label>{getLabel(lang, "Display Order", "ترتیب نمایش", "د ښودلو ترتیب")}</Label>
                   <Input
                     type="number"
                     value={formData.display_order}
@@ -188,7 +208,7 @@ const AdminSocialLinks = () => {
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <Label>{isRTL ? "فعال" : "Active"}</Label>
+                  <Label>{getLabel(lang, "Active", "فعال", "فعال")}</Label>
                   <Switch
                     checked={formData.is_active}
                     onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
@@ -197,12 +217,12 @@ const AdminSocialLinks = () => {
 
                 <div className="flex gap-2 justify-end pt-4">
                   <Button type="button" variant="outline" onClick={handleCloseDialog}>
-                    {isRTL ? "انصراف" : "Cancel"}
+                    {getLabel(lang, "Cancel", "انصراف", "لغوه کول")}
                   </Button>
                   <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
                     {editingLink 
-                      ? (isRTL ? "ذخیره تغییرات" : "Save Changes")
-                      : (isRTL ? "افزودن" : "Add")
+                      ? getLabel(lang, "Save Changes", "ذخیره تغییرات", "بدلونونه خوندي کړئ")
+                      : getLabel(lang, "Add", "افزودن", "اضافه کړئ")
                     }
                   </Button>
                 </div>
@@ -213,7 +233,7 @@ const AdminSocialLinks = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>{isRTL ? "لینک‌های موجود" : "Existing Links"}</CardTitle>
+            <CardTitle>{getLabel(lang, "Existing Links", "لینک‌های موجود", "موجود لینکونه")}</CardTitle>
           </CardHeader>
           <CardContent>
             {isLoading ? (
@@ -224,18 +244,18 @@ const AdminSocialLinks = () => {
               </div>
             ) : !socialLinks?.length ? (
               <div className="text-center py-8 text-muted-foreground">
-                {isRTL ? "هیچ لینکی یافت نشد" : "No social links found"}
+                {getLabel(lang, "No social links found", "هیچ لینکی یافت نشد", "هیڅ ټولنیز لینک ونه موندل شو")}
               </div>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-12">#</TableHead>
-                    <TableHead>{isRTL ? "پلتفرم" : "Platform"}</TableHead>
-                    <TableHead>{isRTL ? "آدرس" : "URL"}</TableHead>
-                    <TableHead className="text-center">{isRTL ? "وضعیت" : "Status"}</TableHead>
-                    <TableHead className="text-center">{isRTL ? "ترتیب" : "Order"}</TableHead>
-                    <TableHead className="text-end">{isRTL ? "عملیات" : "Actions"}</TableHead>
+                    <TableHead>{getLabel(lang, "Platform", "پلتفرم", "پلیټفارم")}</TableHead>
+                    <TableHead>{getLabel(lang, "URL", "آدرس", "پته")}</TableHead>
+                    <TableHead className="text-center">{getLabel(lang, "Status", "وضعیت", "حالت")}</TableHead>
+                    <TableHead className="text-center">{getLabel(lang, "Order", "ترتیب", "ترتیب")}</TableHead>
+                    <TableHead className="text-end">{getLabel(lang, "Actions", "عملیات", "عملیات")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
