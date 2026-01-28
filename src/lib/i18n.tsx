@@ -32,6 +32,7 @@ export const translations = {
       logoutTitle: "خروج از حساب",
       logoutConfirm: "آیا مطمئن هستید که می‌خواهید از حساب خود خارج شوید؟",
       menu: "منو",
+      language: "زبان",
     },
     
     // Top Bar
@@ -585,6 +586,7 @@ export const translations = {
       logoutTitle: "له حساب څخه وتل",
       logoutConfirm: "ایا تاسو ډاډه یاست چې له خپل حساب څخه وتل غواړئ؟",
       menu: "مینو",
+      language: "ژبه",
     },
     
     // Top Bar
@@ -1138,6 +1140,7 @@ export const translations = {
       logoutTitle: "Logout",
       logoutConfirm: "Are you sure you want to logout from your account?",
       menu: "Menu",
+      language: "Language",
     },
     
     // Top Bar
