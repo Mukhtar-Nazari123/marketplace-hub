@@ -44,12 +44,6 @@ const Navigation = () => {
             ))}
           </div>
 
-          {/* Special Offers */}
-          <div className={`hidden md:flex items-center gap-4 ${isRTL ? 'mr-auto' : 'ml-auto'}`}>
-            <Link to="/products?filter=sale" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-              {t.nav.specialOffer}
-            </Link>
-          </div>
         </div>
       </div>
     </nav>
