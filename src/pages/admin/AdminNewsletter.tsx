@@ -35,7 +35,7 @@ import {
   useDeleteSubscriber,
   exportSubscribersToCSV,
 } from '@/hooks/useNewsletter';
-import { useLanguage } from '@/lib/i18n';
+import { useLanguage, Language } from '@/lib/i18n';
 import {
   Search,
   Download,
@@ -50,8 +50,15 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 
+const getLabel = (lang: Language, en: string, fa: string, ps: string) => {
+  if (lang === 'ps') return ps;
+  if (lang === 'fa') return fa;
+  return en;
+};
+
 const AdminNewsletter = () => {
-  const { t, isRTL } = useLanguage();
+  const { language } = useLanguage();
+  const lang = language as Language;
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'unsubscribed'>('all');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -96,8 +103,8 @@ const AdminNewsletter = () => {
 
   return (
     <AdminLayout
-      title={isRTL ? 'اعضای خبرنامه' : 'Newsletter Subscribers'}
-      description={isRTL ? 'مدیریت اعضای خبرنامه' : 'Manage newsletter subscribers'}
+      title={getLabel(lang, 'Newsletter Subscribers', 'اعضای خبرنامه', 'د خبرپاڼې غړي')}
+      description={getLabel(lang, 'Manage newsletter subscribers', 'مدیریت اعضای خبرنامه', 'د خبرپاڼې غړو اداره کول')}
     >
       <div className="space-y-6 animate-fade-in">
         {/* Stats Cards */}
@@ -105,7 +112,7 @@ const AdminNewsletter = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">
-                {isRTL ? 'کل اعضا' : 'Total Subscribers'}
+                {getLabel(lang, 'Total Subscribers', 'کل اعضا', 'ټول غړي')}
               </CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
@@ -116,7 +123,7 @@ const AdminNewsletter = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">
-                {isRTL ? 'اعضای فعال' : 'Active'}
+                {getLabel(lang, 'Active', 'اعضای فعال', 'فعال غړي')}
               </CardTitle>
               <UserCheck className="h-4 w-4 text-green-500" />
             </CardHeader>
@@ -127,7 +134,7 @@ const AdminNewsletter = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">
-                {isRTL ? 'لغو عضویت' : 'Unsubscribed'}
+                {getLabel(lang, 'Unsubscribed', 'لغو عضویت', 'غړیتوب لغوه شوی')}
               </CardTitle>
               <UserX className="h-4 w-4 text-red-500" />
             </CardHeader>
@@ -145,7 +152,7 @@ const AdminNewsletter = () => {
                 <div className="relative flex-1 max-w-sm">
                   <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder={isRTL ? 'جستجوی ایمیل...' : 'Search emails...'}
+                    placeholder={getLabel(lang, 'Search emails...', 'جستجوی ایمیل...', 'بریښنالیک لټون...')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="ps-9"
@@ -155,28 +162,28 @@ const AdminNewsletter = () => {
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline">
                       {statusFilter === 'all'
-                        ? isRTL ? 'همه' : 'All'
+                        ? getLabel(lang, 'All', 'همه', 'ټول')
                         : statusFilter === 'active'
-                        ? isRTL ? 'فعال' : 'Active'
-                        : isRTL ? 'لغو شده' : 'Unsubscribed'}
+                        ? getLabel(lang, 'Active', 'فعال', 'فعال')
+                        : getLabel(lang, 'Unsubscribed', 'لغو شده', 'لغوه شوی')}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     <DropdownMenuItem onClick={() => setStatusFilter('all')}>
-                      {isRTL ? 'همه' : 'All'}
+                      {getLabel(lang, 'All', 'همه', 'ټول')}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setStatusFilter('active')}>
-                      {isRTL ? 'فعال' : 'Active'}
+                      {getLabel(lang, 'Active', 'فعال', 'فعال')}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setStatusFilter('unsubscribed')}>
-                      {isRTL ? 'لغو شده' : 'Unsubscribed'}
+                      {getLabel(lang, 'Unsubscribed', 'لغو شده', 'لغوه شوی')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
               <Button onClick={handleExport} disabled={filteredSubscribers.length === 0}>
                 <Download className="h-4 w-4 me-2" />
-                {isRTL ? 'خروجی CSV' : 'Export CSV'}
+                {getLabel(lang, 'Export CSV', 'خروجی CSV', 'CSV صادرول')}
               </Button>
             </div>
           </CardHeader>
@@ -191,7 +198,7 @@ const AdminNewsletter = () => {
               <div className="text-center py-12">
                 <Mail className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground">
-                  {isRTL ? 'هیچ عضوی یافت نشد' : 'No subscribers found'}
+                  {getLabel(lang, 'No subscribers found', 'هیچ عضوی یافت نشد', 'هیڅ غړی ونه موندل شو')}
                 </p>
               </div>
             ) : (
@@ -199,9 +206,9 @@ const AdminNewsletter = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>{isRTL ? 'ایمیل' : 'Email'}</TableHead>
-                      <TableHead>{isRTL ? 'وضعیت' : 'Status'}</TableHead>
-                      <TableHead>{isRTL ? 'تاریخ عضویت' : 'Subscribed'}</TableHead>
+                      <TableHead>{getLabel(lang, 'Email', 'ایمیل', 'بریښنالیک')}</TableHead>
+                      <TableHead>{getLabel(lang, 'Status', 'وضعیت', 'حالت')}</TableHead>
+                      <TableHead>{getLabel(lang, 'Subscribed', 'تاریخ عضویت', 'د غړیتوب نیټه')}</TableHead>
                       <TableHead className="w-[70px]"></TableHead>
                     </TableRow>
                   </TableHeader>
@@ -219,8 +226,8 @@ const AdminNewsletter = () => {
                             }
                           >
                             {subscriber.status === 'active'
-                              ? isRTL ? 'فعال' : 'Active'
-                              : isRTL ? 'لغو شده' : 'Unsubscribed'}
+                              ? getLabel(lang, 'Active', 'فعال', 'فعال')
+                              : getLabel(lang, 'Unsubscribed', 'لغو شده', 'لغوه شوی')}
                           </Badge>
                         </TableCell>
                         <TableCell>
@@ -240,12 +247,12 @@ const AdminNewsletter = () => {
                                 {subscriber.status === 'active' ? (
                                   <>
                                     <ToggleLeft className="h-4 w-4 me-2" />
-                                    {isRTL ? 'غیرفعال کردن' : 'Deactivate'}
+                                    {getLabel(lang, 'Deactivate', 'غیرفعال کردن', 'غیر فعال کول')}
                                   </>
                                 ) : (
                                   <>
                                     <ToggleRight className="h-4 w-4 me-2" />
-                                    {isRTL ? 'فعال کردن' : 'Activate'}
+                                    {getLabel(lang, 'Activate', 'فعال کردن', 'فعال کول')}
                                   </>
                                 )}
                               </DropdownMenuItem>
@@ -257,7 +264,7 @@ const AdminNewsletter = () => {
                                 }}
                               >
                                 <Trash2 className="h-4 w-4 me-2" />
-                                {isRTL ? 'حذف' : 'Delete'}
+                                {getLabel(lang, 'Delete', 'حذف', 'حذف کول')}
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -277,18 +284,21 @@ const AdminNewsletter = () => {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {isRTL ? 'حذف عضو' : 'Delete Subscriber'}
+              {getLabel(lang, 'Delete Subscriber', 'حذف عضو', 'غړی حذف کول')}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {isRTL
-                ? 'آیا مطمئن هستید که می‌خواهید این عضو را حذف کنید؟ این عمل قابل بازگشت نیست.'
-                : 'Are you sure you want to delete this subscriber? This action cannot be undone.'}
+              {getLabel(
+                lang,
+                'Are you sure you want to delete this subscriber? This action cannot be undone.',
+                'آیا مطمئن هستید که می‌خواهید این عضو را حذف کنید؟ این عمل قابل بازگشت نیست.',
+                'ایا تاسو ډاډه یاست چې غواړئ دا غړی حذف کړئ؟ دا عمل بیرته نشي راوستل کیدی.'
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{isRTL ? 'انصراف' : 'Cancel'}</AlertDialogCancel>
+            <AlertDialogCancel>{getLabel(lang, 'Cancel', 'انصراف', 'لغوه کول')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
-              {isRTL ? 'حذف' : 'Delete'}
+              {getLabel(lang, 'Delete', 'حذف', 'حذف کول')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
