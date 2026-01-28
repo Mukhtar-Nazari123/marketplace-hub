@@ -19,12 +19,14 @@ export type Database = {
           created_at: string
           description_en: string | null
           description_fa: string | null
+          description_ps: string | null
           icon_or_image: string | null
           id: string
           is_active: boolean
           priority: number
           title_en: string
           title_fa: string | null
+          title_ps: string | null
           updated_at: string
           year: number | null
         }
@@ -32,12 +34,14 @@ export type Database = {
           created_at?: string
           description_en?: string | null
           description_fa?: string | null
+          description_ps?: string | null
           icon_or_image?: string | null
           id?: string
           is_active?: boolean
           priority?: number
           title_en: string
           title_fa?: string | null
+          title_ps?: string | null
           updated_at?: string
           year?: number | null
         }
@@ -45,12 +49,14 @@ export type Database = {
           created_at?: string
           description_en?: string | null
           description_fa?: string | null
+          description_ps?: string | null
           icon_or_image?: string | null
           id?: string
           is_active?: boolean
           priority?: number
           title_en?: string
           title_fa?: string | null
+          title_ps?: string | null
           updated_at?: string
           year?: number | null
         }
@@ -60,9 +66,11 @@ export type Database = {
         Row: {
           content_en: string | null
           content_fa: string | null
+          content_ps: string | null
           created_at: string
           description_en: string | null
           description_fa: string | null
+          description_ps: string | null
           icon: string | null
           id: string
           is_active: boolean
@@ -71,14 +79,17 @@ export type Database = {
           start_year: number | null
           title_en: string
           title_fa: string | null
+          title_ps: string | null
           updated_at: string
         }
         Insert: {
           content_en?: string | null
           content_fa?: string | null
+          content_ps?: string | null
           created_at?: string
           description_en?: string | null
           description_fa?: string | null
+          description_ps?: string | null
           icon?: string | null
           id?: string
           is_active?: boolean
@@ -87,14 +98,17 @@ export type Database = {
           start_year?: number | null
           title_en: string
           title_fa?: string | null
+          title_ps?: string | null
           updated_at?: string
         }
         Update: {
           content_en?: string | null
           content_fa?: string | null
+          content_ps?: string | null
           created_at?: string
           description_en?: string | null
           description_fa?: string | null
+          description_ps?: string | null
           icon?: string | null
           id?: string
           is_active?: boolean
@@ -103,6 +117,7 @@ export type Database = {
           start_year?: number | null
           title_en?: string
           title_fa?: string | null
+          title_ps?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -112,42 +127,51 @@ export type Database = {
           created_at: string
           description_en: string | null
           description_fa: string | null
+          description_ps: string | null
           id: string
           is_active: boolean
           name_en: string
           name_fa: string | null
+          name_ps: string | null
           photo_url: string | null
           priority: number
           role_en: string
           role_fa: string | null
+          role_ps: string | null
           updated_at: string
         }
         Insert: {
           created_at?: string
           description_en?: string | null
           description_fa?: string | null
+          description_ps?: string | null
           id?: string
           is_active?: boolean
           name_en: string
           name_fa?: string | null
+          name_ps?: string | null
           photo_url?: string | null
           priority?: number
           role_en: string
           role_fa?: string | null
+          role_ps?: string | null
           updated_at?: string
         }
         Update: {
           created_at?: string
           description_en?: string | null
           description_fa?: string | null
+          description_ps?: string | null
           id?: string
           is_active?: boolean
           name_en?: string
           name_fa?: string | null
+          name_ps?: string | null
           photo_url?: string | null
           priority?: number
           role_en?: string
           role_fa?: string | null
+          role_ps?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -157,36 +181,42 @@ export type Database = {
           created_at: string
           description_en: string | null
           description_fa: string | null
+          description_ps: string | null
           icon: string
           id: string
           is_active: boolean
           priority: number
           title_en: string
           title_fa: string | null
+          title_ps: string | null
           updated_at: string
         }
         Insert: {
           created_at?: string
           description_en?: string | null
           description_fa?: string | null
+          description_ps?: string | null
           icon?: string
           id?: string
           is_active?: boolean
           priority?: number
           title_en: string
           title_fa?: string | null
+          title_ps?: string | null
           updated_at?: string
         }
         Update: {
           created_at?: string
           description_en?: string | null
           description_fa?: string | null
+          description_ps?: string | null
           icon?: string
           id?: string
           is_active?: boolean
           priority?: number
           title_en?: string
           title_fa?: string | null
+          title_ps?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -230,6 +260,7 @@ export type Database = {
           is_read: boolean | null
           message_en: string
           message_fa: string
+          message_ps: string | null
           order_currency: string | null
           order_number: string | null
           order_total: number | null
@@ -243,6 +274,7 @@ export type Database = {
           store_name: string | null
           title_en: string
           title_fa: string
+          title_ps: string | null
           type: string
         }
         Insert: {
@@ -253,6 +285,7 @@ export type Database = {
           is_read?: boolean | null
           message_en: string
           message_fa: string
+          message_ps?: string | null
           order_currency?: string | null
           order_number?: string | null
           order_total?: number | null
@@ -266,6 +299,7 @@ export type Database = {
           store_name?: string | null
           title_en: string
           title_fa: string
+          title_ps?: string | null
           type: string
         }
         Update: {
@@ -276,6 +310,7 @@ export type Database = {
           is_read?: boolean | null
           message_en?: string
           message_fa?: string
+          message_ps?: string | null
           order_currency?: string | null
           order_number?: string | null
           order_total?: number | null
@@ -289,6 +324,7 @@ export type Database = {
           store_name?: string | null
           title_en?: string
           title_fa?: string
+          title_ps?: string | null
           type?: string
         }
         Relationships: []
@@ -343,10 +379,12 @@ export type Database = {
           created_at: string
           description: string | null
           description_fa: string | null
+          description_ps: string | null
           id: string
           is_active: boolean
           name: string
           name_fa: string | null
+          name_ps: string | null
           slug: string
           sort_order: number
           updated_at: string
@@ -355,10 +393,12 @@ export type Database = {
           created_at?: string
           description?: string | null
           description_fa?: string | null
+          description_ps?: string | null
           id?: string
           is_active?: boolean
           name: string
           name_fa?: string | null
+          name_ps?: string | null
           slug: string
           sort_order?: number
           updated_at?: string
@@ -367,10 +407,12 @@ export type Database = {
           created_at?: string
           description?: string | null
           description_fa?: string | null
+          description_ps?: string | null
           id?: string
           is_active?: boolean
           name?: string
           name_fa?: string | null
+          name_ps?: string | null
           slug?: string
           sort_order?: number
           updated_at?: string
@@ -381,78 +423,99 @@ export type Database = {
         Row: {
           author_name: string
           author_name_fa: string | null
+          author_name_ps: string | null
           category_id: string | null
           content: string | null
           content_fa: string | null
+          content_ps: string | null
           cover_image_url: string | null
           created_at: string
           excerpt: string | null
           excerpt_fa: string | null
+          excerpt_ps: string | null
           id: string
           is_featured: boolean
           is_published: boolean
           meta_description: string | null
           meta_description_fa: string | null
+          meta_description_ps: string | null
           meta_title: string | null
           meta_title_fa: string | null
+          meta_title_ps: string | null
           published_at: string | null
           slug: string
           tags: string[] | null
           tags_fa: string[] | null
+          tags_ps: string[] | null
           title: string
           title_fa: string | null
+          title_ps: string | null
           updated_at: string
           views_count: number
         }
         Insert: {
           author_name?: string
           author_name_fa?: string | null
+          author_name_ps?: string | null
           category_id?: string | null
           content?: string | null
           content_fa?: string | null
+          content_ps?: string | null
           cover_image_url?: string | null
           created_at?: string
           excerpt?: string | null
           excerpt_fa?: string | null
+          excerpt_ps?: string | null
           id?: string
           is_featured?: boolean
           is_published?: boolean
           meta_description?: string | null
           meta_description_fa?: string | null
+          meta_description_ps?: string | null
           meta_title?: string | null
           meta_title_fa?: string | null
+          meta_title_ps?: string | null
           published_at?: string | null
           slug: string
           tags?: string[] | null
           tags_fa?: string[] | null
+          tags_ps?: string[] | null
           title: string
           title_fa?: string | null
+          title_ps?: string | null
           updated_at?: string
           views_count?: number
         }
         Update: {
           author_name?: string
           author_name_fa?: string | null
+          author_name_ps?: string | null
           category_id?: string | null
           content?: string | null
           content_fa?: string | null
+          content_ps?: string | null
           cover_image_url?: string | null
           created_at?: string
           excerpt?: string | null
           excerpt_fa?: string | null
+          excerpt_ps?: string | null
           id?: string
           is_featured?: boolean
           is_published?: boolean
           meta_description?: string | null
           meta_description_fa?: string | null
+          meta_description_ps?: string | null
           meta_title?: string | null
           meta_title_fa?: string | null
+          meta_title_ps?: string | null
           published_at?: string | null
           slug?: string
           tags?: string[] | null
           tags_fa?: string[] | null
+          tags_ps?: string[] | null
           title?: string
           title_fa?: string | null
+          title_ps?: string | null
           updated_at?: string
           views_count?: number
         }
@@ -510,6 +573,7 @@ export type Database = {
           is_active: boolean
           name: string
           name_fa: string | null
+          name_ps: string | null
           parent_id: string | null
           slug: string
           sort_order: number
@@ -523,6 +587,7 @@ export type Database = {
           is_active?: boolean
           name: string
           name_fa?: string | null
+          name_ps?: string | null
           parent_id?: string | null
           slug: string
           sort_order?: number
@@ -536,6 +601,7 @@ export type Database = {
           is_active?: boolean
           name?: string
           name_fa?: string | null
+          name_ps?: string | null
           parent_id?: string | null
           slug?: string
           sort_order?: number
@@ -647,12 +713,15 @@ export type Database = {
           background_image: string | null
           badge_text: string | null
           badge_text_fa: string | null
+          badge_text_ps: string | null
           created_at: string
           cta_link: string | null
           cta_text: string | null
           cta_text_fa: string | null
+          cta_text_ps: string | null
           description: string | null
           description_fa: string | null
+          description_ps: string | null
           display_order: number
           highlight_words: string[] | null
           icon_image: string | null
@@ -660,6 +729,7 @@ export type Database = {
           is_active: boolean
           title: string
           title_fa: string | null
+          title_ps: string | null
           updated_at: string
         }
         Insert: {
@@ -667,12 +737,15 @@ export type Database = {
           background_image?: string | null
           badge_text?: string | null
           badge_text_fa?: string | null
+          badge_text_ps?: string | null
           created_at?: string
           cta_link?: string | null
           cta_text?: string | null
           cta_text_fa?: string | null
+          cta_text_ps?: string | null
           description?: string | null
           description_fa?: string | null
+          description_ps?: string | null
           display_order?: number
           highlight_words?: string[] | null
           icon_image?: string | null
@@ -680,6 +753,7 @@ export type Database = {
           is_active?: boolean
           title: string
           title_fa?: string | null
+          title_ps?: string | null
           updated_at?: string
         }
         Update: {
@@ -687,12 +761,15 @@ export type Database = {
           background_image?: string | null
           badge_text?: string | null
           badge_text_fa?: string | null
+          badge_text_ps?: string | null
           created_at?: string
           cta_link?: string | null
           cta_text?: string | null
           cta_text_fa?: string | null
+          cta_text_ps?: string | null
           description?: string | null
           description_fa?: string | null
+          description_ps?: string | null
           display_order?: number
           highlight_words?: string[] | null
           icon_image?: string | null
@@ -700,6 +777,7 @@ export type Database = {
           is_active?: boolean
           title?: string
           title_fa?: string | null
+          title_ps?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -711,6 +789,7 @@ export type Database = {
           background_type: string
           button_text_en: string | null
           button_text_fa: string | null
+          button_text_ps: string | null
           button_url: string | null
           created_at: string
           icon_or_image_path: string | null
@@ -718,11 +797,14 @@ export type Database = {
           is_active: boolean
           price_text_en: string | null
           price_text_fa: string | null
+          price_text_ps: string | null
           priority: number
           subtitle_en: string | null
           subtitle_fa: string | null
+          subtitle_ps: string | null
           title_en: string
           title_fa: string | null
+          title_ps: string | null
           updated_at: string
         }
         Insert: {
@@ -731,6 +813,7 @@ export type Database = {
           background_type?: string
           button_text_en?: string | null
           button_text_fa?: string | null
+          button_text_ps?: string | null
           button_url?: string | null
           created_at?: string
           icon_or_image_path?: string | null
@@ -738,11 +821,14 @@ export type Database = {
           is_active?: boolean
           price_text_en?: string | null
           price_text_fa?: string | null
+          price_text_ps?: string | null
           priority?: number
           subtitle_en?: string | null
           subtitle_fa?: string | null
+          subtitle_ps?: string | null
           title_en: string
           title_fa?: string | null
+          title_ps?: string | null
           updated_at?: string
         }
         Update: {
@@ -751,6 +837,7 @@ export type Database = {
           background_type?: string
           button_text_en?: string | null
           button_text_fa?: string | null
+          button_text_ps?: string | null
           button_url?: string | null
           created_at?: string
           icon_or_image_path?: string | null
@@ -758,11 +845,14 @@ export type Database = {
           is_active?: boolean
           price_text_en?: string | null
           price_text_fa?: string | null
+          price_text_ps?: string | null
           priority?: number
           subtitle_en?: string | null
           subtitle_fa?: string | null
+          subtitle_ps?: string | null
           title_en?: string
           title_fa?: string | null
+          title_ps?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -805,6 +895,7 @@ export type Database = {
           is_read: boolean | null
           message_en: string
           message_fa: string
+          message_ps: string | null
           order_currency: string | null
           order_id: string | null
           order_number: string | null
@@ -822,6 +913,7 @@ export type Database = {
           store_name: string | null
           title_en: string
           title_fa: string
+          title_ps: string | null
           type: string
           user_id: string
           user_role: string
@@ -833,6 +925,7 @@ export type Database = {
           is_read?: boolean | null
           message_en: string
           message_fa: string
+          message_ps?: string | null
           order_currency?: string | null
           order_id?: string | null
           order_number?: string | null
@@ -850,6 +943,7 @@ export type Database = {
           store_name?: string | null
           title_en: string
           title_fa: string
+          title_ps?: string | null
           type: string
           user_id: string
           user_role: string
@@ -861,6 +955,7 @@ export type Database = {
           is_read?: boolean | null
           message_en?: string
           message_fa?: string
+          message_ps?: string | null
           order_currency?: string | null
           order_id?: string | null
           order_number?: string | null
@@ -878,6 +973,7 @@ export type Database = {
           store_name?: string | null
           title_en?: string
           title_fa?: string
+          title_ps?: string | null
           type?: string
           user_id?: string
           user_role?: string
@@ -1158,6 +1254,7 @@ export type Database = {
         Row: {
           badge_text: string | null
           badge_text_fa: string | null
+          badge_text_ps: string | null
           badge_variant: string
           category_id: string | null
           color_theme: string
@@ -1172,13 +1269,16 @@ export type Database = {
           starting_price: number
           subtitle: string | null
           subtitle_fa: string | null
+          subtitle_ps: string | null
           title: string
           title_fa: string | null
+          title_ps: string | null
           updated_at: string
         }
         Insert: {
           badge_text?: string | null
           badge_text_fa?: string | null
+          badge_text_ps?: string | null
           badge_variant?: string
           category_id?: string | null
           color_theme?: string
@@ -1193,13 +1293,16 @@ export type Database = {
           starting_price?: number
           subtitle?: string | null
           subtitle_fa?: string | null
+          subtitle_ps?: string | null
           title: string
           title_fa?: string | null
+          title_ps?: string | null
           updated_at?: string
         }
         Update: {
           badge_text?: string | null
           badge_text_fa?: string | null
+          badge_text_ps?: string | null
           badge_variant?: string
           category_id?: string | null
           color_theme?: string
@@ -1214,8 +1317,10 @@ export type Database = {
           starting_price?: number
           subtitle?: string | null
           subtitle_fa?: string | null
+          subtitle_ps?: string | null
           title?: string
           title_fa?: string | null
+          title_ps?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -1493,6 +1598,7 @@ export type Database = {
         Row: {
           address_en: string | null
           address_fa: string | null
+          address_ps: string | null
           created_at: string
           id: string
           phone: string | null
@@ -1501,10 +1607,12 @@ export type Database = {
           updated_by: string | null
           working_hours_en: string | null
           working_hours_fa: string | null
+          working_hours_ps: string | null
         }
         Insert: {
           address_en?: string | null
           address_fa?: string | null
+          address_ps?: string | null
           created_at?: string
           id?: string
           phone?: string | null
@@ -1513,10 +1621,12 @@ export type Database = {
           updated_by?: string | null
           working_hours_en?: string | null
           working_hours_fa?: string | null
+          working_hours_ps?: string | null
         }
         Update: {
           address_en?: string | null
           address_fa?: string | null
+          address_ps?: string | null
           created_at?: string
           id?: string
           phone?: string | null
@@ -1525,6 +1635,7 @@ export type Database = {
           updated_by?: string | null
           working_hours_en?: string | null
           working_hours_fa?: string | null
+          working_hours_ps?: string | null
         }
         Relationships: []
       }
@@ -1536,6 +1647,7 @@ export type Database = {
           logo_url: string | null
           site_name_en: string
           site_name_fa: string
+          site_name_ps: string | null
           updated_at: string
         }
         Insert: {
@@ -1545,6 +1657,7 @@ export type Database = {
           logo_url?: string | null
           site_name_en?: string
           site_name_fa?: string
+          site_name_ps?: string | null
           updated_at?: string
         }
         Update: {
@@ -1554,6 +1667,7 @@ export type Database = {
           logo_url?: string | null
           site_name_en?: string
           site_name_fa?: string
+          site_name_ps?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -1601,6 +1715,7 @@ export type Database = {
           is_active: boolean
           name: string
           name_fa: string | null
+          name_ps: string | null
           slug: string
           sort_order: number
           updated_at: string
@@ -1614,6 +1729,7 @@ export type Database = {
           is_active?: boolean
           name: string
           name_fa?: string | null
+          name_ps?: string | null
           slug: string
           sort_order?: number
           updated_at?: string
@@ -1627,6 +1743,7 @@ export type Database = {
           is_active?: boolean
           name?: string
           name_fa?: string | null
+          name_ps?: string | null
           slug?: string
           sort_order?: number
           updated_at?: string

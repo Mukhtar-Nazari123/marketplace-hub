@@ -6,11 +6,12 @@ import { useLanguage } from '@/lib/i18n';
 import { useCategories, Category } from '@/hooks/useCategories';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
+import { getCategoryName, getSubcategoryName } from '@/lib/localizedContent';
 
 const CategoryMegaMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<Category | null>(null);
-  const { t, isRTL } = useLanguage();
+  const { t, isRTL, language } = useLanguage();
   const { categories, loading } = useCategories();
 
   const handleCategoryHover = (category: Category) => {
@@ -82,7 +83,7 @@ const CategoryMegaMenu = () => {
                     onMouseEnter={() => handleCategoryHover(category)}
                   >
                     <span className="font-medium text-sm">
-                      {isRTL && category.name_fa ? category.name_fa : category.name}
+                      {getCategoryName(category, language)}
                     </span>
                     {isRTL ? (
                       <ChevronLeft className="h-4 w-4 text-muted-foreground" />
@@ -94,7 +95,7 @@ const CategoryMegaMenu = () => {
               </div>
             ) : (
               <div className="px-4 py-6 text-center text-muted-foreground text-sm">
-                {isRTL ? 'دسته‌بندی موجود نیست' : 'No categories available'}
+                {language === 'ps' ? 'کټګورۍ نشته' : isRTL ? 'دسته‌بندی موجود نیست' : 'No categories available'}
               </div>
             )}
           </div>
@@ -111,7 +112,7 @@ const CategoryMegaMenu = () => {
                     className="text-lg font-bold text-foreground hover:text-primary transition-colors"
                     onClick={() => setIsOpen(false)}
                   >
-                    {isRTL && activeCategory.name_fa ? activeCategory.name_fa : activeCategory.name}
+                    {getCategoryName(activeCategory, language)}
                   </Link>
                 </div>
 
@@ -131,7 +132,7 @@ const CategoryMegaMenu = () => {
                             {sub.image_url ? (
                               <img
                                 src={sub.image_url}
-                                alt={isRTL && sub.name_fa ? sub.name_fa : sub.name}
+                                alt={getSubcategoryName(sub, language)}
                                 className="w-full h-full object-cover"
                                 loading="lazy"
                               />
@@ -147,27 +148,27 @@ const CategoryMegaMenu = () => {
                               variant="sale" 
                               className={`absolute -top-1 text-[10px] px-1.5 py-0 ${isRTL ? '-left-1' : '-right-1'}`}
                             >
-                              {isRTL ? 'داغ' : 'HOT'}
+                              {language === 'ps' ? 'تود' : isRTL ? 'داغ' : 'HOT'}
                             </Badge>
                           )}
                         </div>
 
                         {/* Subcategory Name */}
                         <span className="mt-2 text-xs text-foreground group-hover:text-primary transition-colors line-clamp-2 max-w-[80px]">
-                          {isRTL && sub.name_fa ? sub.name_fa : sub.name}
+                          {getSubcategoryName(sub, language)}
                         </span>
                       </Link>
                     ))}
                   </div>
                 ) : (
                   <div className="flex items-center justify-center h-48 text-muted-foreground text-sm">
-                    {isRTL ? 'زیرمجموعه‌ای موجود نیست' : 'No subcategories available'}
+                    {language === 'ps' ? 'فرعي کټګورۍ نشته' : isRTL ? 'زیرمجموعه‌ای موجود نیست' : 'No subcategories available'}
                   </div>
                 )}
               </>
             ) : (
               <div className="flex items-center justify-center h-full text-muted-foreground">
-                {isRTL ? 'یک دسته‌بندی انتخاب کنید' : 'Select a category'}
+                {language === 'ps' ? 'کټګوري وټاکئ' : isRTL ? 'یک دسته‌بندی انتخاب کنید' : 'Select a category'}
               </div>
             )}
           </div>
