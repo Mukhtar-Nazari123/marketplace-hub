@@ -6,6 +6,7 @@ interface Step {
   id: number;
   title: string;
   titleFa: string;
+  titlePs?: string;
 }
 
 interface ProfileStepperProps {
@@ -15,7 +16,19 @@ interface ProfileStepperProps {
 }
 
 export const ProfileStepper = ({ steps, currentStep, onStepClick }: ProfileStepperProps) => {
-  const { isRTL } = useLanguage();
+  const { isRTL, language } = useLanguage();
+
+  const getStepTitle = (step: Step) => {
+    if (language === 'ps' && step.titlePs) return step.titlePs;
+    if (language === 'fa' && step.titleFa) return step.titleFa;
+    return step.title;
+  };
+
+  const getCurrentStepLabel = () => {
+    if (language === 'ps') return 'اوسنی مرحله';
+    if (language === 'fa') return 'مرحله فعلی';
+    return 'Current step';
+  };
 
   return (
     <div className="w-full">
@@ -51,7 +64,7 @@ export const ProfileStepper = ({ steps, currentStep, onStepClick }: ProfileStepp
                   currentStep >= step.id ? "text-foreground" : "text-muted-foreground"
                 )}
               >
-                {isRTL ? step.titleFa : step.title}
+                {getStepTitle(step)}
               </span>
             </div>
             {index < steps.length - 1 && (
@@ -108,11 +121,11 @@ export const ProfileStepper = ({ steps, currentStep, onStepClick }: ProfileStepp
                   currentStep >= step.id ? "text-foreground" : "text-muted-foreground"
                 )}
               >
-                {isRTL ? step.titleFa : step.title}
+                {getStepTitle(step)}
               </span>
               {currentStep === step.id && (
                 <div className="text-xs text-muted-foreground mt-1">
-                  {isRTL ? 'مرحله فعلی' : 'Current step'}
+                  {getCurrentStepLabel()}
                 </div>
               )}
             </div>

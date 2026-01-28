@@ -10,11 +10,13 @@ import Footer from '@/components/layout/Footer';
 import StickyNavbar from '@/components/layout/StickyNavbar';
 import { ClipboardCheck, Clock, ArrowRight, ArrowLeft, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useSellerProfileTranslations } from '@/lib/seller-profile-translations';
 
 const SellerProfileChoice = () => {
   const { user, role, loading } = useAuth();
-  const { isRTL } = useLanguage();
+  const { isRTL, language } = useLanguage();
   const navigate = useNavigate();
+  const { t } = useSellerProfileTranslations(language as 'en' | 'fa' | 'ps');
 
   useEffect(() => {
     if (!loading) {
@@ -34,6 +36,8 @@ const SellerProfileChoice = () => {
     );
   }
 
+  const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
+
   return (
     <div className={cn("min-h-screen flex flex-col bg-background", isRTL && "rtl")}>
       {/* Auto-hide Sticky Navbar */}
@@ -50,12 +54,10 @@ const SellerProfileChoice = () => {
               <Sparkles className="w-8 h-8 text-primary" />
             </div>
             <h1 className="text-3xl md:text-4xl font-bold mb-4">
-              {isRTL ? 'به خانواده فروشندگان خوش آمدید!' : 'Welcome to the Seller Family!'}
+              {t('choice', 'welcomeTitle')}
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              {isRTL 
-                ? 'برای شروع فروش، ابتدا باید پروفایل فروشندگی خود را تکمیل کنید. این کار فقط چند دقیقه طول می‌کشد.' 
-                : 'To start selling, you need to complete your seller profile first. This only takes a few minutes.'}
+              {t('choice', 'welcomeSubtitle')}
             </p>
           </div>
 
@@ -74,30 +76,30 @@ const SellerProfileChoice = () => {
                   <ClipboardCheck className="w-7 h-7 text-primary" />
                 </div>
                 <CardTitle className="text-xl">
-                  {isRTL ? 'همین الان تکمیل کنم' : 'Complete Now'}
+                  {t('choice', 'completeNow')}
                 </CardTitle>
                 <CardDescription>
-                  {isRTL ? 'پروفایل خود را در چند دقیقه تکمیل کنید' : 'Complete your profile in a few minutes'}
+                  {t('choice', 'completeNowDesc')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="text-center">
                 <ul className={cn("text-sm text-muted-foreground space-y-2 mb-6", isRTL && "text-right")}>
                   <li className="flex items-center gap-2">
-                    {isRTL ? <ArrowLeft className="w-4 h-4 text-primary" /> : <ArrowRight className="w-4 h-4 text-primary" />}
-                    {isRTL ? 'فرم ساده و مرحله‌ای' : 'Simple step-by-step form'}
+                    <ArrowIcon className="w-4 h-4 text-primary" />
+                    {t('choice', 'simpleForm')}
                   </li>
                   <li className="flex items-center gap-2">
-                    {isRTL ? <ArrowLeft className="w-4 h-4 text-primary" /> : <ArrowRight className="w-4 h-4 text-primary" />}
-                    {isRTL ? 'ذخیره خودکار اطلاعات' : 'Auto-save your progress'}
+                    <ArrowIcon className="w-4 h-4 text-primary" />
+                    {t('choice', 'autoSave')}
                   </li>
                   <li className="flex items-center gap-2">
-                    {isRTL ? <ArrowLeft className="w-4 h-4 text-primary" /> : <ArrowRight className="w-4 h-4 text-primary" />}
-                    {isRTL ? 'بررسی سریع توسط تیم پشتیبانی' : 'Quick review by our team'}
+                    <ArrowIcon className="w-4 h-4 text-primary" />
+                    {t('choice', 'quickReview')}
                   </li>
                 </ul>
                 <Button className="w-full group-hover:bg-primary/90">
-                  {isRTL ? 'شروع کنید' : 'Get Started'}
-                  {isRTL ? <ArrowLeft className="w-4 h-4 mr-2" /> : <ArrowRight className="w-4 h-4 ml-2" />}
+                  {t('buttons', 'getStarted')}
+                  <ArrowIcon className={cn("w-4 h-4", isRTL ? "mr-2" : "ml-2")} />
                 </Button>
               </CardContent>
             </Card>
@@ -114,30 +116,30 @@ const SellerProfileChoice = () => {
                   <Clock className="w-7 h-7 text-muted-foreground" />
                 </div>
                 <CardTitle className="text-xl">
-                  {isRTL ? 'بعداً تکمیل می‌کنم' : 'Complete Later'}
+                  {t('choice', 'completeLater')}
                 </CardTitle>
                 <CardDescription>
-                  {isRTL ? 'فعلاً وارد داشبورد شوید' : 'Go to your dashboard for now'}
+                  {t('choice', 'completeLaterDesc')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="text-center">
                 <ul className={cn("text-sm text-muted-foreground space-y-2 mb-6", isRTL && "text-right")}>
                   <li className="flex items-center gap-2">
-                    {isRTL ? <ArrowLeft className="w-4 h-4 text-muted-foreground" /> : <ArrowRight className="w-4 h-4 text-muted-foreground" />}
-                    {isRTL ? 'مشاهده وضعیت حساب' : 'View your account status'}
+                    <ArrowIcon className="w-4 h-4 text-muted-foreground" />
+                    {t('choice', 'viewAccountStatus')}
                   </li>
                   <li className="flex items-center gap-2">
-                    {isRTL ? <ArrowLeft className="w-4 h-4 text-muted-foreground" /> : <ArrowRight className="w-4 h-4 text-muted-foreground" />}
-                    {isRTL ? 'یادآوری برای تکمیل پروفایل' : 'Reminder to complete profile'}
+                    <ArrowIcon className="w-4 h-4 text-muted-foreground" />
+                    {t('choice', 'reminderToComplete')}
                   </li>
                   <li className="flex items-center gap-2">
-                    {isRTL ? <ArrowLeft className="w-4 h-4 text-muted-foreground" /> : <ArrowRight className="w-4 h-4 text-muted-foreground" />}
-                    {isRTL ? 'دسترسی محدود تا تأیید' : 'Limited access until approval'}
+                    <ArrowIcon className="w-4 h-4 text-muted-foreground" />
+                    {t('choice', 'limitedAccess')}
                   </li>
                 </ul>
                 <Button variant="outline" className="w-full">
-                  {isRTL ? 'ادامه به داشبورد' : 'Continue to Dashboard'}
-                  {isRTL ? <ArrowLeft className="w-4 h-4 mr-2" /> : <ArrowRight className="w-4 h-4 ml-2" />}
+                  {t('buttons', 'continueToDashboard')}
+                  <ArrowIcon className={cn("w-4 h-4", isRTL ? "mr-2" : "ml-2")} />
                 </Button>
               </CardContent>
             </Card>

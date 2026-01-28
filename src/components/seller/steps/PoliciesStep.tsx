@@ -5,6 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useSellerProfileTranslations } from '@/lib/seller-profile-translations';
 
 interface PoliciesStepProps {
   data: {
@@ -18,7 +19,8 @@ interface PoliciesStepProps {
 }
 
 export const PoliciesStep = ({ data, onUpdate, onNext, onBack }: PoliciesStepProps) => {
-  const { isRTL } = useLanguage();
+  const { isRTL, language } = useLanguage();
+  const { t } = useSellerProfileTranslations(language as 'en' | 'fa' | 'ps');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,40 +31,36 @@ export const PoliciesStep = ({ data, onUpdate, onNext, onBack }: PoliciesStepPro
     <form onSubmit={handleSubmit} className="space-y-6 animate-fade-in">
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold">
-          {isRTL ? 'سیاست‌ها و تنظیمات' : 'Policies & Settings'}
+          {t('policies', 'title')}
         </h2>
         <p className="text-muted-foreground mt-2">
-          {isRTL ? 'سیاست‌های فروشگاه خود را تعریف کنید' : 'Define your store policies'}
+          {t('policies', 'subtitle')}
         </p>
       </div>
 
       <div className="space-y-6">
         <div className="space-y-2">
           <Label htmlFor="returnPolicy">
-            {isRTL ? 'سیاست بازگشت کالا' : 'Return & Refund Policy'}
+            {t('policies', 'returnPolicy')}
           </Label>
           <Textarea
             id="returnPolicy"
             value={data.returnPolicy}
             onChange={(e) => onUpdate({ returnPolicy: e.target.value })}
-            placeholder={isRTL 
-              ? 'شرایط و ضوابط بازگشت کالا را توضیح دهید...' 
-              : 'Describe your return and refund conditions...'}
+            placeholder={t('policies', 'returnPolicyPlaceholder')}
             className={cn("min-h-[120px]", isRTL && "text-right")}
           />
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="shippingPolicy">
-            {isRTL ? 'سیاست ارسال' : 'Shipping Policy'}
+            {t('policies', 'shippingPolicy')}
           </Label>
           <Textarea
             id="shippingPolicy"
             value={data.shippingPolicy}
             onChange={(e) => onUpdate({ shippingPolicy: e.target.value })}
-            placeholder={isRTL 
-              ? 'نحوه ارسال سفارشات، زمان تحویل و هزینه‌ها را توضیح دهید...' 
-              : 'Describe shipping methods, delivery times, and costs...'}
+            placeholder={t('policies', 'shippingPolicyPlaceholder')}
             className={cn("min-h-[120px]", isRTL && "text-right")}
           />
         </div>
@@ -73,12 +71,10 @@ export const PoliciesStep = ({ data, onUpdate, onNext, onBack }: PoliciesStepPro
         )}>
           <div className={cn(isRTL && "text-right")}>
             <Label htmlFor="storeVisible" className="text-base font-medium">
-              {isRTL ? 'نمایش فروشگاه' : 'Store Visibility'}
+              {t('policies', 'storeVisibility')}
             </Label>
             <p className="text-sm text-muted-foreground mt-1">
-              {isRTL 
-                ? 'آیا فروشگاه شما برای مشتریان قابل مشاهده باشد؟' 
-                : 'Should your store be visible to customers?'}
+              {t('policies', 'storeVisibilityDesc')}
             </p>
           </div>
           <Switch
@@ -90,9 +86,7 @@ export const PoliciesStep = ({ data, onUpdate, onNext, onBack }: PoliciesStepPro
 
         <div className="p-4 rounded-lg bg-muted/50 border">
           <p className="text-sm text-muted-foreground">
-            {isRTL 
-              ? '💡 می‌توانید این سیاست‌ها را بعداً در تنظیمات فروشگاه ویرایش کنید.' 
-              : '💡 You can edit these policies later in your store settings.'}
+            {t('policies', 'policiesNote')}
           </p>
         </div>
       </div>
@@ -100,10 +94,10 @@ export const PoliciesStep = ({ data, onUpdate, onNext, onBack }: PoliciesStepPro
       <div className="flex justify-between pt-4">
         <Button type="button" variant="outline" size="lg" onClick={onBack}>
           {isRTL ? <ArrowRight className="w-4 h-4 ml-2" /> : <ArrowLeft className="w-4 h-4 mr-2" />}
-          {isRTL ? 'مرحله قبل' : 'Previous'}
+          {t('buttons', 'previous')}
         </Button>
         <Button type="submit" size="lg">
-          {isRTL ? 'مرحله بعد' : 'Next Step'}
+          {t('buttons', 'nextStep')}
         </Button>
       </div>
     </form>
