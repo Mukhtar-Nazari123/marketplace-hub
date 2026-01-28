@@ -16,13 +16,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
-
-const STEPS = [
-  { id: 1, title: 'Personal Info', titleFa: 'اطلاعات شخصی' },
-  { id: 2, title: 'Store Details', titleFa: 'اطلاعات فروشگاه' },
-  { id: 3, title: 'Policies', titleFa: 'سیاست‌ها' },
-  { id: 4, title: 'Review', titleFa: 'بررسی نهایی' }
-];
+import { useSellerProfileTranslations } from '@/lib/seller-profile-translations';
 
 interface PersonalInfo {
   fullName: string;
@@ -50,9 +44,17 @@ interface Policies {
 
 const SellerProfileComplete = () => {
   const { user, role, loading: authLoading } = useAuth();
-  const { isRTL } = useLanguage();
+  const { isRTL, language } = useLanguage();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { t } = useSellerProfileTranslations(language as 'en' | 'fa' | 'ps');
+
+  const STEPS = [
+    { id: 1, title: 'Personal Info', titleFa: 'اطلاعات شخصی', titlePs: t('steps', 'personalInfo') },
+    { id: 2, title: 'Store Details', titleFa: 'اطلاعات فروشگاه', titlePs: t('steps', 'storeDetails') },
+    { id: 3, title: 'Policies', titleFa: 'سیاست‌ها', titlePs: t('steps', 'policies') },
+    { id: 4, title: 'Review', titleFa: 'بررسی نهایی', titlePs: t('steps', 'review') }
+  ];
 
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -258,18 +260,16 @@ const SellerProfileComplete = () => {
         .eq('user_id', user.id);
 
       toast({
-        title: isRTL ? 'پروفایل ارسال شد' : 'Profile Submitted',
-        description: isRTL 
-          ? 'درخواست شما برای بررسی ارسال شد. به زودی نتیجه به شما اطلاع داده می‌شود.' 
-          : 'Your request has been submitted for review. You will be notified soon.'
+        title: t('toasts', 'profileSubmitted'),
+        description: t('toasts', 'profileSubmittedDesc')
       });
 
       navigate('/dashboard/seller/pending');
     } catch (error) {
       console.error('Error submitting profile:', error);
       toast({
-        title: isRTL ? 'خطا' : 'Error',
-        description: isRTL ? 'خطا در ارسال پروفایل. لطفاً دوباره تلاش کنید.' : 'Failed to submit profile. Please try again.',
+        title: t('toasts', 'error'),
+        description: t('toasts', 'profileSubmitError'),
         variant: 'destructive'
       });
     }
@@ -313,7 +313,7 @@ const SellerProfileComplete = () => {
                   isRTL ? "left-4" : "right-4"
                 )}>
                   <Loader2 className="w-3 h-3 animate-spin" />
-                  {isRTL ? 'در حال ذخیره...' : 'Saving...'}
+                  {t('buttons', 'saving')}
                 </div>
               )}
 

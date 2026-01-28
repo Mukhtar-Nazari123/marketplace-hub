@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Camera, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { useSellerProfileTranslations } from '@/lib/seller-profile-translations';
 
 interface PersonalInfoStepProps {
   data: {
@@ -23,8 +24,9 @@ interface PersonalInfoStepProps {
 
 export const PersonalInfoStep = ({ data, onUpdate, onNext }: PersonalInfoStepProps) => {
   const { user } = useAuth();
-  const { isRTL } = useLanguage();
+  const { isRTL, language } = useLanguage();
   const { toast } = useToast();
+  const { t } = useSellerProfileTranslations(language as 'en' | 'fa' | 'ps');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
 
@@ -34,8 +36,8 @@ export const PersonalInfoStep = ({ data, onUpdate, onNext }: PersonalInfoStepPro
 
     if (!file.type.startsWith('image/')) {
       toast({
-        title: isRTL ? 'خطا' : 'Error',
-        description: isRTL ? 'لطفاً یک فایل تصویری انتخاب کنید' : 'Please select an image file',
+        title: t('toasts', 'error'),
+        description: t('toasts', 'selectImageFile'),
         variant: 'destructive'
       });
       return;
@@ -58,14 +60,14 @@ export const PersonalInfoStep = ({ data, onUpdate, onNext }: PersonalInfoStepPro
 
       onUpdate({ avatarUrl: urlData.publicUrl });
       toast({
-        title: isRTL ? 'موفق' : 'Success',
-        description: isRTL ? 'تصویر آپلود شد' : 'Image uploaded successfully'
+        title: t('toasts', 'success'),
+        description: t('toasts', 'imageUploadSuccess')
       });
     } catch (error) {
       console.error('Error uploading avatar:', error);
       toast({
-        title: isRTL ? 'خطا' : 'Error',
-        description: isRTL ? 'خطا در آپلود تصویر' : 'Failed to upload image',
+        title: t('toasts', 'error'),
+        description: t('toasts', 'imageUploadError'),
         variant: 'destructive'
       });
     } finally {
@@ -77,8 +79,8 @@ export const PersonalInfoStep = ({ data, onUpdate, onNext }: PersonalInfoStepPro
     e.preventDefault();
     if (!data.fullName || !data.phone) {
       toast({
-        title: isRTL ? 'خطا' : 'Error',
-        description: isRTL ? 'لطفاً تمام فیلدهای الزامی را پر کنید' : 'Please fill all required fields',
+        title: t('toasts', 'error'),
+        description: t('toasts', 'fillRequiredFields'),
         variant: 'destructive'
       });
       return;
@@ -90,10 +92,10 @@ export const PersonalInfoStep = ({ data, onUpdate, onNext }: PersonalInfoStepPro
     <form onSubmit={handleSubmit} className="space-y-6 animate-fade-in">
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold">
-          {isRTL ? 'اطلاعات شخصی' : 'Personal Information'}
+          {t('personalInfo', 'title')}
         </h2>
         <p className="text-muted-foreground mt-2">
-          {isRTL ? 'اطلاعات پایه خود را وارد کنید' : 'Enter your basic information'}
+          {t('personalInfo', 'subtitle')}
         </p>
       </div>
 
@@ -131,20 +133,20 @@ export const PersonalInfoStep = ({ data, onUpdate, onNext }: PersonalInfoStepPro
           />
         </div>
         <p className="text-sm text-muted-foreground">
-          {isRTL ? 'تصویر پروفایل (اختیاری)' : 'Profile photo (optional)'}
+          {t('personalInfo', 'profilePhoto')}
         </p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="fullName">
-            {isRTL ? 'نام کامل' : 'Full Name'} <span className="text-destructive">*</span>
+            {t('personalInfo', 'fullName')} <span className="text-destructive">*</span>
           </Label>
           <Input
             id="fullName"
             value={data.fullName}
             onChange={(e) => onUpdate({ fullName: e.target.value })}
-            placeholder={isRTL ? 'نام و نام خانوادگی' : 'Your full name'}
+            placeholder={t('personalInfo', 'fullNamePlaceholder')}
             className={cn(isRTL && "text-right")}
             required
           />
@@ -152,7 +154,7 @@ export const PersonalInfoStep = ({ data, onUpdate, onNext }: PersonalInfoStepPro
 
         <div className="space-y-2">
           <Label htmlFor="email">
-            {isRTL ? 'ایمیل' : 'Email'}
+            {t('personalInfo', 'email')}
           </Label>
           <Input
             id="email"
@@ -165,14 +167,14 @@ export const PersonalInfoStep = ({ data, onUpdate, onNext }: PersonalInfoStepPro
 
         <div className="space-y-2 md:col-span-2">
           <Label htmlFor="phone">
-            {isRTL ? 'شماره تلفن' : 'Phone Number'} <span className="text-destructive">*</span>
+            {t('personalInfo', 'phoneNumber')} <span className="text-destructive">*</span>
           </Label>
           <Input
             id="phone"
             type="tel"
             value={data.phone}
             onChange={(e) => onUpdate({ phone: e.target.value })}
-            placeholder={isRTL ? 'شماره تلفن همراه' : 'Your phone number'}
+            placeholder={t('personalInfo', 'phonePlaceholder')}
             className={cn(isRTL && "text-right")}
             required
           />
@@ -181,7 +183,7 @@ export const PersonalInfoStep = ({ data, onUpdate, onNext }: PersonalInfoStepPro
 
       <div className="flex justify-end pt-4">
         <Button type="submit" size="lg">
-          {isRTL ? 'مرحله بعد' : 'Next Step'}
+          {t('buttons', 'nextStep')}
         </Button>
       </div>
     </form>

@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ImagePlus, Loader2, ArrowLeft, ArrowRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { useSellerProfileTranslations } from '@/lib/seller-profile-translations';
 
 interface StoreDetailsStepProps {
   data: {
@@ -29,8 +30,9 @@ interface StoreDetailsStepProps {
 
 export const StoreDetailsStep = ({ data, onUpdate, onNext, onBack }: StoreDetailsStepProps) => {
   const { user } = useAuth();
-  const { isRTL } = useLanguage();
+  const { isRTL, language } = useLanguage();
   const { toast } = useToast();
+  const { t } = useSellerProfileTranslations(language as 'en' | 'fa' | 'ps');
   const logoInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
   const [uploadingLogo, setUploadingLogo] = useState(false);
@@ -45,8 +47,8 @@ export const StoreDetailsStep = ({ data, onUpdate, onNext, onBack }: StoreDetail
 
     if (!file.type.startsWith('image/')) {
       toast({
-        title: isRTL ? 'خطا' : 'Error',
-        description: isRTL ? 'لطفاً یک فایل تصویری انتخاب کنید' : 'Please select an image file',
+        title: t('toasts', 'error'),
+        description: t('toasts', 'selectImageFile'),
         variant: 'destructive'
       });
       return;
@@ -74,14 +76,14 @@ export const StoreDetailsStep = ({ data, onUpdate, onNext, onBack }: StoreDetail
       }
 
       toast({
-        title: isRTL ? 'موفق' : 'Success',
-        description: isRTL ? 'تصویر آپلود شد' : 'Image uploaded successfully'
+        title: t('toasts', 'success'),
+        description: t('toasts', 'imageUploadSuccess')
       });
     } catch (error) {
       console.error('Error uploading image:', error);
       toast({
-        title: isRTL ? 'خطا' : 'Error',
-        description: isRTL ? 'خطا در آپلود تصویر' : 'Failed to upload image',
+        title: t('toasts', 'error'),
+        description: t('toasts', 'imageUploadError'),
         variant: 'destructive'
       });
     } finally {
@@ -93,8 +95,8 @@ export const StoreDetailsStep = ({ data, onUpdate, onNext, onBack }: StoreDetail
     e.preventDefault();
     if (!data.businessName || !data.businessType) {
       toast({
-        title: isRTL ? 'خطا' : 'Error',
-        description: isRTL ? 'لطفاً تمام فیلدهای الزامی را پر کنید' : 'Please fill all required fields',
+        title: t('toasts', 'error'),
+        description: t('toasts', 'fillRequiredFields'),
         variant: 'destructive'
       });
       return;
@@ -106,16 +108,16 @@ export const StoreDetailsStep = ({ data, onUpdate, onNext, onBack }: StoreDetail
     <form onSubmit={handleSubmit} className="space-y-6 animate-fade-in">
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold">
-          {isRTL ? 'اطلاعات فروشگاه' : 'Store Details'}
+          {t('storeDetails', 'title')}
         </h2>
         <p className="text-muted-foreground mt-2">
-          {isRTL ? 'اطلاعات فروشگاه یا شرکت خود را وارد کنید' : 'Enter your store or company information'}
+          {t('storeDetails', 'subtitle')}
         </p>
       </div>
 
       {/* Banner upload */}
       <div className="space-y-2">
-        <Label>{isRTL ? 'بنر فروشگاه' : 'Store Banner'}</Label>
+        <Label>{t('storeDetails', 'storeBanner')}</Label>
         <div
           onClick={() => bannerInputRef.current?.click()}
           className={cn(
@@ -138,7 +140,7 @@ export const StoreDetailsStep = ({ data, onUpdate, onNext, onBack }: StoreDetail
               ) : (
                 <>
                   <ImagePlus className="w-8 h-8 mx-auto mb-2" />
-                  <span className="text-sm">{isRTL ? 'آپلود بنر' : 'Upload Banner'}</span>
+                  <span className="text-sm">{t('storeDetails', 'uploadBanner')}</span>
                 </>
               )}
             </div>
@@ -156,7 +158,7 @@ export const StoreDetailsStep = ({ data, onUpdate, onNext, onBack }: StoreDetail
       <div className="grid gap-4 md:grid-cols-2">
         {/* Logo upload */}
         <div className="space-y-2">
-          <Label>{isRTL ? 'لوگوی فروشگاه' : 'Store Logo'}</Label>
+          <Label>{t('storeDetails', 'storeLogo')}</Label>
           <div
             onClick={() => logoInputRef.current?.click()}
             className={cn(
@@ -193,13 +195,13 @@ export const StoreDetailsStep = ({ data, onUpdate, onNext, onBack }: StoreDetail
 
         <div className="space-y-2">
           <Label htmlFor="businessName">
-            {isRTL ? 'نام فروشگاه / شرکت' : 'Store / Company Name'} <span className="text-destructive">*</span>
+            {t('storeDetails', 'storeName')} <span className="text-destructive">*</span>
           </Label>
           <Input
             id="businessName"
             value={data.businessName}
             onChange={(e) => onUpdate({ businessName: e.target.value })}
-            placeholder={isRTL ? 'نام فروشگاه' : 'Your store name'}
+            placeholder={t('storeDetails', 'storeNamePlaceholder')}
             className={cn(isRTL && "text-right")}
             required
           />
@@ -207,61 +209,61 @@ export const StoreDetailsStep = ({ data, onUpdate, onNext, onBack }: StoreDetail
 
         <div className="space-y-2">
           <Label htmlFor="businessType">
-            {isRTL ? 'نوع کسب‌وکار' : 'Business Type'} <span className="text-destructive">*</span>
+            {t('storeDetails', 'businessType')} <span className="text-destructive">*</span>
           </Label>
           <Select value={data.businessType} onValueChange={(val) => onUpdate({ businessType: val })}>
             <SelectTrigger className={cn(isRTL && "text-right")}>
-              <SelectValue placeholder={isRTL ? 'انتخاب کنید' : 'Select type'} />
+              <SelectValue placeholder={t('storeDetails', 'selectType')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="individual">{isRTL ? 'شخصی' : 'Individual'}</SelectItem>
-              <SelectItem value="company">{isRTL ? 'شرکتی' : 'Company'}</SelectItem>
+              <SelectItem value="individual">{t('storeDetails', 'individual')}</SelectItem>
+              <SelectItem value="company">{t('storeDetails', 'company')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="contactEmail">{isRTL ? 'ایمیل تماس' : 'Contact Email'}</Label>
+          <Label htmlFor="contactEmail">{t('storeDetails', 'contactEmail')}</Label>
           <Input
             id="contactEmail"
             type="email"
             value={data.contactEmail}
             onChange={(e) => onUpdate({ contactEmail: e.target.value })}
-            placeholder={isRTL ? 'ایمیل برای تماس' : 'Contact email'}
+            placeholder={t('storeDetails', 'contactEmailPlaceholder')}
             className={cn(isRTL && "text-right")}
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="contactPhone">{isRTL ? 'تلفن تماس' : 'Contact Phone'}</Label>
+          <Label htmlFor="contactPhone">{t('storeDetails', 'contactPhone')}</Label>
           <Input
             id="contactPhone"
             type="tel"
             value={data.contactPhone}
             onChange={(e) => onUpdate({ contactPhone: e.target.value })}
-            placeholder={isRTL ? 'شماره تلفن فروشگاه' : 'Store phone number'}
+            placeholder={t('storeDetails', 'contactPhonePlaceholder')}
             className={cn(isRTL && "text-right")}
           />
         </div>
 
         <div className="space-y-2 md:col-span-2">
-          <Label htmlFor="address">{isRTL ? 'آدرس' : 'Address'}</Label>
+          <Label htmlFor="address">{t('storeDetails', 'address')}</Label>
           <Input
             id="address"
             value={data.address}
             onChange={(e) => onUpdate({ address: e.target.value })}
-            placeholder={isRTL ? 'آدرس فروشگاه' : 'Store address'}
+            placeholder={t('storeDetails', 'addressPlaceholder')}
             className={cn(isRTL && "text-right")}
           />
         </div>
 
         <div className="space-y-2 md:col-span-2">
-          <Label htmlFor="businessDescription">{isRTL ? 'توضیحات کسب‌وکار' : 'Business Description'}</Label>
+          <Label htmlFor="businessDescription">{t('storeDetails', 'businessDescription')}</Label>
           <Textarea
             id="businessDescription"
             value={data.businessDescription}
             onChange={(e) => onUpdate({ businessDescription: e.target.value })}
-            placeholder={isRTL ? 'توضیح کوتاه درباره فروشگاه' : 'Brief description about your store'}
+            placeholder={t('storeDetails', 'businessDescriptionPlaceholder')}
             className={cn("min-h-[100px]", isRTL && "text-right")}
           />
         </div>
@@ -270,10 +272,10 @@ export const StoreDetailsStep = ({ data, onUpdate, onNext, onBack }: StoreDetail
       <div className="flex justify-between pt-4">
         <Button type="button" variant="outline" size="lg" onClick={onBack}>
           {isRTL ? <ArrowRight className="w-4 h-4 ml-2" /> : <ArrowLeft className="w-4 h-4 mr-2" />}
-          {isRTL ? 'مرحله قبل' : 'Previous'}
+          {t('buttons', 'previous')}
         </Button>
         <Button type="submit" size="lg">
-          {isRTL ? 'مرحله بعد' : 'Next Step'}
+          {t('buttons', 'nextStep')}
         </Button>
       </div>
     </form>
