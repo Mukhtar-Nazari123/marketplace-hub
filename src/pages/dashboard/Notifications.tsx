@@ -16,26 +16,33 @@ type FilterType = NotificationType | 'ALL';
 
 const Notifications = () => {
   const { role } = useAuth();
-  const { isRTL } = useLanguage();
+  const { isRTL, language } = useLanguage();
   const navigate = useNavigate();
   const [filter, setFilter] = useState<FilterType>('ALL');
   const { notifications, isLoading, unreadCount, refetch, markAsRead, markAllAsRead, isMarkingAllAsRead } = useNotifications(filter);
+
+  // Helper for trilingual support
+  const getLabel = (en: string, fa: string, ps: string) => {
+    if (language === 'ps') return ps;
+    if (language === 'fa') return fa;
+    return en;
+  };
 
   // Get filter options based on role
   const getFilterOptions = () => {
     if (role === 'buyer') {
       return [
-        { value: 'ALL', label: isRTL ? 'همه' : 'All' },
-        { value: 'ORDER_STATUS_CHANGED', label: isRTL ? 'وضعیت سفارش' : 'Order Status' },
+        { value: 'ALL', label: getLabel('All', 'همه', 'ټول') },
+        { value: 'ORDER_STATUS_CHANGED', label: getLabel('Order Status', 'وضعیت سفارش', 'د امر حالت') },
       ];
     }
     // Seller filters
     return [
-      { value: 'ALL', label: isRTL ? 'همه' : 'All' },
-      { value: 'NEW_ORDER', label: isRTL ? 'سفارشات' : 'Orders' },
-      { value: 'PRODUCT_APPROVED', label: isRTL ? 'محصولات' : 'Products' },
-      { value: 'STORE_APPROVED', label: isRTL ? 'فروشگاه' : 'Store' },
-      { value: 'NEW_REVIEW', label: isRTL ? 'نظرات' : 'Reviews' },
+      { value: 'ALL', label: getLabel('All', 'همه', 'ټول') },
+      { value: 'NEW_ORDER', label: getLabel('Orders', 'سفارشات', 'امرونه') },
+      { value: 'PRODUCT_APPROVED', label: getLabel('Products', 'محصولات', 'محصولات') },
+      { value: 'STORE_APPROVED', label: getLabel('Store', 'فروشگاه', 'پلورنځی') },
+      { value: 'NEW_REVIEW', label: getLabel('Reviews', 'نظرات', 'بیاکتنې') },
     ];
   };
 
@@ -56,10 +63,10 @@ const Notifications = () => {
       return num.toString();
     };
 
-    if (diffMins < 1) return isRTL ? 'همین الان' : 'Just now';
-    if (diffMins < 60) return isRTL ? `${formatNum(diffMins)} دقیقه پیش` : `${diffMins} minutes ago`;
-    if (diffHours < 24) return isRTL ? `${formatNum(diffHours)} ساعت پیش` : `${diffHours} hours ago`;
-    return isRTL ? `${formatNum(diffDays)} روز پیش` : `${diffDays} days ago`;
+    if (diffMins < 1) return getLabel('Just now', 'همین الان', 'همدا اوس');
+    if (diffMins < 60) return getLabel(`${diffMins} minutes ago`, `${formatNum(diffMins)} دقیقه پیش`, `${formatNum(diffMins)} دقیقې مخکې`);
+    if (diffHours < 24) return getLabel(`${diffHours} hours ago`, `${formatNum(diffHours)} ساعت پیش`, `${formatNum(diffHours)} ساعتونه مخکې`);
+    return getLabel(`${diffDays} days ago`, `${formatNum(diffDays)} روز پیش`, `${formatNum(diffDays)} ورځې مخکې`);
   };
 
   // Get icon based on notification type
@@ -103,16 +110,18 @@ const Notifications = () => {
 
   // Get type label
   const getTypeLabel = (type: string): string => {
-    const labels: Record<string, { en: string; fa: string }> = {
-      ORDER_STATUS_CHANGED: { en: 'Order', fa: 'سفارش' },
-      NEW_ORDER: { en: 'New Order', fa: 'سفارش جدید' },
-      STORE_APPROVED: { en: 'Store', fa: 'فروشگاه' },
-      STORE_REJECTED: { en: 'Store', fa: 'فروشگاه' },
-      PRODUCT_APPROVED: { en: 'Product', fa: 'محصول' },
-      PRODUCT_REJECTED: { en: 'Product', fa: 'محصول' },
-      NEW_REVIEW: { en: 'Review', fa: 'نظر' },
+    const labels: Record<string, { en: string; fa: string; ps: string }> = {
+      ORDER_STATUS_CHANGED: { en: 'Order', fa: 'سفارش', ps: 'امر' },
+      NEW_ORDER: { en: 'New Order', fa: 'سفارش جدید', ps: 'نوی امر' },
+      STORE_APPROVED: { en: 'Store', fa: 'فروشگاه', ps: 'پلورنځی' },
+      STORE_REJECTED: { en: 'Store', fa: 'فروشگاه', ps: 'پلورنځی' },
+      PRODUCT_APPROVED: { en: 'Product', fa: 'محصول', ps: 'محصول' },
+      PRODUCT_REJECTED: { en: 'Product', fa: 'محصول', ps: 'محصول' },
+      NEW_REVIEW: { en: 'Review', fa: 'نظر', ps: 'بیاکتنه' },
     };
-    return isRTL ? labels[type]?.fa || type : labels[type]?.en || type;
+    if (language === 'ps') return labels[type]?.ps || type;
+    if (language === 'fa') return labels[type]?.fa || type;
+    return labels[type]?.en || type;
   };
 
   // Handle notification click
@@ -147,8 +156,8 @@ const Notifications = () => {
 
   return (
     <DashboardLayout
-      title={isRTL ? 'اعلان‌ها' : 'Notifications'}
-      description={isRTL ? 'مشاهده و مدیریت اعلان‌ها' : 'View and manage your notifications'}
+      title={getLabel('Notifications', 'اعلان‌ها', 'خبرتیاوې')}
+      description={getLabel('View and manage your notifications', 'مشاهده و مدیریت اعلان‌ها', 'خپلې خبرتیاوې وګورئ او اداره یې کړئ')}
       allowedRoles={allowedRoles}
     >
       <div className="space-y-6">
@@ -158,11 +167,11 @@ const Notifications = () => {
             <Bell className="h-6 w-6 text-primary" />
             <div>
               <h2 className="text-lg font-semibold">
-                {isRTL ? 'اعلان‌های شما' : 'Your Notifications'}
+                {getLabel('Your Notifications', 'اعلان‌های شما', 'ستاسو خبرتیاوې')}
               </h2>
               {unreadCount > 0 && (
                 <p className="text-sm text-muted-foreground">
-                  {isRTL ? `${unreadCount} اعلان خوانده نشده` : `${unreadCount} unread notifications`}
+                  {getLabel(`${unreadCount} unread notifications`, `${unreadCount} اعلان خوانده نشده`, `${unreadCount} نالوستل شوي خبرتیاوې`)}
                 </p>
               )}
             </div>
@@ -171,7 +180,7 @@ const Notifications = () => {
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={() => refetch()}>
               <RefreshCw className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-              {isRTL ? 'بروزرسانی' : 'Refresh'}
+              {getLabel('Refresh', 'بروزرسانی', 'تازه کول')}
             </Button>
             {unreadCount > 0 && (
               <Button 
@@ -181,7 +190,7 @@ const Notifications = () => {
                 disabled={isMarkingAllAsRead}
               >
                 <CheckCheck className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                {isRTL ? 'خواندن همه' : 'Mark All Read'}
+                {getLabel('Mark All Read', 'خواندن همه', 'ټول لوستل شوي')}
               </Button>
             )}
           </div>
@@ -224,10 +233,10 @@ const Notifications = () => {
               <CardContent className="flex flex-col items-center justify-center py-16">
                 <Bell className="h-16 w-16 text-muted-foreground/30 mb-4" />
                 <h3 className="text-lg font-medium text-muted-foreground">
-                  {isRTL ? 'اعلانی وجود ندارد' : 'No notifications'}
+                  {getLabel('No notifications', 'اعلانی وجود ندارد', 'خبرتیاوې نشته')}
                 </h3>
                 <p className="text-sm text-muted-foreground/70 mt-1">
-                  {isRTL ? 'وقتی اتفاقی بیفتد، اینجا مطلع می‌شوید' : "You'll be notified when something happens"}
+                  {getLabel("You'll be notified when something happens", 'وقتی اتفاقی بیفتد، اینجا مطلع می‌شوید', 'کله چې یو څه پېښ شي، تاسو به خبر شئ')}
                 </p>
               </CardContent>
             </Card>
