@@ -25,9 +25,8 @@ const SellerTranslations = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | 'complete' | 'incomplete'>('all');
 
-  const t = (section: keyof typeof import('@/lib/seller-translations').sellerTranslations, key: string) => {
-    const translations = require('@/lib/seller-translations').sellerTranslations;
-    const sectionData = translations[section];
+  const t = (section: keyof typeof sellerTranslations, key: string) => {
+    const sectionData = sellerTranslations[section] as Record<string, Record<string, string>> | undefined;
     if (!sectionData || !sectionData[key]) return key;
     return sectionData[key][language] || sectionData[key].en || key;
   };
