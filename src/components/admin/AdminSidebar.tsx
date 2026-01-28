@@ -50,6 +50,14 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
+type Language = 'en' | 'fa' | 'ps';
+
+const getLabel = (lang: Language, en: string, fa: string, ps: string) => {
+  if (lang === 'ps') return ps;
+  if (lang === 'fa') return fa;
+  return en;
+};
+
 export const AdminSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -58,52 +66,80 @@ export const AdminSidebar = () => {
   const { unreadCount } = useAdminNotifications();
   const { state } = useSidebar();
   const isCollapsed = state === 'collapsed';
+  const lang = language as Language;
 
   // Format unread count for display
   const formatUnreadCount = (count: number): string => {
     if (count > 15) return isRTL ? '۱۵+' : '15+';
     if (isRTL) {
-      // Convert to Persian numerals
+      // Convert to Persian/Pashto numerals
       const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
       return count.toString().replace(/\d/g, (d) => persianDigits[parseInt(d)]);
     }
     return count.toString();
   };
 
+  // Trilingual navigation labels
   const mainNavItems = [
-    { title: t.admin.dashboard, icon: LayoutDashboard, url: '/dashboard/admin', showBadge: false },
-    { title: isRTL ? 'اعلان‌ها' : 'Notifications', icon: Bell, url: '/dashboard/admin/notifications', showBadge: true },
-    { title: t.admin.users.title, icon: Users, url: '/dashboard/users', showBadge: false },
-    { title: t.admin.products.title, icon: Package, url: '/dashboard/products', showBadge: false },
-    { title: t.admin.orders.title, icon: ShoppingCart, url: '/dashboard/orders', showBadge: false },
-    { title: t.admin.sellers.title, icon: BadgeCheck, url: '/dashboard/sellers', showBadge: false },
-    { title: isRTL ? 'نظرات' : 'Reviews', icon: Star, url: '/dashboard/reviews', showBadge: false },
-    { title: isRTL ? 'پیام‌های تماس' : 'Contact Messages', icon: MessageSquare, url: '/dashboard/contact-messages', showBadge: false },
+    { title: getLabel(lang, 'Dashboard', 'داشبورد', 'ډشبورډ'), icon: LayoutDashboard, url: '/dashboard/admin', showBadge: false },
+    { title: getLabel(lang, 'Notifications', 'اعلان‌ها', 'خبرتیاوې'), icon: Bell, url: '/dashboard/admin/notifications', showBadge: true },
+    { title: getLabel(lang, 'Users', 'کاربران', 'کاروونکي'), icon: Users, url: '/dashboard/users', showBadge: false },
+    { title: getLabel(lang, 'Products', 'محصولات', 'محصولات'), icon: Package, url: '/dashboard/products', showBadge: false },
+    { title: getLabel(lang, 'Orders', 'سفارشات', 'امرونه'), icon: ShoppingCart, url: '/dashboard/orders', showBadge: false },
+    { title: getLabel(lang, 'Sellers', 'فروشندگان', 'پلورونکي'), icon: BadgeCheck, url: '/dashboard/sellers', showBadge: false },
+    { title: getLabel(lang, 'Reviews', 'نظرات', 'بیاکتنې'), icon: Star, url: '/dashboard/reviews', showBadge: false },
+    { title: getLabel(lang, 'Contact Messages', 'پیام‌های تماس', 'د اړیکو پیغامونه'), icon: MessageSquare, url: '/dashboard/contact-messages', showBadge: false },
   ];
 
   const contentNavItems = [
-    { title: isRTL ? 'دسته‌بندی‌ها' : 'Categories', icon: FolderTree, url: '/dashboard/categories' },
-    { title: isRTL ? 'وبلاگ' : 'Blog', icon: FileText, url: '/dashboard/blogs' },
-    { title: isRTL ? 'درباره ما' : 'About Page', icon: FileText, url: '/dashboard/about' },
-    { title: isRTL ? 'تخفیف‌های روزانه' : "Today's Deals", icon: Zap, url: '/dashboard/deals' },
-    { title: isRTL ? 'بنرهای هیرو' : 'Hero Banners', icon: Monitor, url: '/dashboard/hero-banners' },
-    { title: t.admin.cms.title, icon: FileText, url: '/dashboard/cms' },
-    { title: isRTL ? 'خبرنامه' : 'Newsletter', icon: Mail, url: '/dashboard/newsletter' },
+    { title: getLabel(lang, 'Categories', 'دسته‌بندی‌ها', 'کټګورۍ'), icon: FolderTree, url: '/dashboard/categories' },
+    { title: getLabel(lang, 'Blog', 'وبلاگ', 'بلاګ'), icon: FileText, url: '/dashboard/blogs' },
+    { title: getLabel(lang, 'About Page', 'درباره ما', 'زموږ په اړه'), icon: FileText, url: '/dashboard/about' },
+    { title: getLabel(lang, "Today's Deals", 'تخفیف‌های روزانه', 'نننۍ تخفیفونه'), icon: Zap, url: '/dashboard/deals' },
+    { title: getLabel(lang, 'Hero Banners', 'بنرهای هیرو', 'هیرو بینرونه'), icon: Monitor, url: '/dashboard/hero-banners' },
+    { title: getLabel(lang, 'CMS', 'مدیریت محتوا', 'د منځپانګې مدیریت'), icon: FileText, url: '/dashboard/cms' },
+    { title: getLabel(lang, 'Newsletter', 'خبرنامه', 'خبرپاڼه'), icon: Mail, url: '/dashboard/newsletter' },
   ];
 
   const settingsNavItems = [
-    { title: isRTL ? 'لینک‌های اجتماعی' : 'Social Links', icon: Share2, url: '/dashboard/social-links' },
-    { title: isRTL ? 'تنظیمات تماس' : 'Contact Settings', icon: MessageSquare, url: '/dashboard/contact-settings' },
-    { title: t.admin.settings.title, icon: Settings, url: '/dashboard/settings' },
+    { title: getLabel(lang, 'Social Links', 'لینک‌های اجتماعی', 'ټولنیز لینکونه'), icon: Share2, url: '/dashboard/social-links' },
+    { title: getLabel(lang, 'Contact Settings', 'تنظیمات تماس', 'د اړیکو تنظیمات'), icon: MessageSquare, url: '/dashboard/contact-settings' },
+    { title: getLabel(lang, 'Settings', 'تنظیمات', 'ترتیبات'), icon: Settings, url: '/dashboard/settings' },
   ];
+
+  // Group labels
+  const mainLabel = getLabel(lang, 'Main', 'اصلی', 'اصلي');
+  const contentLabel = getLabel(lang, 'Content', 'محتوا', 'منځپانګه');
+  const systemLabel = getLabel(lang, 'System', 'سیستم', 'سیسټم');
+  const languageLabel = getLabel(lang, 'Language', 'زبان', 'ژبه');
+  const managerLabel = getLabel(lang, 'Admin', 'مدیر', 'مدیر');
+  const logoutLabel = getLabel(lang, 'Logout', 'خروج', 'وتل');
+  const panelTitle = getLabel(lang, 'Admin Panel', 'پنل مدیریت', 'مدیریت پینل');
+  const panelSubtitle = getLabel(lang, 'Manage your store', 'مدیریت فروشگاه', 'خپل پلورنځی مدیریت کړئ');
 
   const handleLogout = async () => {
     await signOut();
     navigate('/login');
   };
 
-  const toggleLanguage = () => {
-    setLanguage(language === 'fa' ? 'en' : 'fa');
+  // Language options for cycling
+  const languages: Language[] = ['en', 'fa', 'ps'];
+  const languageNames: Record<Language, string> = {
+    en: 'English',
+    fa: 'دری',
+    ps: 'پښتو',
+  };
+
+  const cycleLanguage = () => {
+    const currentIndex = languages.indexOf(lang);
+    const nextIndex = (currentIndex + 1) % languages.length;
+    setLanguage(languages[nextIndex]);
+  };
+
+  const getNextLanguageLabel = () => {
+    const currentIndex = languages.indexOf(lang);
+    const nextIndex = (currentIndex + 1) % languages.length;
+    return languageNames[languages[nextIndex]];
   };
 
   const isActive = (url: string) => {
@@ -124,8 +160,8 @@ export const AdminSidebar = () => {
               </div>
               {!isCollapsed && (
                 <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="font-semibold">{t.admin.panelTitle}</span>
-                  <span className="text-xs text-muted-foreground">{t.admin.panelSubtitle}</span>
+                  <span className="font-semibold">{panelTitle}</span>
+                  <span className="text-xs text-muted-foreground">{panelSubtitle}</span>
                 </div>
               )}
             </SidebarMenuButton>
@@ -135,7 +171,7 @@ export const AdminSidebar = () => {
       
       <SidebarContent>
         <SidebarGroup>
-          {!isCollapsed && <SidebarGroupLabel>{t.admin.main}</SidebarGroupLabel>}
+          {!isCollapsed && <SidebarGroupLabel>{mainLabel}</SidebarGroupLabel>}
           <SidebarGroupContent>
             <SidebarMenu>
               {mainNavItems.map((item) => (
@@ -166,7 +202,7 @@ export const AdminSidebar = () => {
         </SidebarGroup>
 
         <SidebarGroup>
-          {!isCollapsed && <SidebarGroupLabel>{t.admin.content}</SidebarGroupLabel>}
+          {!isCollapsed && <SidebarGroupLabel>{contentLabel}</SidebarGroupLabel>}
           <SidebarGroupContent>
             <SidebarMenu>
               {contentNavItems.map((item) => (
@@ -188,7 +224,7 @@ export const AdminSidebar = () => {
         </SidebarGroup>
 
         <SidebarGroup>
-          {!isCollapsed && <SidebarGroupLabel>{t.admin.system}</SidebarGroupLabel>}
+          {!isCollapsed && <SidebarGroupLabel>{systemLabel}</SidebarGroupLabel>}
           <SidebarGroupContent>
             <SidebarMenu>
               {settingsNavItems.map((item) => (
@@ -214,9 +250,9 @@ export const AdminSidebar = () => {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton onClick={toggleLanguage} tooltip={language === 'fa' ? 'English' : 'دری'}>
+                <SidebarMenuButton onClick={cycleLanguage} tooltip={getNextLanguageLabel()}>
                   <Globe className="h-4 w-4 shrink-0" />
-                  {!isCollapsed && <span>{language === 'fa' ? 'English' : 'دری'}</span>}
+                  {!isCollapsed && <span>{getNextLanguageLabel()}</span>}
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
@@ -241,7 +277,7 @@ export const AdminSidebar = () => {
                   {!isCollapsed && (
                     <>
                       <div className={`grid flex-1 text-sm leading-tight ${isRTL ? 'text-right' : 'text-left'}`}>
-                        <span className="truncate font-semibold">{t.admin.manager}</span>
+                        <span className="truncate font-semibold">{managerLabel}</span>
                         <span className="truncate text-xs text-muted-foreground">
                           {user?.email}
                         </span>
@@ -257,14 +293,14 @@ export const AdminSidebar = () => {
                 align={isRTL ? 'start' : 'end'}
                 sideOffset={4}
               >
-                <DropdownMenuItem onClick={toggleLanguage}>
+                <DropdownMenuItem onClick={cycleLanguage}>
                   <Globe className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                  {language === 'fa' ? 'English' : 'دری'}
+                  {getNextLanguageLabel()}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+                <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
                   <LogOut className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                  {t.admin.logout}
+                  {logoutLabel}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
