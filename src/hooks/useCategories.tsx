@@ -5,6 +5,7 @@ export interface Subcategory {
   id: string;
   name: string;
   name_fa: string | null;
+  name_ps: string | null;
   slug: string;
   description: string | null;
   image_url: string | null;
@@ -18,6 +19,7 @@ export interface Category {
   id: string;
   name: string;
   name_fa?: string | null;
+  name_ps?: string | null;
   slug: string;
   description: string | null;
   image_url: string | null;
