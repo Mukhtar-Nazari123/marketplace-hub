@@ -96,14 +96,18 @@ const ProductGrid = ({ products, viewMode = 'grid', onViewModeChange }: ProductG
   );
 };
 
-const getProductName = (name: { fa: string; en: string } | string, language: 'fa' | 'en'): string => {
+const getProductName = (name: { fa: string; en: string; ps?: string } | string, language: 'fa' | 'en' | 'ps'): string => {
   if (typeof name === 'string') return name;
+  // For Pashto, fallback to Persian then English
+  if (language === 'ps') return name.ps || name.fa || name.en;
   return name[language] || name.en;
 };
 
-const getProductDescription = (desc: { fa: string; en: string } | string | undefined, language: 'fa' | 'en'): string => {
+const getProductDescription = (desc: { fa: string; en: string; ps?: string } | string | undefined, language: 'fa' | 'en' | 'ps'): string => {
   if (!desc) return '';
   if (typeof desc === 'string') return desc;
+  // For Pashto, fallback to Persian then English
+  if (language === 'ps') return desc.ps || desc.fa || desc.en;
   return desc[language] || desc.en;
 };
 

@@ -1,5 +1,8 @@
-// Bilingual translations - Afghan Persian (Dari) & English
-export type Language = 'fa' | 'en';
+// Trilingual translations - English, Persian (Dari) & Pashto
+export type Language = 'fa' | 'en' | 'ps';
+
+// RTL languages array for easy checking
+export const RTL_LANGUAGES: Language[] = ['fa', 'ps'];
 
 export const translations = {
   fa: {
@@ -546,6 +549,556 @@ export const translations = {
     },
   },
   
+  // ============================================
+  // PASHTO (ps) - پښتو
+  // ============================================
+  ps: {
+    // Navigation
+    nav: {
+      category: "کټګورۍ",
+      products: "محصولات",
+      categories: "کټګورۍ",
+      newArrivals: "نوي راغلي",
+      blog: "بلاګ",
+      contactUs: "موږ سره اړیکه",
+      aboutUs: "زموږ په اړه",
+      specialOffer: "ځانګړی وړاندیز!",
+      blackFriday: "تور جمعه",
+    },
+    
+    // Header
+    header: {
+      searchPlaceholder: "محصولات ولټوئ...",
+      search: "لټون",
+      signIn: "ننوتل / نوم لیکنه",
+      welcomeGuest: "ښه راغلاست میلمه",
+      cart: "کارټ",
+    },
+    
+    // Top Bar
+    topBar: {
+      callUs: "موږ ته زنګ ووهئ:",
+      myAccount: "زما حساب",
+      wishlist: "د خوښې لیست",
+      checkout: "تادیه",
+      language: "ژبه",
+      currency: "افغانی",
+    },
+    
+    // Categories
+    categories: {
+      title: "کټګورۍ",
+      allCategories: "ټولې کټګورۍ",
+      electronics: "بریښنایی توکي",
+      fashion: "فیشن",
+      homeGarden: "کور او باغ",
+      sports: "سپورت او بهر",
+      healthBeauty: "روغتیا او ښایست",
+      toysGames: "لوبې",
+      automotive: "موټر",
+      booksMedia: "کتابونه او میډیا",
+      subcategories: "فرعي کټګورۍ",
+      productsInCategory: "په دې کټګورۍ کې محصولات",
+    },
+    
+    // Hero Section
+    hero: {
+      sale: "۵۰٪ تخفیف",
+      modernStyle: "عصري سټایل",
+      headphones: "هیډفونونه",
+      model: "ماډل",
+      quickSale: "ګړندي! یوازې ۱۰۰ محصولات د دې تخفیف سره شتون لري.",
+      shopNow: "اوس پیرود وکړئ",
+      nowAvailable: "اوس شتون لري!",
+      topSelling: "غوره پلور",
+      startingFrom: "له",
+      latestGeneration: "وروستی نسل",
+      kitchenEssentials: "د پخلنځي توکي",
+      mustHaveGadgets: "اړین وسایل",
+    },
+    
+    // Product
+    product: {
+      reviews: "بیاکتنې",
+      addToCart: "کارټ ته اضافه کړئ",
+      quickView: "چټک لید",
+      new: "نوی",
+      hot: "تود",
+      hours: "ساعتونه",
+      minutes: "دقیقې",
+      seconds: "ثانیې",
+      price: "بیه",
+      description: "تفصیل",
+      specifications: "مشخصات",
+      availability: "شتون",
+      inStock: "شتون لري",
+      outOfStock: "شتون نلري",
+      quantity: "مقدار",
+      addToWishlist: "خوښې ته اضافه کړئ",
+      relatedProducts: "اړوند محصولات",
+      sellerInfo: "د پلورونکي معلومات",
+      allProducts: "ټول محصولات",
+      newProducts: "نوي محصولات",
+    },
+    
+    // Filters
+    filters: {
+      title: "فلترونه",
+      priceRange: "د بیې حد",
+      rating: "درجه بندي",
+      brand: "برانډ",
+      sortBy: "ترتیب",
+      latest: "وروستي",
+      popularity: "مشهور",
+      priceLowHigh: "بیه: ټیټ څخه لوړ",
+      priceHighLow: "بیه: لوړ څخه ټیټ",
+      category: "کټګوري",
+      seller: "پلورونکی",
+      discount: "تخفیف لرونکي",
+      clear: "پاک کړئ",
+      apply: "پلي کړئ",
+      min: "لږترلږه",
+      max: "اعظمي",
+    },
+    
+    // View
+    view: {
+      grid: "ګریډ لید",
+      list: "لیست لید",
+      showMore: "نور وښایاست",
+      showLess: "لږ وښایاست",
+    },
+    
+    // Today Deals
+    deals: {
+      todayDeal: "د نن سودا",
+      seeAll: "ټول وګورئ",
+    },
+    
+    // Best Sellers
+    bestSellers: {
+      weeklyBestSellers: "د اونۍ غوره پلور",
+      television: "تلویزیون",
+      airConditional: "ایرکنډیشنر",
+      laptopsAccessories: "لپټاپ او لوازم",
+      smartphoneTablets: "سمارټ فون او ټابلیت",
+    },
+    
+    // Promo Banner
+    promo: {
+      savingOff: "یوازې iPad لپاره په ملیونونو ایپس کې ۲۰٪ خوندي کړئ",
+      limitedOffer: "محدود وړاندیز. دا حیرانوونکی سوداګري له لاسه مه ورکوئ!",
+    },
+    
+    // Category Banners
+    categoryBanners: {
+      tabletAccessories: "ټابلیت او لوازم",
+      tvAudioVideo: "تلویزیون او آډیو/ویډیو",
+      smartphoneAccessories: "سمارټ فون او لوازم",
+    },
+    
+    // Footer
+    footer: {
+      freeShipping: "وړیا لیږد",
+      ordersOver: "د ۱۰۰۰ افغانیو څخه پورته سفارشونه",
+      securePayment: "خوندي تادیه",
+      protected: "۱۰۰٪ خوندي",
+      support: "۲۴/۷ ملاتړ",
+      dedicatedHelp: "ځانګړی مرسته",
+      easyReturns: "اسانه بیرته ورکول",
+      daysReturn: "۳۰ ورځې بیرته ورکول",
+      quickLinks: "چټک لینکونه",
+      aboutUs: "زموږ په اړه",
+      contactUs: "موږ سره اړیکه",
+      privacyPolicy: "د محرمیت پالیسي",
+      termsConditions: "شرایط",
+      faq: "عمومي پوښتنې",
+      sitemap: "د سایت نقشه",
+      customerService: "پیرودونکو خدمات",
+      myAccount: "زما حساب",
+      orderTracking: "د سفارش تعقیب",
+      wishlist: "د خوښې لیست",
+      returns: "بیرته ورکول",
+      shippingInfo: "د لیږد معلومات",
+      giftCards: "تحفې کارتونه",
+      newsletter: "خبر پاڼه",
+      subscribeText: "د ځانګړو وړاندیزونو، تحفو او تخفیفونو لپاره ګډون وکړئ.",
+      enterEmail: "خپل بریښنالیک دننه کړئ",
+      allRightsReserved: "ټول حقونه خوندي دي",
+      onlineStore: "آنلاین پلورنځی",
+      description: "ستاسو د کیفیت لرونکو محصولاتو لپاره یو ځای د غوره بیو سره. په ډاډ سره پیرود وکړئ.",
+    },
+    
+    // About Page
+    about: {
+      title: "زموږ په اړه",
+      subtitle: "زموږ کیسه",
+      mission: "زموږ ماموریت",
+      missionText: "د غوره کیفیت محصولات د مناسبو بیو او غوره پیرودونکو خدماتو سره وړاندې کول.",
+      vision: "زموږ لید",
+      visionText: "په افغانستان او سیمه کې مخکښ آنلاین پلورنځی کېدل.",
+      values: "زموږ ارزښتونه",
+      valuesText: "صداقت، کیفیت، نوښت او د پیرودونکو رضایت.",
+      team: "زموږ ټیم",
+      history: "تاریخچه",
+      historyText: "موږ په ۱۴۰۰ کال کې خپل کار پیل کړ او تر نن پورې زرګونو پیرودونکو ته خدمات وړاندې کړي.",
+      awards: "جوایز او افتخارات",
+      awardsText: "د ۱۴۰۲ غوره آنلاین پلورنځي جایزه ګټونکی",
+    },
+    
+    // Contact Page
+    contact: {
+      title: "موږ سره اړیکه",
+      subtitle: "موږ دلته یو ستاسو مرستې ته",
+      name: "نوم",
+      email: "بریښنالیک",
+      phone: "تلیفون",
+      subject: "موضوع",
+      message: "پیغام",
+      send: "پیغام واستوئ",
+      address: "پته",
+      workingHours: "کاري ساعتونه",
+      success: "ستاسو پیغام په بریالیتوب سره واستول شو!",
+      error: "د پیغام لیږلو کې تېروتنه. مهرباني وکړئ بیا هڅه وکړئ.",
+      addressText: "کابل، افغانستان",
+      phoneNumber: "+93 700 000 000",
+      emailAddress: "info@store.af",
+      workingHoursText: "شنبه تر پنجشنبې: ۸ سهار - ۶ ماښام",
+    },
+    
+    // Blog Page
+    blog: {
+      title: "بلاګ",
+      subtitle: "وروستي خبرونه او مقالې",
+      searchPlaceholder: "مقالو کې ولټوئ...",
+      readMore: "نور ولولئ",
+      categories: "کټګورۍ",
+      recentPosts: "وروستي پوسټونه",
+      tags: "ټاګونه",
+      noResults: "هیڅ مقاله ونه موندل شوه",
+      publishedOn: "خپره شوې په",
+      by: "له لوري",
+      backToBlog: "بلاګ ته بیرته",
+      views: "لیدونه",
+      share: "شریک کړئ",
+    },
+    
+    // Admin - Comprehensive translations
+    admin: {
+      panelTitle: "اداري پینل",
+      panelSubtitle: "د سیسټم مدیریت",
+      main: "اصلي",
+      content: "منځپانګه",
+      system: "سیسټم",
+      manager: "مدیر",
+      logout: "وتل",
+      dashboard: "ډشبورډ",
+      dashboardDescription: "د سیسټم عمومي لید",
+      totalUsers: "ټول کاروونکي",
+      totalOrders: "ټول سفارشونه",
+      totalRevenue: "ټول عاید",
+      pendingSellers: "انتظار کې پلورونکي",
+      activeProducts: "فعال محصولات",
+      newRegistrations: "نوې نوم لیکنې",
+      activeSellers: "فعال پلورونکي",
+      pendingProducts: "انتظار کې محصولات",
+      alerts: "خبرتیاوې",
+      thisWeek: "دا اونۍ",
+      fromLastMonth: "تېر میاشت څخه",
+      pendingReview: "بیاکتنې انتظار کې",
+      needsAttention: "پاملرنې ته اړتیا لري",
+      inProgress: "روان",
+      awaitingVerification: "تصدیق انتظار کې",
+      revenueOverview: "د عاید لید",
+      monthlyRevenue: "میاشتني عاید",
+      monthlyOrders: "میاشتني سفارشونه",
+      revenue: "عاید",
+      quickActions: "چټک اقدامات",
+      reviewSellers: "پلورونکي بیاکتنه",
+      pendingSellerRequests: "انتظار کې پلورونکو غوښتنې",
+      reviewProducts: "محصولات بیاکتنه",
+      pendingProductApprovals: "انتظار کې محصولات تایید",
+      viewAllOrders: "ټول سفارشونه وګورئ",
+      manageOrders: "سفارشونه او تحویلي مدیریت کړئ",
+      recentActivity: "وروستي فعالیتونه",
+      newUserRegistration: "د نوي کاروونکي نوم لیکنه",
+      newUserJoined: "نوی کاروونکی د پیرودونکي په توګه ګډ شو",
+      newOrder: "نوی سفارش",
+      newOrderCreated: "نوی سفارش د ۱۵۰ ډالرو په ارزښت جوړ شو",
+      newProductPending: "نوی محصول انتظار کې",
+      newProductNeedsReview: "نوی محصول بیاکتنې ته اړتیا لري",
+      newVerificationRequest: "نوې تصدیق غوښتنه",
+      newSellerVerification: "نوي پلورونکي تصدیق غوښتنه لري",
+      
+      months: {
+        january: "وری", february: "غویی", march: "غبرګولی", april: "چنګاښ",
+        may: "زمری", june: "وږی", july: "تله", august: "لړم",
+        september: "لیندۍ", october: "مرغومی", november: "سلواغه", december: "کب",
+      },
+      
+      users: {
+        title: "د کاروونکو مدیریت", description: "ټول کاروونکي وګورئ او مدیریت کړئ",
+        usersTitle: "کاروونکي", totalUsers: "ټول {count} کاروونکي",
+        refresh: "تازه کړئ", export: "صادر کړئ",
+        searchPlaceholder: "د نوم یا بریښنالیک سره ولټوئ...", filterByRole: "د رول سره فلتر کړئ",
+        allRoles: "ټول رولونه", buyers: "پیرودونکي", sellers: "پلورونکي",
+        moderators: "ناظران", admins: "مدیران", user: "کاروونکی", role: "رول",
+        registrationDate: "د نوم لیکنې نېټه", actions: "اقدامات",
+        viewDetails: "تفصیلات وګورئ", suspendAccount: "حساب وځنډوئ",
+        userDetails: "د کاروونکي تفصیلات", fullInfo: "بشپړ کاروونکي معلومات",
+        close: "بند کړئ", noUsers: "هیڅ کاروونکی ونه موندل شو", loadError: "د کاروونکو پورته کولو کې تېروتنه",
+        roles: { admin: "مدیر", moderator: "ناظر", seller: "پلورونکی", buyer: "پیرودونکی", unspecified: "نامعلوم" },
+      },
+      
+      products: {
+        title: "د محصولاتو مدیریت", description: "ټول محصولات بیاکتنه او مدیریت کړئ",
+        productsTitle: "محصولات", totalProducts: "ټول {count} محصولات",
+        refresh: "تازه کړئ", searchPlaceholder: "د نوم سره ولټوئ...",
+        filterByStatus: "د حالت سره فلتر کړئ", allStatuses: "ټول حالتونه",
+        product: "محصول", price: "بیه", status: "حالت", addedDate: "اضافه شوې نېټه",
+        actions: "اقدامات", viewDetails: "تفصیلات وګورئ", approve: "تایید کړئ", reject: "رد کړئ",
+        rejectProduct: "محصول رد کړئ", enterRejectionReason: "مهرباني وکړئ د رد دلیل ولیکئ",
+        rejectionReasonPlaceholder: "د رد دلیل...", cancel: "لغوه کړئ", rejecting: "رد روان...",
+        noProducts: "هیڅ محصول ونه موندل شو", loadError: "د محصولاتو پورته کولو کې تېروتنه",
+        approveSuccess: "محصول تایید شو", approveError: "د تایید کې تېروتنه",
+        rejectSuccess: "محصول رد شو", rejectError: "د رد کې تېروتنه",
+        statuses: { active: "فعال", pending: "انتظار کې", rejected: "رد شوی", draft: "مسوده", archived: "آرشیف شوی" },
+      },
+      
+      orders: {
+        title: "د سفارشونو مدیریت", description: "ټول سفارشونه وګورئ او تعقیب کړئ",
+        ordersTitle: "سفارشونه", totalOrders: "ټول {count} سفارشونه",
+        refresh: "تازه کړئ", searchPlaceholder: "د سفارش نمبر سره ولټوئ...",
+        filterByStatus: "د حالت سره فلتر کړئ", allStatuses: "ټول حالتونه",
+        orderNumber: "سفارش نمبر", status: "حالت", payment: "تادیه",
+        amount: "مبلغ", date: "نېټه", actions: "اقدامات", noOrders: "هیڅ سفارش ونه موندل شو",
+        loadError: "د سفارشونو پورته کولو کې تېروتنه",
+        statuses: { pending: "انتظار کې", confirmed: "تایید شوی", processing: "پروسس کې", shipped: "لیږل شوی", delivered: "تحویل شوی", cancelled: "لغوه شوی", refunded: "بیرته ورکړل شوی" },
+        paymentStatuses: { pending: "تادیه انتظار کې", paid: "تادیه شوی", failed: "تادیه ناکامه", refunded: "بیرته ورکړل شوی" },
+      },
+      
+      sellers: {
+        title: "د پلورونکو تصدیق", description: "د پلورونکو تصدیق غوښتنې بیاکتنه کړئ",
+        verificationsTitle: "تصدیق غوښتنې", totalRequests: "ټول {count} غوښتنې",
+        refresh: "تازه کړئ", searchPlaceholder: "د شرکت نوم سره ولټوئ...",
+        companyName: "د شرکت نوم", businessType: "د سوداګرۍ ډول", phone: "تلیفون",
+        status: "حالت", date: "نېټه", actions: "اقدامات", unspecified: "مشخص نه دی",
+        rejectVerification: "تصدیق غوښتنه رد کړئ", enterRejectionReason: "مهرباني وکړئ د رد دلیل ولیکئ",
+        rejectionReasonPlaceholder: "د رد دلیل...", cancel: "لغوه کړئ", rejectRequest: "غوښتنه رد کړئ",
+        rejecting: "رد روان...", noVerifications: "هیڅ تصدیق غوښتنه ونه موندل شوه",
+        loadError: "د غوښتنو پورته کولو کې تېروتنه", approveSuccess: "پلورونکی تایید شو",
+        approveError: "تایید ناکام", rejectSuccess: "پلورونکی غوښتنه رد شوه", rejectError: "رد ناکام",
+        statuses: { approved: "تایید شوی", pending: "انتظار کې", rejected: "رد شوی", suspended: "ځنډول شوی" },
+      },
+      
+      banners: {
+        title: "د بنرونو مدیریت", description: "تبلیغاتي بنرونه مدیریت کړئ",
+        bannersTitle: "بنرونه", bannersDescription: "بنرونه او تبلیغات مدیریت کړئ",
+        addBanner: "بنر اضافه کړئ", noBanners: "هیڅ بنر نشته",
+        startByAdding: "د کور پاڼې لپاره نوی بنر اضافه کولو سره پیل کړئ",
+        addFirstBanner: "لومړی بنر اضافه کړئ",
+      },
+      
+      promotions: {
+        title: "د تبلیغاتو مدیریت", description: "تبلیغات جوړ او مدیریت کړئ",
+        promotionsTitle: "تبلیغات", promotionsDescription: "کوپنونه او تخفیفونه مدیریت کړئ",
+        addPromotion: "تبلیغ اضافه کړئ", noPromotions: "هیڅ تبلیغ نشته",
+        startByCreating: "نوی تبلیغ جوړولو سره پیل کړئ", createFirst: "لومړی تبلیغ جوړ کړئ",
+      },
+      
+      cms: {
+        title: "د منځپانګې مدیریت", description: "د ویب پاڼې پاڼې او منځپانګه سم کړئ",
+        pages: {
+          home: "کور پاڼه", homeDescription: "د کور پاڼې منځپانګه مدیریت کړئ",
+          about: "زموږ په اړه", aboutDescription: "زموږ په اړه پاڼه سم کړئ",
+          contact: "موږ سره اړیکه", contactDescription: "د اړیکو معلومات سم کړئ",
+          terms: "شرایط", termsDescription: "شرایط سم کړئ",
+          privacy: "د محرمیت پالیسي", privacyDescription: "د محرمیت پالیسي سم کړئ",
+        },
+      },
+      
+      settings: {
+        title: "ترتیبات", description: "د سیسټم ترتیبات او تنظیمات",
+        saveChanges: "بدلونونه خوندي کړئ",
+        tabs: { general: "عمومي", notifications: "خبرتیاوې", security: "امنیت" },
+        general: {
+          title: "عمومي ترتیبات", description: "اصلي سیسټم ترتیبات",
+          siteName: "د سایت نوم", siteNamePlaceholder: "د پلورنځي نوم",
+          siteEmail: "د سایت بریښنالیک", maintenanceMode: "ساتنې حالت",
+          maintenanceDescription: "د ساتنې لپاره سایت موقتاً غیر فعال کړئ",
+        },
+        notifications: {
+          title: "د خبرتیاوو ترتیبات", description: "د بریښنالیک خبرتیاوې تنظیم کړئ",
+          newOrders: "نوي سفارش خبرتیاوې", newOrdersDescription: "د نوي سفارش په وخت کې خبرتیا ترلاسه کړئ",
+          newRegistrations: "نوې نوم لیکنې خبرتیاوې", newRegistrationsDescription: "د نوي کاروونکي نوم لیکنې په وخت کې خبرتیا ترلاسه کړئ",
+          verificationRequests: "تصدیق غوښتنې خبرتیاوې", verificationRequestsDescription: "د نوې تصدیق غوښتنې په وخت کې خبرتیا ترلاسه کړئ",
+        },
+        security: {
+          title: "امنیتي ترتیبات", description: "امنیتي اختیارات تنظیم کړئ",
+          twoFactor: "دوه مرحله ای تصدیق", twoFactorDescription: "د مدیرانو لپاره دوه مرحله ای تصدیق فعال کړئ",
+          activityLog: "د فعالیت ثبت", activityLogDescription: "د مدیرانو ټول فعالیتونه ثبت کړئ",
+        },
+      },
+    },
+    
+    // Common
+    common: {
+      loading: "پورته کیږي...",
+      noProducts: "هیڅ محصول ونه موندل شو",
+      viewMore: "نور وګورئ",
+      backToHome: "کور ته بیرته",
+      pageNotFound: "پاڼه ونه موندل شوه",
+      search: "لټون",
+      cancel: "لغوه کړئ",
+      save: "خوندي کړئ",
+      submit: "واستوئ",
+      close: "بند کړئ",
+      yes: "هو",
+      no: "نه",
+      confirm: "تایید کړئ",
+      delete: "حذف کړئ",
+      edit: "سم کړئ",
+      view: "وګورئ",
+      all: "ټول",
+      none: "هیڅ",
+      or: "یا",
+      and: "او",
+      from: "له",
+      to: "ته",
+    },
+    
+    // Pages
+    pages: {
+      home: "کور",
+      products: "محصولات",
+      categories: "کټګورۍ",
+      about: "زموږ په اړه",
+      contact: "اړیکه",
+      blog: "بلاګ",
+      pricing: "بیه ټاکل",
+      login: "ننوتل",
+      register: "نوم لیکنه",
+      newProducts: "نوي محصولات",
+    },
+    
+    // Auth
+    auth: {
+      login: "ننوتل",
+      register: "نوم لیکنه",
+      email: "بریښنالیک",
+      password: "پټنوم",
+      confirmPassword: "پټنوم تایید کړئ",
+      forgotPassword: "پټنوم مو هیر شوی؟",
+      rememberMe: "ما په یاد ولرئ",
+      noAccount: "حساب نلرئ؟",
+      haveAccount: "لا دمخه حساب لرئ؟",
+      signUp: "نوم ولیکئ",
+      signIn: "ننوزئ",
+      logout: "وځئ",
+      fullName: "بشپړ نوم",
+      selectRole: "خپل رول وټاکئ",
+      createAccount: "حساب جوړ کړئ",
+      orContinueWith: "یا دوام ورکړئ سره",
+      agreeToTerms: "د نوم لیکنې سره، تاسو موافق یاست سره",
+      termsOfService: "د خدماتو شرایط",
+      privacyPolicy: "د محرمیت پالیسي",
+      agree: "",
+      resetPassword: "پټنوم بیا تنظیم کړئ",
+      sendResetLink: "د بیا تنظیم لینک واستوئ",
+      backToLogin: "ننوتلو ته بیرته",
+      checkEmail: "خپل بریښنالیک وګورئ",
+      resetLinkSent: "د پټنوم بیا تنظیم لینک واستول شو",
+    },
+    
+    // Checkout
+    checkout: {
+      title: "تادیه",
+      steps: {
+        address: "پته",
+        orderSummary: "د سفارش لنډیز",
+        payment: "تادیه",
+        confirm: "تایید",
+      },
+      address: {
+        title: "د تحویلي پته",
+        name: "بشپړ نوم",
+        phone: "تلیفون نمبر",
+        city: "ښار",
+        fullAddress: "بشپړه پته",
+        useProfileAddress: "د پروفایل پته وکاروئ",
+        editAddress: "پته سم کړئ",
+      },
+      orderSummary: {
+        title: "د سفارش لنډیز",
+        product: "محصول",
+        quantity: "مقدار",
+        price: "بیه",
+        subtotal: "ټوله",
+        deliveryFee: "د تحویلي فیس",
+        total: "مجموعه",
+        sellerPolicies: "د پلورونکي پالیسي",
+        returnPolicy: "د بیرته ورکولو پالیسي",
+        shippingPolicy: "د لیږد پالیسي",
+        noPolicyProvided: "هیڅ پالیسي نشته",
+      },
+      payment: {
+        title: "د تادیې طریقه",
+        cashOnDelivery: "د تحویلي په وخت تادیه",
+        cashOnDeliveryDesc: "کله چې سفارش ترلاسه کړئ تادیه کړئ",
+        onlinePaymentSoon: "آنلاین تادیه ډېر ژر راځي",
+      },
+      confirm: {
+        title: "سفارش تایید کړئ",
+        placeOrder: "سفارش ورکړئ",
+        processing: "پروسس روان...",
+        reviewOrder: "مهرباني وکړئ خپل سفارش بیاکتنه کړئ",
+        orderSuccess: "سفارش په بریالیتوب سره ورکړل شو",
+        orderSuccessDesc: "ستاسو سفارش ورکړل شو او ډېر ژر پروسس کیږي",
+      },
+      errors: {
+        emptyCart: "ستاسو کارټ خالي دی",
+        fillAllFields: "مهرباني وکړئ ټول اړین ساحې ډک کړئ",
+        orderFailed: "سفارش ورکولو کې ناکام",
+      },
+      navigation: {
+        next: "راتلونکی",
+        previous: "مخکینی",
+        backToCart: "کارټ ته بیرته",
+      },
+    },
+    
+    // Validation messages
+    validation: {
+      required: "دا ساحه اړینه ده",
+      invalidEmail: "ناسم بریښنالیک",
+      passwordsDoNotMatch: "پټنومونه سره نه سمون لري",
+      invalidPhone: "ناسم تلیفون نمبر",
+      minLength: "لږترلږه {min} توري ولیکئ",
+      maxLength: "اعظمي {max} توري اجازه لري",
+    },
+    
+    // Error messages
+    errors: {
+      somethingWentWrong: "یو څه غلط شول",
+      tryAgain: "مهرباني وکړئ بیا هڅه وکړئ",
+      networkError: "د شبکې تېروتنه",
+      unauthorized: "غیر مجاز لاسرسی",
+      notFound: "ونه موندل شو",
+      serverError: "د سرور تېروتنه",
+    },
+    
+    // Success messages
+    success: {
+      saved: "په بریالیتوب سره خوندي شو",
+      deleted: "په بریالیتوب سره حذف شو",
+      updated: "په بریالیتوب سره تازه شو",
+      created: "په بریالیتوب سره جوړ شو",
+    },
+  },
+  
+  // ============================================
+  // ENGLISH (en)
+  // ============================================
   en: {
     // Navigation
     nav: {
@@ -1118,24 +1671,27 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
     localStorage.setItem('language', lang);
-    document.documentElement.dir = lang === 'fa' ? 'rtl' : 'ltr';
+    const isRTL = RTL_LANGUAGES.includes(lang);
+    document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
     document.documentElement.lang = lang;
     // Update the font family based on language
-    document.body.style.fontFamily = lang === 'fa' 
+    // Vazirmatn supports both Persian and Pashto scripts
+    document.body.style.fontFamily = isRTL 
       ? "'Vazirmatn', sans-serif" 
       : "'Inter', 'Vazirmatn', sans-serif";
   };
 
   useEffect(() => {
-    document.documentElement.dir = language === 'fa' ? 'rtl' : 'ltr';
+    const isRTL = RTL_LANGUAGES.includes(language);
+    document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
     document.documentElement.lang = language;
-    document.body.style.fontFamily = language === 'fa' 
+    document.body.style.fontFamily = isRTL 
       ? "'Vazirmatn', sans-serif" 
       : "'Inter', 'Vazirmatn', sans-serif";
   }, [language]);
 
   const t = translations[language];
-  const isRTL = language === 'fa';
+  const isRTL = RTL_LANGUAGES.includes(language);
   const dir = isRTL ? 'rtl' : 'ltr';
   const direction = dir;
 
@@ -1165,6 +1721,14 @@ export const formatDate = (date: Date | string, language: Language): string => {
       day: 'numeric',
     });
   }
+  if (language === 'ps') {
+    // Use Pashto formatting (falls back to Persian locale as Pashto is similar)
+    return d.toLocaleDateString('ps-AF', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  }
   return d.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
@@ -1174,7 +1738,8 @@ export const formatDate = (date: Date | string, language: Language): string => {
 
 // Number formatting utilities
 export const formatNumber = (num: number, language: Language): string => {
-  if (language === 'fa') {
+  if (language === 'fa' || language === 'ps') {
+    // Both Persian and Pashto use Eastern Arabic numerals
     return num.toLocaleString('fa-AF');
   }
   return num.toLocaleString('en-US');
@@ -1185,5 +1750,21 @@ export const formatCurrency = (amount: number, language: Language): string => {
   if (language === 'fa') {
     return `${formatNumber(amount, language)} افغانی`;
   }
+  if (language === 'ps') {
+    return `${formatNumber(amount, language)} افغانی`;
+  }
   return `$${formatNumber(amount, language)}`;
+};
+
+// Get localized content with fallback chain: requested language -> English
+export const getLocalizedContent = <T extends Record<string, unknown>>(
+  item: T,
+  field: string,
+  language: Language
+): string => {
+  const localizedField = `${field}_${language === 'en' ? '' : language}`.replace(/_$/, '');
+  const fallbackField = field;
+  
+  // Try localized field first, then fallback to base field (English)
+  return (item[localizedField] as string) || (item[fallbackField] as string) || '';
 };
