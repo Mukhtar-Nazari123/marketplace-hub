@@ -7,9 +7,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const LanguageSwitcher = () => {
-  const { language, setLanguage } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
 
   const languages = [
     { code: "en", label: "English", shortLabel: "EN" },
@@ -21,20 +22,28 @@ const LanguageSwitcher = () => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="transition-all duration-300 hover:bg-muted"
-        >
-          <Globe className="h-5 w-5 text-muted-foreground" />
-        </Button>
-      </DropdownMenuTrigger>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="transition-all duration-300 hover:bg-muted"
+              aria-label={t.header.language}
+            >
+              <Globe className="h-5 w-5 text-muted-foreground" />
+            </Button>
+          </DropdownMenuTrigger>
+        </TooltipTrigger>
+        <TooltipContent>
+          {t.header.language}
+        </TooltipContent>
+      </Tooltip>
       <DropdownMenuContent align="end" className="min-w-[120px]">
         {languages.map((lang) => (
           <DropdownMenuItem
             key={lang.code}
-            onClick={() => setLanguage(lang.code as "en" | "fa")}
+            onClick={() => setLanguage(lang.code as "en" | "fa" | "ps")}
             className="flex items-center justify-between cursor-pointer"
           >
             <span>{lang.label}</span>
