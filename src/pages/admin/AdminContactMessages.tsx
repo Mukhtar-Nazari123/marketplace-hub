@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useLanguage } from '@/lib/i18n';
+import { useLanguage, Language } from '@/lib/i18n';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -78,8 +78,16 @@ interface ContactMessage {
   updated_at: string;
 }
 
+const getLabel = (lang: Language, en: string, fa: string, ps: string) => {
+  if (lang === 'ps') return ps;
+  if (lang === 'fa') return fa;
+  return en;
+};
+
 const AdminContactMessages = () => {
-  const { t, isRTL } = useLanguage();
+  const { t, isRTL, language } = useLanguage();
+  const lang = language as Language;
+  
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -115,8 +123,8 @@ const AdminContactMessages = () => {
     } catch (error) {
       console.error('Error fetching messages:', error);
       toast({
-        title: isRTL ? 'خطا' : 'Error',
-        description: isRTL ? 'دریافت پیام‌ها ناموفق بود' : 'Failed to fetch messages',
+        title: getLabel(lang, 'Error', 'خطا', 'تېروتنه'),
+        description: getLabel(lang, 'Failed to fetch messages', 'دریافت پیام‌ها ناموفق بود', 'پیغامونه راوړل ناکام شول'),
         variant: 'destructive',
       });
     } finally {
@@ -172,8 +180,8 @@ const AdminContactMessages = () => {
       if (error) throw error;
 
       toast({
-        title: isRTL ? 'موفق' : 'Success',
-        description: isRTL ? 'پاسخ ذخیره شد' : 'Reply saved successfully',
+        title: getLabel(lang, 'Success', 'موفق', 'بریالیتوب'),
+        description: getLabel(lang, 'Reply saved successfully', 'پاسخ ذخیره شد', 'ځواب بریالی خوندی شو'),
       });
 
       setMessages(prev =>
@@ -188,8 +196,8 @@ const AdminContactMessages = () => {
     } catch (error) {
       console.error('Error saving reply:', error);
       toast({
-        title: isRTL ? 'خطا' : 'Error',
-        description: isRTL ? 'ذخیره پاسخ ناموفق بود' : 'Failed to save reply',
+        title: getLabel(lang, 'Error', 'خطا', 'تېروتنه'),
+        description: getLabel(lang, 'Failed to save reply', 'ذخیره پاسخ ناموفق بود', 'ځواب خوندي کول ناکام شول'),
         variant: 'destructive',
       });
     } finally {
@@ -211,14 +219,14 @@ const AdminContactMessages = () => {
       );
 
       toast({
-        title: isRTL ? 'موفق' : 'Success',
-        description: isRTL ? 'وضعیت به‌روز شد' : 'Status updated',
+        title: getLabel(lang, 'Success', 'موفق', 'بریالیتوب'),
+        description: getLabel(lang, 'Status updated', 'وضعیت به‌روز شد', 'حالت تازه شو'),
       });
     } catch (error) {
       console.error('Error updating status:', error);
       toast({
-        title: isRTL ? 'خطا' : 'Error',
-        description: isRTL ? 'به‌روزرسانی وضعیت ناموفق بود' : 'Failed to update status',
+        title: getLabel(lang, 'Error', 'خطا', 'تېروتنه'),
+        description: getLabel(lang, 'Failed to update status', 'به‌روزرسانی وضعیت ناموفق بود', 'حالت تازه کول ناکام شول'),
         variant: 'destructive',
       });
     }
@@ -237,8 +245,8 @@ const AdminContactMessages = () => {
       if (error) throw error;
 
       toast({
-        title: isRTL ? 'موفق' : 'Success',
-        description: isRTL ? 'پیام حذف شد' : 'Message deleted',
+        title: getLabel(lang, 'Success', 'موفق', 'بریالیتوب'),
+        description: getLabel(lang, 'Message deleted', 'پیام حذف شد', 'پیغام ړنګ شو'),
       });
 
       setMessages(prev => prev.filter(m => m.id !== selectedMessage.id));
@@ -247,8 +255,8 @@ const AdminContactMessages = () => {
     } catch (error) {
       console.error('Error deleting message:', error);
       toast({
-        title: isRTL ? 'خطا' : 'Error',
-        description: isRTL ? 'حذف پیام ناموفق بود' : 'Failed to delete message',
+        title: getLabel(lang, 'Error', 'خطا', 'تېروتنه'),
+        description: getLabel(lang, 'Failed to delete message', 'حذف پیام ناموفق بود', 'پیغام ړنګول ناکام شول'),
         variant: 'destructive',
       });
     } finally {
@@ -258,10 +266,10 @@ const AdminContactMessages = () => {
 
   const getStatusBadge = (status: string) => {
     const statusConfig: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: React.ReactNode; label: string }> = {
-      new: { variant: 'default', icon: <MessageCircle size={12} />, label: isRTL ? 'جدید' : 'New' },
-      read: { variant: 'secondary', icon: <Eye size={12} />, label: isRTL ? 'خوانده شده' : 'Read' },
-      replied: { variant: 'outline', icon: <CheckCircle size={12} />, label: isRTL ? 'پاسخ داده شده' : 'Replied' },
-      closed: { variant: 'destructive', icon: <XCircle size={12} />, label: isRTL ? 'بسته شده' : 'Closed' },
+      new: { variant: 'default', icon: <MessageCircle size={12} />, label: getLabel(lang, 'New', 'جدید', 'نوی') },
+      read: { variant: 'secondary', icon: <Eye size={12} />, label: getLabel(lang, 'Read', 'خوانده شده', 'لوستل شوی') },
+      replied: { variant: 'outline', icon: <CheckCircle size={12} />, label: getLabel(lang, 'Replied', 'پاسخ داده شده', 'ځواب شوی') },
+      closed: { variant: 'destructive', icon: <XCircle size={12} />, label: getLabel(lang, 'Closed', 'بسته شده', 'تړل شوی') },
     };
 
     const config = statusConfig[status] || statusConfig.new;
@@ -275,14 +283,23 @@ const AdminContactMessages = () => {
 
   const getRoleBadge = (role: string) => {
     const roleConfig: Record<string, { className: string; label: string }> = {
-      guest: { className: 'bg-gray-100 text-gray-800', label: isRTL ? 'مهمان' : 'Guest' },
-      buyer: { className: 'bg-blue-100 text-blue-800', label: isRTL ? 'خریدار' : 'Buyer' },
-      seller: { className: 'bg-green-100 text-green-800', label: isRTL ? 'فروشنده' : 'Seller' },
-      admin: { className: 'bg-purple-100 text-purple-800', label: isRTL ? 'ادمین' : 'Admin' },
+      guest: { className: 'bg-muted text-muted-foreground', label: getLabel(lang, 'Guest', 'مهمان', 'میلمه') },
+      buyer: { className: 'bg-primary/10 text-primary', label: getLabel(lang, 'Buyer', 'خریدار', 'پیرودونکی') },
+      seller: { className: 'bg-success/10 text-success', label: getLabel(lang, 'Seller', 'فروشنده', 'پلورونکی') },
+      admin: { className: 'bg-accent text-accent-foreground', label: getLabel(lang, 'Admin', 'ادمین', 'اډمین') },
     };
 
     const config = roleConfig[role] || roleConfig.guest;
     return <Badge className={config.className}>{config.label}</Badge>;
+  };
+
+  const getLocaleName = (locale: string) => {
+    const localeMap: Record<string, string> = {
+      en: 'English',
+      fa: 'فارسی',
+      ps: 'پښتو',
+    };
+    return localeMap[locale] || locale;
   };
 
   const filteredMessages = messages.filter(
@@ -301,18 +318,21 @@ const AdminContactMessages = () => {
   };
 
   return (
-    <AdminLayout title={isRTL ? 'پیام‌های تماس' : 'Contact Messages'} description={isRTL ? 'مدیریت پیام‌های دریافتی از فرم تماس' : 'Manage contact form submissions'}>
+    <AdminLayout 
+      title={getLabel(lang, 'Contact Messages', 'پیام‌های تماس', 'د اړیکو پیغامونه')} 
+      description={getLabel(lang, 'Manage contact form submissions', 'مدیریت پیام‌های دریافتی از فرم تماس', 'د اړیکو فورم پیغامونه اداره کړئ')}
+    >
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">{isRTL ? 'پیام‌های تماس' : 'Contact Messages'}</h1>
+            <h1 className="text-2xl font-bold">{getLabel(lang, 'Contact Messages', 'پیام‌های تماس', 'د اړیکو پیغامونه')}</h1>
             <p className="text-muted-foreground">
-              {isRTL ? 'مدیریت پیام‌های دریافتی از فرم تماس' : 'Manage contact form submissions'}
+              {getLabel(lang, 'Manage contact form submissions', 'مدیریت پیام‌های دریافتی از فرم تماس', 'د اړیکو فورم پیغامونه اداره کړئ')}
             </p>
           </div>
           <Button onClick={fetchMessages} variant="outline" className="gap-2">
             <RefreshCw size={16} />
-            {isRTL ? 'بازنشانی' : 'Refresh'}
+            {getLabel(lang, 'Refresh', 'بازنشانی', 'تازه کول')}
           </Button>
         </div>
 
@@ -321,31 +341,31 @@ const AdminContactMessages = () => {
           <Card>
             <CardContent className="pt-4">
               <div className="text-2xl font-bold">{stats.total}</div>
-              <div className="text-sm text-muted-foreground">{isRTL ? 'کل پیام‌ها' : 'Total'}</div>
+              <div className="text-sm text-muted-foreground">{getLabel(lang, 'Total', 'کل پیام‌ها', 'ټول')}</div>
             </CardContent>
           </Card>
-          <Card className="border-blue-200 bg-blue-50/50">
+          <Card className="border-primary/20 bg-primary/5">
             <CardContent className="pt-4">
-              <div className="text-2xl font-bold text-blue-600">{stats.new}</div>
-              <div className="text-sm text-muted-foreground">{isRTL ? 'جدید' : 'New'}</div>
+              <div className="text-2xl font-bold text-primary">{stats.new}</div>
+              <div className="text-sm text-muted-foreground">{getLabel(lang, 'New', 'جدید', 'نوی')}</div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="pt-4">
               <div className="text-2xl font-bold">{stats.read}</div>
-              <div className="text-sm text-muted-foreground">{isRTL ? 'خوانده شده' : 'Read'}</div>
+              <div className="text-sm text-muted-foreground">{getLabel(lang, 'Read', 'خوانده شده', 'لوستل شوی')}</div>
             </CardContent>
           </Card>
-          <Card className="border-green-200 bg-green-50/50">
+          <Card className="border-success/20 bg-success/5">
             <CardContent className="pt-4">
-              <div className="text-2xl font-bold text-green-600">{stats.replied}</div>
-              <div className="text-sm text-muted-foreground">{isRTL ? 'پاسخ داده شده' : 'Replied'}</div>
+              <div className="text-2xl font-bold text-success">{stats.replied}</div>
+              <div className="text-sm text-muted-foreground">{getLabel(lang, 'Replied', 'پاسخ داده شده', 'ځواب شوی')}</div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="pt-4">
               <div className="text-2xl font-bold">{stats.closed}</div>
-              <div className="text-sm text-muted-foreground">{isRTL ? 'بسته شده' : 'Closed'}</div>
+              <div className="text-sm text-muted-foreground">{getLabel(lang, 'Closed', 'بسته شده', 'تړل شوی')}</div>
             </CardContent>
           </Card>
         </div>
@@ -357,7 +377,7 @@ const AdminContactMessages = () => {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
                 <Input
-                  placeholder={isRTL ? 'جستجو در پیام‌ها...' : 'Search messages...'}
+                  placeholder={getLabel(lang, 'Search messages...', 'جستجو در پیام‌ها...', 'پیغامونه ولټوئ...')}
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
                   className="pl-10"
@@ -365,25 +385,25 @@ const AdminContactMessages = () => {
               </div>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-full sm:w-40">
-                  <SelectValue placeholder={isRTL ? 'وضعیت' : 'Status'} />
+                  <SelectValue placeholder={getLabel(lang, 'Status', 'وضعیت', 'حالت')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">{isRTL ? 'همه' : 'All'}</SelectItem>
-                  <SelectItem value="new">{isRTL ? 'جدید' : 'New'}</SelectItem>
-                  <SelectItem value="read">{isRTL ? 'خوانده شده' : 'Read'}</SelectItem>
-                  <SelectItem value="replied">{isRTL ? 'پاسخ داده شده' : 'Replied'}</SelectItem>
-                  <SelectItem value="closed">{isRTL ? 'بسته شده' : 'Closed'}</SelectItem>
+                  <SelectItem value="all">{getLabel(lang, 'All', 'همه', 'ټول')}</SelectItem>
+                  <SelectItem value="new">{getLabel(lang, 'New', 'جدید', 'نوی')}</SelectItem>
+                  <SelectItem value="read">{getLabel(lang, 'Read', 'خوانده شده', 'لوستل شوی')}</SelectItem>
+                  <SelectItem value="replied">{getLabel(lang, 'Replied', 'پاسخ داده شده', 'ځواب شوی')}</SelectItem>
+                  <SelectItem value="closed">{getLabel(lang, 'Closed', 'بسته شده', 'تړل شوی')}</SelectItem>
                 </SelectContent>
               </Select>
               <Select value={roleFilter} onValueChange={setRoleFilter}>
                 <SelectTrigger className="w-full sm:w-40">
-                  <SelectValue placeholder={isRTL ? 'نقش کاربر' : 'User Role'} />
+                  <SelectValue placeholder={getLabel(lang, 'User Role', 'نقش کاربر', 'د کاروونکي رول')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">{isRTL ? 'همه' : 'All'}</SelectItem>
-                  <SelectItem value="guest">{isRTL ? 'مهمان' : 'Guest'}</SelectItem>
-                  <SelectItem value="buyer">{isRTL ? 'خریدار' : 'Buyer'}</SelectItem>
-                  <SelectItem value="seller">{isRTL ? 'فروشنده' : 'Seller'}</SelectItem>
+                  <SelectItem value="all">{getLabel(lang, 'All', 'همه', 'ټول')}</SelectItem>
+                  <SelectItem value="guest">{getLabel(lang, 'Guest', 'مهمان', 'میلمه')}</SelectItem>
+                  <SelectItem value="buyer">{getLabel(lang, 'Buyer', 'خریدار', 'پیرودونکی')}</SelectItem>
+                  <SelectItem value="seller">{getLabel(lang, 'Seller', 'فروشنده', 'پلورونکی')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -399,23 +419,23 @@ const AdminContactMessages = () => {
               </div>
             ) : filteredMessages.length === 0 ? (
               <div className="text-center py-12 text-muted-foreground">
-                {isRTL ? 'پیامی یافت نشد' : 'No messages found'}
+                {getLabel(lang, 'No messages found', 'پیامی یافت نشد', 'هیڅ پیغام ونه موندل شو')}
               </div>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>{isRTL ? 'فرستنده' : 'Sender'}</TableHead>
-                    <TableHead>{isRTL ? 'موضوع' : 'Subject'}</TableHead>
-                    <TableHead>{isRTL ? 'نقش' : 'Role'}</TableHead>
-                    <TableHead>{isRTL ? 'وضعیت' : 'Status'}</TableHead>
-                    <TableHead>{isRTL ? 'تاریخ' : 'Date'}</TableHead>
-                    <TableHead className="text-center">{isRTL ? 'عملیات' : 'Actions'}</TableHead>
+                    <TableHead>{getLabel(lang, 'Sender', 'فرستنده', 'لیږونکی')}</TableHead>
+                    <TableHead>{getLabel(lang, 'Subject', 'موضوع', 'موضوع')}</TableHead>
+                    <TableHead>{getLabel(lang, 'Role', 'نقش', 'رول')}</TableHead>
+                    <TableHead>{getLabel(lang, 'Status', 'وضعیت', 'حالت')}</TableHead>
+                    <TableHead>{getLabel(lang, 'Date', 'تاریخ', 'نیټه')}</TableHead>
+                    <TableHead className="text-center">{getLabel(lang, 'Actions', 'عملیات', 'کړنې')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredMessages.map(message => (
-                    <TableRow key={message.id} className={message.status === 'new' ? 'bg-blue-50/50' : ''}>
+                    <TableRow key={message.id} className={message.status === 'new' ? 'bg-primary/5' : ''}>
                       <TableCell>
                         <div>
                           <div className="font-medium">{message.full_name}</div>
@@ -438,7 +458,7 @@ const AdminContactMessages = () => {
                             variant="ghost"
                             size="icon"
                             onClick={() => handleViewMessage(message)}
-                            title={isRTL ? 'مشاهده' : 'View'}
+                            title={getLabel(lang, 'View', 'مشاهده', 'لید')}
                           >
                             <Eye size={16} />
                           </Button>
@@ -446,7 +466,7 @@ const AdminContactMessages = () => {
                             variant="ghost"
                             size="icon"
                             onClick={() => handleReplyClick(message)}
-                            title={isRTL ? 'پاسخ' : 'Reply'}
+                            title={getLabel(lang, 'Reply', 'پاسخ', 'ځواب')}
                           >
                             <Reply size={16} />
                           </Button>
@@ -457,7 +477,7 @@ const AdminContactMessages = () => {
                               setSelectedMessage(message);
                               setIsDeleteDialogOpen(true);
                             }}
-                            title={isRTL ? 'حذف' : 'Delete'}
+                            title={getLabel(lang, 'Delete', 'حذف', 'ړنګول')}
                             className="text-destructive hover:text-destructive"
                           >
                             <Trash2 size={16} />
@@ -476,7 +496,7 @@ const AdminContactMessages = () => {
         <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
           <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>{isRTL ? 'جزئیات پیام' : 'Message Details'}</DialogTitle>
+              <DialogTitle>{getLabel(lang, 'Message Details', 'جزئیات پیام', 'د پیغام توضیحات')}</DialogTitle>
             </DialogHeader>
             {selectedMessage && (
               <div className="space-y-4">
@@ -497,7 +517,7 @@ const AdminContactMessages = () => {
                   )}
                   <div className="flex items-center gap-2">
                     <Globe size={16} className="text-muted-foreground" />
-                    <span>{selectedMessage.locale === 'fa' ? 'فارسی' : 'English'}</span>
+                    <span>{getLocaleName(selectedMessage.locale)}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Calendar size={16} className="text-muted-foreground" />
@@ -517,24 +537,24 @@ const AdminContactMessages = () => {
                 </div>
 
                 <div className="border-t pt-4">
-                  <h4 className="font-medium mb-2">{isRTL ? 'موضوع' : 'Subject'}</h4>
+                  <h4 className="font-medium mb-2">{getLabel(lang, 'Subject', 'موضوع', 'موضوع')}</h4>
                   <p>{selectedMessage.subject}</p>
                 </div>
 
                 <div className="border-t pt-4">
-                  <h4 className="font-medium mb-2">{isRTL ? 'پیام' : 'Message'}</h4>
+                  <h4 className="font-medium mb-2">{getLabel(lang, 'Message', 'پیام', 'پیغام')}</h4>
                   <p className="whitespace-pre-wrap bg-muted/50 p-4 rounded-lg">{selectedMessage.message}</p>
                 </div>
 
                 {selectedMessage.admin_reply && (
                   <div className="border-t pt-4">
-                    <h4 className="font-medium mb-2 text-green-600">{isRTL ? 'پاسخ ادمین' : 'Admin Reply'}</h4>
-                    <p className="whitespace-pre-wrap bg-green-50 p-4 rounded-lg border border-green-200">
+                    <h4 className="font-medium mb-2 text-success">{getLabel(lang, 'Admin Reply', 'پاسخ ادمین', 'د اډمین ځواب')}</h4>
+                    <p className="whitespace-pre-wrap bg-success/10 p-4 rounded-lg border border-success/20">
                       {selectedMessage.admin_reply}
                     </p>
                     {selectedMessage.replied_at && (
                       <div className="text-sm text-muted-foreground mt-2">
-                        {isRTL ? 'پاسخ داده شده در:' : 'Replied at:'}{' '}
+                        {getLabel(lang, 'Replied at:', 'پاسخ داده شده در:', 'ځواب شوی په:')}{' '}
                         {format(new Date(selectedMessage.replied_at), 'yyyy-MM-dd HH:mm')}
                       </div>
                     )}
@@ -553,15 +573,15 @@ const AdminContactMessages = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="new">{isRTL ? 'جدید' : 'New'}</SelectItem>
-                      <SelectItem value="read">{isRTL ? 'خوانده شده' : 'Read'}</SelectItem>
-                      <SelectItem value="replied">{isRTL ? 'پاسخ داده شده' : 'Replied'}</SelectItem>
-                      <SelectItem value="closed">{isRTL ? 'بسته شده' : 'Closed'}</SelectItem>
+                      <SelectItem value="new">{getLabel(lang, 'New', 'جدید', 'نوی')}</SelectItem>
+                      <SelectItem value="read">{getLabel(lang, 'Read', 'خوانده شده', 'لوستل شوی')}</SelectItem>
+                      <SelectItem value="replied">{getLabel(lang, 'Replied', 'پاسخ داده شده', 'ځواب شوی')}</SelectItem>
+                      <SelectItem value="closed">{getLabel(lang, 'Closed', 'بسته شده', 'تړل شوی')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <Button onClick={() => handleReplyClick(selectedMessage)} className="gap-2">
                     <Reply size={16} />
-                    {isRTL ? 'پاسخ' : 'Reply'}
+                    {getLabel(lang, 'Reply', 'پاسخ', 'ځواب')}
                   </Button>
                 </div>
               </div>
@@ -573,28 +593,28 @@ const AdminContactMessages = () => {
         <Dialog open={isReplyDialogOpen} onOpenChange={setIsReplyDialogOpen}>
           <DialogContent className="max-w-lg">
             <DialogHeader>
-              <DialogTitle>{isRTL ? 'پاسخ به پیام' : 'Reply to Message'}</DialogTitle>
+              <DialogTitle>{getLabel(lang, 'Reply to Message', 'پاسخ به پیام', 'پیغام ته ځواب')}</DialogTitle>
             </DialogHeader>
             {selectedMessage && (
               <div className="space-y-4">
                 <div className="text-sm text-muted-foreground">
-                  {isRTL ? 'پاسخ به' : 'Replying to'}: <strong>{selectedMessage.full_name}</strong> ({selectedMessage.email})
+                  {getLabel(lang, 'Replying to', 'پاسخ به', 'ځواب ورکول')}: <strong>{selectedMessage.full_name}</strong> ({selectedMessage.email})
                 </div>
                 <Textarea
                   value={replyText}
                   onChange={e => setReplyText(e.target.value)}
-                  placeholder={isRTL ? 'پاسخ خود را بنویسید...' : 'Write your reply...'}
+                  placeholder={getLabel(lang, 'Write your reply...', 'پاسخ خود را بنویسید...', 'خپل ځواب ولیکئ...')}
                   rows={6}
                 />
               </div>
             )}
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsReplyDialogOpen(false)}>
-                {isRTL ? 'انصراف' : 'Cancel'}
+                {getLabel(lang, 'Cancel', 'انصراف', 'لغوه کړئ')}
               </Button>
               <Button onClick={handleSubmitReply} disabled={isSubmitting || !replyText.trim()}>
                 {isSubmitting ? <RefreshCw className="animate-spin" size={16} /> : null}
-                {isRTL ? 'ذخیره پاسخ' : 'Save Reply'}
+                {getLabel(lang, 'Save Reply', 'ذخیره پاسخ', 'ځواب خوندي کړئ')}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -604,22 +624,25 @@ const AdminContactMessages = () => {
         <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>{isRTL ? 'حذف پیام' : 'Delete Message'}</AlertDialogTitle>
+              <AlertDialogTitle>{getLabel(lang, 'Delete Message', 'حذف پیام', 'پیغام ړنګول')}</AlertDialogTitle>
               <AlertDialogDescription>
-                {isRTL
-                  ? 'آیا مطمئن هستید که می‌خواهید این پیام را حذف کنید؟ این عمل قابل بازگشت نیست.'
-                  : 'Are you sure you want to delete this message? This action cannot be undone.'}
+                {getLabel(
+                  lang,
+                  'Are you sure you want to delete this message? This action cannot be undone.',
+                  'آیا مطمئن هستید که می‌خواهید این پیام را حذف کنید؟ این عمل قابل بازگشت نیست.',
+                  'ایا تاسو ډاډه یاست چې دا پیغام ړنګول غواړئ؟ دا کړنه بیرته نشي کېدلی.'
+                )}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>{isRTL ? 'انصراف' : 'Cancel'}</AlertDialogCancel>
+              <AlertDialogCancel>{getLabel(lang, 'Cancel', 'انصراف', 'لغوه کړئ')}</AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleDeleteMessage}
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? <RefreshCw className="animate-spin" size={16} /> : null}
-                {isRTL ? 'حذف' : 'Delete'}
+                {getLabel(lang, 'Delete', 'حذف', 'ړنګول')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
