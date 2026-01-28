@@ -33,12 +33,16 @@ const AdminHeroBanners = () => {
   const [formData, setFormData] = useState<HeroBannerInput>({
     title: '',
     title_fa: '',
+    title_ps: '',
     badge_text: '',
     badge_text_fa: '',
+    badge_text_ps: '',
     description: '',
     description_fa: '',
+    description_ps: '',
     cta_text: 'Shop Now',
     cta_text_fa: 'خرید کنید',
+    cta_text_ps: 'اوس پیرود وکړئ',
     cta_link: '',
     background_image: '',
     background_color: '',
@@ -51,12 +55,16 @@ const AdminHeroBanners = () => {
     setFormData({
       title: '',
       title_fa: '',
+      title_ps: '',
       badge_text: '',
       badge_text_fa: '',
+      badge_text_ps: '',
       description: '',
       description_fa: '',
+      description_ps: '',
       cta_text: 'Shop Now',
       cta_text_fa: 'خرید کنید',
+      cta_text_ps: 'اوس پیرود وکړئ',
       cta_link: '',
       background_image: '',
       background_color: '',
@@ -73,12 +81,16 @@ const AdminHeroBanners = () => {
       setFormData({
         title: banner.title,
         title_fa: banner.title_fa || '',
+        title_ps: (banner as any).title_ps || '',
         badge_text: banner.badge_text || '',
         badge_text_fa: banner.badge_text_fa || '',
+        badge_text_ps: (banner as any).badge_text_ps || '',
         description: banner.description || '',
         description_fa: banner.description_fa || '',
+        description_ps: (banner as any).description_ps || '',
         cta_text: banner.cta_text || 'Shop Now',
         cta_text_fa: banner.cta_text_fa || 'خرید کنید',
+        cta_text_ps: (banner as any).cta_text_ps || 'اوس پیرود وکړئ',
         cta_link: banner.cta_link || '',
         background_image: banner.background_image || '',
         background_color: banner.background_color || '',
@@ -241,7 +253,54 @@ const AdminHeroBanners = () => {
                           value={formData.cta_text_fa || ''}
                           onChange={(e) => setFormData({ ...formData, cta_text_fa: e.target.value })}
                         />
+                    </div>
+
+                    {/* Pashto Content */}
+                    <div className="space-y-4 border-t pt-4">
+                      <h4 className="font-medium text-sm text-muted-foreground">
+                        {getLabel(lang, 'Pashto Content (پښتو)', 'محتوای پشتو', 'پښتو منځپانګه')}
+                      </h4>
+                      <div className="grid gap-2">
+                        <Label htmlFor="badge_text_ps">{getLabel(lang, 'Badge Text (پښتو)', 'متن نشان (پشتو)', 'د بیج متن (پښتو)')}</Label>
+                        <Input
+                          id="badge_text_ps"
+                          dir="rtl"
+                          placeholder="لکه: ۵۰٪ تخفیف"
+                          value={formData.badge_text_ps || ''}
+                          onChange={(e) => setFormData({ ...formData, badge_text_ps: e.target.value })}
+                        />
                       </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="title_ps">{getLabel(lang, 'Title (پښتو)', 'عنوان (پشتو)', 'سرلیک (پښتو)')}</Label>
+                        <Input
+                          id="title_ps"
+                          dir="rtl"
+                          placeholder="لکه: عصري سټایل هیډفون ماډل"
+                          value={formData.title_ps || ''}
+                          onChange={(e) => setFormData({ ...formData, title_ps: e.target.value })}
+                        />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="description_ps">{getLabel(lang, 'Description (پښتو)', 'توضیحات (پشتو)', 'توضیحات (پښتو)')}</Label>
+                        <Textarea
+                          id="description_ps"
+                          dir="rtl"
+                          placeholder="لکه: چټک شئ! یوازې ۱۰۰ محصولات په دې تخفیف بیه."
+                          value={formData.description_ps || ''}
+                          onChange={(e) => setFormData({ ...formData, description_ps: e.target.value })}
+                        />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="cta_text_ps">{getLabel(lang, 'CTA Button Text (پښتو)', 'متن دکمه (پشتو)', 'د تڼۍ متن (پښتو)')}</Label>
+                        <Input
+                          id="cta_text_ps"
+                          dir="rtl"
+                          placeholder="لکه: اوس پیرود وکړئ"
+                          value={formData.cta_text_ps || ''}
+                          onChange={(e) => setFormData({ ...formData, cta_text_ps: e.target.value })}
+                        />
+                      </div>
+                    </div>
                     </div>
 
                     {/* Link & Images */}

@@ -26,12 +26,16 @@ export interface HeroBanner {
 export interface HeroBannerInput {
   badge_text?: string | null;
   badge_text_fa?: string | null;
+  badge_text_ps?: string | null;
   title: string;
   title_fa?: string | null;
+  title_ps?: string | null;
   description?: string | null;
   description_fa?: string | null;
+  description_ps?: string | null;
   cta_text?: string | null;
   cta_text_fa?: string | null;
+  cta_text_ps?: string | null;
   cta_link?: string | null;
   background_image?: string | null;
   background_color?: string | null;
