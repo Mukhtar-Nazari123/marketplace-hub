@@ -132,12 +132,6 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
             ))}
           </div>
 
-          {/* Special Offers */}
-          <div className="mt-6 p-4 bg-gradient-to-r from-orange/10 to-cyan/10 rounded-lg">
-            <p className="text-sm text-muted-foreground">
-              {t.nav.specialOffer}
-            </p>
-          </div>
 
           {/* Wishlist & Cart - Only for logged in users */}
           {user && (
