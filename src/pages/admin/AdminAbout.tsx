@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { AdminLayout } from '@/components/admin/AdminLayout';
-import { useLanguage } from '@/lib/i18n';
+import { useLanguage, Language } from '@/lib/i18n';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -38,6 +38,13 @@ import {
   Users, CheckCircle, History, Star, Sparkles, GripVertical 
 } from 'lucide-react';
 
+// Trilingual helper
+const getLabel = (lang: Language, en: string, fa: string, ps: string) => {
+  if (lang === 'ps') return ps;
+  if (lang === 'fa') return fa;
+  return en;
+};
+
 const ICONS = [
   { name: 'Target', icon: Target },
   { name: 'Eye', icon: Eye },
@@ -51,35 +58,36 @@ const ICONS = [
 ];
 
 const AdminAbout = () => {
-  const { t, isRTL } = useLanguage();
+  const { language, isRTL } = useLanguage();
+  const lang = language as Language;
 
   return (
     <AdminLayout 
-      title={isRTL ? 'مدیریت صفحه درباره ما' : 'About Page Management'}
-      description={isRTL ? 'ویرایش محتوای صفحه درباره ما' : 'Edit About page content'}
+      title={getLabel(lang, 'About Page Management', 'مدیریت صفحه درباره ما', 'د زموږ په اړه پاڼه مدیریت')}
+      description={getLabel(lang, 'Edit About page content', 'ویرایش محتوای صفحه درباره ما', 'د زموږ په اړه پاڼې منځپانګه سمول')}
     >
       <Tabs defaultValue="sections" className="space-y-6">
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="sections">{isRTL ? 'بخش‌ها' : 'Sections'}</TabsTrigger>
-          <TabsTrigger value="values">{isRTL ? 'ارزش‌ها' : 'Values'}</TabsTrigger>
-          <TabsTrigger value="team">{isRTL ? 'تیم' : 'Team'}</TabsTrigger>
-          <TabsTrigger value="awards">{isRTL ? 'جوایز' : 'Awards'}</TabsTrigger>
+          <TabsTrigger value="sections">{getLabel(lang, 'Sections', 'بخش‌ها', 'برخې')}</TabsTrigger>
+          <TabsTrigger value="values">{getLabel(lang, 'Values', 'ارزش‌ها', 'ارزښتونه')}</TabsTrigger>
+          <TabsTrigger value="team">{getLabel(lang, 'Team', 'تیم', 'ټیم')}</TabsTrigger>
+          <TabsTrigger value="awards">{getLabel(lang, 'Awards', 'جوایز', 'جوایز')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="sections">
-          <SectionsTab isRTL={isRTL} />
+          <SectionsTab lang={lang} isRTL={isRTL} />
         </TabsContent>
 
         <TabsContent value="values">
-          <ValuesTab isRTL={isRTL} />
+          <ValuesTab lang={lang} isRTL={isRTL} />
         </TabsContent>
 
         <TabsContent value="team">
-          <TeamTab isRTL={isRTL} />
+          <TeamTab lang={lang} isRTL={isRTL} />
         </TabsContent>
 
         <TabsContent value="awards">
-          <AwardsTab isRTL={isRTL} />
+          <AwardsTab lang={lang} isRTL={isRTL} />
         </TabsContent>
       </Tabs>
     </AdminLayout>
@@ -87,7 +95,7 @@ const AdminAbout = () => {
 };
 
 // Sections Tab
-const SectionsTab = ({ isRTL }: { isRTL: boolean }) => {
+const SectionsTab = ({ lang, isRTL }: { lang: Language; isRTL: boolean }) => {
   const { data: sections, isLoading } = useAdminAboutSections();
   const updateSection = useUpdateAboutSection();
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -102,10 +110,10 @@ const SectionsTab = ({ isRTL }: { isRTL: boolean }) => {
     if (!editingId) return;
     try {
       await updateSection.mutateAsync({ id: editingId, ...formData });
-      toast.success(isRTL ? 'بخش به‌روزرسانی شد' : 'Section updated');
+      toast.success(getLabel(lang, 'Section updated', 'بخش به‌روزرسانی شد', 'برخه تازه شوه'));
       setEditingId(null);
     } catch (error) {
-      toast.error(isRTL ? 'خطا در به‌روزرسانی' : 'Update failed');
+      toast.error(getLabel(lang, 'Update failed', 'خطا در به‌روزرسانی', 'تازه کول ناکام شول'));
     }
   };
 
@@ -121,7 +129,9 @@ const SectionsTab = ({ isRTL }: { isRTL: boolean }) => {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="text-lg capitalize">{section.section_key}</CardTitle>
-                <CardDescription>{isRTL ? section.title_fa : section.title_en}</CardDescription>
+                <CardDescription>
+                  {lang === 'ps' ? section.title_ps || section.title_en : lang === 'fa' ? section.title_fa : section.title_en}
+                </CardDescription>
               </div>
               <div className="flex items-center gap-2">
                 <Switch
@@ -138,26 +148,34 @@ const SectionsTab = ({ isRTL }: { isRTL: boolean }) => {
           </CardHeader>
           {editingId === section.id && (
             <CardContent className="space-y-4 border-t pt-4">
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-4 md:grid-cols-3">
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'عنوان (انگلیسی)' : 'Title (English)'}</Label>
+                  <Label>{getLabel(lang, 'Title (English)', 'عنوان (انگلیسی)', 'سرلیک (انګلیسي)')}</Label>
                   <Input
                     value={formData.title_en || ''}
                     onChange={(e) => setFormData({ ...formData, title_en: e.target.value })}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'عنوان (فارسی)' : 'Title (Persian)'}</Label>
+                  <Label>{getLabel(lang, 'Title (Persian)', 'عنوان (فارسی)', 'سرلیک (فارسي)')}</Label>
                   <Input
                     value={formData.title_fa || ''}
                     onChange={(e) => setFormData({ ...formData, title_fa: e.target.value })}
                     dir="rtl"
                   />
                 </div>
-              </div>
-              <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'توضیحات (انگلیسی)' : 'Description (English)'}</Label>
+                  <Label>{getLabel(lang, 'Title (Pashto)', 'عنوان (پشتو)', 'سرلیک (پښتو)')}</Label>
+                  <Input
+                    value={formData.title_ps || ''}
+                    onChange={(e) => setFormData({ ...formData, title_ps: e.target.value })}
+                    dir="rtl"
+                  />
+                </div>
+              </div>
+              <div className="grid gap-4 md:grid-cols-3">
+                <div className="space-y-2">
+                  <Label>{getLabel(lang, 'Description (English)', 'توضیحات (انگلیسی)', 'تشریح (انګلیسي)')}</Label>
                   <Textarea
                     value={formData.description_en || ''}
                     onChange={(e) => setFormData({ ...formData, description_en: e.target.value })}
@@ -165,7 +183,7 @@ const SectionsTab = ({ isRTL }: { isRTL: boolean }) => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'توضیحات (فارسی)' : 'Description (Persian)'}</Label>
+                  <Label>{getLabel(lang, 'Description (Persian)', 'توضیحات (فارسی)', 'تشریح (فارسي)')}</Label>
                   <Textarea
                     value={formData.description_fa || ''}
                     onChange={(e) => setFormData({ ...formData, description_fa: e.target.value })}
@@ -173,11 +191,20 @@ const SectionsTab = ({ isRTL }: { isRTL: boolean }) => {
                     rows={3}
                   />
                 </div>
+                <div className="space-y-2">
+                  <Label>{getLabel(lang, 'Description (Pashto)', 'توضیحات (پشتو)', 'تشریح (پښتو)')}</Label>
+                  <Textarea
+                    value={formData.description_ps || ''}
+                    onChange={(e) => setFormData({ ...formData, description_ps: e.target.value })}
+                    dir="rtl"
+                    rows={3}
+                  />
+                </div>
               </div>
               {section.section_key === 'history' && (
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className="grid gap-4 md:grid-cols-3">
                   <div className="space-y-2">
-                    <Label>{isRTL ? 'محتوای کامل (انگلیسی)' : 'Full Content (English)'}</Label>
+                    <Label>{getLabel(lang, 'Full Content (English)', 'محتوای کامل (انگلیسی)', 'بشپړ منځپانګه (انګلیسي)')}</Label>
                     <Textarea
                       value={formData.content_en || ''}
                       onChange={(e) => setFormData({ ...formData, content_en: e.target.value })}
@@ -185,10 +212,19 @@ const SectionsTab = ({ isRTL }: { isRTL: boolean }) => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>{isRTL ? 'محتوای کامل (فارسی)' : 'Full Content (Persian)'}</Label>
+                    <Label>{getLabel(lang, 'Full Content (Persian)', 'محتوای کامل (فارسی)', 'بشپړ منځپانګه (فارسي)')}</Label>
                     <Textarea
                       value={formData.content_fa || ''}
                       onChange={(e) => setFormData({ ...formData, content_fa: e.target.value })}
+                      dir="rtl"
+                      rows={5}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>{getLabel(lang, 'Full Content (Pashto)', 'محتوای کامل (پشتو)', 'بشپړ منځپانګه (پښتو)')}</Label>
+                    <Textarea
+                      value={formData.content_ps || ''}
+                      onChange={(e) => setFormData({ ...formData, content_ps: e.target.value })}
                       dir="rtl"
                       rows={5}
                     />
@@ -197,13 +233,13 @@ const SectionsTab = ({ isRTL }: { isRTL: boolean }) => {
               )}
               <div className="grid gap-4 md:grid-cols-3">
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'آیکون' : 'Icon'}</Label>
+                  <Label>{getLabel(lang, 'Icon', 'آیکون', 'آیکون')}</Label>
                   <Select
                     value={formData.icon || ''}
                     onValueChange={(value) => setFormData({ ...formData, icon: value })}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder={isRTL ? 'انتخاب آیکون' : 'Select icon'} />
+                      <SelectValue placeholder={getLabel(lang, 'Select icon', 'انتخاب آیکون', 'آیکون غوره کړئ')} />
                     </SelectTrigger>
                     <SelectContent>
                       {ICONS.map(({ name, icon: Icon }) => (
@@ -219,7 +255,7 @@ const SectionsTab = ({ isRTL }: { isRTL: boolean }) => {
                 </div>
                 {section.section_key === 'history' && (
                   <div className="space-y-2">
-                    <Label>{isRTL ? 'سال شروع' : 'Start Year'}</Label>
+                    <Label>{getLabel(lang, 'Start Year', 'سال شروع', 'پیل کال')}</Label>
                     <Input
                       type="number"
                       value={formData.start_year || ''}
@@ -228,7 +264,7 @@ const SectionsTab = ({ isRTL }: { isRTL: boolean }) => {
                   </div>
                 )}
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'اولویت' : 'Priority'}</Label>
+                  <Label>{getLabel(lang, 'Priority', 'اولویت', 'لومړیتوب')}</Label>
                   <Input
                     type="number"
                     value={formData.priority || 0}
@@ -239,10 +275,10 @@ const SectionsTab = ({ isRTL }: { isRTL: boolean }) => {
               <div className="flex gap-2">
                 <Button onClick={handleSave} disabled={updateSection.isPending}>
                   <Save className="h-4 w-4 mr-2" />
-                  {isRTL ? 'ذخیره' : 'Save'}
+                  {getLabel(lang, 'Save', 'ذخیره', 'خوندي کړئ')}
                 </Button>
                 <Button variant="outline" onClick={() => setEditingId(null)}>
-                  {isRTL ? 'انصراف' : 'Cancel'}
+                  {getLabel(lang, 'Cancel', 'انصراف', 'لغوه کول')}
                 </Button>
               </div>
             </CardContent>
@@ -254,7 +290,7 @@ const SectionsTab = ({ isRTL }: { isRTL: boolean }) => {
 };
 
 // Values Tab
-const ValuesTab = ({ isRTL }: { isRTL: boolean }) => {
+const ValuesTab = ({ lang, isRTL }: { lang: Language; isRTL: boolean }) => {
   const { data: values, isLoading } = useAdminAboutValues();
   const createValue = useCreateAboutValue();
   const updateValue = useUpdateAboutValue();
@@ -264,8 +300,10 @@ const ValuesTab = ({ isRTL }: { isRTL: boolean }) => {
   const [formData, setFormData] = useState({
     title_en: '',
     title_fa: '',
+    title_ps: '',
     description_en: '',
     description_fa: '',
+    description_ps: '',
     icon: 'CheckCircle',
     priority: 0,
     is_active: true,
@@ -275,8 +313,10 @@ const ValuesTab = ({ isRTL }: { isRTL: boolean }) => {
     setFormData({
       title_en: '',
       title_fa: '',
+      title_ps: '',
       description_en: '',
       description_fa: '',
+      description_ps: '',
       icon: 'CheckCircle',
       priority: 0,
       is_active: true,
@@ -289,8 +329,10 @@ const ValuesTab = ({ isRTL }: { isRTL: boolean }) => {
     setFormData({
       title_en: value.title_en,
       title_fa: value.title_fa || '',
+      title_ps: value.title_ps || '',
       description_en: value.description_en || '',
       description_fa: value.description_fa || '',
+      description_ps: value.description_ps || '',
       icon: value.icon,
       priority: value.priority,
       is_active: value.is_active,
@@ -302,25 +344,25 @@ const ValuesTab = ({ isRTL }: { isRTL: boolean }) => {
     try {
       if (editingValue) {
         await updateValue.mutateAsync({ id: editingValue.id, ...formData });
-        toast.success(isRTL ? 'ارزش به‌روزرسانی شد' : 'Value updated');
+        toast.success(getLabel(lang, 'Value updated', 'ارزش به‌روزرسانی شد', 'ارزښت تازه شو'));
       } else {
         await createValue.mutateAsync(formData);
-        toast.success(isRTL ? 'ارزش اضافه شد' : 'Value added');
+        toast.success(getLabel(lang, 'Value added', 'ارزش اضافه شد', 'ارزښت اضافه شو'));
       }
       setDialogOpen(false);
       resetForm();
     } catch (error) {
-      toast.error(isRTL ? 'خطا' : 'Error');
+      toast.error(getLabel(lang, 'Error', 'خطا', 'تېروتنه'));
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm(isRTL ? 'آیا مطمئن هستید؟' : 'Are you sure?')) return;
+    if (!confirm(getLabel(lang, 'Are you sure?', 'آیا مطمئن هستید؟', 'ایا تاسو ډاډه یاست؟'))) return;
     try {
       await deleteValue.mutateAsync(id);
-      toast.success(isRTL ? 'حذف شد' : 'Deleted');
+      toast.success(getLabel(lang, 'Deleted', 'حذف شد', 'ړنګ شو'));
     } catch (error) {
-      toast.error(isRTL ? 'خطا' : 'Error');
+      toast.error(getLabel(lang, 'Error', 'خطا', 'تېروتنه'));
     }
   };
 
@@ -333,36 +375,49 @@ const ValuesTab = ({ isRTL }: { isRTL: boolean }) => {
       <div className="flex justify-end">
         <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>
           <DialogTrigger asChild>
-            <Button><Plus className="h-4 w-4 mr-2" />{isRTL ? 'افزودن ارزش' : 'Add Value'}</Button>
+            <Button><Plus className="h-4 w-4 mr-2" />{getLabel(lang, 'Add Value', 'افزودن ارزش', 'ارزښت اضافه کړئ')}</Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>{editingValue ? (isRTL ? 'ویرایش ارزش' : 'Edit Value') : (isRTL ? 'افزودن ارزش' : 'Add Value')}</DialogTitle>
+              <DialogTitle>
+                {editingValue 
+                  ? getLabel(lang, 'Edit Value', 'ویرایش ارزش', 'ارزښت سمول')
+                  : getLabel(lang, 'Add Value', 'افزودن ارزش', 'ارزښت اضافه کړئ')
+                }
+              </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-4 md:grid-cols-3">
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'عنوان (انگلیسی)' : 'Title (English)'}</Label>
+                  <Label>{getLabel(lang, 'Title (English)', 'عنوان (انگلیسی)', 'سرلیک (انګلیسي)')}</Label>
                   <Input value={formData.title_en} onChange={(e) => setFormData({ ...formData, title_en: e.target.value })} />
                 </div>
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'عنوان (فارسی)' : 'Title (Persian)'}</Label>
+                  <Label>{getLabel(lang, 'Title (Persian)', 'عنوان (فارسی)', 'سرلیک (فارسي)')}</Label>
                   <Input value={formData.title_fa} onChange={(e) => setFormData({ ...formData, title_fa: e.target.value })} dir="rtl" />
                 </div>
-              </div>
-              <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'توضیحات (انگلیسی)' : 'Description (English)'}</Label>
-                  <Textarea value={formData.description_en} onChange={(e) => setFormData({ ...formData, description_en: e.target.value })} />
-                </div>
-                <div className="space-y-2">
-                  <Label>{isRTL ? 'توضیحات (فارسی)' : 'Description (Persian)'}</Label>
-                  <Textarea value={formData.description_fa} onChange={(e) => setFormData({ ...formData, description_fa: e.target.value })} dir="rtl" />
+                  <Label>{getLabel(lang, 'Title (Pashto)', 'عنوان (پشتو)', 'سرلیک (پښتو)')}</Label>
+                  <Input value={formData.title_ps} onChange={(e) => setFormData({ ...formData, title_ps: e.target.value })} dir="rtl" />
                 </div>
               </div>
               <div className="grid gap-4 md:grid-cols-3">
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'آیکون' : 'Icon'}</Label>
+                  <Label>{getLabel(lang, 'Description (English)', 'توضیحات (انگلیسی)', 'تشریح (انګلیسي)')}</Label>
+                  <Textarea value={formData.description_en} onChange={(e) => setFormData({ ...formData, description_en: e.target.value })} />
+                </div>
+                <div className="space-y-2">
+                  <Label>{getLabel(lang, 'Description (Persian)', 'توضیحات (فارسی)', 'تشریح (فارسي)')}</Label>
+                  <Textarea value={formData.description_fa} onChange={(e) => setFormData({ ...formData, description_fa: e.target.value })} dir="rtl" />
+                </div>
+                <div className="space-y-2">
+                  <Label>{getLabel(lang, 'Description (Pashto)', 'توضیحات (پشتو)', 'تشریح (پښتو)')}</Label>
+                  <Textarea value={formData.description_ps} onChange={(e) => setFormData({ ...formData, description_ps: e.target.value })} dir="rtl" />
+                </div>
+              </div>
+              <div className="grid gap-4 md:grid-cols-3">
+                <div className="space-y-2">
+                  <Label>{getLabel(lang, 'Icon', 'آیکون', 'آیکون')}</Label>
                   <Select value={formData.icon} onValueChange={(value) => setFormData({ ...formData, icon: value })}>
                     <SelectTrigger>
                       <SelectValue />
@@ -377,15 +432,15 @@ const ValuesTab = ({ isRTL }: { isRTL: boolean }) => {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'اولویت' : 'Priority'}</Label>
+                  <Label>{getLabel(lang, 'Priority', 'اولویت', 'لومړیتوب')}</Label>
                   <Input type="number" value={formData.priority} onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) || 0 })} />
                 </div>
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'فعال' : 'Active'}</Label>
+                  <Label>{getLabel(lang, 'Active', 'فعال', 'فعال')}</Label>
                   <Switch checked={formData.is_active} onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })} />
                 </div>
               </div>
-              <Button onClick={handleSave} className="w-full">{isRTL ? 'ذخیره' : 'Save'}</Button>
+              <Button onClick={handleSave} className="w-full">{getLabel(lang, 'Save', 'ذخیره', 'خوندي کړئ')}</Button>
             </div>
           </DialogContent>
         </Dialog>
@@ -394,6 +449,8 @@ const ValuesTab = ({ isRTL }: { isRTL: boolean }) => {
       <div className="grid gap-4 md:grid-cols-2">
         {values?.map((value) => {
           const IconComponent = ICONS.find(i => i.name === value.icon)?.icon || CheckCircle;
+          const title = lang === 'ps' && value.title_ps ? value.title_ps : lang === 'fa' && value.title_fa ? value.title_fa : value.title_en;
+          const description = lang === 'ps' && value.description_ps ? value.description_ps : lang === 'fa' && value.description_fa ? value.description_fa : value.description_en;
           return (
             <Card key={value.id} className={!value.is_active ? 'opacity-50' : ''}>
               <CardHeader>
@@ -403,8 +460,8 @@ const ValuesTab = ({ isRTL }: { isRTL: boolean }) => {
                       <IconComponent className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                      <CardTitle className="text-base">{isRTL ? value.title_fa : value.title_en}</CardTitle>
-                      <CardDescription className="text-xs">{isRTL ? value.description_fa : value.description_en}</CardDescription>
+                      <CardTitle className="text-base">{title}</CardTitle>
+                      <CardDescription className="text-xs">{description}</CardDescription>
                     </div>
                   </div>
                   <div className="flex gap-1">
@@ -422,7 +479,7 @@ const ValuesTab = ({ isRTL }: { isRTL: boolean }) => {
 };
 
 // Team Tab
-const TeamTab = ({ isRTL }: { isRTL: boolean }) => {
+const TeamTab = ({ lang, isRTL }: { lang: Language; isRTL: boolean }) => {
   const { data: members, isLoading } = useAdminAboutTeamMembers();
   const createMember = useCreateAboutTeamMember();
   const updateMember = useUpdateAboutTeamMember();
@@ -432,10 +489,13 @@ const TeamTab = ({ isRTL }: { isRTL: boolean }) => {
   const [formData, setFormData] = useState({
     name_en: '',
     name_fa: '',
+    name_ps: '',
     role_en: '',
     role_fa: '',
+    role_ps: '',
     description_en: '',
     description_fa: '',
+    description_ps: '',
     photo_url: '',
     priority: 0,
     is_active: true,
@@ -445,10 +505,13 @@ const TeamTab = ({ isRTL }: { isRTL: boolean }) => {
     setFormData({
       name_en: '',
       name_fa: '',
+      name_ps: '',
       role_en: '',
       role_fa: '',
+      role_ps: '',
       description_en: '',
       description_fa: '',
+      description_ps: '',
       photo_url: '',
       priority: 0,
       is_active: true,
@@ -461,10 +524,13 @@ const TeamTab = ({ isRTL }: { isRTL: boolean }) => {
     setFormData({
       name_en: member.name_en,
       name_fa: member.name_fa || '',
+      name_ps: member.name_ps || '',
       role_en: member.role_en,
       role_fa: member.role_fa || '',
+      role_ps: member.role_ps || '',
       description_en: member.description_en || '',
       description_fa: member.description_fa || '',
+      description_ps: member.description_ps || '',
       photo_url: member.photo_url || '',
       priority: member.priority,
       is_active: member.is_active,
@@ -476,25 +542,25 @@ const TeamTab = ({ isRTL }: { isRTL: boolean }) => {
     try {
       if (editingMember) {
         await updateMember.mutateAsync({ id: editingMember.id, ...formData });
-        toast.success(isRTL ? 'عضو تیم به‌روزرسانی شد' : 'Team member updated');
+        toast.success(getLabel(lang, 'Team member updated', 'عضو تیم به‌روزرسانی شد', 'د ټیم غړی تازه شو'));
       } else {
         await createMember.mutateAsync(formData);
-        toast.success(isRTL ? 'عضو تیم اضافه شد' : 'Team member added');
+        toast.success(getLabel(lang, 'Team member added', 'عضو تیم اضافه شد', 'د ټیم غړی اضافه شو'));
       }
       setDialogOpen(false);
       resetForm();
     } catch (error) {
-      toast.error(isRTL ? 'خطا' : 'Error');
+      toast.error(getLabel(lang, 'Error', 'خطا', 'تېروتنه'));
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm(isRTL ? 'آیا مطمئن هستید؟' : 'Are you sure?')) return;
+    if (!confirm(getLabel(lang, 'Are you sure?', 'آیا مطمئن هستید؟', 'ایا تاسو ډاډه یاست؟'))) return;
     try {
       await deleteMember.mutateAsync(id);
-      toast.success(isRTL ? 'حذف شد' : 'Deleted');
+      toast.success(getLabel(lang, 'Deleted', 'حذف شد', 'ړنګ شو'));
     } catch (error) {
-      toast.error(isRTL ? 'خطا' : 'Error');
+      toast.error(getLabel(lang, 'Error', 'خطا', 'تېروتنه'));
     }
   };
 
@@ -507,98 +573,119 @@ const TeamTab = ({ isRTL }: { isRTL: boolean }) => {
       <div className="flex justify-end">
         <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>
           <DialogTrigger asChild>
-            <Button><Plus className="h-4 w-4 mr-2" />{isRTL ? 'افزودن عضو' : 'Add Member'}</Button>
+            <Button><Plus className="h-4 w-4 mr-2" />{getLabel(lang, 'Add Member', 'افزودن عضو', 'غړی اضافه کړئ')}</Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>{editingMember ? (isRTL ? 'ویرایش عضو' : 'Edit Member') : (isRTL ? 'افزودن عضو' : 'Add Member')}</DialogTitle>
+              <DialogTitle>
+                {editingMember 
+                  ? getLabel(lang, 'Edit Member', 'ویرایش عضو', 'غړی سمول')
+                  : getLabel(lang, 'Add Member', 'افزودن عضو', 'غړی اضافه کړئ')
+                }
+              </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-4 md:grid-cols-3">
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'نام (انگلیسی)' : 'Name (English)'}</Label>
+                  <Label>{getLabel(lang, 'Name (English)', 'نام (انگلیسی)', 'نوم (انګلیسي)')}</Label>
                   <Input value={formData.name_en} onChange={(e) => setFormData({ ...formData, name_en: e.target.value })} />
                 </div>
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'نام (فارسی)' : 'Name (Persian)'}</Label>
+                  <Label>{getLabel(lang, 'Name (Persian)', 'نام (فارسی)', 'نوم (فارسي)')}</Label>
                   <Input value={formData.name_fa} onChange={(e) => setFormData({ ...formData, name_fa: e.target.value })} dir="rtl" />
                 </div>
-              </div>
-              <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'نقش (انگلیسی)' : 'Role (English)'}</Label>
+                  <Label>{getLabel(lang, 'Name (Pashto)', 'نام (پشتو)', 'نوم (پښتو)')}</Label>
+                  <Input value={formData.name_ps} onChange={(e) => setFormData({ ...formData, name_ps: e.target.value })} dir="rtl" />
+                </div>
+              </div>
+              <div className="grid gap-4 md:grid-cols-3">
+                <div className="space-y-2">
+                  <Label>{getLabel(lang, 'Role (English)', 'نقش (انگلیسی)', 'رول (انګلیسي)')}</Label>
                   <Input value={formData.role_en} onChange={(e) => setFormData({ ...formData, role_en: e.target.value })} />
                 </div>
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'نقش (فارسی)' : 'Role (Persian)'}</Label>
+                  <Label>{getLabel(lang, 'Role (Persian)', 'نقش (فارسی)', 'رول (فارسي)')}</Label>
                   <Input value={formData.role_fa} onChange={(e) => setFormData({ ...formData, role_fa: e.target.value })} dir="rtl" />
                 </div>
-              </div>
-              <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'توضیحات (انگلیسی)' : 'Description (English)'}</Label>
+                  <Label>{getLabel(lang, 'Role (Pashto)', 'نقش (پشتو)', 'رول (پښتو)')}</Label>
+                  <Input value={formData.role_ps} onChange={(e) => setFormData({ ...formData, role_ps: e.target.value })} dir="rtl" />
+                </div>
+              </div>
+              <div className="grid gap-4 md:grid-cols-3">
+                <div className="space-y-2">
+                  <Label>{getLabel(lang, 'Description (English)', 'توضیحات (انگلیسی)', 'تشریح (انګلیسي)')}</Label>
                   <Textarea value={formData.description_en} onChange={(e) => setFormData({ ...formData, description_en: e.target.value })} />
                 </div>
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'توضیحات (فارسی)' : 'Description (Persian)'}</Label>
+                  <Label>{getLabel(lang, 'Description (Persian)', 'توضیحات (فارسی)', 'تشریح (فارسي)')}</Label>
                   <Textarea value={formData.description_fa} onChange={(e) => setFormData({ ...formData, description_fa: e.target.value })} dir="rtl" />
+                </div>
+                <div className="space-y-2">
+                  <Label>{getLabel(lang, 'Description (Pashto)', 'توضیحات (پشتو)', 'تشریح (پښتو)')}</Label>
+                  <Textarea value={formData.description_ps} onChange={(e) => setFormData({ ...formData, description_ps: e.target.value })} dir="rtl" />
                 </div>
               </div>
               <ImageUpload
-                label={isRTL ? 'تصویر' : 'Photo'}
+                label={getLabel(lang, 'Photo', 'تصویر', 'انځور')}
                 value={formData.photo_url}
                 onChange={(url) => setFormData({ ...formData, photo_url: url })}
                 bucket="site-assets"
                 folder="team-photos"
-                placeholder={isRTL ? 'تصویر عضو تیم را انتخاب کنید' : 'Select team member photo'}
+                placeholder={getLabel(lang, 'Select team member photo', 'تصویر عضو تیم را انتخاب کنید', 'د ټیم غړي انځور غوره کړئ')}
               />
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'اولویت' : 'Priority'}</Label>
+                  <Label>{getLabel(lang, 'Priority', 'اولویت', 'لومړیتوب')}</Label>
                   <Input type="number" value={formData.priority} onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) || 0 })} />
                 </div>
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'فعال' : 'Active'}</Label>
+                  <Label>{getLabel(lang, 'Active', 'فعال', 'فعال')}</Label>
                   <Switch checked={formData.is_active} onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })} />
                 </div>
               </div>
-              <Button onClick={handleSave} className="w-full">{isRTL ? 'ذخیره' : 'Save'}</Button>
+              <Button onClick={handleSave} className="w-full">{getLabel(lang, 'Save', 'ذخیره', 'خوندي کړئ')}</Button>
             </div>
           </DialogContent>
         </Dialog>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {members?.map((member) => (
-          <Card key={member.id} className={!member.is_active ? 'opacity-50' : ''}>
-            <div className="aspect-square overflow-hidden rounded-t-lg bg-muted">
-              {member.photo_url ? (
-                <img src={member.photo_url} alt={member.name_en} className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center"><Users className="h-16 w-16 text-muted-foreground" /></div>
-              )}
-            </div>
-            <CardHeader className="p-4">
-              <div className="flex items-start justify-between">
-                <div>
-                  <CardTitle className="text-base">{isRTL ? member.name_fa : member.name_en}</CardTitle>
-                  <CardDescription>{isRTL ? member.role_fa : member.role_en}</CardDescription>
-                </div>
-                <div className="flex gap-1">
-                  <Button variant="ghost" size="icon" onClick={() => handleEdit(member)}><Edit className="h-4 w-4" /></Button>
-                  <Button variant="ghost" size="icon" onClick={() => handleDelete(member.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-                </div>
+        {members?.map((member) => {
+          const name = lang === 'ps' && member.name_ps ? member.name_ps : lang === 'fa' && member.name_fa ? member.name_fa : member.name_en;
+          const role = lang === 'ps' && member.role_ps ? member.role_ps : lang === 'fa' && member.role_fa ? member.role_fa : member.role_en;
+          return (
+            <Card key={member.id} className={!member.is_active ? 'opacity-50' : ''}>
+              <div className="aspect-square overflow-hidden rounded-t-lg bg-muted">
+                {member.photo_url ? (
+                  <img src={member.photo_url} alt={member.name_en} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center"><Users className="h-16 w-16 text-muted-foreground" /></div>
+                )}
               </div>
-            </CardHeader>
-          </Card>
-        ))}
+              <CardHeader className="p-4">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <CardTitle className="text-base">{name}</CardTitle>
+                    <CardDescription>{role}</CardDescription>
+                  </div>
+                  <div className="flex gap-1">
+                    <Button variant="ghost" size="icon" onClick={() => handleEdit(member)}><Edit className="h-4 w-4" /></Button>
+                    <Button variant="ghost" size="icon" onClick={() => handleDelete(member.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                  </div>
+                </div>
+              </CardHeader>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );
 };
 
 // Awards Tab
-const AwardsTab = ({ isRTL }: { isRTL: boolean }) => {
+const AwardsTab = ({ lang, isRTL }: { lang: Language; isRTL: boolean }) => {
   const { data: awards, isLoading } = useAdminAboutAwards();
   const createAward = useCreateAboutAward();
   const updateAward = useUpdateAboutAward();
@@ -608,8 +695,10 @@ const AwardsTab = ({ isRTL }: { isRTL: boolean }) => {
   const [formData, setFormData] = useState({
     title_en: '',
     title_fa: '',
+    title_ps: '',
     description_en: '',
     description_fa: '',
+    description_ps: '',
     year: new Date().getFullYear(),
     icon_or_image: 'Star',
     priority: 0,
@@ -620,8 +709,10 @@ const AwardsTab = ({ isRTL }: { isRTL: boolean }) => {
     setFormData({
       title_en: '',
       title_fa: '',
+      title_ps: '',
       description_en: '',
       description_fa: '',
+      description_ps: '',
       year: new Date().getFullYear(),
       icon_or_image: 'Star',
       priority: 0,
@@ -635,8 +726,10 @@ const AwardsTab = ({ isRTL }: { isRTL: boolean }) => {
     setFormData({
       title_en: award.title_en,
       title_fa: award.title_fa || '',
+      title_ps: award.title_ps || '',
       description_en: award.description_en || '',
       description_fa: award.description_fa || '',
+      description_ps: award.description_ps || '',
       year: award.year || new Date().getFullYear(),
       icon_or_image: award.icon_or_image || 'Star',
       priority: award.priority,
@@ -649,25 +742,25 @@ const AwardsTab = ({ isRTL }: { isRTL: boolean }) => {
     try {
       if (editingAward) {
         await updateAward.mutateAsync({ id: editingAward.id, ...formData });
-        toast.success(isRTL ? 'جایزه به‌روزرسانی شد' : 'Award updated');
+        toast.success(getLabel(lang, 'Award updated', 'جایزه به‌روزرسانی شد', 'جایزه تازه شوه'));
       } else {
         await createAward.mutateAsync(formData);
-        toast.success(isRTL ? 'جایزه اضافه شد' : 'Award added');
+        toast.success(getLabel(lang, 'Award added', 'جایزه اضافه شد', 'جایزه اضافه شوه'));
       }
       setDialogOpen(false);
       resetForm();
     } catch (error) {
-      toast.error(isRTL ? 'خطا' : 'Error');
+      toast.error(getLabel(lang, 'Error', 'خطا', 'تېروتنه'));
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm(isRTL ? 'آیا مطمئن هستید؟' : 'Are you sure?')) return;
+    if (!confirm(getLabel(lang, 'Are you sure?', 'آیا مطمئن هستید؟', 'ایا تاسو ډاډه یاست؟'))) return;
     try {
       await deleteAward.mutateAsync(id);
-      toast.success(isRTL ? 'حذف شد' : 'Deleted');
+      toast.success(getLabel(lang, 'Deleted', 'حذف شد', 'ړنګ شو'));
     } catch (error) {
-      toast.error(isRTL ? 'خطا' : 'Error');
+      toast.error(getLabel(lang, 'Error', 'خطا', 'تېروتنه'));
     }
   };
 
@@ -680,36 +773,49 @@ const AwardsTab = ({ isRTL }: { isRTL: boolean }) => {
       <div className="flex justify-end">
         <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>
           <DialogTrigger asChild>
-            <Button><Plus className="h-4 w-4 mr-2" />{isRTL ? 'افزودن جایزه' : 'Add Award'}</Button>
+            <Button><Plus className="h-4 w-4 mr-2" />{getLabel(lang, 'Add Award', 'افزودن جایزه', 'جایزه اضافه کړئ')}</Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>{editingAward ? (isRTL ? 'ویرایش جایزه' : 'Edit Award') : (isRTL ? 'افزودن جایزه' : 'Add Award')}</DialogTitle>
+              <DialogTitle>
+                {editingAward 
+                  ? getLabel(lang, 'Edit Award', 'ویرایش جایزه', 'جایزه سمول')
+                  : getLabel(lang, 'Add Award', 'افزودن جایزه', 'جایزه اضافه کړئ')
+                }
+              </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-4 md:grid-cols-3">
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'عنوان (انگلیسی)' : 'Title (English)'}</Label>
+                  <Label>{getLabel(lang, 'Title (English)', 'عنوان (انگلیسی)', 'سرلیک (انګلیسي)')}</Label>
                   <Input value={formData.title_en} onChange={(e) => setFormData({ ...formData, title_en: e.target.value })} />
                 </div>
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'عنوان (فارسی)' : 'Title (Persian)'}</Label>
+                  <Label>{getLabel(lang, 'Title (Persian)', 'عنوان (فارسی)', 'سرلیک (فارسي)')}</Label>
                   <Input value={formData.title_fa} onChange={(e) => setFormData({ ...formData, title_fa: e.target.value })} dir="rtl" />
                 </div>
-              </div>
-              <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'توضیحات (انگلیسی)' : 'Description (English)'}</Label>
-                  <Textarea value={formData.description_en} onChange={(e) => setFormData({ ...formData, description_en: e.target.value })} />
-                </div>
-                <div className="space-y-2">
-                  <Label>{isRTL ? 'توضیحات (فارسی)' : 'Description (Persian)'}</Label>
-                  <Textarea value={formData.description_fa} onChange={(e) => setFormData({ ...formData, description_fa: e.target.value })} dir="rtl" />
+                  <Label>{getLabel(lang, 'Title (Pashto)', 'عنوان (پشتو)', 'سرلیک (پښتو)')}</Label>
+                  <Input value={formData.title_ps} onChange={(e) => setFormData({ ...formData, title_ps: e.target.value })} dir="rtl" />
                 </div>
               </div>
               <div className="grid gap-4 md:grid-cols-3">
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'آیکون' : 'Icon'}</Label>
+                  <Label>{getLabel(lang, 'Description (English)', 'توضیحات (انگلیسی)', 'تشریح (انګلیسي)')}</Label>
+                  <Textarea value={formData.description_en} onChange={(e) => setFormData({ ...formData, description_en: e.target.value })} />
+                </div>
+                <div className="space-y-2">
+                  <Label>{getLabel(lang, 'Description (Persian)', 'توضیحات (فارسی)', 'تشریح (فارسي)')}</Label>
+                  <Textarea value={formData.description_fa} onChange={(e) => setFormData({ ...formData, description_fa: e.target.value })} dir="rtl" />
+                </div>
+                <div className="space-y-2">
+                  <Label>{getLabel(lang, 'Description (Pashto)', 'توضیحات (پشتو)', 'تشریح (پښتو)')}</Label>
+                  <Textarea value={formData.description_ps} onChange={(e) => setFormData({ ...formData, description_ps: e.target.value })} dir="rtl" />
+                </div>
+              </div>
+              <div className="grid gap-4 md:grid-cols-3">
+                <div className="space-y-2">
+                  <Label>{getLabel(lang, 'Icon', 'آیکون', 'آیکون')}</Label>
                   <Select value={formData.icon_or_image} onValueChange={(value) => setFormData({ ...formData, icon_or_image: value })}>
                     <SelectTrigger>
                       <SelectValue />
@@ -724,19 +830,19 @@ const AwardsTab = ({ isRTL }: { isRTL: boolean }) => {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'سال' : 'Year'}</Label>
+                  <Label>{getLabel(lang, 'Year', 'سال', 'کال')}</Label>
                   <Input type="number" value={formData.year} onChange={(e) => setFormData({ ...formData, year: parseInt(e.target.value) || new Date().getFullYear() })} />
                 </div>
                 <div className="space-y-2">
-                  <Label>{isRTL ? 'اولویت' : 'Priority'}</Label>
+                  <Label>{getLabel(lang, 'Priority', 'اولویت', 'لومړیتوب')}</Label>
                   <Input type="number" value={formData.priority} onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) || 0 })} />
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <Switch checked={formData.is_active} onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })} />
-                <Label>{isRTL ? 'فعال' : 'Active'}</Label>
+                <Label>{getLabel(lang, 'Active', 'فعال', 'فعال')}</Label>
               </div>
-              <Button onClick={handleSave} className="w-full">{isRTL ? 'ذخیره' : 'Save'}</Button>
+              <Button onClick={handleSave} className="w-full">{getLabel(lang, 'Save', 'ذخیره', 'خوندي کړئ')}</Button>
             </div>
           </DialogContent>
         </Dialog>
@@ -745,6 +851,7 @@ const AwardsTab = ({ isRTL }: { isRTL: boolean }) => {
       <div className="grid gap-4 md:grid-cols-3">
         {awards?.map((award) => {
           const IconComponent = ICONS.find(i => i.name === award.icon_or_image)?.icon || Star;
+          const title = lang === 'ps' && award.title_ps ? award.title_ps : lang === 'fa' && award.title_fa ? award.title_fa : award.title_en;
           return (
             <Card key={award.id} className={!award.is_active ? 'opacity-50' : ''}>
               <CardHeader>
@@ -754,7 +861,7 @@ const AwardsTab = ({ isRTL }: { isRTL: boolean }) => {
                       <IconComponent className="h-5 w-5 text-yellow-500" />
                     </div>
                     <div>
-                      <CardTitle className="text-base">{isRTL ? award.title_fa : award.title_en}</CardTitle>
+                      <CardTitle className="text-base">{title}</CardTitle>
                       {award.year && <CardDescription>{award.year}</CardDescription>}
                     </div>
                   </div>
