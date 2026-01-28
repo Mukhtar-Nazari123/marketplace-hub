@@ -4,7 +4,7 @@ import { Loader2 } from "lucide-react";
 
 import { useAuth } from "@/hooks/useAuth";
 import { useSellerStatus } from "@/hooks/useSellerStatus";
-import { useLanguage } from "@/lib/i18n";
+import { useLanguage, type Language } from "@/lib/i18n";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
@@ -36,118 +36,122 @@ const getAllowedRolesForPath = (pathname: string): AppRole[] => {
   return ["buyer", "seller", "admin", "moderator"];
 };
 
-const getHeaderConfig = (pathname: string, isRTL: boolean): HeaderConfig => {
-  const t = (fa: string, en: string) => (isRTL ? fa : en);
+const getHeaderConfig = (pathname: string, language: Language): HeaderConfig => {
+  const t = (en: string, fa: string, ps: string) => {
+    if (language === 'ps') return ps;
+    if (language === 'fa') return fa;
+    return en;
+  };
 
   // Seller
   if (pathname === "/dashboard/seller" || pathname === "/dashboard/seller/") {
     return {
-      title: t("داشبورد فروشنده", "Seller Dashboard"),
-      description: t("مدیریت فروش و محصولات", "Manage your sales and products"),
+      title: t("Seller Dashboard", "داشبورد فروشنده", "د پلورونکي ډشبورډ"),
+      description: t("Manage your sales and products", "مدیریت فروش و محصولات", "خپل پلور او محصولات اداره کړئ"),
     };
   }
   if (pathname.startsWith("/dashboard/seller/products/new")) {
     return {
-      title: t("افزودن محصول", "Add Product"),
-      description: t("محصول جدید به فروشگاه اضافه کنید", "Add a new product to your store"),
+      title: t("Add Product", "افزودن محصول", "محصول اضافه کړئ"),
+      description: t("Add a new product to your store", "محصول جدید به فروشگاه اضافه کنید", "خپل پلورنځي ته نوی محصول اضافه کړئ"),
     };
   }
   if (pathname.includes("/dashboard/seller/products/edit/")) {
     return {
-      title: t("ویرایش محصول", "Edit Product"),
-      description: t("ویرایش محصول", "Edit your product"),
+      title: t("Edit Product", "ویرایش محصول", "محصول سمول"),
+      description: t("Edit your product", "ویرایش محصول", "خپل محصول وسموئ"),
     };
   }
   if (pathname.includes("/dashboard/seller/products/view/")) {
     return {
-      title: t("مشاهده محصول", "View Product"),
+      title: t("View Product", "مشاهده محصول", "محصول وګورئ"),
       description: "",
     };
   }
   if (pathname.startsWith("/dashboard/seller/products")) {
     return {
-      title: t("محصولات من", "My Products"),
-      description: t("مدیریت محصولات فروشگاه", "Manage your store products"),
+      title: t("My Products", "محصولات من", "زما محصولات"),
+      description: t("Manage your store products", "مدیریت محصولات فروشگاه", "د پلورنځي محصولات اداره کړئ"),
     };
   }
   if (pathname.startsWith("/dashboard/seller/orders")) {
     return {
-      title: t("سفارشات", "Orders"),
-      description: t("مدیریت سفارشات مشتریان", "Manage customer orders"),
+      title: t("Orders", "سفارشات", "امرونه"),
+      description: t("Manage customer orders", "مدیریت سفارشات مشتریان", "د پیرودونکو امرونه اداره کړئ"),
     };
   }
   if (pathname.startsWith("/dashboard/seller/reviews")) {
     return {
-      title: t("نظرات محصولات", "Product Reviews"),
-      description: t("مشاهده نظرات خریداران درباره محصولات شما", "View customer reviews about your products"),
+      title: t("Product Reviews", "نظرات محصولات", "د محصولاتو نظرونه"),
+      description: t("View customer reviews about your products", "مشاهده نظرات خریداران درباره محصولات شما", "ستاسو د محصولاتو په اړه د پیرودونکو نظرونه وګورئ"),
     };
   }
   if (pathname.startsWith("/dashboard/seller/analytics")) {
     return {
-      title: t("آنالیتیکس", "Analytics"),
-      description: t("آمار و گزارش فروش", "Sales statistics and reports"),
+      title: t("Analytics", "آنالیتیکس", "تحلیلات"),
+      description: t("Sales statistics and reports", "آمار و گزارش فروش", "د پلور احصایې او راپورونه"),
     };
   }
 
   // Buyer
   if (pathname === "/dashboard/buyer" || pathname === "/dashboard/buyer/") {
     return {
-      title: t("داشبورد خریدار", "Buyer Dashboard"),
-      description: t("خلاصه حساب و سفارشات", "Account overview and orders"),
+      title: t("Buyer Dashboard", "داشبورد خریدار", "د پیرودونکي ډشبورډ"),
+      description: t("Account overview and orders", "خلاصه حساب و سفارشات", "د حساب او امرونو لنډیز"),
     };
   }
   if (pathname.startsWith("/dashboard/buyer/orders")) {
     return {
-      title: t("سفارشات من", "My Orders"),
-      description: t("پیگیری سفارشات و سابقه خرید", "Track your orders and purchase history"),
+      title: t("My Orders", "سفارشات من", "زما امرونه"),
+      description: t("Track your orders and purchase history", "پیگیری سفارشات و سابقه خرید", "خپل امرونه او د پیرودلو تاریخ تعقیب کړئ"),
     };
   }
   if (pathname.startsWith("/dashboard/buyer/reviews")) {
     return {
-      title: t("نظرات من", "My Reviews"),
-      description: t("مدیریت نظرات و امتیازات شما", "Manage your reviews and ratings"),
+      title: t("My Reviews", "نظرات من", "زما نظرونه"),
+      description: t("Manage your reviews and ratings", "مدیریت نظرات و امتیازات شما", "خپل نظرونه او درجې اداره کړئ"),
     };
   }
   if (pathname.startsWith("/dashboard/buyer/wishlist")) {
     return {
-      title: t("علاقهمندیها", "Wishlist"),
-      description: t("محصولات مورد علاقه شما", "Your favorite products"),
+      title: t("Wishlist", "علاقهمندیها", "خوښې"),
+      description: t("Your favorite products", "محصولات مورد علاقه شما", "ستاسو خوښ محصولات"),
     };
   }
   if (pathname.startsWith("/dashboard/buyer/addresses")) {
     return {
-      title: t("آدرسها", "Addresses"),
-      description: t("مدیریت آدرسهای شما", "Manage your saved addresses"),
+      title: t("Addresses", "آدرسها", "پتې"),
+      description: t("Manage your saved addresses", "مدیریت آدرسهای شما", "خپلې ساتل شوې پتې اداره کړئ"),
     };
   }
   if (pathname.startsWith("/dashboard/buyer/payments")) {
     return {
-      title: t("روشهای پرداخت", "Payment Methods"),
-      description: t("مدیریت روشهای پرداخت", "Manage your payment methods"),
+      title: t("Payment Methods", "روشهای پرداخت", "د تادیې لارې"),
+      description: t("Manage your payment methods", "مدیریت روشهای پرداخت", "د تادیې لارې اداره کړئ"),
     };
   }
 
   // Shared
   if (pathname.startsWith("/dashboard/notifications")) {
     return {
-      title: t("اعلانها", "Notifications"),
-      description: t("مشاهده و مدیریت اعلانها", "View and manage your notifications"),
+      title: t("Notifications", "اعلانها", "خبرتیاوې"),
+      description: t("View and manage your notifications", "مشاهده و مدیریت اعلانها", "خپلې خبرتیاوې وګورئ او اداره کړئ"),
     };
   }
   if (pathname.startsWith("/dashboard/profile")) {
     return {
-      title: t("پروفایل من", "My Profile"),
-      description: t("مدیریت اطلاعات حساب", "Manage your account information"),
+      title: t("My Profile", "پروفایل من", "زما پروفایل"),
+      description: t("Manage your account information", "مدیریت اطلاعات حساب", "د حساب معلومات اداره کړئ"),
     };
   }
 
-  return { title: t("داشبورد", "Dashboard") };
+  return { title: t("Dashboard", "داشبورد", "ډشبورډ") };
 };
 
 export default function DashboardShell() {
   const { user, role, loading } = useAuth();
   const { status: sellerStatus, loading: sellerStatusLoading } = useSellerStatus();
-  const { isRTL } = useLanguage();
+  const { isRTL, language } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useIsMobile();
@@ -157,8 +161,8 @@ export default function DashboardShell() {
 
   const allowedRoles = useMemo(() => getAllowedRolesForPath(location.pathname), [location.pathname]);
   const header = useMemo(
-    () => getHeaderConfig(location.pathname, isRTL),
-    [location.pathname, isRTL],
+    () => getHeaderConfig(location.pathname, language),
+    [location.pathname, language],
   );
 
   // Redirect logic
