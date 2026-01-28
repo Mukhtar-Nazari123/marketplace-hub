@@ -31,7 +31,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useLanguage, formatDate } from '@/lib/i18n';
+import { useLanguage, formatDate, type Language } from '@/lib/i18n';
 import { getDealStatus, type DealStatus } from '@/hooks/useDealCountdown';
 
 interface Product {
@@ -46,8 +46,16 @@ interface Product {
   deal_end_at: string | null;
 }
 
+// Trilingual helper
+const getLabel = (lang: Language, en: string, fa: string, ps: string) => {
+  if (lang === 'ps') return ps;
+  if (lang === 'fa') return fa;
+  return en;
+};
+
 const AdminDeals = () => {
-  const { t, direction } = useLanguage();
+  const { t, direction, language } = useLanguage();
+  const lang = language as Language;
   const isRTL = direction === 'rtl';
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
@@ -77,7 +85,7 @@ const AdminDeals = () => {
       setFilteredProducts(data || []);
     } catch (error) {
       console.error('Error fetching products:', error);
-      toast.error(isRTL ? 'خطا در بارگذاری محصولات' : 'Error loading products');
+      toast.error(getLabel(lang, 'Error loading products', 'خطا در بارگذاری محصولات', 'د محصولاتو په پورته کولو کې تېروتنه'));
     } finally {
       setIsLoading(false);
     }
@@ -103,16 +111,16 @@ const AdminDeals = () => {
     
     switch (status) {
       case 'active':
-        return <Badge className="bg-success text-success-foreground">{isRTL ? 'فعال' : 'Active'}</Badge>;
+        return <Badge className="bg-success text-success-foreground">{getLabel(lang, 'Active', 'فعال', 'فعال')}</Badge>;
       case 'upcoming':
-        return <Badge className="bg-info text-info-foreground">{isRTL ? 'آینده' : 'Upcoming'}</Badge>;
+        return <Badge className="bg-info text-info-foreground">{getLabel(lang, 'Upcoming', 'آینده', 'راتلونکی')}</Badge>;
       case 'expired':
         if (product.is_deal) {
-          return <Badge className="bg-destructive text-destructive-foreground">{isRTL ? 'منقضی' : 'Expired'}</Badge>;
+          return <Badge className="bg-destructive text-destructive-foreground">{getLabel(lang, 'Expired', 'منقضی', 'پای ته رسېدلی')}</Badge>;
         }
-        return <Badge variant="outline">{isRTL ? 'غیرفعال' : 'Inactive'}</Badge>;
+        return <Badge variant="outline">{getLabel(lang, 'Inactive', 'غیرفعال', 'غیر فعال')}</Badge>;
       default:
-        return <Badge variant="outline">{isRTL ? 'غیرفعال' : 'Inactive'}</Badge>;
+        return <Badge variant="outline">{getLabel(lang, 'Inactive', 'غیرفعال', 'غیر فعال')}</Badge>;
     }
   };
 
@@ -136,11 +144,11 @@ const AdminDeals = () => {
 
     if (isDeal) {
       if (!dealStartAt || !dealEndAt) {
-        toast.error(isRTL ? 'لطفا تاریخ شروع و پایان را وارد کنید' : 'Please enter start and end dates');
+        toast.error(getLabel(lang, 'Please enter start and end dates', 'لطفا تاریخ شروع و پایان را وارد کنید', 'مهرباني وکړئ د پیل او پای نیټې ولیکئ'));
         return;
       }
       if (new Date(dealEndAt) <= new Date(dealStartAt)) {
-        toast.error(isRTL ? 'تاریخ پایان باید بعد از تاریخ شروع باشد' : 'End date must be after start date');
+        toast.error(getLabel(lang, 'End date must be after start date', 'تاریخ پایان باید بعد از تاریخ شروع باشد', 'د پای نیټه باید د پیل نیټې وروسته وي'));
         return;
       }
     }
@@ -158,12 +166,12 @@ const AdminDeals = () => {
 
       if (error) throw error;
 
-      toast.success(isRTL ? 'تنظیمات تخفیف با موفقیت ذخیره شد' : 'Deal settings saved successfully');
+      toast.success(getLabel(lang, 'Deal settings saved successfully', 'تنظیمات تخفیف با موفقیت ذخیره شد', 'د تخفیف ترتیبات په بریالیتوب سره خوندي شوې'));
       setIsEditDialogOpen(false);
       fetchProducts();
     } catch (error) {
       console.error('Error saving deal:', error);
-      toast.error(isRTL ? 'خطا در ذخیره تنظیمات' : 'Error saving settings');
+      toast.error(getLabel(lang, 'Error saving settings', 'خطا در ذخیره تنظیمات', 'د ترتیباتو په خوندي کولو کې تېروتنه'));
     } finally {
       setIsSubmitting(false);
     }
@@ -186,11 +194,11 @@ const AdminDeals = () => {
 
       if (error) throw error;
 
-      toast.success(isRTL ? 'تخفیف ۲۴ ساعته فعال شد' : '24-hour deal enabled');
+      toast.success(getLabel(lang, '24-hour deal enabled', 'تخفیف ۲۴ ساعته فعال شد', 'د ۲۴ ساعتو تخفیف فعال شو'));
       fetchProducts();
     } catch (error) {
       console.error('Error enabling deal:', error);
-      toast.error(isRTL ? 'خطا در فعال‌سازی تخفیف' : 'Error enabling deal');
+      toast.error(getLabel(lang, 'Error enabling deal', 'خطا در فعال‌سازی تخفیف', 'د تخفیف په فعالولو کې تېروتنه'));
     }
   };
 
@@ -207,11 +215,11 @@ const AdminDeals = () => {
 
       if (error) throw error;
 
-      toast.success(isRTL ? 'تخفیف غیرفعال شد' : 'Deal disabled');
+      toast.success(getLabel(lang, 'Deal disabled', 'تخفیف غیرفعال شد', 'تخفیف غیر فعال شو'));
       fetchProducts();
     } catch (error) {
       console.error('Error disabling deal:', error);
-      toast.error(isRTL ? 'خطا در غیرفعال‌سازی تخفیف' : 'Error disabling deal');
+      toast.error(getLabel(lang, 'Error disabling deal', 'خطا در غیرفعال‌سازی تخفیف', 'د تخفیف په غیر فعالولو کې تېروتنه'));
     }
   };
 
@@ -231,8 +239,8 @@ const AdminDeals = () => {
 
   return (
     <AdminLayout 
-      title={isRTL ? 'مدیریت تخفیف‌های روزانه' : 'Today\'s Deals Management'} 
-      description={isRTL ? 'تنظیم تایمر تخفیف برای محصولات' : 'Configure countdown timers for deal products'}
+      title={getLabel(lang, "Today's Deals Management", 'مدیریت تخفیف‌های روزانه', 'د ورځني تخفیفونو مدیریت')} 
+      description={getLabel(lang, 'Configure countdown timers for deal products', 'تنظیم تایمر تخفیف برای محصولات', 'د تخفیف محصولاتو لپاره شمېرنه ترتیب کړئ')}
     >
       <div className="space-y-6 animate-fade-in">
         {/* Stats Cards */}
@@ -240,7 +248,7 @@ const AdminDeals = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                {isRTL ? 'تخفیف‌های فعال' : 'Active Deals'}
+                {getLabel(lang, 'Active Deals', 'تخفیف‌های فعال', 'فعال تخفیفونه')}
               </CardTitle>
               <Zap className="h-4 w-4 text-success" />
             </CardHeader>
@@ -251,7 +259,7 @@ const AdminDeals = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                {isRTL ? 'تخفیف‌های آینده' : 'Upcoming Deals'}
+                {getLabel(lang, 'Upcoming Deals', 'تخفیف‌های آینده', 'راتلونکي تخفیفونه')}
               </CardTitle>
               <Clock className="h-4 w-4 text-info" />
             </CardHeader>
@@ -262,7 +270,7 @@ const AdminDeals = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                {isRTL ? 'کل محصولات فعال' : 'Total Active Products'}
+                {getLabel(lang, 'Total Active Products', 'کل محصولات فعال', 'ټول فعال محصولات')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -276,14 +284,14 @@ const AdminDeals = () => {
           <CardHeader>
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
-                <CardTitle>{isRTL ? 'محصولات' : 'Products'}</CardTitle>
+                <CardTitle>{getLabel(lang, 'Products', 'محصولات', 'محصولات')}</CardTitle>
                 <CardDescription>
-                  {isRTL ? 'تنظیم تخفیف برای محصولات' : 'Configure deals for products'}
+                  {getLabel(lang, 'Configure deals for products', 'تنظیم تخفیف برای محصولات', 'د محصولاتو لپاره تخفیف ترتیب کړئ')}
                 </CardDescription>
               </div>
               <Button variant="outline" size="sm" onClick={fetchProducts} className="hover-scale">
                 <RefreshCw className={`h-4 w-4 ${iconMarginClass}`} />
-                {isRTL ? 'بروزرسانی' : 'Refresh'}
+                {getLabel(lang, 'Refresh', 'بروزرسانی', 'تازه کول')}
               </Button>
             </div>
           </CardHeader>
@@ -293,7 +301,7 @@ const AdminDeals = () => {
               <div className="relative flex-1">
                 <Search className={`absolute ${searchIconClass} top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground`} />
                 <Input
-                  placeholder={isRTL ? 'جستجوی محصول...' : 'Search products...'}
+                  placeholder={getLabel(lang, 'Search products...', 'جستجوی محصول...', 'محصول وپلټئ...')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className={inputPaddingClass}
@@ -306,12 +314,12 @@ const AdminDeals = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>{isRTL ? 'محصول' : 'Product'}</TableHead>
-                    <TableHead>{isRTL ? 'قیمت' : 'Price'}</TableHead>
-                    <TableHead>{isRTL ? 'وضعیت تخفیف' : 'Deal Status'}</TableHead>
-                    <TableHead>{isRTL ? 'شروع' : 'Start'}</TableHead>
-                    <TableHead>{isRTL ? 'پایان' : 'End'}</TableHead>
-                    <TableHead className={isRTL ? 'text-left' : 'text-right'}>{isRTL ? 'عملیات' : 'Actions'}</TableHead>
+                    <TableHead>{getLabel(lang, 'Product', 'محصول', 'محصول')}</TableHead>
+                    <TableHead>{getLabel(lang, 'Price', 'قیمت', 'بیه')}</TableHead>
+                    <TableHead>{getLabel(lang, 'Deal Status', 'وضعیت تخفیف', 'د تخفیف حالت')}</TableHead>
+                    <TableHead>{getLabel(lang, 'Start', 'شروع', 'پیل')}</TableHead>
+                    <TableHead>{getLabel(lang, 'End', 'پایان', 'پای')}</TableHead>
+                    <TableHead className={isRTL ? 'text-left' : 'text-right'}>{getLabel(lang, 'Actions', 'عملیات', 'عملیات')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -329,7 +337,7 @@ const AdminDeals = () => {
                   ) : filteredProducts.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={6} className="h-24 text-center">
-                        {isRTL ? 'محصولی یافت نشد' : 'No products found'}
+                        {getLabel(lang, 'No products found', 'محصولی یافت نشد', 'هیڅ محصول ونه موندل شو')}
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -353,12 +361,12 @@ const AdminDeals = () => {
                         <TableCell>{getDealStatusBadge(product)}</TableCell>
                         <TableCell>
                           {product.deal_start_at 
-                            ? formatDate(new Date(product.deal_start_at), isRTL ? 'fa' : 'en')
+                            ? formatDate(new Date(product.deal_start_at), lang)
                             : '-'}
                         </TableCell>
                         <TableCell>
                           {product.deal_end_at 
-                            ? formatDate(new Date(product.deal_end_at), isRTL ? 'fa' : 'en')
+                            ? formatDate(new Date(product.deal_end_at), lang)
                             : '-'}
                         </TableCell>
                         <TableCell>
@@ -370,7 +378,7 @@ const AdminDeals = () => {
                                 onClick={() => quickEnableDeal(product)}
                               >
                                 <Zap className={`h-4 w-4 ${iconMarginClass}`} />
-                                {isRTL ? '۲۴ ساعته' : '24h Deal'}
+                                {getLabel(lang, '24h Deal', '۲۴ ساعته', 'د ۲۴ ساعتو')}
                               </Button>
                             )}
                             {product.is_deal && (
@@ -379,7 +387,7 @@ const AdminDeals = () => {
                                 size="sm"
                                 onClick={() => disableDeal(product)}
                               >
-                                {isRTL ? 'غیرفعال' : 'Disable'}
+                                {getLabel(lang, 'Disable', 'غیرفعال', 'غیر فعال')}
                               </Button>
                             )}
                             <Button 
@@ -404,14 +412,14 @@ const AdminDeals = () => {
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>{isRTL ? 'تنظیمات تخفیف' : 'Deal Settings'}</DialogTitle>
+              <DialogTitle>{getLabel(lang, 'Deal Settings', 'تنظیمات تخفیف', 'د تخفیف ترتیبات')}</DialogTitle>
               <DialogDescription>
                 {selectedProduct?.name}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="flex items-center justify-between">
-                <Label htmlFor="is-deal">{isRTL ? 'فعال کردن تخفیف' : 'Enable Deal'}</Label>
+                <Label htmlFor="is-deal">{getLabel(lang, 'Enable Deal', 'فعال کردن تخفیف', 'تخفیف فعالول')}</Label>
                 <Switch
                   id="is-deal"
                   checked={isDeal}
@@ -422,7 +430,7 @@ const AdminDeals = () => {
               {isDeal && (
                 <>
                   <div className="space-y-2">
-                    <Label htmlFor="deal-start">{isRTL ? 'تاریخ و ساعت شروع' : 'Start Date & Time'}</Label>
+                    <Label htmlFor="deal-start">{getLabel(lang, 'Start Date & Time', 'تاریخ و ساعت شروع', 'د پیل نیټه او وخت')}</Label>
                     <Input
                       id="deal-start"
                       type="datetime-local"
@@ -431,7 +439,7 @@ const AdminDeals = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="deal-end">{isRTL ? 'تاریخ و ساعت پایان' : 'End Date & Time'}</Label>
+                    <Label htmlFor="deal-end">{getLabel(lang, 'End Date & Time', 'تاریخ و ساعت پایان', 'د پای نیټه او وخت')}</Label>
                     <Input
                       id="deal-end"
                       type="datetime-local"
@@ -447,13 +455,15 @@ const AdminDeals = () => {
                 variant="outline"
                 onClick={() => setIsEditDialogOpen(false)}
               >
-                {isRTL ? 'انصراف' : 'Cancel'}
+                {getLabel(lang, 'Cancel', 'انصراف', 'لغوه کول')}
               </Button>
               <Button
                 onClick={handleSave}
                 disabled={isSubmitting}
               >
-                {isSubmitting ? (isRTL ? 'در حال ذخیره...' : 'Saving...') : (isRTL ? 'ذخیره' : 'Save')}
+                {isSubmitting 
+                  ? getLabel(lang, 'Saving...', 'در حال ذخیره...', 'خوندي کیږي...') 
+                  : getLabel(lang, 'Save', 'ذخیره', 'خوندي کول')}
               </Button>
             </DialogFooter>
           </DialogContent>

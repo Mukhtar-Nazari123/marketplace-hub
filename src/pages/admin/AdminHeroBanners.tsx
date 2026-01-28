@@ -10,13 +10,22 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Edit, Trash2, Monitor } from 'lucide-react';
-import { useLanguage } from '@/lib/i18n';
+import { useLanguage, type Language } from '@/lib/i18n';
 import { useHeroBanners, HeroBannerInput } from '@/hooks/useHeroBanners';
 import ImageUpload from '@/components/admin/ImageUpload';
 
+// Trilingual helper
+const getLabel = (lang: Language, en: string, fa: string, ps: string) => {
+  if (lang === 'ps') return ps;
+  if (lang === 'fa') return fa;
+  return en;
+};
+
 const AdminHeroBanners = () => {
-  const { direction } = useLanguage();
-  const iconMarginClass = direction === 'rtl' ? 'ml-2' : 'mr-2';
+  const { direction, language } = useLanguage();
+  const lang = language as Language;
+  const isRTL = direction === 'rtl';
+  const iconMarginClass = isRTL ? 'ml-2' : 'mr-2';
   const { heroBanners, loading, createHeroBanner, updateHeroBanner, deleteHeroBanner, toggleHeroBanner } = useHeroBanners(false);
   
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -98,72 +107,90 @@ const AdminHeroBanners = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this banner?')) {
+    const confirmMessage = getLabel(lang, 
+      'Are you sure you want to delete this banner?', 
+      'آیا مطمئن هستید که می‌خواهید این بنر را حذف کنید؟',
+      'ایا تاسو ډاډه یاست چې دا بینر حذف کړئ؟'
+    );
+    if (confirm(confirmMessage)) {
       await deleteHeroBanner(id);
     }
   };
 
   return (
-    <AdminLayout title="Hero Banners" description="Manage home page hero banners">
+    <AdminLayout 
+      title={getLabel(lang, 'Hero Banners', 'بنرهای اصلی', 'اصلي بینرونه')} 
+      description={getLabel(lang, 'Manage home page hero banners', 'مدیریت بنرهای صفحه اصلی', 'د کور پاڼې اصلي بینرونه اداره کړئ')}
+    >
       <div className="space-y-6 animate-fade-in">
         <Card className="hover-lift">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle>Hero Banners</CardTitle>
-                <CardDescription>Create and manage main hero banners for the home page</CardDescription>
+                <CardTitle>{getLabel(lang, 'Hero Banners', 'بنرهای اصلی', 'اصلي بینرونه')}</CardTitle>
+                <CardDescription>
+                  {getLabel(lang, 'Create and manage main hero banners for the home page', 'ایجاد و مدیریت بنرهای اصلی صفحه اول', 'د کور پاڼې لپاره اصلي بینرونه جوړ او اداره کړئ')}
+                </CardDescription>
               </div>
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
                   <Button className="hover-scale" onClick={() => handleOpenDialog()}>
                     <Plus className={`h-4 w-4 ${iconMarginClass}`} />
-                    Add Banner
+                    {getLabel(lang, 'Add Banner', 'افزودن بنر', 'بینر اضافه کړئ')}
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
-                    <DialogTitle>{editingBanner ? 'Edit Hero Banner' : 'Create Hero Banner'}</DialogTitle>
+                    <DialogTitle>
+                      {editingBanner 
+                        ? getLabel(lang, 'Edit Hero Banner', 'ویرایش بنر', 'بینر سمول') 
+                        : getLabel(lang, 'Create Hero Banner', 'ایجاد بنر', 'بینر جوړول')}
+                    </DialogTitle>
                     <DialogDescription>
-                      {editingBanner ? 'Update the hero banner details' : 'Add a new hero banner to the home page'}
+                      {editingBanner 
+                        ? getLabel(lang, 'Update the hero banner details', 'جزئیات بنر را به‌روزرسانی کنید', 'د بینر جزئیات تازه کړئ') 
+                        : getLabel(lang, 'Add a new hero banner to the home page', 'یک بنر جدید به صفحه اصلی اضافه کنید', 'کور پاڼې ته نوی بینر اضافه کړئ')}
                     </DialogDescription>
                   </DialogHeader>
                   
                   <div className="grid gap-4 py-4">
                     {/* English Content */}
                     <div className="space-y-4">
-                      <h4 className="font-medium text-sm text-muted-foreground">English Content</h4>
+                      <h4 className="font-medium text-sm text-muted-foreground">
+                        {getLabel(lang, 'English Content', 'محتوای انگلیسی', 'انګلیسي منځپانګه')}
+                      </h4>
                       <div className="grid gap-2">
-                        <Label htmlFor="badge_text">Badge Text</Label>
+                        <Label htmlFor="badge_text">{getLabel(lang, 'Badge Text', 'متن نشان', 'د بیج متن')}</Label>
                         <Input
                           id="badge_text"
-                          placeholder="e.g. 50% OFF"
+                          placeholder={getLabel(lang, 'e.g. 50% OFF', 'مثلاً: ۵۰٪ تخفیف', 'لکه ۵۰٪ تخفیف')}
                           value={formData.badge_text || ''}
                           onChange={(e) => setFormData({ ...formData, badge_text: e.target.value })}
                         />
                       </div>
                       <div className="grid gap-2">
-                        <Label htmlFor="title">Title *</Label>
+                        <Label htmlFor="title">{getLabel(lang, 'Title *', 'عنوان *', 'سرلیک *')}</Label>
                         <Input
                           id="title"
-                          placeholder="e.g. Modern Style Headphones Model"
+                          placeholder={getLabel(lang, 'e.g. Modern Style Headphones Model', 'مثلاً: مدل هدفون مدرن استایل', 'لکه عصري سټایل هیډفون ماډل')}
                           value={formData.title}
                           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                         />
                       </div>
                       <div className="grid gap-2">
-                        <Label htmlFor="description">Description</Label>
+                        <Label htmlFor="description">{getLabel(lang, 'Description', 'توضیحات', 'توضیحات')}</Label>
                         <Textarea
                           id="description"
-                          placeholder="e.g. Hurry up! Only 100 products at this discounted price."
+                          placeholder={getLabel(lang, 'e.g. Hurry up! Only 100 products at this discounted price.', 'مثلاً: عجله کنید! فقط ۱۰۰ محصول با این قیمت تخفیف‌دار.', 'لکه چټک شئ! یوازې ۱۰۰ محصولات په دې تخفیف بیه.')}
                           value={formData.description || ''}
                           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                         />
                       </div>
                       <div className="grid gap-2">
-                        <Label htmlFor="cta_text">CTA Button Text</Label>
+                        <Label htmlFor="cta_text">{getLabel(lang, 'CTA Button Text', 'متن دکمه', 'د تڼۍ متن')}</Label>
                         <Input
                           id="cta_text"
-                          placeholder="e.g. Shop Now"
+                          placeholder={getLabel(lang, 'e.g. Shop Now', 'مثلاً: خرید کنید', 'لکه اوس پیرود وکړئ')}
                           value={formData.cta_text || ''}
                           onChange={(e) => setFormData({ ...formData, cta_text: e.target.value })}
                         />
@@ -172,9 +199,11 @@ const AdminHeroBanners = () => {
 
                     {/* Persian Content */}
                     <div className="space-y-4 border-t pt-4">
-                      <h4 className="font-medium text-sm text-muted-foreground">Persian Content (فارسی)</h4>
+                      <h4 className="font-medium text-sm text-muted-foreground">
+                        {getLabel(lang, 'Persian Content (فارسی)', 'محتوای فارسی', 'فارسي منځپانګه')}
+                      </h4>
                       <div className="grid gap-2">
-                        <Label htmlFor="badge_text_fa">Badge Text (فارسی)</Label>
+                        <Label htmlFor="badge_text_fa">{getLabel(lang, 'Badge Text (فارسی)', 'متن نشان (فارسی)', 'د بیج متن (فارسي)')}</Label>
                         <Input
                           id="badge_text_fa"
                           dir="rtl"
@@ -184,7 +213,7 @@ const AdminHeroBanners = () => {
                         />
                       </div>
                       <div className="grid gap-2">
-                        <Label htmlFor="title_fa">Title (فارسی)</Label>
+                        <Label htmlFor="title_fa">{getLabel(lang, 'Title (فارسی)', 'عنوان (فارسی)', 'سرلیک (فارسي)')}</Label>
                         <Input
                           id="title_fa"
                           dir="rtl"
@@ -194,7 +223,7 @@ const AdminHeroBanners = () => {
                         />
                       </div>
                       <div className="grid gap-2">
-                        <Label htmlFor="description_fa">Description (فارسی)</Label>
+                        <Label htmlFor="description_fa">{getLabel(lang, 'Description (فارسی)', 'توضیحات (فارسی)', 'توضیحات (فارسي)')}</Label>
                         <Textarea
                           id="description_fa"
                           dir="rtl"
@@ -204,7 +233,7 @@ const AdminHeroBanners = () => {
                         />
                       </div>
                       <div className="grid gap-2">
-                        <Label htmlFor="cta_text_fa">CTA Button Text (فارسی)</Label>
+                        <Label htmlFor="cta_text_fa">{getLabel(lang, 'CTA Button Text (فارسی)', 'متن دکمه (فارسی)', 'د تڼۍ متن (فارسي)')}</Label>
                         <Input
                           id="cta_text_fa"
                           dir="rtl"
@@ -217,18 +246,20 @@ const AdminHeroBanners = () => {
 
                     {/* Link & Images */}
                     <div className="space-y-4 border-t pt-4">
-                      <h4 className="font-medium text-sm text-muted-foreground">Link & Images</h4>
+                      <h4 className="font-medium text-sm text-muted-foreground">
+                        {getLabel(lang, 'Link & Images', 'لینک و تصاویر', 'لینک او انځورونه')}
+                      </h4>
                       <div className="grid gap-2">
-                        <Label htmlFor="cta_link">CTA Link</Label>
+                        <Label htmlFor="cta_link">{getLabel(lang, 'CTA Link', 'لینک دکمه', 'د تڼۍ لینک')}</Label>
                         <Input
                           id="cta_link"
-                          placeholder="e.g. /products or /categories/electronics"
+                          placeholder={getLabel(lang, 'e.g. /products or /categories/electronics', 'مثلاً: /products یا /categories/electronics', 'لکه /products یا /categories/electronics')}
                           value={formData.cta_link || ''}
                           onChange={(e) => setFormData({ ...formData, cta_link: e.target.value })}
                         />
                       </div>
                       <div className="grid gap-2">
-                        <Label htmlFor="background_color">Background Color</Label>
+                        <Label htmlFor="background_color">{getLabel(lang, 'Background Color', 'رنگ پس‌زمینه', 'د شالید رنګ')}</Label>
                         <div className="flex gap-2">
                           <Input
                             id="background_color"
@@ -238,28 +269,28 @@ const AdminHeroBanners = () => {
                             onChange={(e) => setFormData({ ...formData, background_color: e.target.value })}
                           />
                           <Input
-                            placeholder="e.g. #eb1d31 or leave empty"
+                            placeholder={getLabel(lang, 'e.g. #eb1d31 or leave empty', 'مثلاً: #eb1d31 یا خالی بگذارید', 'لکه #eb1d31 یا خالي پریږدئ')}
                             value={formData.background_color || ''}
                             onChange={(e) => setFormData({ ...formData, background_color: e.target.value })}
                           />
                         </div>
                         <p className="text-xs text-muted-foreground">
-                          Used when no background image is set
+                          {getLabel(lang, 'Used when no background image is set', 'زمانی استفاده می‌شود که تصویر پس‌زمینه تنظیم نشده باشد', 'کله چې د شالید انځور نه وي ترتیب شوی کارول کیږي')}
                         </p>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <ImageUpload
-                          label="Background Image"
+                          label={getLabel(lang, 'Background Image', 'تصویر پس‌زمینه', 'د شالید انځور')}
                           value={formData.background_image || ''}
                           onChange={(url) => setFormData({ ...formData, background_image: url })}
-                          placeholder="Upload background image"
+                          placeholder={getLabel(lang, 'Upload background image', 'آپلود تصویر پس‌زمینه', 'د شالید انځور پورته کړئ')}
                           folder="hero-banners"
                         />
                         <ImageUpload
-                          label="Icon/Product Image"
+                          label={getLabel(lang, 'Icon/Product Image', 'تصویر آیکون/محصول', 'د آیکون/محصول انځور')}
                           value={formData.icon_image || ''}
                           onChange={(url) => setFormData({ ...formData, icon_image: url })}
-                          placeholder="Upload product image"
+                          placeholder={getLabel(lang, 'Upload product image', 'آپلود تصویر محصول', 'د محصول انځور پورته کړئ')}
                           folder="hero-banners"
                         />
                       </div>
@@ -267,9 +298,11 @@ const AdminHeroBanners = () => {
 
                     {/* Settings */}
                     <div className="space-y-4 border-t pt-4">
-                      <h4 className="font-medium text-sm text-muted-foreground">Settings</h4>
+                      <h4 className="font-medium text-sm text-muted-foreground">
+                        {getLabel(lang, 'Settings', 'تنظیمات', 'ترتیبات')}
+                      </h4>
                       <div className="grid gap-2">
-                        <Label htmlFor="display_order">Display Order</Label>
+                        <Label htmlFor="display_order">{getLabel(lang, 'Display Order', 'ترتیب نمایش', 'د ښودلو ترتیب')}</Label>
                         <Input
                           id="display_order"
                           type="number"
@@ -282,15 +315,19 @@ const AdminHeroBanners = () => {
                           checked={formData.is_active}
                           onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
                         />
-                        <Label>Active</Label>
+                        <Label>{getLabel(lang, 'Active', 'فعال', 'فعال')}</Label>
                       </div>
                     </div>
                   </div>
 
                   <DialogFooter>
-                    <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
+                    <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                      {getLabel(lang, 'Cancel', 'انصراف', 'لغوه کول')}
+                    </Button>
                     <Button onClick={handleSubmit} disabled={!formData.title}>
-                      {editingBanner ? 'Update' : 'Create'}
+                      {editingBanner 
+                        ? getLabel(lang, 'Update', 'به‌روزرسانی', 'تازه کول') 
+                        : getLabel(lang, 'Create', 'ایجاد', 'جوړول')}
                     </Button>
                   </DialogFooter>
                 </DialogContent>
@@ -307,25 +344,29 @@ const AdminHeroBanners = () => {
                 <div className="rounded-full bg-muted p-4 animate-pulse">
                   <Monitor className="h-8 w-8 text-muted-foreground" />
                 </div>
-                <h3 className="mt-4 text-lg font-semibold">No Hero Banners</h3>
+                <h3 className="mt-4 text-lg font-semibold">
+                  {getLabel(lang, 'No Hero Banners', 'بنری وجود ندارد', 'هیڅ بینر نشته')}
+                </h3>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  Create your first hero banner to display on the home page
+                  {getLabel(lang, 'Create your first hero banner to display on the home page', 'اولین بنر خود را برای نمایش در صفحه اصلی ایجاد کنید', 'د کور پاڼې لپاره خپل لومړی بینر جوړ کړئ')}
                 </p>
                 <Button className="mt-4 hover-scale" onClick={() => handleOpenDialog()}>
                   <Plus className={`h-4 w-4 ${iconMarginClass}`} />
-                  Add First Banner
+                  {getLabel(lang, 'Add First Banner', 'افزودن اولین بنر', 'لومړی بینر اضافه کړئ')}
                 </Button>
               </div>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Order</TableHead>
-                    <TableHead>Title</TableHead>
-                    <TableHead>Badge</TableHead>
-                    <TableHead>CTA</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead>{getLabel(lang, 'Order', 'ترتیب', 'ترتیب')}</TableHead>
+                    <TableHead>{getLabel(lang, 'Title', 'عنوان', 'سرلیک')}</TableHead>
+                    <TableHead>{getLabel(lang, 'Badge', 'نشان', 'بیج')}</TableHead>
+                    <TableHead>{getLabel(lang, 'CTA', 'دکمه', 'تڼۍ')}</TableHead>
+                    <TableHead>{getLabel(lang, 'Status', 'وضعیت', 'حالت')}</TableHead>
+                    <TableHead className={isRTL ? 'text-left' : 'text-right'}>
+                      {getLabel(lang, 'Actions', 'عملیات', 'عملیات')}
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -355,8 +396,8 @@ const AdminHeroBanners = () => {
                           onCheckedChange={(checked) => toggleHeroBanner(banner.id, checked)}
                         />
                       </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
+                      <TableCell className={isRTL ? 'text-left' : 'text-right'}>
+                        <div className={`flex gap-2 ${isRTL ? 'justify-start' : 'justify-end'}`}>
                           <Button variant="ghost" size="icon" onClick={() => handleOpenDialog(banner)}>
                             <Edit className="h-4 w-4" />
                           </Button>
