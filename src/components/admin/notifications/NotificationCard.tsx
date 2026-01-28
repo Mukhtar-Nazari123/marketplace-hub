@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Package, ShoppingCart, Store, CheckCheck } from "lucide-react";
-import { useLanguage } from "@/lib/i18n";
+import { useLanguage, Language } from "@/lib/i18n";
 import { AdminNotification } from "@/hooks/useAdminNotifications";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,13 @@ interface NotificationCardProps {
 export const NotificationCard = ({ notification, onMarkAsRead }: NotificationCardProps) => {
   const navigate = useNavigate();
   const { isRTL, language } = useLanguage();
+  const lang = language as Language;
+
+  const getLabel = (en: string, fa: string, ps: string) => {
+    if (lang === 'ps') return ps;
+    if (lang === 'fa') return fa;
+    return en;
+  };
 
   const formatTimeAgo = (timestamp: string) => {
     const now = new Date();
@@ -22,16 +29,16 @@ export const NotificationCard = ({ notification, onMarkAsRead }: NotificationCar
     const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
     if (diffInSeconds < 60) {
-      return isRTL ? 'همین الان' : 'Just now';
+      return getLabel('Just now', 'همین الان', 'همدا اوس');
     } else if (diffInSeconds < 3600) {
       const minutes = Math.floor(diffInSeconds / 60);
-      return isRTL ? `${minutes} دقیقه پیش` : `${minutes}m ago`;
+      return getLabel(`${minutes}m ago`, `${minutes} دقیقه پیش`, `${minutes} دقیقې مخکې`);
     } else if (diffInSeconds < 86400) {
       const hours = Math.floor(diffInSeconds / 3600);
-      return isRTL ? `${hours} ساعت پیش` : `${hours}h ago`;
+      return getLabel(`${hours}h ago`, `${hours} ساعت پیش`, `${hours} ساعته مخکې`);
     } else {
       const days = Math.floor(diffInSeconds / 86400);
-      return isRTL ? `${days} روز پیش` : `${days}d ago`;
+      return getLabel(`${days}d ago`, `${days} روز پیش`, `${days} ورځې مخکې`);
     }
   };
 
@@ -39,7 +46,8 @@ export const NotificationCard = ({ notification, onMarkAsRead }: NotificationCar
     if (amount === null) return '';
     const curr = currency || 'AFN';
     if (isRTL) {
-      return `${amount.toLocaleString('fa-AF')} ${curr === 'AFN' ? 'افغانی' : curr}`;
+      const currLabel = curr === 'AFN' ? getLabel('AFN', 'افغانی', 'افغانۍ') : curr;
+      return `${amount.toLocaleString('fa-AF')} ${currLabel}`;
     }
     return `${amount.toLocaleString()} ${curr}`;
   };
@@ -73,11 +81,11 @@ export const NotificationCard = ({ notification, onMarkAsRead }: NotificationCar
   const getTypeLabel = () => {
     switch (notification.type) {
       case 'NEW_PRODUCT':
-        return isRTL ? 'محصول' : 'Product';
+        return getLabel('Product', 'محصول', 'محصول');
       case 'NEW_ORDER':
-        return isRTL ? 'سفارش' : 'Order';
+        return getLabel('Order', 'سفارش', 'امر');
       case 'NEW_STORE':
-        return isRTL ? 'فروشگاه' : 'Store';
+        return getLabel('Store', 'فروشگاه', 'پلورنځی');
       default:
         return '';
     }
@@ -186,10 +194,10 @@ export const NotificationCard = ({ notification, onMarkAsRead }: NotificationCar
             </span>
           )}
           {notification.seller_name && (
-            <span>{isRTL ? 'فروشنده:' : 'Seller:'} {notification.seller_name}</span>
+            <span>{getLabel('Seller:', 'فروشنده:', 'پلورونکی:')} {notification.seller_name}</span>
           )}
           {notification.buyer_name && (
-            <span>{isRTL ? 'خریدار:' : 'Buyer:'} {notification.buyer_name}</span>
+            <span>{getLabel('Buyer:', 'خریدار:', 'پیرودونکی:')} {notification.buyer_name}</span>
           )}
         </div>
       </div>

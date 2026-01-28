@@ -1,6 +1,6 @@
 import { Bell, CheckCheck, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useLanguage } from "@/lib/i18n";
+import { useLanguage, Language } from "@/lib/i18n";
 import { useAdminNotifications } from "@/hooks/useAdminNotifications";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export const NotificationDropdown = () => {
   const navigate = useNavigate();
-  const { isRTL } = useLanguage();
+  const { isRTL, language } = useLanguage();
+  const lang = language as Language;
   const { 
     notifications, 
     isLoading, 
@@ -23,6 +24,12 @@ export const NotificationDropdown = () => {
     markAsRead, 
     markAllAsRead 
   } = useAdminNotifications();
+
+  const getLabel = (en: string, fa: string, ps: string) => {
+    if (lang === 'ps') return ps;
+    if (lang === 'fa') return fa;
+    return en;
+  };
 
   // Show only latest 5 notifications in dropdown
   const recentNotifications = notifications.slice(0, 5);
@@ -54,7 +61,7 @@ export const NotificationDropdown = () => {
           isRTL && "flex-row-reverse"
         )}>
           <h3 className="font-semibold text-sm">
-            {isRTL ? 'اعلان‌ها' : 'Notifications'}
+            {getLabel('Notifications', 'اعلان‌ها', 'خبرتیاوې')}
           </h3>
           {unreadCount > 0 && (
             <Button
@@ -64,7 +71,7 @@ export const NotificationDropdown = () => {
               className={cn("gap-1 text-xs h-7", isRTL && "flex-row-reverse")}
             >
               <CheckCheck className="h-3.5 w-3.5" />
-              {isRTL ? 'همه خوانده شود' : 'Mark all read'}
+              {getLabel('Mark all read', 'همه خوانده شود', 'ټول لوستل شوي')}
             </Button>
           )}
         </div>
@@ -87,7 +94,7 @@ export const NotificationDropdown = () => {
             <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
               <Bell className="h-12 w-12 mb-3 opacity-50" />
               <p className="text-sm">
-                {isRTL ? 'اعلان جدیدی نیست' : 'No notifications yet'}
+                {getLabel('No notifications yet', 'اعلان جدیدی نیست', 'تر اوسه هیڅ خبرتیا نشته')}
               </p>
             </div>
           ) : (
@@ -114,7 +121,7 @@ export const NotificationDropdown = () => {
               )}
               onClick={() => navigate('/dashboard/admin/notifications')}
             >
-              {isRTL ? 'مشاهده همه اعلان‌ها' : 'View all notifications'}
+              {getLabel('View all notifications', 'مشاهده همه اعلان‌ها', 'ټولې خبرتیاوې وګورئ')}
               <ArrowRight className={cn("h-4 w-4", isRTL && "rotate-180")} />
             </Button>
           </div>
