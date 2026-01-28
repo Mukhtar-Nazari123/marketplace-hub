@@ -67,17 +67,20 @@ interface SellerSubOrder {
 }
 
 // Helper to format SKUs for display
-const formatProductSKUs = (items: OrderItem[] | undefined, isRTL: boolean): string => {
-  if (!items || items.length === 0) return isRTL ? "بدون SKU" : "No SKU";
+const formatProductSKUs = (items: OrderItem[] | undefined, language: string): string => {
+  const noSkuText = language === 'ps' ? "SKU نشته" : language === 'fa' ? "بدون SKU" : "No SKU";
+  if (!items || items.length === 0) return noSkuText;
 
   const skus = items
     .map((item) => item.product_sku)
     .filter((sku): sku is string => sku !== null && sku !== undefined && sku.trim() !== "");
 
-  if (skus.length === 0) return isRTL ? "بدون SKU" : "No SKU";
+  if (skus.length === 0) return noSkuText;
   if (skus.length === 1) return skus[0];
-  if (skus.length === 2) return skus.join(isRTL ? " ، " : ", ");
-  return `${skus[0]}${isRTL ? " و " : ", "}+${skus.length - 1}`;
+  const separator = language === 'fa' || language === 'ps' ? " ، " : ", ";
+  const andText = language === 'ps' ? " او " : language === 'fa' ? " و " : ", ";
+  if (skus.length === 2) return skus.join(separator);
+  return `${skus[0]}${andText}+${skus.length - 1}`;
 };
 
 interface Order {
@@ -110,55 +113,47 @@ const BuyerOrders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Helper for trilingual support
+  const getLabel = (en: string, fa: string, ps: string) => {
+    if (language === 'ps') return ps;
+    if (language === 'fa') return fa;
+    return en;
+  };
+
   // Localized texts
   const texts = {
-    en: {
-      title: "My Orders",
-      description: "Track your orders and purchase history",
-      noOrders: "No orders yet",
-      noOrdersDesc: "Your orders will appear here once you make your first purchase.",
-      browseProducts: "Browse Products",
-      totalOrders: "Total Orders",
-      inProgress: "In Progress",
-      delivered: "Delivered",
-      items: "items",
-      sellers: "sellers",
-      seller: "Seller",
-      noSku: "No SKU",
-      product: "product",
-    },
-    fa: {
-      title: "سفارشات من",
-      description: "پیگیری سفارشات و سابقه خرید",
-      noOrders: "هنوز سفارشی ندارید",
-      noOrdersDesc: "با خرید اولین محصول، سفارشات شما در اینجا نمایش داده می‌شود.",
-      browseProducts: "مشاهده محصولات",
-      totalOrders: "کل سفارشات",
-      inProgress: "در حال پردازش",
-      delivered: "تحویل شده",
-      items: "محصول",
-      sellers: "فروشنده",
-      seller: "فروشنده",
-      noSku: "بدون SKU",
-      product: "محصول",
-    },
-    ps: {
-      title: "زما سفارشونه",
-      description: "خپل سفارشونه او پیرود تاریخچه تعقیب کړئ",
-      noOrders: "تر اوسه هیڅ سفارش نشته",
-      noOrdersDesc: "ستاسو سفارشونه به دلته ښکاره شي کله چې تاسو خپل لومړی پیرود وکړئ.",
-      browseProducts: "محصولات وګورئ",
-      totalOrders: "ټول سفارشونه",
-      inProgress: "روان",
-      delivered: "تحویل شوی",
-      items: "توکي",
-      sellers: "پلورونکي",
-      seller: "پلورونکی",
-      noSku: "SKU نشته",
-      product: "محصول",
-    },
+    title: getLabel('My Orders', 'سفارشات من', 'زما امرونه'),
+    description: getLabel('Track your orders and purchase history', 'پیگیری سفارشات و سابقه خرید', 'خپل امرونه او پیرود تاریخچه تعقیب کړئ'),
+    noOrders: getLabel('No orders yet', 'هنوز سفارشی ندارید', 'تر اوسه هیڅ امر نشته'),
+    noOrdersDesc: getLabel('Your orders will appear here once you make your first purchase.', 'با خرید اولین محصول، سفارشات شما در اینجا نمایش داده می‌شود.', 'ستاسو امرونه به دلته ښکاره شي کله چې تاسو خپل لومړی پیرود وکړئ.'),
+    browseProducts: getLabel('Browse Products', 'مشاهده محصولات', 'محصولات وګورئ'),
+    totalOrders: getLabel('Total Orders', 'کل سفارشات', 'ټول امرونه'),
+    inProgress: getLabel('In Progress', 'در حال پردازش', 'روان'),
+    delivered: getLabel('Delivered', 'تحویل شده', 'تحویل شوی'),
+    items: getLabel('items', 'محصول', 'توکي'),
+    sellers: getLabel('sellers', 'فروشنده', 'پلورونکي'),
+    seller: getLabel('Seller', 'فروشنده', 'پلورونکی'),
+    noSku: getLabel('No SKU', 'بدون SKU', 'SKU نشته'),
+    product: getLabel('product', 'محصول', 'محصول'),
+    products: getLabel('Products', 'محصولات', 'محصولات'),
+    shippingAddress: getLabel('Shipping Address', 'آدرس ارسال', 'د لیږلو پته'),
+    paymentSummary: getLabel('Payment Summary', 'خلاصه پرداخت', 'د تادیې لنډیز'),
+    subtotal: getLabel('Subtotal', 'جمع محصولات', 'فرعي مجموعه'),
+    shipping: getLabel('Shipping', 'ارسال', 'لیږل'),
+    discount: getLabel('Discount', 'تخفیف', 'تخفیف'),
+    total: getLabel('Total', 'مجموع', 'مجموعه'),
+    payment: getLabel('Payment', 'روش پرداخت', 'تادیه'),
+    cashOnDelivery: getLabel('Cash on Delivery', 'پرداخت در محل', 'په تحویلي تادیه'),
+    delivery: getLabel('Delivery', 'هزینه ارسال', 'رسول'),
+    rejected: getLabel('Rejected', 'رد شده', 'رد شوی'),
+    rejectedMessage: getLabel('This order has been rejected by the seller', 'این سفارش توسط فروشنده رد شده است', 'دا امر د پلورونکي لخوا رد شوی'),
+    orderStatusBySeller: getLabel('Order Status by Seller', 'وضعیت سفارش به تفکیک فروشنده', 'د پلورونکي په اساس د امر حالت'),
+    sellerPolicies: getLabel('Seller Policies', 'سیاست‌های فروشنده', 'د پلورونکي پالیسۍ'),
+    returnPolicy: getLabel('Return Policy', 'سیاست بازگشت', 'د بیرته ورکولو پالیسي'),
+    shippingPolicy: getLabel('Shipping Policy', 'سیاست ارسال', 'د لیږلو پالیسي'),
+    notProvided: getLabel('Not provided', 'ارائه نشده', 'نه دی ورکړل شوی'),
   };
-  const t = texts[language as keyof typeof texts] || texts.en;
+  const t = texts;
 
   const fetchOrders = async () => {
     if (!user) return;
@@ -506,7 +501,7 @@ const BuyerOrders = () => {
                               <div key={sellerOrder.id} className="flex items-center gap-2 p-2 rounded-lg bg-destructive/10 border border-destructive/20">
                                 <XCircle className="w-5 h-5 text-destructive shrink-0" />
                                 <span className="text-sm text-destructive font-medium">
-                                  {isRTL ? "رد شده" : "Rejected"}
+                                  {t.rejected}
                                 </span>
                               </div>
                             );
@@ -516,7 +511,7 @@ const BuyerOrders = () => {
                             <div key={sellerOrder.id} className="space-y-2">
                               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                 <span className="font-mono bg-primary/10 text-primary px-1.5 py-0.5 rounded text-[10px]">
-                                  {formatProductSKUs(sellerOrder.items, isRTL)}
+                                  {formatProductSKUs(sellerOrder.items, language)}
                                 </span>
                               </div>
                               {/* Horizontal Timeline */}
@@ -531,12 +526,13 @@ const BuyerOrders = () => {
                                     delivered: CheckCircle,
                                   };
                                   const Icon = icons[step];
-                                  const labels: Record<string, { en: string; fa: string }> = {
-                                    pending: { en: "Pending", fa: "در انتظار" },
-                                    confirmed: { en: "Confirmed", fa: "تایید" },
-                                    shipped: { en: "Shipped", fa: "ارسال" },
-                                    delivered: { en: "Done", fa: "تحویل" },
+                                  const labels: Record<string, { en: string; fa: string; ps: string }> = {
+                                    pending: { en: "Pending", fa: "در انتظار", ps: "انتظار کې" },
+                                    confirmed: { en: "Confirmed", fa: "تایید", ps: "تایید شوی" },
+                                    shipped: { en: "Shipped", fa: "ارسال", ps: "لیږل شوی" },
+                                    delivered: { en: "Done", fa: "تحویل", ps: "تحویل شوی" },
                                   };
+                                  const labelToShow = language === 'ps' ? labels[step].ps : language === 'fa' ? labels[step].fa : labels[step].en;
 
                                   return (
                                     <div key={step} className="flex items-center">
@@ -551,7 +547,7 @@ const BuyerOrders = () => {
                                           <Icon className="w-3 h-3" />
                                         </div>
                                         <span className={`text-[9px] mt-0.5 ${isCompleted ? "text-primary" : "text-muted-foreground"}`}>
-                                          {isRTL ? labels[step].fa : labels[step].en}
+                                          {labelToShow}
                                         </span>
                                       </div>
                                       {index < statusSteps.length - 1 && (
@@ -570,10 +566,10 @@ const BuyerOrders = () => {
                     <Separator />
 
                     {/* Products List */}
-                    <div className="space-y-3">
-                      <h4 className="font-semibold flex items-center gap-2 text-sm">
-                        <Package className="w-4 h-4" />
-                        {isRTL ? "محصولات" : "Products"}
+                      <div className="space-y-3">
+                        <h4 className="font-semibold flex items-center gap-2 text-sm">
+                          <Package className="w-4 h-4" />
+                          {t.products}
                       </h4>
                       {sellerGroups.map(([sellerId, group]) => {
                         const sellerOrder = order.seller_orders?.find((so) => so.seller_id === sellerId);
@@ -622,7 +618,7 @@ const BuyerOrders = () => {
                       <div className="space-y-2">
                         <h4 className="font-semibold flex items-center gap-2 text-sm">
                           <MapPin className="w-4 h-4" />
-                          {isRTL ? "آدرس ارسال" : "Shipping Address"}
+                          {t.shippingAddress}
                         </h4>
                         <div className="p-3 bg-muted/50 rounded-lg text-xs space-y-1">
                           <p className="font-medium">{order.shipping_address.name}</p>
@@ -638,11 +634,11 @@ const BuyerOrders = () => {
                     <div className="space-y-2">
                       <h4 className="font-semibold flex items-center gap-2 text-sm">
                         <CreditCard className="w-4 h-4" />
-                        {isRTL ? "خلاصه پرداخت" : "Payment Summary"}
+                        {t.paymentSummary}
                       </h4>
                       <div className="p-3 bg-muted/50 rounded-lg text-xs space-y-2">
                         <div className="flex justify-between">
-                          <span className="text-muted-foreground">{isRTL ? "جمع محصولات" : "Subtotal"}</span>
+                          <span className="text-muted-foreground">{t.subtotal}</span>
                           <span>
                             {order.subtotal_usd > 0 && order.subtotal_afn > 0 ? (
                               <>
@@ -658,19 +654,19 @@ const BuyerOrders = () => {
                         <div className="flex justify-between">
                           <span className="text-muted-foreground flex items-center gap-1">
                             <Truck className="w-3 h-3" />
-                            {isRTL ? "ارسال" : "Shipping"}
+                            {t.shipping}
                           </span>
                           <span>{formatCurrency(order.delivery_fee_afn, "AFN", isRTL)}</span>
                         </div>
                         {order.discount > 0 && (
                           <div className="flex justify-between text-green-600">
-                            <span>{isRTL ? "تخفیف" : "Discount"}</span>
+                            <span>{t.discount}</span>
                             <span>-{formatCurrency(order.discount, "AFN", isRTL)}</span>
                           </div>
                         )}
                         <Separator />
                         <div className="flex justify-between font-bold text-sm">
-                          <span>{isRTL ? "مجموع" : "Total"}</span>
+                          <span>{t.total}</span>
                           <span className="text-primary">
                             {order.total_usd > 0 && order.total_afn > 0 ? (
                               <>
@@ -684,10 +680,10 @@ const BuyerOrders = () => {
                           </span>
                         </div>
                         <div className="flex justify-between text-[10px] text-muted-foreground pt-1">
-                          <span>{isRTL ? "روش پرداخت" : "Payment"}</span>
+                          <span>{t.payment}</span>
                           <span>
                             {order.payment_method === "cash_on_delivery"
-                              ? isRTL ? "پرداخت در محل" : "Cash on Delivery"
+                              ? t.cashOnDelivery
                               : order.payment_method}
                           </span>
                         </div>
@@ -721,7 +717,7 @@ const BuyerOrders = () => {
                         {sellerGroups.length > 1 && (
                           <Badge variant="outline" className="gap-1 text-xs">
                             <Store className="w-3 h-3" />
-                            {sellerGroups.length} {isRTL ? "فروشنده" : "sellers"}
+                            {sellerGroups.length} {t.sellers}
                           </Badge>
                         )}
                       </div>
@@ -743,7 +739,7 @@ const BuyerOrders = () => {
                         )}
                       </p>
                       <p className="text-xs md:text-sm text-muted-foreground">
-                        {order.order_items.length} {isRTL ? "محصول" : "items"}
+                        {order.order_items.length} {t.items}
                       </p>
                     </div>
                   </div>
@@ -756,28 +752,28 @@ const BuyerOrders = () => {
                       <div className="space-y-4">
                         <h4 className="font-semibold flex items-center gap-2">
                           <Store className="w-4 h-4" />
-                          {isRTL ? "وضعیت سفارش به تفکیک فروشنده" : "Order Status by Seller"}
+                          {t.orderStatusBySeller}
                         </h4>
                         <div className="space-y-4">
                           {order.seller_orders.map((sellerOrder) => {
                             const statusSteps = ["pending", "confirmed", "shipped", "delivered"];
                             const isRejected = sellerOrder.status === "rejected";
                             const currentIndex = isRejected ? -1 : statusSteps.indexOf(sellerOrder.status);
-                            const statusLabels: Record<string, { en: string; fa: string }> = {
-                              pending: { en: "Pending", fa: "در انتظار" },
-                              confirmed: { en: "Confirmed", fa: "تایید شده" },
-                              shipped: { en: "Shipped", fa: "ارسال شده" },
-                              delivered: { en: "Delivered", fa: "تحویل شده" },
-                              rejected: { en: "Rejected", fa: "رد شده" },
+                            const statusLabels: Record<string, { en: string; fa: string; ps: string }> = {
+                              pending: { en: "Pending", fa: "در انتظار", ps: "انتظار کې" },
+                              confirmed: { en: "Confirmed", fa: "تایید شده", ps: "تایید شوی" },
+                              shipped: { en: "Shipped", fa: "ارسال شده", ps: "لیږل شوی" },
+                              delivered: { en: "Delivered", fa: "تحویل شده", ps: "تحویل شوی" },
+                              rejected: { en: "Rejected", fa: "رد شده", ps: "رد شوی" },
                             };
 
                             return (
                               <Card key={sellerOrder.id} className="bg-muted/30 border-primary/10">
                                 <CardContent className="p-4">
                                   <div className="flex items-center justify-between mb-4">
-                                    <span className="font-mono text-xs bg-primary/10 text-primary px-2 py-1 rounded border border-primary/20">
-                                      {formatProductSKUs(sellerOrder.items, isRTL)}
-                                    </span>
+                                  <span className="font-mono text-xs bg-primary/10 text-primary px-2 py-1 rounded border border-primary/20">
+                                    {formatProductSKUs(sellerOrder.items, language)}
+                                  </span>
                                     <div className="flex items-center gap-2">
                                       {getStatusBadge(sellerOrder.status)}
                                       <span className="font-semibold">
@@ -846,7 +842,7 @@ const BuyerOrders = () => {
                                                 isCompleted ? "text-primary" : "text-muted-foreground"
                                               }`}
                                             >
-                                              {isRTL ? statusLabels[step]?.fa : statusLabels[step]?.en}
+                                              {language === 'ps' ? statusLabels[step]?.ps : language === 'fa' ? statusLabels[step]?.fa : statusLabels[step]?.en}
                                             </span>
                                           </div>
                                         );
@@ -867,7 +863,7 @@ const BuyerOrders = () => {
                     <div className="space-y-4 md:space-y-6">
                       <h4 className="font-semibold flex items-center gap-2 text-sm md:text-base">
                         <Package className="w-4 h-4" />
-                        {isRTL ? "محصولات" : "Products"}
+                        {t.products}
                       </h4>
 
                       {sellerGroups.map(([sellerId, group]) => {
@@ -922,7 +918,7 @@ const BuyerOrders = () => {
                                     <div className="text-right">
                                       <p className="text-xs text-muted-foreground flex items-center gap-1 justify-end mb-0.5">
                                         <Truck className="w-3 h-3" />
-                                        <span className="hidden sm:inline">{isRTL ? "هزینه ارسال" : "Delivery"}</span>
+                                        <span className="hidden sm:inline">{t.delivery}</span>
                                         <span className="font-medium text-foreground">
                                           {formatCurrency(sellerOrder?.delivery_fee || 0, 'AFN', isRTL)}
                                         </span>
@@ -949,7 +945,7 @@ const BuyerOrders = () => {
                         <div className="space-y-2 md:space-y-3">
                           <h4 className="font-semibold flex items-center gap-2 text-sm md:text-base">
                             <MapPin className="w-4 h-4" />
-                            {isRTL ? "آدرس ارسال" : "Shipping Address"}
+                            {t.shippingAddress}
                           </h4>
                           <div className="p-3 md:p-4 bg-muted/50 rounded-lg text-sm space-y-1">
                             <p className="font-medium">{order.shipping_address.name}</p>
@@ -965,11 +961,11 @@ const BuyerOrders = () => {
                       <div className="space-y-2 md:space-y-3">
                         <h4 className="font-semibold flex items-center gap-2 text-sm md:text-base">
                           <CreditCard className="w-4 h-4" />
-                          {isRTL ? "خلاصه پرداخت" : "Payment Summary"}
+                          {t.paymentSummary}
                         </h4>
                         <div className="p-3 md:p-4 bg-muted/50 rounded-lg text-sm space-y-2">
                           <div className="flex justify-between text-xs md:text-sm">
-                            <span className="text-muted-foreground">{isRTL ? "جمع محصولات" : "Subtotal"}</span>
+                            <span className="text-muted-foreground">{t.subtotal}</span>
                             <span>
                               {order.subtotal_usd > 0 && order.subtotal_afn > 0 ? (
                                 <>
@@ -986,19 +982,19 @@ const BuyerOrders = () => {
                           <div className="flex justify-between text-xs md:text-sm">
                             <span className="text-muted-foreground flex items-center gap-1">
                               <Truck className="w-3 h-3" />
-                              {isRTL ? "ارسال" : "Shipping"}
+                              {t.shipping}
                             </span>
                             <span>{formatCurrency(order.delivery_fee_afn, "AFN", isRTL)}</span>
                           </div>
                           {order.discount > 0 && (
                             <div className="flex justify-between text-green-600 text-xs md:text-sm">
-                              <span>{isRTL ? "تخفیف" : "Discount"}</span>
+                              <span>{t.discount}</span>
                               <span>-{formatCurrency(order.discount, "AFN", isRTL)}</span>
                             </div>
                           )}
                           <Separator />
                           <div className="flex justify-between font-bold text-sm md:text-base">
-                            <span>{isRTL ? "مجموع" : "Total"}</span>
+                            <span>{t.total}</span>
                             <span className="text-primary">
                               {order.total_usd > 0 && order.total_afn > 0 ? (
                                 <>
@@ -1014,12 +1010,10 @@ const BuyerOrders = () => {
                           </div>
 
                           <div className="flex justify-between text-[10px] md:text-xs text-muted-foreground pt-2">
-                            <span>{isRTL ? "روش پرداخت" : "Payment"}</span>
+                            <span>{t.payment}</span>
                             <span>
                               {order.payment_method === "cash_on_delivery"
-                                ? isRTL
-                                  ? "پرداخت در محل"
-                                  : "Cash on Delivery"
+                                ? t.cashOnDelivery
                                 : order.payment_method}
                             </span>
                           </div>
@@ -1034,7 +1028,7 @@ const BuyerOrders = () => {
                         <div className="space-y-4">
                           <h4 className="font-semibold flex items-center gap-2">
                             <RotateCcw className="w-4 h-4" />
-                            {isRTL ? "سیاست‌های فروشنده" : "Seller Policies"}
+                            {t.sellerPolicies}
                           </h4>
                           {order.seller_policies.map((policy, idx) => (
                             <div key={idx} className="p-4 border rounded-lg space-y-3">
@@ -1043,19 +1037,19 @@ const BuyerOrders = () => {
                                 <div>
                                   <p className="text-sm font-medium text-muted-foreground flex items-center gap-1 mb-1">
                                     <RotateCcw className="w-3 h-3" />
-                                    {isRTL ? "سیاست بازگشت" : "Return Policy"}
+                                    {t.returnPolicy}
                                   </p>
                                   <p className="text-sm p-2 bg-muted/50 rounded">
-                                    {policy.return_policy || (isRTL ? "ارائه نشده" : "Not provided")}
+                                    {policy.return_policy || t.notProvided}
                                   </p>
                                 </div>
                                 <div>
                                   <p className="text-sm font-medium text-muted-foreground flex items-center gap-1 mb-1">
                                     <Truck className="w-3 h-3" />
-                                    {isRTL ? "سیاست ارسال" : "Shipping Policy"}
+                                    {t.shippingPolicy}
                                   </p>
                                   <p className="text-sm p-2 bg-muted/50 rounded">
-                                    {policy.shipping_policy || (isRTL ? "ارائه نشده" : "Not provided")}
+                                    {policy.shipping_policy || t.notProvided}
                                   </p>
                                 </div>
                               </div>
