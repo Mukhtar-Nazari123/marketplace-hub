@@ -39,6 +39,39 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/currencyFormatter';
 
+// Trilingual translations for Seller Products page
+const translations = {
+  pageTitle: { en: 'My Products', fa: 'محصولات من', ps: 'زما محصولات' },
+  pageDescription: { en: 'Manage your store products', fa: 'مدیریت محصولات فروشگاه', ps: 'د خپل پلورنځي محصولات اداره کړئ' },
+  searchPlaceholder: { en: 'Search products...', fa: 'جستجوی محصولات...', ps: 'محصولات ولټوئ...' },
+  addProduct: { en: 'Add Product', fa: 'افزودن محصول', ps: 'محصول اضافه کړئ' },
+  noProductsFound: { en: 'No products found', fa: 'محصولی یافت نشد', ps: 'هیڅ محصول ونه موندل شو' },
+  noProductsYet: { en: 'No products yet', fa: 'هنوز محصولی ندارید', ps: 'تاسو لا تر اوسه محصول نلرئ' },
+  tryDifferentSearch: { en: 'Try a different search term', fa: 'عبارت جستجو را تغییر دهید', ps: 'بله لټون عبارت وازمایئ' },
+  addFirstProduct: { en: 'Add your first product to get started', fa: 'اولین محصول خود را اضافه کنید', ps: 'د پیل لپاره خپل لومړی محصول اضافه کړئ' },
+  view: { en: 'View', fa: 'مشاهده', ps: 'کتل' },
+  edit: { en: 'Edit', fa: 'ویرایش', ps: 'سمون' },
+  delete: { en: 'Delete', fa: 'حذف', ps: 'ړنګول' },
+  stock: { en: 'Stock', fa: 'موجودی', ps: 'زیرمه' },
+  deleteProduct: { en: 'Delete Product', fa: 'حذف محصول', ps: 'محصول ړنګ کړئ' },
+  deleteConfirmation: { 
+    en: (name: string) => `Are you sure you want to delete "${name}"? This action cannot be undone.`,
+    fa: (name: string) => `آیا از حذف "${name}" اطمینان دارید؟ این عمل قابل بازگشت نیست.`,
+    ps: (name: string) => `ایا تاسو ډاډه یاست چې "${name}" ړنګ کړئ؟ دا عمل نشي بیرته راګرځیدلی.`
+  },
+  cancel: { en: 'Cancel', fa: 'انصراف', ps: 'لغوه کړئ' },
+  deleting: { en: 'Deleting...', fa: 'در حال حذف...', ps: 'ړنګول کیږي...' },
+  productDeleted: { en: 'Product deleted', fa: 'محصول حذف شد', ps: 'محصول ړنګ شو' },
+  errorFetchingProducts: { en: 'Error fetching products', fa: 'خطا در دریافت محصولات', ps: 'د محصولاتو په راوړلو کې ستونزه' },
+  errorDeletingProduct: { en: 'Error deleting product', fa: 'خطا در حذف محصول', ps: 'د محصول په ړنګولو کې ستونزه' },
+  status: {
+    draft: { en: 'Draft', fa: 'پیش‌نویس', ps: 'مسوده' },
+    pending: { en: 'Pending', fa: 'در انتظار', ps: 'تر کتنې لاندې' },
+    active: { en: 'Active', fa: 'فعال', ps: 'فعال' },
+    rejected: { en: 'Rejected', fa: 'رد شده', ps: 'رد شوی' },
+  }
+};
+
 interface Product {
   id: string;
   name: string;
@@ -55,10 +88,21 @@ interface Product {
 }
 
 const SellerProducts = () => {
-  const { isRTL } = useLanguage();
+  const { isRTL, language } = useLanguage();
   const { user } = useAuth();
   const navigate = useNavigate();
   
+  const lang = language as 'en' | 'fa' | 'ps';
+  
+  // Translation helper
+  const t = (key: keyof typeof translations) => {
+    const value = translations[key];
+    if (typeof value === 'object' && 'en' in value && 'fa' in value && 'ps' in value) {
+      return (value as Record<string, string>)[lang] || (value as Record<string, string>).en;
+    }
+    return key;
+  };
+
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -84,7 +128,7 @@ const SellerProducts = () => {
       setProducts((data as unknown as Product[]) || []);
     } catch (error) {
       console.error('Error fetching products:', error);
-      toast.error(isRTL ? 'خطا در دریافت محصولات' : 'Error fetching products');
+      toast.error(t('errorFetchingProducts'));
     } finally {
       setLoading(false);
     }
@@ -103,10 +147,10 @@ const SellerProducts = () => {
       if (error) throw error;
 
       setProducts(prev => prev.filter(p => p.id !== productToDelete.id));
-      toast.success(isRTL ? 'محصول حذف شد' : 'Product deleted');
+      toast.success(t('productDeleted'));
     } catch (error) {
       console.error('Error deleting product:', error);
-      toast.error(isRTL ? 'خطا در حذف محصول' : 'Error deleting product');
+      toast.error(t('errorDeletingProduct'));
     } finally {
       setIsDeleting(false);
       setDeleteDialogOpen(false);
@@ -115,17 +159,22 @@ const SellerProducts = () => {
   };
 
   const getStatusBadge = (status: string) => {
-    const statusConfig: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; label: string; labelFa: string }> = {
-      draft: { variant: 'secondary', label: 'Draft', labelFa: 'پیش‌نویس' },
-      pending: { variant: 'outline', label: 'Pending', labelFa: 'در انتظار' },
-      active: { variant: 'default', label: 'Active', labelFa: 'فعال' },
-      rejected: { variant: 'destructive', label: 'Rejected', labelFa: 'رد شده' },
+    const statusConfig: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+      draft: { variant: 'secondary' },
+      pending: { variant: 'outline' },
+      active: { variant: 'default' },
+      rejected: { variant: 'destructive' },
     };
 
     const config = statusConfig[status] || statusConfig.draft;
+    const statusKey = status as keyof typeof translations.status;
+    const statusLabel = translations.status[statusKey] 
+      ? translations.status[statusKey][lang] || translations.status[statusKey].en
+      : status;
+    
     return (
       <Badge variant={config.variant}>
-        {isRTL ? config.labelFa : config.label}
+        {statusLabel}
       </Badge>
     );
   };
@@ -138,10 +187,15 @@ const SellerProducts = () => {
     return formatCurrency(price, currency, isRTL);
   };
 
+  const getDeleteConfirmationText = () => {
+    if (!productToDelete) return '';
+    return translations.deleteConfirmation[lang](productToDelete.name);
+  };
+
   return (
     <DashboardLayout
-      title={isRTL ? 'محصولات من' : 'My Products'}
-      description={isRTL ? 'مدیریت محصولات فروشگاه' : 'Manage your store products'}
+      title={t('pageTitle')}
+      description={t('pageDescription')}
       allowedRoles={['seller']}
     >
       <div className="space-y-6">
@@ -156,16 +210,17 @@ const SellerProducts = () => {
               isRTL ? "right-3" : "left-3"
             )} />
             <Input
-              placeholder={isRTL ? 'جستجوی محصولات...' : 'Search products...'}
+              placeholder={t('searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className={cn(isRTL ? "pr-10" : "pl-10")}
+              className={cn(isRTL ? "pr-10 text-right" : "pl-10")}
+              dir={isRTL ? 'rtl' : 'ltr'}
             />
           </div>
           <Button asChild className="gap-2">
             <Link to="/dashboard/seller/products/new">
               <Plus className="h-4 w-4" />
-              {isRTL ? 'افزودن محصول' : 'Add Product'}
+              {t('addProduct')}
             </Link>
           </Button>
         </div>
@@ -191,23 +246,17 @@ const SellerProducts = () => {
               </div>
               <div className="space-y-2">
                 <h3 className="text-lg font-semibold">
-                  {searchQuery
-                    ? (isRTL ? 'محصولی یافت نشد' : 'No products found')
-                    : (isRTL ? 'هنوز محصولی ندارید' : 'No products yet')
-                  }
+                  {searchQuery ? t('noProductsFound') : t('noProductsYet')}
                 </h3>
                 <p className="text-sm text-muted-foreground max-w-sm">
-                  {searchQuery
-                    ? (isRTL ? 'عبارت جستجو را تغییر دهید' : 'Try a different search term')
-                    : (isRTL ? 'اولین محصول خود را اضافه کنید' : 'Add your first product to get started')
-                  }
+                  {searchQuery ? t('tryDifferentSearch') : t('addFirstProduct')}
                 </p>
               </div>
               {!searchQuery && (
                 <Button asChild className="gap-2 mt-2">
                   <Link to="/dashboard/seller/products/new">
                     <Plus className="h-4 w-4" />
-                    {isRTL ? 'افزودن محصول' : 'Add Product'}
+                    {t('addProduct')}
                   </Link>
                 </Button>
               )}
@@ -257,11 +306,11 @@ const SellerProducts = () => {
                       <DropdownMenuContent align={isRTL ? "start" : "end"}>
                         <DropdownMenuItem onClick={() => navigate(`/dashboard/seller/products/view/${product.id}`)}>
                           <Eye className={cn("h-4 w-4", isRTL ? "ml-2" : "mr-2")} />
-                          {isRTL ? 'مشاهده' : 'View'}
+                          {t('view')}
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => navigate(`/dashboard/seller/products/edit/${product.id}`)}>
                           <Edit className={cn("h-4 w-4", isRTL ? "ml-2" : "mr-2")} />
-                          {isRTL ? 'ویرایش' : 'Edit'}
+                          {t('edit')}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="text-destructive focus:text-destructive"
@@ -271,7 +320,7 @@ const SellerProducts = () => {
                           }}
                         >
                           <Trash2 className={cn("h-4 w-4", isRTL ? "ml-2" : "mr-2")} />
-                          {isRTL ? 'حذف' : 'Delete'}
+                          {t('delete')}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -313,7 +362,7 @@ const SellerProducts = () => {
 
                     {/* Stock */}
                     <p className="text-xs text-muted-foreground">
-                      {isRTL ? `موجودی: ${product.quantity}` : `Stock: ${product.quantity}`}
+                      {t('stock')}: {product.quantity}
                     </p>
                   </div>
                 </CardContent>
@@ -327,7 +376,7 @@ const SellerProducts = () => {
                   >
                     <Edit className="h-4 w-4" />
                     <span className={cn(isRTL ? "mr-2" : "ml-2")}>
-                      {isRTL ? 'ویرایش' : 'Edit'}
+                      {t('edit')}
                     </span>
                   </Button>
                   <Button
@@ -346,28 +395,25 @@ const SellerProducts = () => {
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent dir={isRTL ? 'rtl' : 'ltr'}>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              {isRTL ? 'حذف محصول' : 'Delete Product'}
+            <AlertDialogTitle className={cn(isRTL && "text-right")}>
+              {t('deleteProduct')}
             </AlertDialogTitle>
-            <AlertDialogDescription>
-              {isRTL
-                ? `آیا از حذف "${productToDelete?.name}" اطمینان دارید؟ این عمل قابل بازگشت نیست.`
-                : `Are you sure you want to delete "${productToDelete?.name}"? This action cannot be undone.`
-              }
+            <AlertDialogDescription className={cn(isRTL && "text-right")}>
+              {getDeleteConfirmationText()}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className={isRTL ? "flex-row-reverse gap-2" : ""}>
             <AlertDialogCancel disabled={isDeleting}>
-              {isRTL ? 'انصراف' : 'Cancel'}
+              {t('cancel')}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={isDeleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {isDeleting ? (isRTL ? 'در حال حذف...' : 'Deleting...') : (isRTL ? 'حذف' : 'Delete')}
+              {isDeleting ? t('deleting') : t('delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
