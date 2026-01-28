@@ -15,7 +15,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import {
-  LayoutDashboard, Users, Package, ShoppingCart, BadgeCheck, Image, Tag, FileText, Settings, LogOut, Store, Globe, User, MapPin, Heart, CreditCard, BarChart3, Plus, Home, Star, Bell,
+  LayoutDashboard, Users, Package, ShoppingCart, BadgeCheck, Image, Tag, FileText, Settings, LogOut, Store, Globe, User, MapPin, Heart, CreditCard, BarChart3, Plus, Home, Star, Bell, Languages,
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -74,6 +74,7 @@ export const DashboardSidebar = () => {
     { title: getLabel('Notifications', 'اعلان‌ها', 'خبرتیاوې'), icon: Bell, url: '/dashboard/notifications', showBadge: true },
     { title: getLabel('My Products', 'محصولات من', 'زما محصولات'), icon: Package, url: '/dashboard/seller/products', showBadge: false },
     { title: getLabel('Orders', 'سفارشات', 'امرونه'), icon: ShoppingCart, url: '/dashboard/seller/orders', showBadge: false },
+    { title: getLabel('Translations', 'ترجمه‌ها', 'ژباړې'), icon: Languages, url: '/dashboard/seller/translations', showBadge: false },
     { title: getLabel('Reviews', 'نظرات', 'نظرونه'), icon: Star, url: '/dashboard/seller/reviews', showBadge: false },
     { title: getLabel('Analytics', 'آمار فروش', 'تحلیلات'), icon: BarChart3, url: '/dashboard/seller/analytics', showBadge: false },
     { title: getLabel('Profile', 'پروفایل', 'پروفایل'), icon: User, url: '/dashboard/profile', showBadge: false },

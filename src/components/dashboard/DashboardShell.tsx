@@ -92,6 +92,12 @@ const getHeaderConfig = (pathname: string, language: Language): HeaderConfig => 
       description: t("Sales statistics and reports", "آمار و گزارش فروش", "د پلور احصایې او راپورونه"),
     };
   }
+  if (pathname.startsWith("/dashboard/seller/translations")) {
+    return {
+      title: t("Translations", "ترجمه‌ها", "ژباړې"),
+      description: t("Manage product translations", "مدیریت ترجمه محصولات", "د محصولاتو ژباړې اداره کړئ"),
+    };
+  }
 
   // Buyer
   if (pathname === "/dashboard/buyer" || pathname === "/dashboard/buyer/") {
