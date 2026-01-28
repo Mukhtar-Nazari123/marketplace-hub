@@ -37,8 +37,15 @@ import {
   Play,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useLanguage, formatDate } from '@/lib/i18n';
+import { useLanguage, formatDate, type Language } from '@/lib/i18n';
 import { formatCurrency } from '@/lib/currencyFormatter';
+
+// Trilingual helper function
+const getLabel = (lang: Language, en: string, fa: string, ps: string) => {
+  if (lang === 'ps') return ps;
+  if (lang === 'fa') return fa;
+  return en;
+};
 import { Json } from '@/integrations/supabase/types';
 
 interface ProductMetadata {
@@ -78,7 +85,7 @@ interface Product {
 }
 
 const AdminProductView = () => {
-  const { t, direction } = useLanguage();
+  const { t, direction, language } = useLanguage();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
@@ -86,6 +93,7 @@ const AdminProductView = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
   const isRTL = direction === 'rtl';
+  const lang = language;
 
   useEffect(() => {
     fetchProduct();
@@ -119,7 +127,7 @@ const AdminProductView = () => {
       }
     } catch (error) {
       console.error('Error fetching product:', error);
-      toast.error('Failed to load product');
+      toast.error(getLabel(lang, 'Failed to load product', 'خطا در بارگذاری محصول', 'د محصول پورته کولو کې تېروتنه'));
       navigate('/admin/products');
     } finally {
       setIsLoading(false);
@@ -138,11 +146,11 @@ const AdminProductView = () => {
 
       if (error) throw error;
 
-      toast.success(isRTL ? 'محصول حذف شد' : 'Product deleted successfully');
+      toast.success(getLabel(lang, 'Product deleted successfully', 'محصول حذف شد', 'محصول په بریالیتوب سره حذف شو'));
       navigate('/admin/products');
     } catch (error) {
       console.error('Error deleting product:', error);
-      toast.error(isRTL ? 'خطا در حذف محصول' : 'Failed to delete product');
+      toast.error(getLabel(lang, 'Failed to delete product', 'خطا در حذف محصول', 'د محصول حذف کولو کې تېروتنه'));
     } finally {
       setIsDeleting(false);
     }
@@ -159,24 +167,24 @@ const AdminProductView = () => {
 
       if (error) throw error;
 
-      toast.success(isRTL ? 'محصول تأیید شد' : 'Product approved');
+      toast.success(getLabel(lang, 'Product approved', 'محصول تأیید شد', 'محصول تایید شو'));
       fetchProduct();
     } catch (error) {
       console.error('Error approving product:', error);
-      toast.error(isRTL ? 'خطا در تأیید محصول' : 'Failed to approve product');
+      toast.error(getLabel(lang, 'Failed to approve product', 'خطا در تأیید محصول', 'د محصول تاییدولو کې تېروتنه'));
     }
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'active':
-        return <Badge className="bg-success text-success-foreground gap-1"><CheckCircle className="h-3 w-3" /> Active</Badge>;
+        return <Badge className="bg-success text-success-foreground gap-1"><CheckCircle className="h-3 w-3" /> {getLabel(lang, 'Active', 'فعال', 'فعال')}</Badge>;
       case 'pending':
-        return <Badge className="bg-warning text-warning-foreground gap-1"><AlertCircle className="h-3 w-3" /> Pending</Badge>;
+        return <Badge className="bg-warning text-warning-foreground gap-1"><AlertCircle className="h-3 w-3" /> {getLabel(lang, 'Pending', 'در انتظار', 'انتظار کې')}</Badge>;
       case 'rejected':
-        return <Badge className="bg-destructive text-destructive-foreground gap-1"><XCircle className="h-3 w-3" /> Rejected</Badge>;
+        return <Badge className="bg-destructive text-destructive-foreground gap-1"><XCircle className="h-3 w-3" /> {getLabel(lang, 'Rejected', 'رد شده', 'رد شوی')}</Badge>;
       case 'draft':
-        return <Badge variant="secondary">Draft</Badge>;
+        return <Badge variant="secondary">{getLabel(lang, 'Draft', 'پیش‌نویس', 'مسوده')}</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -203,7 +211,10 @@ const AdminProductView = () => {
 
   if (isLoading) {
     return (
-      <AdminLayout title="Product Details" description="Loading...">
+      <AdminLayout 
+        title={getLabel(lang, 'Product Details', 'جزئیات محصول', 'د محصول تفصیلات')} 
+        description={getLabel(lang, 'Loading...', 'در حال بارگذاری...', 'پورته کېږي...')}
+      >
         <div className="space-y-6">
           <Skeleton className="h-10 w-40" />
           <div className="grid gap-6 md:grid-cols-2">
@@ -221,7 +232,7 @@ const AdminProductView = () => {
 
   return (
     <AdminLayout 
-      title={isRTL ? 'جزئیات محصول' : 'Product Details'} 
+      title={getLabel(lang, 'Product Details', 'جزئیات محصول', 'د محصول تفصیلات')} 
       description={product.name}
     >
       <div className="space-y-6 animate-fade-in">
@@ -233,7 +244,7 @@ const AdminProductView = () => {
             className="gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
-            {isRTL ? 'بازگشت' : 'Back to Products'}
+            {getLabel(lang, 'Back to Products', 'بازگشت به محصولات', 'محصولاتو ته بېرته')}
           </Button>
           
           <div className="flex gap-2">
@@ -243,7 +254,7 @@ const AdminProductView = () => {
                 className="gap-2 bg-success hover:bg-success/90"
               >
                 <CheckCircle className="h-4 w-4" />
-                {isRTL ? 'تأیید محصول' : 'Approve Product'}
+                {getLabel(lang, 'Approve Product', 'تأیید محصول', 'محصول تایید کړئ')}
               </Button>
             )}
             
@@ -251,23 +262,25 @@ const AdminProductView = () => {
               <AlertDialogTrigger asChild>
                 <Button variant="destructive" className="gap-2">
                   <Trash2 className="h-4 w-4" />
-                  {isRTL ? 'حذف' : 'Delete'}
+                  {getLabel(lang, 'Delete', 'حذف', 'حذف')}
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>
-                    {isRTL ? 'آیا مطمئن هستید؟' : 'Are you sure?'}
+                    {getLabel(lang, 'Are you sure?', 'آیا مطمئن هستید؟', 'ایا تاسو ډاډه یاست؟')}
                   </AlertDialogTitle>
                   <AlertDialogDescription>
-                    {isRTL 
-                      ? 'این عمل قابل بازگشت نیست. محصول برای همیشه حذف خواهد شد.'
-                      : 'This action cannot be undone. This will permanently delete the product.'}
+                    {getLabel(lang, 
+                      'This action cannot be undone. This will permanently delete the product.',
+                      'این عمل قابل بازگشت نیست. محصول برای همیشه حذف خواهد شد.',
+                      'دا عمل نشي بېرته کېدای. محصول به تل لپاره حذف شي.'
+                    )}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>
-                    {isRTL ? 'انصراف' : 'Cancel'}
+                    {getLabel(lang, 'Cancel', 'انصراف', 'لغوه')}
                   </AlertDialogCancel>
                   <AlertDialogAction 
                     onClick={handleDelete}
@@ -275,8 +288,8 @@ const AdminProductView = () => {
                     className="bg-destructive hover:bg-destructive/90"
                   >
                     {isDeleting 
-                      ? (isRTL ? 'در حال حذف...' : 'Deleting...') 
-                      : (isRTL ? 'حذف' : 'Delete')}
+                      ? getLabel(lang, 'Deleting...', 'در حال حذف...', 'حذفېږي...') 
+                      : getLabel(lang, 'Delete', 'حذف', 'حذف')}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -290,7 +303,7 @@ const AdminProductView = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <ImageIcon className="h-5 w-5 text-primary" />
-                {isRTL ? 'رسانه محصول' : 'Product Media'}
+                {getLabel(lang, 'Product Media', 'رسانه محصول', 'د محصول رسنۍ')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -306,7 +319,7 @@ const AdminProductView = () => {
                         poster={productImages[0]}
                       >
                         <source src={galleryItems[selectedMediaIndex].url} type="video/mp4" />
-                        {isRTL ? 'مرورگر شما از ویدیو پشتیبانی نمی‌کند.' : 'Your browser does not support the video tag.'}
+                        {getLabel(lang, 'Your browser does not support the video tag.', 'مرورگر شما از ویدیو پشتیبانی نمی‌کند.', 'ستاسو براوزر د ویډیو ټګ نه ملاتړ نه کوي.')}
                       </video>
                     ) : (
                       <img
@@ -355,7 +368,7 @@ const AdminProductView = () => {
                 <div className="aspect-square rounded-xl border-2 border-dashed flex items-center justify-center text-muted-foreground">
                   <div className="text-center">
                     <ImageIcon className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                    <p>{isRTL ? 'بدون تصویر' : 'No images'}</p>
+                    <p>{getLabel(lang, 'No images', 'بدون تصویر', 'انځورونه نشته')}</p>
                   </div>
                 </div>
               )}
@@ -381,7 +394,7 @@ const AdminProductView = () => {
                   <div className="flex items-center gap-2 mb-3">
                     <CurrencyIcon className="h-5 w-5 text-primary" />
                     <span className="font-semibold text-foreground">
-                      {isRTL ? 'قیمت‌گذاری' : 'Pricing'}
+                      {getLabel(lang, 'Pricing', 'قیمت‌گذاری', 'قیمت ټاکل')}
                     </span>
                   </div>
                   
@@ -413,7 +426,7 @@ const AdminProductView = () => {
                             (Math.abs(product.compare_at_price - product.price) /
                               Math.max(product.compare_at_price, product.price)) *
                               100
-                          )}% {isRTL ? 'تخفیف' : 'OFF'}
+                          )}% {getLabel(lang, 'OFF', 'تخفیف', 'تخفیف')}
                         </Badge>
                       </>
                     ) : (
@@ -427,7 +440,7 @@ const AdminProductView = () => {
                   {(product as any)?.delivery_fee !== undefined && (product as any).delivery_fee > 0 && (
                     <div className="mt-3 pt-3 border-t border-primary/10">
                       <span className="text-sm text-muted-foreground">
-                        {isRTL ? 'هزینه ارسال:' : 'Delivery Fee:'}
+                        {getLabel(lang, 'Delivery Fee:', 'هزینه ارسال:', 'د لیږد فیس:')}
                       </span>
                       <span className="font-bold text-foreground ms-2">
                         {formatCurrency((product as any).delivery_fee, 'AFN', isRTL)}
@@ -437,7 +450,7 @@ const AdminProductView = () => {
 
                   {/* Primary Currency */}
                   <div className="mt-2 text-xs text-muted-foreground">
-                    {isRTL ? 'ارز اصلی:' : 'Primary currency:'} {currency}
+                    {getLabel(lang, 'Primary currency:', 'ارز اصلی:', 'اصلي اسعار:')} {currency}
                   </div>
                 </div>
 
@@ -447,7 +460,7 @@ const AdminProductView = () => {
                     <div className="flex items-center gap-2 mb-2">
                       <Package className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm text-muted-foreground">
-                        {isRTL ? 'موجودی' : 'Stock'}
+                        {getLabel(lang, 'Stock', 'موجودی', 'ذخیره')}
                       </span>
                     </div>
                     <p className="text-2xl font-bold">{product.quantity}</p>
@@ -457,7 +470,7 @@ const AdminProductView = () => {
                     <div className="flex items-center gap-2 mb-2">
                       <span className="text-muted-foreground font-mono text-lg">#</span>
                       <span className="text-sm text-muted-foreground">
-                        {isRTL ? 'کد محصول' : 'SKU'}
+                        {getLabel(lang, 'SKU', 'کد محصول', 'د محصول کوډ')}
                       </span>
                     </div>
                     <p className="text-lg font-mono font-semibold">{product.sku || 'N/A'}</p>
@@ -471,7 +484,7 @@ const AdminProductView = () => {
                   <div className="space-y-1">
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                       <Layers className="h-3 w-3" />
-                      {isRTL ? 'دسته‌بندی' : 'Category'}
+                      {getLabel(lang, 'Category', 'دسته‌بندی', 'کټګوري')}
                     </p>
                     <p className="font-medium">
                       {metadata?.categoryName || 'N/A'}
@@ -482,7 +495,7 @@ const AdminProductView = () => {
                   <div className="space-y-1">
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                       <Tag className="h-3 w-3" />
-                      {isRTL ? 'برند' : 'Brand'}
+                      {getLabel(lang, 'Brand', 'برند', 'برانډ')}
                     </p>
                     <p className="font-medium">{metadata?.brand || 'N/A'}</p>
                   </div>
@@ -490,28 +503,28 @@ const AdminProductView = () => {
                   <div className="space-y-1">
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                       <User className="h-3 w-3" />
-                      {isRTL ? 'فروشنده' : 'Seller'}
+                      {getLabel(lang, 'Seller', 'فروشنده', 'پلورونکی')}
                     </p>
-                    <p className="font-medium">{sellerName || 'Unknown'}</p>
+                    <p className="font-medium">{sellerName || getLabel(lang, 'Unknown', 'ناشناخته', 'نامعلوم')}</p>
                   </div>
                   
                   <div className="space-y-1">
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                       <Calendar className="h-3 w-3" />
-                      {isRTL ? 'تاریخ ایجاد' : 'Created'}
+                      {getLabel(lang, 'Created', 'تاریخ ایجاد', 'جوړ شو')}
                     </p>
                     <p className="font-medium">
-                      {formatDate(new Date(product.created_at), isRTL ? 'fa' : 'en')}
+                      {formatDate(new Date(product.created_at), lang)}
                     </p>
                   </div>
                   
                   <div className="space-y-1">
                     <p className="text-xs text-muted-foreground flex items-center gap-1">
                       <Calendar className="h-3 w-3" />
-                      {isRTL ? 'آخرین بروزرسانی' : 'Updated'}
+                      {getLabel(lang, 'Updated', 'آخرین بروزرسانی', 'تازه شو')}
                     </p>
                     <p className="font-medium">
-                      {formatDate(new Date(product.updated_at), isRTL ? 'fa' : 'en')}
+                      {formatDate(new Date(product.updated_at), lang)}
                     </p>
                   </div>
                 </div>
@@ -522,7 +535,7 @@ const AdminProductView = () => {
                     <Separator />
                     <div className="p-4 bg-destructive/10 rounded-lg border border-destructive/20">
                       <p className="text-sm font-medium text-destructive mb-1">
-                        {isRTL ? 'دلیل رد:' : 'Rejection Reason:'}
+                        {getLabel(lang, 'Rejection Reason:', 'دلیل رد:', 'د رد دلیل:')}
                       </p>
                       <p className="text-sm">{product.rejection_reason}</p>
                     </div>
@@ -534,17 +547,17 @@ const AdminProductView = () => {
             {/* Description */}
             {(product.description || metadata?.shortDescription) && (
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Info className="h-5 w-5 text-primary" />
-                    {isRTL ? 'توضیحات' : 'Description'}
-                  </CardTitle>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Info className="h-5 w-5 text-primary" />
+                  {getLabel(lang, 'Description', 'توضیحات', 'توضیحات')}
+                </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {metadata?.shortDescription && (
                     <div>
                       <p className="text-sm font-medium text-muted-foreground mb-1">
-                        {isRTL ? 'توضیح کوتاه' : 'Short Description'}
+                        {getLabel(lang, 'Short Description', 'توضیح کوتاه', 'لنډ توضیحات')}
                       </p>
                       <p>{metadata.shortDescription}</p>
                     </div>
@@ -552,7 +565,7 @@ const AdminProductView = () => {
                   {product.description && (
                     <div>
                       <p className="text-sm font-medium text-muted-foreground mb-1">
-                        {isRTL ? 'توضیحات کامل' : 'Full Description'}
+                        {getLabel(lang, 'Full Description', 'توضیحات کامل', 'بشپړ توضیحات')}
                       </p>
                       <p className="whitespace-pre-wrap">{product.description}</p>
                     </div>
@@ -564,11 +577,11 @@ const AdminProductView = () => {
             {/* Attributes */}
             {metadata?.attributes && Object.keys(metadata.attributes).length > 0 && (
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Layers className="h-5 w-5 text-primary" />
-                    {isRTL ? 'ویژگی‌ها' : 'Attributes'}
-                  </CardTitle>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Layers className="h-5 w-5 text-primary" />
+                  {getLabel(lang, 'Attributes', 'ویژگی‌ها', 'ځانګړتیاوې')}
+                </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
@@ -589,7 +602,7 @@ const AdminProductView = () => {
                           </p>
                           <p className="font-medium">
                             {typeof value === 'boolean' 
-                              ? (value ? (isRTL ? 'بله' : 'Yes') : (isRTL ? 'خیر' : 'No'))
+                              ? (value ? getLabel(lang, 'Yes', 'بله', 'هو') : getLabel(lang, 'No', 'خیر', 'نه'))
                               : Array.isArray(value)
                                 ? value.join(', ')
                                 : String(value)}
@@ -604,18 +617,18 @@ const AdminProductView = () => {
             {/* Stock per Size */}
             {metadata?.stockPerSize && Object.keys(metadata.stockPerSize).length > 0 && (
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Package className="h-5 w-5 text-primary" />
-                    {isRTL ? 'موجودی بر اساس سایز' : 'Stock per Size'}
-                  </CardTitle>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Package className="h-5 w-5 text-primary" />
+                  {getLabel(lang, 'Stock per Size', 'موجودی بر اساس سایز', 'د سایز له مخې ذخیره')}
+                </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-wrap gap-3">
                     {Object.entries(metadata.stockPerSize).map(([size, qty]) => (
                       <div key={size} className="px-4 py-2 bg-muted/50 rounded-lg text-center min-w-[80px]">
                         <p className="text-sm font-bold">{size}</p>
-                        <p className="text-xs text-muted-foreground">{qty} units</p>
+                        <p className="text-xs text-muted-foreground">{qty} {getLabel(lang, 'units', 'عدد', 'واحد')}</p>
                       </div>
                     ))}
                   </div>
