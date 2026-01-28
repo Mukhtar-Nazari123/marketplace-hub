@@ -43,11 +43,18 @@ interface Review {
 }
 
 const BuyerReviews = () => {
-  const { isRTL } = useLanguage();
+  const { isRTL, language } = useLanguage();
   const { user } = useAuth();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingReview, setEditingReview] = useState<Review | null>(null);
+
+  // Helper for trilingual support
+  const getLabel = (en: string, fa: string, ps: string) => {
+    if (language === 'ps') return ps;
+    if (language === 'fa') return fa;
+    return en;
+  };
 
   const fetchReviews = async () => {
     if (!user) return;
@@ -98,8 +105,8 @@ const BuyerReviews = () => {
   if (loading) {
     return (
       <DashboardLayout
-        title={isRTL ? 'نظرات من' : 'My Reviews'}
-        description={isRTL ? 'مدیریت نظرات و امتیازات شما' : 'Manage your reviews and ratings'}
+        title={getLabel('My Reviews', 'نظرات من', 'زما بیاکتنې')}
+        description={getLabel('Manage your reviews and ratings', 'مدیریت نظرات و امتیازات شما', 'خپلې بیاکتنې او درجې اداره کړئ')}
         allowedRoles={['buyer']}
       >
         <div className="space-y-4">
@@ -124,8 +131,8 @@ const BuyerReviews = () => {
 
   return (
     <DashboardLayout
-      title={isRTL ? 'نظرات من' : 'My Reviews'}
-      description={isRTL ? 'مدیریت نظرات و امتیازات شما' : 'Manage your reviews and ratings'}
+      title={getLabel('My Reviews', 'نظرات من', 'زما بیاکتنې')}
+      description={getLabel('Manage your reviews and ratings', 'مدیریت نظرات و امتیازات شما', 'خپلې بیاکتنې او درجې اداره کړئ')}
       allowedRoles={['buyer']}
     >
       <div className="space-y-6">
@@ -140,7 +147,7 @@ const BuyerReviews = () => {
                 <div>
                   <p className="text-2xl font-bold">{reviews.length}</p>
                   <p className="text-sm text-muted-foreground">
-                    {isRTL ? 'کل نظرات' : 'Total Reviews'}
+                    {getLabel('Total Reviews', 'کل نظرات', 'ټولې بیاکتنې')}
                   </p>
                 </div>
               </div>
@@ -156,7 +163,7 @@ const BuyerReviews = () => {
                 <div>
                   <p className="text-2xl font-bold">{averageRating}</p>
                   <p className="text-sm text-muted-foreground">
-                    {isRTL ? 'میانگین امتیاز' : 'Average Rating'}
+                    {getLabel('Average Rating', 'میانگین امتیاز', 'اوسط درجه')}
                   </p>
                 </div>
               </div>
@@ -174,7 +181,7 @@ const BuyerReviews = () => {
                     {reviews.filter(r => canEditReview(r.created_at)).length}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {isRTL ? 'قابل ویرایش' : 'Editable'}
+                    {getLabel('Editable', 'قابل ویرایش', 'د سمون وړ')}
                   </p>
                 </div>
               </div>
@@ -190,16 +197,18 @@ const BuyerReviews = () => {
                 <MessageSquare className="w-10 h-10 text-muted-foreground" />
               </div>
               <h3 className="text-xl font-semibold mb-2">
-                {isRTL ? 'هنوز نظری ثبت نکرده‌اید' : 'No reviews yet'}
+                {getLabel('No reviews yet', 'هنوز نظری ثبت نکرده‌اید', 'تر اوسه بیاکتنه نشته')}
               </h3>
               <p className="text-muted-foreground mb-6 max-w-sm">
-                {isRTL
-                  ? 'پس از تحویل سفارش می‌توانید نظر خود را ثبت کنید.'
-                  : 'You can submit reviews after your orders are delivered.'}
+                {getLabel(
+                  'You can submit reviews after your orders are delivered.',
+                  'پس از تحویل سفارش می‌توانید نظر خود را ثبت کنید.',
+                  'تاسو کولی شئ وروسته له دې چې امرونه تحویل شي بیاکتنې ورکړئ.'
+                )}
               </p>
               <Button asChild>
                 <Link to="/dashboard/buyer/orders">
-                  {isRTL ? 'مشاهده سفارشات' : 'View Orders'}
+                  {getLabel('View Orders', 'مشاهده سفارشات', 'امرونه وګورئ')}
                 </Link>
               </Button>
             </CardContent>
@@ -238,7 +247,7 @@ const BuyerReviews = () => {
                               to={`/products/${review.product?.slug || review.product_id}`}
                               className="font-semibold hover:text-primary transition-colors line-clamp-1 flex items-center gap-1"
                             >
-                              {review.product?.name || (isRTL ? 'محصول' : 'Product')}
+                              {review.product?.name || getLabel('Product', 'محصول', 'محصول')}
                               <ExternalLink className="w-3 h-3 opacity-50" />
                             </Link>
                             <div className={cn("flex items-center gap-2 mt-1", isRTL && "flex-row-reverse")}>
@@ -255,7 +264,7 @@ const BuyerReviews = () => {
                             {canEdit ? (
                               <>
                                 <Badge variant="outline" className="text-xs">
-                                  {isRTL ? `${daysRemaining} روز باقی` : `${daysRemaining} days left`}
+                                  {getLabel(`${daysRemaining} days left`, `${daysRemaining} روز باقی`, `${daysRemaining} ورځې پاتې`)}
                                 </Badge>
                                 <Button
                                   variant="outline"
@@ -264,12 +273,12 @@ const BuyerReviews = () => {
                                   className="gap-1"
                                 >
                                   <Edit className="w-3 h-3" />
-                                  {isRTL ? 'ویرایش' : 'Edit'}
+                                  {getLabel('Edit', 'ویرایش', 'سمول')}
                                 </Button>
                               </>
                             ) : (
                               <Badge variant="secondary" className="text-xs">
-                                {isRTL ? 'غیرقابل ویرایش' : 'Locked'}
+                                {getLabel('Locked', 'غیرقابل ویرایش', 'بندول شوی')}
                               </Badge>
                             )}
                           </div>
@@ -294,7 +303,7 @@ const BuyerReviews = () => {
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>
-              {isRTL ? 'ویرایش نظر' : 'Edit Review'}
+              {getLabel('Edit Review', 'ویرایش نظر', 'بیاکتنه سمول')}
             </DialogTitle>
           </DialogHeader>
           {editingReview && (

@@ -61,6 +61,13 @@ const BuyerProfile = () => {
   const { t, isRTL, language, setLanguage } = useLanguage();
   const { toast } = useToast();
 
+  // Helper for trilingual support
+  const getLabel = (en: string, fa: string, ps: string) => {
+    if (language === 'ps') return ps;
+    if (language === 'fa') return fa;
+    return en;
+  };
+
   // Personal Info State
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -342,15 +349,15 @@ const BuyerProfile = () => {
     await saveAddressesToDb(updatedAddresses);
   };
 
-  const personalInfoText = isRTL ? 'اطلاعات شخصی' : 'Personal Information';
-  const securityText = isRTL ? 'امنیت حساب' : 'Account Security';
-  const addressesText = isRTL ? 'آدرس‌ها' : 'Addresses';
-  const preferencesText = isRTL ? 'تنظیمات' : 'Preferences';
+  const personalInfoText = getLabel('Personal Information', 'اطلاعات شخصی', 'شخصي معلومات');
+  const securityText = getLabel('Account Security', 'امنیت حساب', 'د حساب امنیت');
+  const addressesText = getLabel('Addresses', 'آدرس‌ها', 'پتې');
+  const preferencesText = getLabel('Preferences', 'تنظیمات', 'غوره توبونه');
 
   return (
     <DashboardLayout 
-      title={isRTL ? 'پروفایل من' : 'My Profile'} 
-      description={isRTL ? 'مدیریت اطلاعات حساب' : 'Manage your account information'}
+      title={getLabel('My Profile', 'پروفایل من', 'زما پروفایل')} 
+      description={getLabel('Manage your account information', 'مدیریت اطلاعات حساب', 'د خپل حساب معلومات اداره کړئ')}
       allowedRoles={['buyer', 'admin', 'seller', 'moderator']}
     >
       <div className={`max-w-4xl mx-auto space-y-6 ${isRTL ? 'rtl' : 'ltr'}`}>
