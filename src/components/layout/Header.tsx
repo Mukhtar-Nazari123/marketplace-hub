@@ -165,18 +165,23 @@ const Header = () => {
 
               {/* Cart - Only visible when logged in, hidden on mobile/tablet */}
               {user && (
-                <Link to="/cart" className="hidden lg:block">
-                  <Button variant="ghost" size="icon" className="relative">
-                    <ShoppingCart className="h-5 w-5 text-muted-foreground" />
-                    {itemCount > 0 && (
-                      <span
-                        className={`absolute -top-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-bold ${isRTL ? "-right-1" : "-left-1"}`}
-                      >
-                        {formatCount(itemCount > 99 ? 99 : itemCount)}
-                      </span>
-                    )}
-                  </Button>
-                </Link>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Link to="/cart" className="hidden lg:block">
+                      <Button variant="ghost" size="icon" className="relative">
+                        <ShoppingCart className="h-5 w-5 text-muted-foreground" />
+                        {itemCount > 0 && (
+                          <span
+                            className={`absolute -top-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-bold ${isRTL ? "-right-1" : "-left-1"}`}
+                          >
+                            {formatCount(itemCount > 99 ? 99 : itemCount)}
+                          </span>
+                        )}
+                      </Button>
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent>{t.header.cart}</TooltipContent>
+                </Tooltip>
               )}
 
               {/* Notifications - Only visible when logged in */}
