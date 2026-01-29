@@ -37,8 +37,7 @@ import { getDealStatus, type DealStatus } from '@/hooks/useDealCountdown';
 interface Product {
   id: string;
   name: string;
-  price: number;
-  currency: string;
+  price_afn: number;
   status: string;
   images: string[];
   is_deal: boolean;
@@ -75,7 +74,7 @@ const AdminDeals = () => {
     try {
       const { data, error } = await supabase
         .from('products')
-        .select('id, name, price, currency, status, images, is_deal, deal_start_at, deal_end_at')
+        .select('id, name, price_afn, status, images, is_deal, deal_start_at, deal_end_at')
         .eq('status', 'active')
         .order('is_deal', { ascending: false })
         .order('deal_end_at', { ascending: true, nullsFirst: false });
@@ -356,7 +355,7 @@ const AdminDeals = () => {
                           </div>
                         </TableCell>
                         <TableCell>
-                          {product.currency === 'USD' ? '$' : ''}{product.price.toLocaleString()} {product.currency === 'AFN' ? 'AFN' : ''}
+                          {product.price_afn.toLocaleString()} AFN
                         </TableCell>
                         <TableCell>{getDealStatusBadge(product)}</TableCell>
                         <TableCell>

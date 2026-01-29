@@ -68,8 +68,8 @@ interface Product {
   name: string;
   slug: string;
   description: string | null;
-  price: number;
-  compare_at_price: number | null;
+  price_afn: number;
+  compare_price_afn: number | null;
   quantity: number;
   sku: string | null;
   barcode: string | null;
@@ -81,6 +81,7 @@ interface Product {
   updated_at: string;
   rejection_reason: string | null;
   is_featured: boolean;
+  delivery_fee: number;
   metadata: Json;
 }
 
@@ -191,9 +192,8 @@ const AdminProductView = () => {
   };
 
   const metadata = product?.metadata as ProductMetadata | null;
-  // Use product.currency from database first, then fallback to metadata
-  const currency = (product as any)?.currency || metadata?.currency || 'AFN';
-  const CurrencyIcon = currency === 'AFN' ? Banknote : DollarSign;
+  const currency = 'AFN';
+  const CurrencyIcon = Banknote;
   const videoUrl = metadata?.videoUrl;
   const productImages = product?.images || [];
   
@@ -402,18 +402,18 @@ const AdminProductView = () => {
                   <div
                     className={`flex items-baseline gap-3 flex-wrap ${isRTL ? 'flex-row-reverse' : ''}`}
                   >
-                    {product.compare_at_price !== null && product.compare_at_price !== product.price ? (
+                    {product.compare_price_afn !== null && product.compare_price_afn !== product.price_afn ? (
                       <>
                         <span className="text-lg text-muted-foreground line-through">
                           {formatCurrency(
-                            Math.max(product.compare_at_price, product.price),
+                            Math.max(product.compare_price_afn, product.price_afn),
                             currency,
                             isRTL
                           )}
                         </span>
                         <span className="text-2xl font-bold text-orange">
                           {formatCurrency(
-                            Math.min(product.compare_at_price, product.price),
+                            Math.min(product.compare_price_afn, product.price_afn),
                             currency,
                             isRTL
                           )}
@@ -423,15 +423,15 @@ const AdminProductView = () => {
                           className="bg-success/10 text-success text-xs px-2 py-0.5"
                         >
                           {Math.round(
-                            (Math.abs(product.compare_at_price - product.price) /
-                              Math.max(product.compare_at_price, product.price)) *
+                            (Math.abs(product.compare_price_afn - product.price_afn) /
+                              Math.max(product.compare_price_afn, product.price_afn)) *
                               100
                           )}% {getLabel(lang, 'OFF', 'تخفیف', 'تخفیف')}
                         </Badge>
                       </>
                     ) : (
                       <span className="text-2xl font-bold">
-                        {formatCurrency(product.price, currency, isRTL)}
+                        {formatCurrency(product.price_afn, currency, isRTL)}
                       </span>
                     )}
                   </div>

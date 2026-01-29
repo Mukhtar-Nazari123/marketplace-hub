@@ -56,8 +56,7 @@ interface Product {
   quantity: number;
   low_stock_threshold: number | null;
   images: string[] | null;
-  price: number;
-  currency: string;
+  price_afn: number;
 }
 
 interface OrderItem {
@@ -164,7 +163,7 @@ const SellerAnalytics = () => {
         // Fetch products
         const { data: productsData } = await supabase
           .from('products')
-          .select('id, name, quantity, low_stock_threshold, images, price, currency')
+          .select('id, name, quantity, low_stock_threshold, images, price_afn')
           .eq('seller_id', user.id);
 
         // Fetch order items for this seller
@@ -247,9 +246,7 @@ const SellerAnalytics = () => {
 
     orderItems.forEach(item => {
       const key = item.product_id || item.product_name;
-      // Find the product to get its currency
-      const product = products.find(p => p.id === item.product_id);
-      const currency = product?.currency || 'AFN';
+      const currency = 'AFN';
       
       if (!productSales[key]) {
         productSales[key] = { name: item.product_name, quantity: 0, revenue: 0, currency };
@@ -600,7 +597,7 @@ const SellerAnalytics = () => {
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-sm sm:text-base truncate">{product.name}</p>
                         <p className="text-xs sm:text-sm text-muted-foreground">
-                          {getCurrencySymbol(product.currency)}{product.price.toLocaleString()}
+                          AFN {product.price_afn.toLocaleString()}
                         </p>
                       </div>
                       <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/30 text-xs flex-shrink-0">

@@ -10,10 +10,9 @@ import { useProductRatings } from "@/hooks/useProductRatings";
 interface DealProduct {
   id: string;
   name: string;
-  price: number;
-  compare_at_price: number | null;
+  price_afn: number;
+  compare_price_afn: number | null;
   images: string[];
-  currency: string;
   created_at: string;
   is_deal: boolean;
   deal_start_at: string | null;
@@ -45,12 +44,12 @@ const TodayDeals = () => {
 
       const { data, error } = await supabase
         .from("products")
-        .select("id, name, price, compare_at_price, images, currency, created_at, is_deal, deal_start_at, deal_end_at")
+        .select("id, name, price_afn, compare_price_afn, images, created_at, is_deal, deal_start_at, deal_end_at")
         .eq("status", "active")
         .eq("is_deal", true)
-        .lte("deal_start_at", now) // Deal has started
-        .gte("deal_end_at", now) // Deal hasn't ended
-        .order("deal_end_at", { ascending: true }) // Show soonest expiring first
+        .lte("deal_start_at", now)
+        .gte("deal_end_at", now)
+        .order("deal_end_at", { ascending: true })
         .limit(10);
 
       if (error) throw error;
@@ -97,26 +96,25 @@ const TodayDeals = () => {
   };
 
   const getProductCardData = (product: DealProduct) => {
-    const currency = (product.currency as "AFN" | "USD") || "AFN";
+    const currency = "AFN" as const;
 
-    const hasDiscount = product.compare_at_price && product.compare_at_price !== product.price;
+    const hasDiscount = product.compare_price_afn && product.compare_price_afn !== product.price_afn;
     let originalPrice: number | undefined;
-    let currentPrice = product.price;
+    let currentPrice = product.price_afn;
     let discount: number | undefined;
 
     if (hasDiscount) {
-      if (product.compare_at_price! > product.price) {
-        originalPrice = product.compare_at_price!;
-        currentPrice = product.price;
+      if (product.compare_price_afn! > product.price_afn) {
+        originalPrice = product.compare_price_afn!;
+        currentPrice = product.price_afn;
       } else {
-        originalPrice = product.price;
-        currentPrice = product.compare_at_price!;
+        originalPrice = product.price_afn;
+        currentPrice = product.compare_price_afn!;
       }
       discount = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
     }
 
     const isNew = new Date(product.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-
     const { averageRating, reviewCount } = getRating(product.id);
 
     return {
@@ -130,7 +128,6 @@ const TodayDeals = () => {
       discount,
       image: product.images?.[0],
       currency,
-      // Pass real deal data for countdown
       isDeal: product.is_deal,
       dealStartAt: product.deal_start_at,
       dealEndAt: product.deal_end_at,

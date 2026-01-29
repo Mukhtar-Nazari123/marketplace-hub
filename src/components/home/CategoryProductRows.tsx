@@ -12,11 +12,10 @@ import { Link } from "react-router-dom";
 interface Product {
   id: string;
   name: string;
-  price: number;
-  compare_at_price: number | null;
+  price_afn: number;
+  compare_price_afn: number | null;
   images: string[];
   is_featured: boolean;
-  currency: string;
   created_at: string;
 }
 
@@ -45,7 +44,7 @@ const CategoryRow = ({ category, isRTL, t }: CategoryRowProps) => {
     try {
       const { data, error } = await supabase
         .from("products")
-        .select("id, name, price, compare_at_price, images, is_featured, currency, created_at")
+        .select("id, name, price_afn, compare_price_afn, images, is_featured, created_at")
         .eq("status", "active")
         .eq("category_id", category.id)
         .order("is_featured", { ascending: false })
@@ -96,20 +95,20 @@ const CategoryRow = ({ category, isRTL, t }: CategoryRowProps) => {
   };
 
   const getProductCardData = (product: Product) => {
-    const currency = (product.currency as "AFN" | "USD") || "AFN";
+    const currency = "AFN" as const;
 
-    const hasDiscount = product.compare_at_price && product.compare_at_price !== product.price;
+    const hasDiscount = product.compare_price_afn && product.compare_price_afn !== product.price_afn;
     let originalPrice: number | undefined;
-    let currentPrice = product.price;
+    let currentPrice = product.price_afn;
     let discount: number | undefined;
 
     if (hasDiscount) {
-      if (product.compare_at_price! > product.price) {
-        originalPrice = product.compare_at_price!;
-        currentPrice = product.price;
+      if (product.compare_price_afn! > product.price_afn) {
+        originalPrice = product.compare_price_afn!;
+        currentPrice = product.price_afn;
       } else {
-        originalPrice = product.price;
-        currentPrice = product.compare_at_price!;
+        originalPrice = product.price_afn;
+        currentPrice = product.compare_price_afn!;
       }
       discount = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
     }

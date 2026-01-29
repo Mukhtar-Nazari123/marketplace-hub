@@ -11,11 +11,10 @@ import { Link } from "react-router-dom";
 interface Product {
   id: string;
   name: string;
-  price: number;
-  compare_at_price: number | null;
+  price_afn: number;
+  compare_price_afn: number | null;
   images: string[];
   is_featured: boolean;
-  currency: string;
   created_at: string;
 }
 
@@ -39,7 +38,7 @@ const BestSellers = () => {
     try {
       const { data, error } = await supabase
         .from("products")
-        .select("id, name, price, compare_at_price, images, is_featured, currency, created_at")
+        .select("id, name, price_afn, compare_price_afn, images, is_featured, created_at")
         .eq("status", "active")
         .order("is_featured", { ascending: false })
         .order("created_at", { ascending: false })
@@ -55,31 +54,26 @@ const BestSellers = () => {
   };
 
   const getProductCardData = (product: Product) => {
-    const currency = (product.currency as "AFN" | "USD") || "AFN";
+    const currency = "AFN" as const;
 
-    // Handle inverted price scenario: if compare_at_price exists and differs from price
-    // The original price is the higher value, current price is the lower value
-    const hasDiscount = product.compare_at_price && product.compare_at_price !== product.price;
+    // Handle inverted price scenario: if compare_price_afn exists and differs from price_afn
+    const hasDiscount = product.compare_price_afn && product.compare_price_afn !== product.price_afn;
     let originalPrice: number | undefined;
-    let currentPrice = product.price;
+    let currentPrice = product.price_afn;
     let discount: number | undefined;
 
     if (hasDiscount) {
-      // If compare_at_price > price, normal scenario
-      // If compare_at_price < price, data is inverted - use compare_at_price as current
-      if (product.compare_at_price! > product.price) {
-        originalPrice = product.compare_at_price!;
-        currentPrice = product.price;
+      if (product.compare_price_afn! > product.price_afn) {
+        originalPrice = product.compare_price_afn!;
+        currentPrice = product.price_afn;
       } else {
-        originalPrice = product.price;
-        currentPrice = product.compare_at_price!;
+        originalPrice = product.price_afn;
+        currentPrice = product.compare_price_afn!;
       }
       discount = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
     }
 
-    // Check if product is new (created within last 7 days)
     const isNew = new Date(product.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-
     const { averageRating, reviewCount } = getRating(product.id);
 
     return {

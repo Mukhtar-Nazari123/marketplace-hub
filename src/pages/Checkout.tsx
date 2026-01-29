@@ -53,19 +53,18 @@ interface CartItemWithDetails {
   product: {
     id: string;
     name: string;
-    price: number;
-    compare_at_price?: number | null;
+    price_afn: number;
+    compare_price_afn?: number | null;
     images: string[] | null;
     seller_id: string;
     delivery_fee: number;
-    currency?: string;
   };
 }
 
-// Helper to get effective price (lower of price and compare_at_price)
-const getEffectivePrice = (price: number, compareAtPrice?: number | null): number => {
-  if (compareAtPrice && compareAtPrice !== price) {
-    return Math.min(price, compareAtPrice);
+// Helper to get effective price (lower of price_afn and compare_price_afn)
+const getEffectivePrice = (price: number, comparePrice?: number | null): number => {
+  if (comparePrice && comparePrice !== price) {
+    return Math.min(price, comparePrice);
   }
   return price;
 };
@@ -216,15 +215,11 @@ const Checkout = () => {
   // Calculate totals grouped by currency, then by seller within each currency
   // Delivery fees are always in AFN and tracked separately
   const { currencyBreakdowns, deliveryBreakdown } = useMemo((): { currencyBreakdowns: CurrencyBreakdown[]; deliveryBreakdown: DeliveryBreakdown } => {
-    // First, group items by currency
-    const itemsByCurrency: Record<string, typeof cartItems> = {};
+    // All products are now in AFN
+    const itemsByCurrency: Record<string, typeof cartItems> = { 'AFN': [] };
     
     cartItems.forEach((item) => {
-      const currency = item.product?.currency || 'AFN';
-      if (!itemsByCurrency[currency]) {
-        itemsByCurrency[currency] = [];
-      }
-      itemsByCurrency[currency].push(item);
+      itemsByCurrency['AFN'].push(item);
     });
 
     // Track delivery fees per seller (always AFN)
@@ -258,7 +253,7 @@ const Checkout = () => {
       // Calculate breakdown per seller
       const sellers: SellerBreakdown[] = Object.entries(sellerGroups).map(([sellerId, group]) => {
         const products = group.items.map((item) => {
-          const effectivePrice = getEffectivePrice(item.product?.price || 0, item.product?.compare_at_price);
+          const effectivePrice = getEffectivePrice(item.product?.price_afn || 0, item.product?.compare_price_afn);
           return {
             name: item.product?.name || 'Product',
             quantity: item.quantity,
@@ -378,7 +373,7 @@ const Checkout = () => {
 
       // Create order items
       const orderItems = cartItems.map((item) => {
-        const effectivePrice = getEffectivePrice(item.product?.price || 0, item.product?.compare_at_price);
+        const effectivePrice = getEffectivePrice(item.product?.price_afn || 0, item.product?.compare_price_afn);
         return {
           order_id: order.id,
           product_id: item.product_id,
@@ -409,7 +404,7 @@ const Checkout = () => {
       cartItems.forEach((item) => {
         if (!item.product) return;
         const sellerId = item.product.seller_id;
-        const currency = item.product.currency || 'AFN';
+        const currency = 'AFN';
         const key = `${sellerId}-${currency}`;
 
         if (!sellerOrdersMap.has(key)) {
@@ -425,7 +420,7 @@ const Checkout = () => {
         }
 
         const sellerOrder = sellerOrdersMap.get(key)!;
-        const effectivePrice = getEffectivePrice(item.product.price, item.product.compare_at_price);
+        const effectivePrice = getEffectivePrice(item.product.price_afn, item.product.compare_price_afn);
         sellerOrder.subtotal += effectivePrice * item.quantity;
         sellerOrder.deliveryFee = Math.max(sellerOrder.deliveryFee, item.product.delivery_fee || 0);
         sellerOrder.items.push(item);
