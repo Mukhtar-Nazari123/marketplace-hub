@@ -1048,6 +1048,54 @@ export type Database = {
         }
         Relationships: []
       }
+      product_attributes: {
+        Row: {
+          attribute_key: string
+          attribute_value: string
+          created_at: string
+          id: string
+          language_code: string | null
+          product_id: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          attribute_key: string
+          attribute_value: string
+          created_at?: string
+          id?: string
+          language_code?: string | null
+          product_id: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          attribute_key?: string
+          attribute_value?: string
+          created_at?: string
+          id?: string
+          language_code?: string | null
+          product_id?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_attributes_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_attributes_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products_with_translations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_media: {
         Row: {
           alt_text_en: string | null
