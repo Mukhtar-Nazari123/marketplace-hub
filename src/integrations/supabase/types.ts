@@ -1227,7 +1227,6 @@ export type Database = {
           deal_start_at: string | null
           delivery_fee: number
           id: string
-          images: string[] | null
           is_deal: boolean | null
           is_featured: boolean
           low_stock_threshold: number | null
@@ -1253,7 +1252,6 @@ export type Database = {
           deal_start_at?: string | null
           delivery_fee?: number
           id?: string
-          images?: string[] | null
           is_deal?: boolean | null
           is_featured?: boolean
           low_stock_threshold?: number | null
@@ -1279,7 +1277,6 @@ export type Database = {
           deal_start_at?: string | null
           delivery_fee?: number
           id?: string
-          images?: string[] | null
           is_deal?: boolean | null
           is_featured?: boolean
           low_stock_threshold?: number | null
