@@ -11,14 +11,13 @@ interface CartItem {
   product?: {
     id: string;
     name: string;
-    price: number;
-    compare_at_price: number | null;
+    price_afn: number;
+    compare_price_afn: number | null;
     images: string[] | null;
     quantity: number;
     slug?: string;
     seller_id?: string;
     delivery_fee?: number;
-    currency?: string;
     metadata?: {
       videoUrl?: string;
       [key: string]: unknown;
@@ -63,13 +62,12 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
             id,
             name,
             slug,
-            price,
-            compare_at_price,
+            price_afn,
+            compare_price_afn,
             images,
             quantity,
             seller_id,
             delivery_fee,
-            currency,
             metadata
           )
         `)

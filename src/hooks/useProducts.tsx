@@ -6,8 +6,8 @@ export interface DBProduct {
   name: string;
   slug: string;
   description: string | null;
-  price: number;
-  compare_at_price: number | null;
+  price_afn: number;
+  compare_price_afn: number | null;
   images: string[] | null;
   category_id: string | null;
   subcategory_id: string | null;
@@ -16,7 +16,6 @@ export interface DBProduct {
   quantity: number;
   is_featured: boolean;
   created_at: string;
-  currency: string;
   metadata: {
     brand?: string;
     keywords?: string[];
@@ -216,23 +215,23 @@ export const useProducts = (options: UseProductsOptions = {}) => {
 // Helper to convert DB product to display format
 export const formatProductForDisplay = (product: DBProduct, language: 'fa' | 'en' | 'ps' = 'en') => {
   const metadata = product.metadata || {};
-  // Read currency from database column first (primary source)
-  const currency = product.currency || 'AFN';
-  const currencySymbol = currency === 'USD' ? '$' : 'AFN';
+  // AFN is now the only stored currency
+  const currency = 'AFN';
+  const currencySymbol = 'AFN';
   
   // Handle inverted price scenario
-  const hasDiscount = product.compare_at_price && product.compare_at_price !== product.price;
+  const hasDiscount = product.compare_price_afn && product.compare_price_afn !== product.price_afn;
   let originalPrice: number | undefined;
-  let currentPrice = product.price;
+  let currentPrice = product.price_afn;
   let discount = 0;
 
   if (hasDiscount) {
-    if (product.compare_at_price! > product.price) {
-      originalPrice = product.compare_at_price!;
-      currentPrice = product.price;
+    if (product.compare_price_afn! > product.price_afn) {
+      originalPrice = product.compare_price_afn!;
+      currentPrice = product.price_afn;
     } else {
-      originalPrice = product.price;
-      currentPrice = product.compare_at_price!;
+      originalPrice = product.price_afn;
+      currentPrice = product.compare_price_afn!;
     }
     discount = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
   }
