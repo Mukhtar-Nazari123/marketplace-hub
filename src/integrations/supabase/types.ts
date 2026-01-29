@@ -562,6 +562,13 @@ export type Database = {
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "cart_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products_with_translations"
+            referencedColumns: ["id"]
+          },
         ]
       }
       categories: {
@@ -957,6 +964,13 @@ export type Database = {
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products_with_translations"
+            referencedColumns: ["id"]
+          },
         ]
       }
       orders: {
@@ -1034,6 +1048,66 @@ export type Database = {
         }
         Relationships: []
       }
+      product_media: {
+        Row: {
+          alt_text_en: string | null
+          alt_text_fa: string | null
+          alt_text_ps: string | null
+          created_at: string
+          id: string
+          is_primary: boolean
+          media_type: string
+          metadata: Json | null
+          product_id: string
+          sort_order: number
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          alt_text_en?: string | null
+          alt_text_fa?: string | null
+          alt_text_ps?: string | null
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          media_type?: string
+          metadata?: Json | null
+          product_id: string
+          sort_order?: number
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          alt_text_en?: string | null
+          alt_text_fa?: string | null
+          alt_text_ps?: string | null
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          media_type?: string
+          metadata?: Json | null
+          product_id?: string
+          sort_order?: number
+          updated_at?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_media_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_media_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products_with_translations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_translations: {
         Row: {
           created_at: string
@@ -1085,16 +1159,22 @@ export type Database = {
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "product_translations_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products_with_translations"
+            referencedColumns: ["id"]
+          },
         ]
       }
       products: {
         Row: {
           barcode: string | null
           category_id: string | null
-          compare_at_price: number | null
-          cost_price: number | null
+          compare_price_afn: number | null
+          cost_price_afn: number | null
           created_at: string
-          currency: string
           deal_end_at: string | null
           deal_start_at: string | null
           delivery_fee: number
@@ -1106,7 +1186,7 @@ export type Database = {
           low_stock_threshold: number | null
           metadata: Json | null
           name: string
-          price: number
+          price_afn: number
           quantity: number
           rejection_reason: string | null
           seller_id: string
@@ -1120,10 +1200,9 @@ export type Database = {
         Insert: {
           barcode?: string | null
           category_id?: string | null
-          compare_at_price?: number | null
-          cost_price?: number | null
+          compare_price_afn?: number | null
+          cost_price_afn?: number | null
           created_at?: string
-          currency?: string
           deal_end_at?: string | null
           deal_start_at?: string | null
           delivery_fee?: number
@@ -1135,7 +1214,7 @@ export type Database = {
           low_stock_threshold?: number | null
           metadata?: Json | null
           name: string
-          price: number
+          price_afn: number
           quantity?: number
           rejection_reason?: string | null
           seller_id: string
@@ -1149,10 +1228,9 @@ export type Database = {
         Update: {
           barcode?: string | null
           category_id?: string | null
-          compare_at_price?: number | null
-          cost_price?: number | null
+          compare_price_afn?: number | null
+          cost_price_afn?: number | null
           created_at?: string
-          currency?: string
           deal_end_at?: string | null
           deal_start_at?: string | null
           delivery_fee?: number
@@ -1164,7 +1242,7 @@ export type Database = {
           low_stock_threshold?: number | null
           metadata?: Json | null
           name?: string
-          price?: number
+          price_afn?: number
           quantity?: number
           rejection_reason?: string | null
           seller_id?: string
@@ -1332,6 +1410,13 @@ export type Database = {
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products_with_translations"
             referencedColumns: ["id"]
           },
         ]
@@ -1694,13 +1779,82 @@ export type Database = {
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "wishlist_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products_with_translations"
+            referencedColumns: ["id"]
+          },
         ]
       }
     }
     Views: {
-      [_ in never]: never
+      products_with_translations: {
+        Row: {
+          barcode: string | null
+          category_id: string | null
+          compare_price_afn: number | null
+          cost_price_afn: number | null
+          created_at: string | null
+          deal_end_at: string | null
+          deal_start_at: string | null
+          delivery_fee: number | null
+          description: string | null
+          description_en: string | null
+          description_fa: string | null
+          description_ps: string | null
+          id: string | null
+          images: string[] | null
+          is_deal: boolean | null
+          is_featured: boolean | null
+          low_stock_threshold: number | null
+          metadata: Json | null
+          name: string | null
+          name_en: string | null
+          name_fa: string | null
+          name_ps: string | null
+          price_afn: number | null
+          quantity: number | null
+          rejection_reason: string | null
+          seller_id: string | null
+          short_description_en: string | null
+          short_description_fa: string | null
+          short_description_ps: string | null
+          sku: string | null
+          slug: string | null
+          status: string | null
+          subcategory_id: string | null
+          updated_at: string | null
+          weight: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_subcategory_id_fkey"
+            columns: ["subcategory_id"]
+            isOneToOne: false
+            referencedRelation: "subcategories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
+      get_product_description: {
+        Args: { p_language?: string; p_product_id: string }
+        Returns: string
+      }
+      get_product_name: {
+        Args: { p_language?: string; p_product_id: string }
+        Returns: string
+      }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
