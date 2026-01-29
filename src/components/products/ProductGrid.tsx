@@ -246,8 +246,8 @@ const ProductCard = ({ product, getRating }: ProductCardInternalProps) => {
           >
             <ShoppingCart size={16} className={isAddingToCart ? 'animate-pulse' : ''} />
             {isAddingToCart 
-              ? (isRTL ? 'در حال افزودن...' : 'Adding...') 
-              : t.product.addToCart
+              ? (isRTL ? 'افزودن...' : 'Adding...') 
+              : (isRTL ? 'افزودن' : 'Add')
             }
           </Button>
         </div>
@@ -365,7 +365,7 @@ const ProductListItem = ({ product, getRating }: ProductCardInternalProps) => {
               <ShoppingCart size={16} className={isAddingToCart ? 'animate-pulse' : ''} />
               {isAddingToCart 
                 ? (isRTL ? 'افزودن...' : 'Adding...') 
-                : t.product.addToCart
+                : (isRTL ? 'افزودن' : 'Add')
               }
             </Button>
           </div>

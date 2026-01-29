@@ -232,7 +232,7 @@ const ProductCard = ({
           disabled={isAddingToCart}
         >
           <ShoppingCart className={cn("h-4 w-4 mr-2", isAddingToCart && "animate-pulse")} />
-          {t.product.addToCart}
+          {isRTL ? 'افزودن' : 'Add'}
         </Button>
       </div>
     </div>
