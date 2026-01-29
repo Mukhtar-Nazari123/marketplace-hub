@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { useLanguage } from '@/lib/i18n';
@@ -15,8 +15,8 @@ import { ReviewStep } from '@/components/products/add/ReviewStep';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ArrowLeft, ArrowRight, Save, Send, FileText } from 'lucide-react';
-import { generateSKU } from '@/lib/skuGenerator';
 import { cn } from '@/lib/utils';
+import { saveProduct } from '@/hooks/useProductSave';
 
 export type CurrencyType = 'AFN' | 'USD';
 
@@ -27,22 +27,22 @@ export interface ProductFormData {
   subCategoryId: string;
   subCategoryName: string;
   
-  // Basic Info
+  // Basic Info (these will be saved to product_translations)
   name: string;
   shortDescription: string;
   description: string;
   brand: string;
   
-  // Category-specific attributes
+  // Category-specific attributes (saved to product_attributes)
   attributes: Record<string, string | boolean | string[]>;
   
-  // Media
+  // Media (saved to product_media)
   images: File[];
   imageUrls: string[];
   video: File | null;
   videoUrl: string;
   
-  // Pricing & Inventory
+  // Pricing & Inventory (saved to products table)
   price: number;
   priceUSD: number;
   discountPrice: number | null;
@@ -86,7 +86,7 @@ const STEPS = [
 ];
 
 const AddProduct = () => {
-  const { isRTL } = useLanguage();
+  const { isRTL, language } = useLanguage();
   const { user } = useAuth();
   const { status: sellerStatus } = useSellerStatus();
   const navigate = useNavigate();
@@ -98,6 +98,9 @@ const AddProduct = () => {
   const [draftId, setDraftId] = useState<string | null>(null);
 
   const isVerifiedSeller = sellerStatus === 'approved';
+
+  // Get current language for translations
+  const currentLanguage = (language === 'fa' || language === 'ps') ? language : 'en';
 
   const updateFormData = (updates: Partial<ProductFormData>) => {
     setFormData(prev => ({ ...prev, ...updates }));
@@ -192,51 +195,21 @@ const AddProduct = () => {
         ? await uploadMedia()
         : { imageUrls: formData.imageUrls, videoUrl: formData.videoUrl };
 
-      // Generate SKU automatically
-      const generatedSKU = generateSKU(formData.categoryId, formData.categoryName, formData.name || 'DRAFT');
+      const result = await saveProduct({
+        userId: user.id,
+        productId: draftId,
+        formData,
+        imageUrls,
+        videoUrl,
+        status: 'draft',
+        currentLanguage,
+      });
 
-      const productData = {
-        seller_id: user.id,
-        name: formData.name || 'Untitled Draft',
-        slug: formData.name ? formData.name.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now() : `draft-${Date.now()}`,
-        description: formData.description,
-        price_afn: formData.price || 0,
-        compare_price_afn: formData.discountPrice,
-        quantity: formData.quantity,
-        sku: generatedSKU,
-        category_id: formData.categoryId || null,
-        subcategory_id: formData.subCategoryId || null,
-        images: imageUrls,
-        status: 'draft' as const,
-        delivery_fee: formData.deliveryFee || 0,
-        metadata: {
-          shortDescription: formData.shortDescription,
-          brand: formData.brand,
-          attributes: formData.attributes,
-          videoUrl,
-          stockPerSize: formData.stockPerSize,
-          categoryName: formData.categoryName,
-          subCategoryName: formData.subCategoryName,
-        },
-      };
-
-      if (draftId) {
-        const { error } = await supabase
-          .from('products')
-          .update(productData)
-          .eq('id', draftId);
-
-        if (error) throw error;
-      } else {
-        const { data, error } = await supabase
-          .from('products')
-          .insert(productData)
-          .select('id')
-          .single();
-
-        if (error) throw error;
-        setDraftId(data.id);
+      if (!result.success) {
+        throw new Error(result.error);
       }
+
+      setDraftId(result.productId);
 
       if (!silent) {
         toast.success(isRTL ? 'پیش‌نویس ذخیره شد' : 'Draft saved');
@@ -265,52 +238,23 @@ const AddProduct = () => {
         return;
       }
 
-      let status = 'draft';
+      let status: 'draft' | 'pending' | 'active' = 'draft';
       if (!asDraft) {
         status = isVerifiedSeller ? 'pending' : 'draft';
       }
 
-      // Generate SKU automatically
-      const generatedSKU = generateSKU(formData.categoryId, formData.categoryName, formData.name);
+      const result = await saveProduct({
+        userId: user.id,
+        productId: draftId,
+        formData,
+        imageUrls,
+        videoUrl,
+        status,
+        currentLanguage,
+      });
 
-      const productData = {
-        seller_id: user.id,
-        name: formData.name,
-        slug: formData.name.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now(),
-        description: formData.description,
-        price_afn: formData.price,
-        compare_price_afn: formData.discountPrice,
-        quantity: formData.quantity,
-        sku: generatedSKU,
-        category_id: formData.categoryId || null,
-        subcategory_id: formData.subCategoryId || null,
-        images: imageUrls,
-        status: status as 'draft' | 'pending' | 'active',
-        delivery_fee: formData.deliveryFee || 0,
-        metadata: {
-          shortDescription: formData.shortDescription,
-          brand: formData.brand,
-          attributes: formData.attributes,
-          videoUrl,
-          stockPerSize: formData.stockPerSize,
-          categoryName: formData.categoryName,
-          subCategoryName: formData.subCategoryName,
-        },
-      };
-
-      if (draftId) {
-        const { error } = await supabase
-          .from('products')
-          .update(productData)
-          .eq('id', draftId);
-
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from('products')
-          .insert(productData);
-
-        if (error) throw error;
+      if (!result.success) {
+        throw new Error(result.error);
       }
 
       if (asDraft) {
@@ -364,6 +308,15 @@ const AddProduct = () => {
             </p>
           </Card>
         )}
+
+        {/* Language indicator */}
+        <Card className="p-3 bg-muted/50">
+          <p className="text-sm text-muted-foreground">
+            {isRTL
+              ? `محتوای محصول به زبان ${currentLanguage === 'fa' ? 'فارسی' : currentLanguage === 'ps' ? 'پشتو' : 'انگلیسی'} ذخیره می‌شود. می‌توانید بعداً ترجمه‌ها را اضافه کنید.`
+              : `Product content will be saved in ${currentLanguage === 'fa' ? 'Persian' : currentLanguage === 'ps' ? 'Pashto' : 'English'}. You can add translations later.`}
+          </p>
+        </Card>
 
         {/* Stepper */}
         <Card className="p-6">

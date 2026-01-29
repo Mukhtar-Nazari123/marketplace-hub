@@ -18,6 +18,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, ArrowRight, Save, Send, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ProductFormData } from './AddProduct';
+import { saveProduct, loadProductWithTranslations } from '@/hooks/useProductSave';
 
 const STEPS = [
   { id: 1, title: 'Category', titleFa: 'دسته‌بندی' },
@@ -53,7 +54,7 @@ const initialFormData: ProductFormData = {
 
 const EditProduct = () => {
   const { id } = useParams<{ id: string }>();
-  const { isRTL } = useLanguage();
+  const { isRTL, language } = useLanguage();
   const { user } = useAuth();
   const { status: sellerStatus } = useSellerStatus();
   const navigate = useNavigate();
@@ -65,6 +66,9 @@ const EditProduct = () => {
   const [loading, setLoading] = useState(true);
 
   const isVerifiedSeller = sellerStatus === 'approved';
+  
+  // Get current language for translations
+  const currentLanguage = (language === 'fa' || language === 'ps') ? language : 'en';
 
   useEffect(() => {
     if (id && user) {
@@ -74,45 +78,48 @@ const EditProduct = () => {
 
   const fetchProduct = async () => {
     try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('id', id)
-        .eq('seller_id', user?.id)
-        .single();
+      // Use the new function that loads from normalized tables
+      const { product, translation, attributes, brand, imageUrls, videoUrl } = 
+        await loadProductWithTranslations(id!, currentLanguage);
 
-      if (error) throw error;
-
-      if (!data) {
+      if (!product) {
         toast.error(isRTL ? 'محصول یافت نشد' : 'Product not found');
         navigate('/dashboard/seller/products');
         return;
       }
 
-      const metadata = (data.metadata as Record<string, unknown>) || {};
+      // Check ownership
+      if (product.seller_id !== user?.id) {
+        toast.error(isRTL ? 'دسترسی ندارید' : 'Access denied');
+        navigate('/dashboard/seller/products');
+        return;
+      }
+
+      const metadata = (product.metadata as Record<string, unknown>) || {};
       
       setFormData({
-        categoryId: (metadata.categoryId as string) || data.category_id || '',
+        categoryId: product.category_id || '',
         categoryName: (metadata.categoryName as string) || '',
-        subCategoryId: (metadata.subCategoryId as string) || data.subcategory_id || '',
+        subCategoryId: product.subcategory_id || '',
         subCategoryName: (metadata.subCategoryName as string) || '',
-        name: data.name,
-        shortDescription: (metadata.shortDescription as string) || '',
-        description: data.description || '',
-        brand: (metadata.brand as string) || '',
-        attributes: (metadata.attributes as Record<string, string | boolean | string[]>) || {},
+        // Use translation data if available, fallback to product data
+        name: translation?.name || product.name || '',
+        shortDescription: translation?.short_description || (metadata.shortDescription as string) || '',
+        description: translation?.description || product.description || '',
+        brand: brand || (metadata.brand as string) || '',
+        attributes: attributes || (metadata.attributes as Record<string, string | boolean | string[]>) || {},
         images: [],
-        imageUrls: data.images || [],
+        imageUrls: imageUrls,
         video: null,
-        videoUrl: (metadata.videoUrl as string) || '',
-        price: data.price_afn,
+        videoUrl: videoUrl,
+        price: product.price_afn,
         priceUSD: 0,
-        discountPrice: data.compare_price_afn,
+        discountPrice: product.compare_price_afn,
         discountPriceUSD: null,
         currency: 'AFN',
-        quantity: data.quantity,
+        quantity: product.quantity,
         stockPerSize: (metadata.stockPerSize as Record<string, number>) || {},
-        deliveryFee: data.delivery_fee || 0,
+        deliveryFee: product.delivery_fee || 0,
       });
     } catch (error) {
       console.error('Error fetching product:', error);
@@ -222,43 +229,21 @@ const EditProduct = () => {
         return;
       }
 
-      let status = asDraft ? 'draft' : (isVerifiedSeller ? 'pending' : 'draft');
+      const status: 'draft' | 'pending' | 'active' = asDraft ? 'draft' : (isVerifiedSeller ? 'pending' : 'draft');
 
-      const productData = {
-        name: formData.name,
-        slug: formData.name.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now(),
-        description: formData.description,
-        price: formData.price,
-        compare_at_price: formData.discountPrice,
-        quantity: formData.quantity,
-        category_id: formData.categoryId || null,
-        subcategory_id: formData.subCategoryId || null,
-        images: imageUrls,
+      const result = await saveProduct({
+        userId: user.id,
+        productId: id,
+        formData,
+        imageUrls,
+        videoUrl,
         status,
-        currency: formData.currency, // Save selected currency (AFN or USD) to database
-        delivery_fee: formData.deliveryFee || 0, // Always in AFN
-        metadata: {
-          shortDescription: formData.shortDescription,
-          brand: formData.brand,
-          attributes: formData.attributes,
-          videoUrl,
-          stockPerSize: formData.stockPerSize,
-          categoryId: formData.categoryId,
-          categoryName: formData.categoryName,
-          subCategoryId: formData.subCategoryId,
-          subCategoryName: formData.subCategoryName,
-          priceUSD: formData.priceUSD,
-          discountPriceUSD: formData.discountPriceUSD,
-          deliveryFeeCurrency: 'AFN', // Delivery fee is always AFN
-        },
-      };
+        currentLanguage,
+      });
 
-      const { error } = await supabase
-        .from('products')
-        .update(productData)
-        .eq('id', id);
-
-      if (error) throw error;
+      if (!result.success) {
+        throw new Error(result.error);
+      }
 
       if (asDraft) {
         toast.success(isRTL ? 'پیش‌نویس ذخیره شد' : 'Draft saved successfully');
@@ -329,6 +314,15 @@ const EditProduct = () => {
             </p>
           </Card>
         )}
+
+        {/* Language indicator */}
+        <Card className="p-3 bg-muted/50">
+          <p className="text-sm text-muted-foreground">
+            {isRTL
+              ? `در حال ویرایش محتوای ${currentLanguage === 'fa' ? 'فارسی' : currentLanguage === 'ps' ? 'پشتو' : 'انگلیسی'}. برای مدیریت ترجمه‌ها به صفحه ترجمه‌ها بروید.`
+              : `Editing ${currentLanguage === 'fa' ? 'Persian' : currentLanguage === 'ps' ? 'Pashto' : 'English'} content. Visit Translations page to manage other languages.`}
+          </p>
+        </Card>
 
         <Card className="p-6">
           <ProductStepper steps={STEPS} currentStep={currentStep} onStepClick={goToStep} />
