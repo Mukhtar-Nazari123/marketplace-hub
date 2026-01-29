@@ -135,17 +135,32 @@ const Products = () => {
   const productIds = useMemo(() => paginatedProducts.map((p) => p.id), [paginatedProducts]);
   const { getRating } = useProductRatings(productIds);
 
+  const getLabel = (en: string, fa: string, ps: string) => {
+    if (language === 'ps') return ps;
+    if (language === 'fa') return fa;
+    return en;
+  };
+
   const getTitle = () => {
     if (searchQuery && searchQuery.trim()) {
-      return isRTL ? `نتایج جستجو برای "${searchQuery}"` : `Search results for "${searchQuery}"`;
+      return getLabel(
+        `Search results for "${searchQuery}"`,
+        `نتایج جستجو برای "${searchQuery}"`,
+        `د "${searchQuery}" لپاره د لټون پایلې`
+      );
     }
-    if (filterType === "new") return t.product.newProducts;
-    if (filterType === "sale") return t.filters.discount;
+    if (filterType === "new") return getLabel('New Arrivals', 'محصولات جدید', 'نوي محصولات');
+    if (filterType === "sale") return getLabel('Discounted Products', 'محصولات تخفیف‌دار', 'تخفیف شوي محصولات');
     if (categorySlug) {
       const category = rootCategories.find((c) => c.slug === categorySlug);
-      return category ? (isRTL && category.name_fa ? category.name_fa : category.name) : t.product.allProducts;
+      if (category) {
+        if (language === 'ps') return category.name_ps || category.name_fa || category.name;
+        if (language === 'fa') return category.name_fa || category.name;
+        return category.name;
+      }
+      return getLabel('All Products', 'همه محصولات', 'ټول محصولات');
     }
-    return t.product.allProducts;
+    return getLabel('All Products', 'همه محصولات', 'ټول محصولات');
   };
 
   // Extract unique brands from products
@@ -204,13 +219,15 @@ const Products = () => {
           <div className="container mx-auto px-4 text-center">
             <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur px-4 py-2 rounded-full mb-4">
               <Sparkles className="text-white" size={20} />
-              <span className="text-white font-medium">{t.product.newProducts}</span>
+              <span className="text-white font-medium">
+                {getLabel('New Arrivals', 'محصولات جدید', 'نوي محصولات')}
+              </span>
             </div>
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-              {isRTL ? "جدیدترین محصولات فروشگاه" : "Latest Store Products"}
+              {getLabel('Latest Store Products', 'جدیدترین محصولات فروشگاه', 'د پلورنځي نوي محصولات')}
             </h1>
             <p className="text-white/80">
-              {isRTL ? "بهترین و جدیدترین محصولات را کشف کنید" : "Discover the best and newest products"}
+              {getLabel('Discover the best and newest products', 'بهترین و جدیدترین محصولات را کشف کنید', 'غوره او نوي محصولات ومومئ')}
             </p>
           </div>
         </div>
@@ -225,10 +242,10 @@ const Products = () => {
               {loading ? (
                 <span className="inline-flex items-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  {isRTL ? "در حال جستجو..." : "Searching..."}
+                  {getLabel('Searching...', 'در حال جستجو...', 'لټون روان دی...')}
                 </span>
               ) : (
-                `${filteredProducts.length} ${isRTL ? "محصول" : "products"}`
+                `${filteredProducts.length} ${getLabel('products', 'محصول', 'محصولات')}`
               )}
             </p>
           </div>
@@ -254,21 +271,25 @@ const Products = () => {
               <Search className="h-12 w-12 text-muted-foreground" />
             </div>
             <h3 className="text-lg font-semibold text-foreground mb-2">
-              {isRTL ? "محصولی یافت نشد" : "No products found"}
+              {getLabel('No products found', 'محصولی یافت نشد', 'هیڅ محصول ونه موندل شو')}
             </h3>
             <p className="text-muted-foreground max-w-md">
               {searchQuery
-                ? isRTL
-                  ? `نتیجه‌ای برای "${searchQuery}" پیدا نشد. لطفاً عبارت دیگری را جستجو کنید.`
-                  : `No results found for "${searchQuery}". Try a different search term.`
-                : isRTL
-                  ? "محصولی با فیلترهای انتخاب شده یافت نشد."
-                  : "No products match the selected filters."}
+                ? getLabel(
+                    `No results found for "${searchQuery}". Try a different search term.`,
+                    `نتیجه‌ای برای "${searchQuery}" پیدا نشد. لطفاً عبارت دیگری را جستجو کنید.`,
+                    `د "${searchQuery}" لپاره هیڅ پایله ونه موندل شوه. بل کلیمه وازمایئ.`
+                  )
+                : getLabel(
+                    'No products match the selected filters.',
+                    'محصولی با فیلترهای انتخاب شده یافت نشد.',
+                    'انتخاب شوي فلټرونو سره هیڅ محصول سمون نه خوري.'
+                  )}
             </p>
             {searchQuery && (
               <Link to="/products">
                 <Button variant="outline" className="mt-4">
-                  {isRTL ? "مشاهده همه محصولات" : "View all products"}
+                  {getLabel('View all products', 'مشاهده همه محصولات', 'ټول محصولات وګورئ')}
                 </Button>
               </Link>
             )}
@@ -354,7 +375,14 @@ const ProductCard = ({ product, getRating }: ProductCardProps) => {
 
   const getName = () => {
     if (typeof product.name === "string") return product.name;
+    if (language === 'ps') return (product.name as any).ps || product.name.fa || product.name.en;
     return product.name[language] || product.name.en;
+  };
+
+  const getLabel = (en: string, fa: string, ps: string) => {
+    if (language === 'ps') return ps;
+    if (language === 'fa') return fa;
+    return en;
   };
 
   const handleAddToCart = async (e: React.MouseEvent) => {
@@ -397,8 +425,8 @@ const ProductCard = ({ product, getRating }: ProductCardProps) => {
 
         {/* Badges */}
         <div className={`absolute top-2 ${isRTL ? "right-2" : "left-2"} flex flex-col gap-1`}>
-          {product.isNew && <Badge variant="new">{isRTL ? "جدید" : "New"}</Badge>}
-          {product.isHot && <Badge variant="hot">{isRTL ? "داغ" : "Hot"}</Badge>}
+          {product.isNew && <Badge variant="new">{getLabel('New', 'جدید', 'نوی')}</Badge>}
+          {product.isHot && <Badge variant="hot">{getLabel('Hot', 'داغ', 'ګرم')}</Badge>}
           {product.discount && product.discount > 0 && <Badge variant="sale">-{product.discount}%</Badge>}
         </div>
 
@@ -468,7 +496,7 @@ const ProductCard = ({ product, getRating }: ProductCardProps) => {
             disabled={isAddingToCart}
           >
             <ShoppingCart size={14} className={isAddingToCart ? "animate-pulse" : ""} />
-            {isRTL ? "افزودن" : "Add"}
+            {getLabel('Add', 'افزودن', 'اضافه کړئ')}
           </Button>
         </div>
       </div>
