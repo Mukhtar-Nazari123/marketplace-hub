@@ -200,16 +200,15 @@ const AddProduct = () => {
         name: formData.name || 'Untitled Draft',
         slug: formData.name ? formData.name.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now() : `draft-${Date.now()}`,
         description: formData.description,
-        price: formData.price || 0,
-        compare_at_price: formData.discountPrice,
+        price_afn: formData.price || 0,
+        compare_price_afn: formData.discountPrice,
         quantity: formData.quantity,
         sku: generatedSKU,
         category_id: formData.categoryId || null,
         subcategory_id: formData.subCategoryId || null,
         images: imageUrls,
         status: 'draft' as const,
-        currency: formData.currency, // Store selected currency for product price
-        delivery_fee: formData.deliveryFee || 0, // Always in AFN
+        delivery_fee: formData.deliveryFee || 0,
         metadata: {
           shortDescription: formData.shortDescription,
           brand: formData.brand,
@@ -218,9 +217,6 @@ const AddProduct = () => {
           stockPerSize: formData.stockPerSize,
           categoryName: formData.categoryName,
           subCategoryName: formData.subCategoryName,
-          priceUSD: formData.priceUSD,
-          discountPriceUSD: formData.discountPriceUSD,
-          deliveryFeeCurrency: 'AFN', // Explicitly mark delivery fee as AFN
         },
       };
 
@@ -282,16 +278,15 @@ const AddProduct = () => {
         name: formData.name,
         slug: formData.name.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now(),
         description: formData.description,
-        price: formData.price,
-        compare_at_price: formData.discountPrice,
+        price_afn: formData.price,
+        compare_price_afn: formData.discountPrice,
         quantity: formData.quantity,
         sku: generatedSKU,
         category_id: formData.categoryId || null,
         subcategory_id: formData.subCategoryId || null,
         images: imageUrls,
         status: status as 'draft' | 'pending' | 'active',
-        currency: formData.currency, // Store selected currency for product price
-        delivery_fee: formData.deliveryFee || 0, // Always in AFN
+        delivery_fee: formData.deliveryFee || 0,
         metadata: {
           shortDescription: formData.shortDescription,
           brand: formData.brand,
@@ -300,9 +295,6 @@ const AddProduct = () => {
           stockPerSize: formData.stockPerSize,
           categoryName: formData.categoryName,
           subCategoryName: formData.subCategoryName,
-          priceUSD: formData.priceUSD,
-          discountPriceUSD: formData.discountPriceUSD,
-          deliveryFeeCurrency: 'AFN', // Explicitly mark delivery fee as AFN
         },
       };
 

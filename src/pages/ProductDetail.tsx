@@ -42,8 +42,8 @@ interface Product {
   name: string;
   slug: string;
   description: string | null;
-  price: number;
-  compare_at_price: number | null;
+  price_afn: number;
+  compare_price_afn: number | null;
   images: string[] | null;
   category_id: string | null;
   seller_id: string;
@@ -53,9 +53,7 @@ interface Product {
   is_featured: boolean;
   created_at: string;
   delivery_fee: number;
-  currency: string;
   metadata: {
-    currency?: string;
     brand?: string;
     shortDescription?: string;
     specifications?: Record<string, string>;
@@ -202,19 +200,16 @@ const ProductDetail = () => {
   };
 
   const getCurrencySymbol = () => {
-    // Read from database currency column (not metadata)
-    const currency = product?.currency || product?.metadata?.currency || 'AFN';
-    if (currency === 'USD') return '$';
     return isRTL ? '؋' : 'AFN';
   };
 
   const getProductCurrency = () => {
-    return product?.currency || product?.metadata?.currency || 'AFN';
+    return 'AFN';
   };
 
   const getDiscount = () => {
-    if (!product?.compare_at_price || product.compare_at_price <= product.price) return 0;
-    return Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100);
+    if (!product?.compare_price_afn || product.compare_price_afn <= product.price_afn) return 0;
+    return Math.round(((product.compare_price_afn - product.price_afn) / product.compare_price_afn) * 100);
   };
 
   const formatDate = (date: string) => {
@@ -441,8 +436,8 @@ const ProductDetail = () => {
             {/* Price */}
             <div className="flex items-center gap-4 flex-wrap">
               {(() => {
-                const currentPrice = product.price;
-                const comparePrice = product.compare_at_price;
+                const currentPrice = product.price_afn;
+                const comparePrice = product.compare_price_afn;
                 const hasDiscount = comparePrice && comparePrice !== currentPrice;
                 const originalPrice = hasDiscount ? Math.max(currentPrice, comparePrice) : null;
                 const discountedPrice = hasDiscount ? Math.min(currentPrice, comparePrice) : currentPrice;
@@ -736,19 +731,19 @@ const ProductDetail = () => {
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
               {relatedProducts.map((p, index) => {
-                const pCurrency = (p.currency || 'AFN') as 'AFN' | 'USD';
-                const hasDiscount = p.compare_at_price && p.compare_at_price !== p.price;
+                const pCurrency = 'AFN' as const;
+                const hasDiscount = p.compare_price_afn && p.compare_price_afn !== p.price_afn;
                 let originalPrice: number | undefined;
-                let currentPrice = p.price;
+                let currentPrice = p.price_afn;
                 let discountPercent: number | undefined;
 
                 if (hasDiscount) {
-                  if (p.compare_at_price! > p.price) {
-                    originalPrice = p.compare_at_price!;
-                    currentPrice = p.price;
+                  if (p.compare_price_afn! > p.price_afn) {
+                    originalPrice = p.compare_price_afn!;
+                    currentPrice = p.price_afn;
                   } else {
-                    originalPrice = p.price;
-                    currentPrice = p.compare_at_price!;
+                    originalPrice = p.price_afn;
+                    currentPrice = p.compare_price_afn!;
                   }
                   discountPercent = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
                 }

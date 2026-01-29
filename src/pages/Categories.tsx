@@ -24,14 +24,13 @@ interface DbProduct {
   id: string;
   name: string;
   slug: string;
-  price: number;
-  compare_at_price: number | null;
+  price_afn: number;
+  compare_price_afn: number | null;
   images: string[] | null;
   category_id: string | null;
   quantity: number;
   is_featured: boolean;
   metadata: Record<string, unknown> | null;
-  currency: string;
 }
 
 const Categories = () => {
@@ -129,7 +128,7 @@ const Categories = () => {
         let query = supabase
           .from("products")
           .select(
-            "id, name, slug, price, compare_at_price, images, category_id, quantity, is_featured, metadata, currency",
+            "id, name, slug, price_afn, compare_price_afn, images, category_id, quantity, is_featured, metadata",
           )
           .eq("status", "active");
 
@@ -168,18 +167,15 @@ const Categories = () => {
   const displayProducts = useMemo(() => {
     return dbProducts.map((p) => {
       const metadata = p.metadata as { brand?: string } | null;
-      // Use currency from database column (primary source)
-      const currency = p.currency || "AFN";
+      const currency = "AFN";
 
-      // Determine effective prices: lower price is the sale price, higher is original
-      const hasComparePrice = p.compare_at_price && p.compare_at_price !== p.price;
-      let effectivePrice = p.price;
+      const hasComparePrice = p.compare_price_afn && p.compare_price_afn !== p.price_afn;
+      let effectivePrice = p.price_afn;
       let effectiveOriginalPrice: number | undefined = undefined;
 
       if (hasComparePrice) {
-        // Always use the lower value as the sale price, higher as original (strikethrough)
-        effectivePrice = Math.min(p.price, p.compare_at_price!);
-        effectiveOriginalPrice = Math.max(p.price, p.compare_at_price!);
+        effectivePrice = Math.min(p.price_afn, p.compare_price_afn!);
+        effectiveOriginalPrice = Math.max(p.price_afn, p.compare_price_afn!);
       }
 
       const discount = effectiveOriginalPrice
@@ -203,7 +199,7 @@ const Categories = () => {
         isHot: false,
         discount,
         currency,
-        currencySymbol: currency === "USD" ? "$" : "AFN",
+        currencySymbol: "AFN",
         seller: { id: "", name: "", rating: 0, productCount: 0, avatar: "" },
         description: { fa: "", en: "" },
         specifications: [],

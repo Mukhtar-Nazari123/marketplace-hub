@@ -55,9 +55,8 @@ interface Product {
   id: string;
   name: string;
   slug: string;
-  price: number;
-  compare_at_price: number | null;
-  currency: string;
+  price_afn: number;
+  compare_price_afn: number | null;
   status: string;
   seller_id: string;
   category_id: string | null;
@@ -66,23 +65,21 @@ interface Product {
   rejection_reason: string | null;
 }
 
-const getCurrencySymbol = (currency: string): string => {
-  switch (currency) {
-    case 'AFN': return '؋';
-    case 'USD': return '$';
-    default: return currency;
-  }
+const getCurrencySymbol = (): string => {
+  return '؋';
 };
 
-const formatPriceWithCurrency = (price: number, currency: string, isRTL: boolean): string => {
-  const symbol = getCurrencySymbol(currency);
+const formatPriceWithCurrency = (price: number, isRTL: boolean): string => {
+  const symbol = getCurrencySymbol();
   const formattedPrice = price.toLocaleString(isRTL ? 'fa-IR' : 'en-US');
-  return isRTL ? `${formattedPrice} ${symbol}` : `${symbol}${formattedPrice}`;
+  return isRTL ? `${formattedPrice} ${symbol}` : `AFN ${formattedPrice}`;
 };
 
 const AdminProducts = () => {
   const { t, direction } = useLanguage();
+  const isRTL = direction === 'rtl';
   const navigate = useNavigate();
+
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -227,7 +224,6 @@ const AdminProducts = () => {
     }
   };
 
-  const isRTL = direction === 'rtl';
   const searchIconClass = isRTL ? 'right-3' : 'left-3';
   const inputPaddingClass = isRTL ? 'pr-9' : 'pl-9';
   const iconMarginClass = isRTL ? 'ml-2' : 'mr-2';
@@ -325,17 +321,17 @@ const AdminProducts = () => {
                         </TableCell>
                         <TableCell>
                           <div className="flex flex-col gap-1">
-                            {product.compare_at_price && product.compare_at_price > product.price ? (
+                            {product.compare_price_afn && product.compare_price_afn > product.price_afn ? (
                               <>
                                 <span className="text-xs text-muted-foreground line-through">
-                                  {formatPriceWithCurrency(Number(product.compare_at_price), product.currency || 'AFN', isRTL)}
+                                  {formatPriceWithCurrency(Number(product.compare_price_afn), isRTL)}
                                 </span>
                                 <span className="font-semibold text-amber-500">
-                                  {formatPriceWithCurrency(Number(product.price), product.currency || 'AFN', isRTL)}
+                                  {formatPriceWithCurrency(Number(product.price_afn), isRTL)}
                                 </span>
                               </>
                             ) : (
-                              <span className="font-medium">{formatPriceWithCurrency(Number(product.price), product.currency || 'AFN', isRTL)}</span>
+                              <span className="font-medium">{formatPriceWithCurrency(Number(product.price_afn), isRTL)}</span>
                             )}
                           </div>
                         </TableCell>

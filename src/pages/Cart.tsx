@@ -17,14 +17,13 @@ import { useEffect } from 'react';
 interface CartItemProduct {
   id: string;
   name: string;
-  price: number;
-  compare_at_price: number | null;
+  price_afn: number;
+  compare_price_afn: number | null;
   images: string[] | null;
   quantity: number;
   slug?: string;
   seller_id?: string;
   delivery_fee?: number;
-  currency?: string;
 }
 
 const Cart = () => {
@@ -41,24 +40,20 @@ const Cart = () => {
     }
   }, [user, role, authLoading, navigate]);
 
-  const getCurrencySymbol = (currency: string) => {
-    if (currency === 'USD') return '$';
+  const getCurrencySymbol = () => {
     return isRTL ? '؋' : 'AFN ';
   };
 
   // AFN symbol for delivery (always AFN)
   const afnSymbol = isRTL ? '؋' : 'AFN ';
 
-  // Group items by currency first, then by seller within each currency
+  // All prices are now in AFN - group by seller
   const itemsWithDetails = items.map(item => {
     const product = item.product as CartItemProduct | undefined;
-    const currency = product?.currency || 'AFN';
+    const currency = 'AFN';
     
-    // Use the lower price for cart calculation (handles both scenarios)
-    // Scenario 1: compare_at_price > price (standard discount)
-    // Scenario 2: price > compare_at_price (inverted in database)
-    const priceValue = product?.price || 0;
-    const comparePrice = product?.compare_at_price || null;
+    const priceValue = product?.price_afn || 0;
+    const comparePrice = product?.compare_price_afn || null;
     const hasDiscount = comparePrice && comparePrice !== priceValue;
     const effectivePrice = hasDiscount ? Math.min(priceValue, comparePrice) : priceValue;
     const originalPrice = hasDiscount ? Math.max(priceValue, comparePrice) : null;
@@ -66,12 +61,12 @@ const Cart = () => {
     return {
       ...item,
       currency,
-      currencySymbol: getCurrencySymbol(currency),
+      currencySymbol: getCurrencySymbol(),
       originalPrice,
       effectivePrice,
       itemTotal: effectivePrice * item.quantity,
       sellerId: product?.seller_id || 'unknown',
-      deliveryFee: product?.delivery_fee || 0, // Always in AFN
+      deliveryFee: product?.delivery_fee || 0,
       hasDiscount,
     };
   });
@@ -111,7 +106,7 @@ const Cart = () => {
 
     return {
       currency,
-      symbol: getCurrencySymbol(currency),
+      symbol: getCurrencySymbol(),
       productSubtotal,
       sellerGroups,
     };
