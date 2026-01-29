@@ -106,13 +106,13 @@ const AdminProductView = () => {
     setIsLoading(true);
     try {
       const { data, error } = await supabase
-        .from('products')
+        .from('products_with_translations')
         .select('*')
         .eq('id', id)
         .single();
 
       if (error) throw error;
-      setProduct(data);
+      setProduct({ ...data, name: data.name || 'Untitled', description: data.description || '' } as any);
 
       // Fetch seller name
       if (data?.seller_id) {

@@ -162,7 +162,7 @@ const SellerAnalytics = () => {
 
         // Fetch products
         const { data: productsData } = await supabase
-          .from('products')
+          .from('products_with_translations')
           .select('id, name, quantity, low_stock_threshold, images, price_afn')
           .eq('seller_id', user.id);
 

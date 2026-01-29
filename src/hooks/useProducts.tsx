@@ -87,8 +87,9 @@ export const useProducts = (options: UseProductsOptions = {}) => {
         }
       }
 
+      // Use products_with_translations view for multilingual support
       let query = supabase
-        .from('products')
+        .from('products_with_translations')
         .select(`
           *,
           category:categories(id, name, slug, parent_id),

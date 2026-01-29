@@ -1226,14 +1226,12 @@ export type Database = {
           deal_end_at: string | null
           deal_start_at: string | null
           delivery_fee: number
-          description: string | null
           id: string
           images: string[] | null
           is_deal: boolean | null
           is_featured: boolean
           low_stock_threshold: number | null
           metadata: Json | null
-          name: string
           price_afn: number
           quantity: number
           rejection_reason: string | null
@@ -1254,14 +1252,12 @@ export type Database = {
           deal_end_at?: string | null
           deal_start_at?: string | null
           delivery_fee?: number
-          description?: string | null
           id?: string
           images?: string[] | null
           is_deal?: boolean | null
           is_featured?: boolean
           low_stock_threshold?: number | null
           metadata?: Json | null
-          name: string
           price_afn: number
           quantity?: number
           rejection_reason?: string | null
@@ -1282,14 +1278,12 @@ export type Database = {
           deal_end_at?: string | null
           deal_start_at?: string | null
           delivery_fee?: number
-          description?: string | null
           id?: string
           images?: string[] | null
           is_deal?: boolean | null
           is_featured?: boolean
           low_stock_threshold?: number | null
           metadata?: Json | null
-          name?: string
           price_afn?: number
           quantity?: number
           rejection_reason?: string | null

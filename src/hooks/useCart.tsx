@@ -58,7 +58,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           id,
           product_id,
           quantity,
-          products (
+          products:products_with_translations (
             id,
             name,
             slug,

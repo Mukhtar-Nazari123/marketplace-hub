@@ -37,15 +37,15 @@ const BestSellers = () => {
     setIsLoading(true);
     try {
       const { data, error } = await supabase
-        .from("products")
-        .select("id, name, price_afn, compare_price_afn, images, is_featured, created_at")
+        .from("products_with_translations")
+        .select("id, name, name_en, name_fa, name_ps, price_afn, compare_price_afn, images, is_featured, created_at")
         .eq("status", "active")
         .order("is_featured", { ascending: false })
         .order("created_at", { ascending: false })
         .limit(12);
 
       if (error) throw error;
-      setProducts((data as Product[]) || []);
+      setProducts((data || []).map(p => ({ ...p, name: p.name || 'Untitled' })) as Product[]);
     } catch (error) {
       console.error("Error fetching products:", error);
     } finally {

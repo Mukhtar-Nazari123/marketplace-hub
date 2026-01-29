@@ -39,15 +39,15 @@ const DiscoverProducts = () => {
 
     try {
       const { data, error } = await supabase
-        .from("products")
-        .select("id, name, price_afn, compare_price_afn, images, is_featured, created_at")
+        .from("products_with_translations")
+        .select("id, name, name_en, name_fa, name_ps, price_afn, compare_price_afn, images, is_featured, created_at")
         .eq("status", "active")
         .order("created_at", { ascending: false })
         .range(pageNum * PRODUCTS_PER_PAGE, (pageNum + 1) * PRODUCTS_PER_PAGE - 1);
 
       if (error) throw error;
 
-      const newProducts = (data as Product[]) || [];
+      const newProducts = ((data || []).map(p => ({ ...p, name: p.name || 'Untitled' }))) as Product[];
 
       // Shuffle products for random appearance
       const shuffled = [...newProducts].sort(() => Math.random() - 0.5);
