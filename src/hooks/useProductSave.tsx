@@ -35,7 +35,7 @@ export async function saveProduct(options: SaveProductOptions): Promise<SaveProd
       ? formData.name.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now() 
       : `draft-${Date.now()}`;
 
-    // 1. Save/Update core product data (NO name/description - those go to translations)
+    // 1. Save/Update core product data (NO name/description - those are in product_translations)
     const productData = {
       seller_id: userId,
       slug,
@@ -54,9 +54,6 @@ export async function saveProduct(options: SaveProductOptions): Promise<SaveProd
       },
       // Keep images array for backward compatibility during transition
       images: imageUrls,
-      // Store base name for admin notifications (will be overwritten by translations on display)
-      name: formData.name || 'Untitled',
-      description: formData.description || null,
     };
 
     let finalProductId = productId;
@@ -318,9 +315,9 @@ export async function loadProductWithTranslations(
   productId: string, 
   language: 'en' | 'fa' | 'ps' = 'en'
 ) {
-  // Fetch product
+  // Fetch product from view for translations
   const { data: product, error: productError } = await supabase
-    .from('products')
+    .from('products_with_translations')
     .select('*')
     .eq('id', productId)
     .single();

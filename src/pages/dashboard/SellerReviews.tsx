@@ -89,7 +89,7 @@ const SellerReviews = () => {
     try {
       // Get all products by this seller
       const { data: products } = await supabase
-        .from('products')
+        .from('products_with_translations')
         .select('id, name, slug, images')
         .eq('seller_id', user.id);
 

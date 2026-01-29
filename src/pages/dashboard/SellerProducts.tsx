@@ -119,13 +119,13 @@ const SellerProducts = () => {
 
     try {
       const { data, error } = await supabase
-        .from('products')
-        .select('id, name, slug, description, price, compare_at_price, currency, quantity, images, status, created_at, metadata')
+        .from('products_with_translations')
+        .select('id, name, slug, description, price_afn, compare_price_afn, quantity, images, status, created_at, metadata')
         .eq('seller_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setProducts((data as unknown as Product[]) || []);
+      setProducts((data || []).map(p => ({ ...p, name: p.name || 'Untitled' })) as unknown as Product[]);
     } catch (error) {
       console.error('Error fetching products:', error);
       toast.error(t('errorFetchingProducts'));

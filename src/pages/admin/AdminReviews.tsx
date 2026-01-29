@@ -100,10 +100,9 @@ const AdminReviews = () => {
         .select('user_id, full_name, avatar_url, email')
         .in('user_id', buyerIds);
 
-      // Fetch products
       const productIds = [...new Set(reviewsData.map(r => r.product_id))];
       const { data: products } = await supabase
-        .from('products')
+        .from('products_with_translations')
         .select('id, name, seller_id')
         .in('id', productIds);
 

@@ -103,9 +103,9 @@ const EditProduct = () => {
         subCategoryId: product.subcategory_id || '',
         subCategoryName: (metadata.subCategoryName as string) || '',
         // Use translation data if available, fallback to product data
-        name: translation?.name || product.name || '',
+        name: translation?.name || '',
         shortDescription: translation?.short_description || (metadata.shortDescription as string) || '',
-        description: translation?.description || product.description || '',
+        description: translation?.description || '',
         brand: brand || (metadata.brand as string) || '',
         attributes: attributes || (metadata.attributes as Record<string, string | boolean | string[]>) || {},
         images: [],

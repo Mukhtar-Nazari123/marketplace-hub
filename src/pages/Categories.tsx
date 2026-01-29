@@ -126,7 +126,7 @@ const Categories = () => {
       setProductsLoading(true);
       try {
         let query = supabase
-          .from("products")
+          .from("products_with_translations")
           .select(
             "id, name, slug, price_afn, compare_price_afn, images, category_id, quantity, is_featured, metadata",
           )

@@ -95,14 +95,15 @@ const AdminProducts = () => {
     setIsLoading(true);
     try {
       const { data, error } = await supabase
-        .from('products')
+        .from('products_with_translations')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      setProducts(data || []);
-      setFilteredProducts(data || []);
+      const mappedData = (data || []).map(p => ({ ...p, name: p.name || 'Untitled', description: p.description || '' })) as Product[];
+      setProducts(mappedData);
+      setFilteredProducts(mappedData);
     } catch (error) {
       console.error('Error fetching products:', error);
       toast.error(t.admin.products.loadError);

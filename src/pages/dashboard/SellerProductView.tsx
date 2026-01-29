@@ -68,7 +68,7 @@ const SellerProductView = () => {
   const fetchProduct = async () => {
     try {
       const { data, error } = await supabase
-        .from('products')
+        .from('products_with_translations')
         .select('*')
         .eq('id', id)
         .eq('seller_id', user?.id)

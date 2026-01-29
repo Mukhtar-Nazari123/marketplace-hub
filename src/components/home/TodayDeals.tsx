@@ -43,8 +43,8 @@ const TodayDeals = () => {
       const now = new Date().toISOString();
 
       const { data, error } = await supabase
-        .from("products")
-        .select("id, name, price_afn, compare_price_afn, images, created_at, is_deal, deal_start_at, deal_end_at")
+        .from("products_with_translations")
+        .select("id, name, name_en, name_fa, name_ps, price_afn, compare_price_afn, images, created_at, is_deal, deal_start_at, deal_end_at")
         .eq("status", "active")
         .eq("is_deal", true)
         .lte("deal_start_at", now)
@@ -53,7 +53,7 @@ const TodayDeals = () => {
         .limit(10);
 
       if (error) throw error;
-      setProducts((data as DealProduct[]) || []);
+      setProducts((data || []).map(p => ({ ...p, name: p.name || 'Untitled' })) as DealProduct[]);
     } catch (error) {
       console.error("Error fetching deal products:", error);
     } finally {

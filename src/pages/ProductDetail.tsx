@@ -114,7 +114,7 @@ const ProductDetail = () => {
           );
 
         let query = supabase
-          .from('products')
+          .from('products_with_translations')
           .select(
             `
             *,
@@ -145,7 +145,7 @@ const ProductDetail = () => {
         // Fetch related products
         if (data.category_id) {
           const { data: related } = await supabase
-            .from('products')
+            .from('products_with_translations')
             .select(`
               *,
               category:categories(id, name, name_fa, slug)

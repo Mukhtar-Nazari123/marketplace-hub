@@ -158,9 +158,9 @@ export function useTranslationCoverage() {
     queryFn: async () => {
       if (!user?.id) return [];
 
-      // Get all products for the seller
+      // Get all products for the seller with translations
       const { data: products, error: productsError } = await supabase
-        .from('products')
+        .from('products_with_translations')
         .select('id, name')
         .eq('seller_id', user.id)
         .order('created_at', { ascending: false });

@@ -73,15 +73,15 @@ const AdminDeals = () => {
     setIsLoading(true);
     try {
       const { data, error } = await supabase
-        .from('products')
+        .from('products_with_translations')
         .select('id, name, price_afn, status, images, is_deal, deal_start_at, deal_end_at')
         .eq('status', 'active')
         .order('is_deal', { ascending: false })
         .order('deal_end_at', { ascending: true, nullsFirst: false });
 
       if (error) throw error;
-      setProducts(data || []);
-      setFilteredProducts(data || []);
+      setProducts((data || []).map(p => ({ ...p, name: p.name || 'Untitled' })) as Product[]);
+      setFilteredProducts((data || []).map(p => ({ ...p, name: p.name || 'Untitled' })) as Product[]);
     } catch (error) {
       console.error('Error fetching products:', error);
       toast.error(getLabel(lang, 'Error loading products', 'خطا در بارگذاری محصولات', 'د محصولاتو په پورته کولو کې تېروتنه'));
