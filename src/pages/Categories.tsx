@@ -93,19 +93,31 @@ const Categories = () => {
       try {
         const imageMap = new Map<string, string>();
 
-        // Fetch one product per category
+        // Fetch one product per category using product_media
         for (const cat of rootCategories) {
-          const { data } = await supabase
+          // First get a product ID for this category
+          const { data: product } = await supabase
             .from("products")
-            .select("images")
+            .select("id")
             .eq("category_id", cat.id)
             .eq("status", "active")
-            .not("images", "is", null)
             .limit(1)
             .maybeSingle();
 
-          if (data?.images && data.images.length > 0) {
-            imageMap.set(cat.id, data.images[0]);
+          if (product?.id) {
+            // Then get the primary image from product_media
+            const { data: media } = await supabase
+              .from("product_media")
+              .select("url")
+              .eq("product_id", product.id)
+              .eq("media_type", "image")
+              .order("sort_order")
+              .limit(1)
+              .maybeSingle();
+
+            if (media?.url) {
+              imageMap.set(cat.id, media.url);
+            }
           }
         }
 
