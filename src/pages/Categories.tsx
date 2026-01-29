@@ -68,9 +68,17 @@ const Categories = () => {
 
   const ITEMS_PER_PAGE = 24;
 
-  const getLocalizedName = (item?: { name: string; name_fa?: string | null } | null) => {
+  const getLocalizedName = (item?: { name: string; name_fa?: string | null; name_ps?: string | null } | null) => {
     if (!item) return "";
-    return isRTL && item.name_fa ? item.name_fa : item.name;
+    if (language === 'ps') return item.name_ps || item.name_fa || item.name;
+    if (language === 'fa') return item.name_fa || item.name;
+    return item.name;
+  };
+
+  const getLabel = (en: string, fa: string, ps: string) => {
+    if (language === 'ps') return ps;
+    if (language === 'fa') return fa;
+    return en;
   };
 
   // Memoize subcategories to prevent infinite re-renders
@@ -284,7 +292,7 @@ const Categories = () => {
                 t.categories.allCategories}
             </h1>
             <p className="text-muted-foreground">
-              {filteredProducts.length} {isRTL ? "محصول" : "products"}
+              {filteredProducts.length} {getLabel('products', 'محصول', 'محصولات')}
             </p>
           </div>
         </div>
@@ -337,7 +345,7 @@ const Categories = () => {
               <div className="text-center py-12">
                 <Package className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
                 <p className="text-muted-foreground">
-                  {isRTL ? "هنوز دسته‌بندی‌ای وجود ندارد" : "No categories available yet"}
+                  {getLabel('No categories available yet', 'هنوز دسته‌بندی‌ای وجود ندارد', 'تر اوسه پورې هیڅ کټګوري نشته')}
                 </p>
               </div>
             )}
@@ -364,10 +372,10 @@ const Categories = () => {
               <Package className="h-12 w-12 text-muted-foreground" />
             </div>
             <h3 className="text-lg font-semibold text-foreground mb-2">
-              {isRTL ? "محصولی یافت نشد" : "No products found"}
+              {getLabel('No products found', 'محصولی یافت نشد', 'هیڅ محصول ونه موندل شو')}
             </h3>
             <p className="text-muted-foreground max-w-md">
-              {isRTL ? "محصولی در این دسته‌بندی موجود نیست." : "No products available in this category."}
+              {getLabel('No products available in this category.', 'محصولی در این دسته‌بندی موجود نیست.', 'پدې کټګوري کې هیڅ محصول شتون نلري.')}
             </p>
           </div>
         ) : (
@@ -451,7 +459,14 @@ const ProductCard = ({ product, getRating }: ProductCardProps) => {
 
   const getName = () => {
     if (typeof product.name === "string") return product.name;
+    if (language === 'ps') return (product.name as any).ps || product.name.fa || product.name.en;
     return product.name[language] || product.name.en;
+  };
+
+  const getLabel = (en: string, fa: string, ps: string) => {
+    if (language === 'ps') return ps;
+    if (language === 'fa') return fa;
+    return en;
   };
 
   const handleAddToCart = async (e: React.MouseEvent) => {
@@ -494,8 +509,8 @@ const ProductCard = ({ product, getRating }: ProductCardProps) => {
 
         {/* Badges */}
         <div className={`absolute top-2 ${isRTL ? "right-2" : "left-2"} flex flex-col gap-1`}>
-          {product.isNew && <Badge variant="new">{isRTL ? "جدید" : "New"}</Badge>}
-          {product.isHot && <Badge variant="hot">{isRTL ? "داغ" : "Hot"}</Badge>}
+          {product.isNew && <Badge variant="new">{getLabel('New', 'جدید', 'نوی')}</Badge>}
+          {product.isHot && <Badge variant="hot">{getLabel('Hot', 'داغ', 'ګرم')}</Badge>}
           {product.discount && product.discount > 0 && <Badge variant="sale">-{product.discount}%</Badge>}
         </div>
 
@@ -565,7 +580,7 @@ const ProductCard = ({ product, getRating }: ProductCardProps) => {
             disabled={isAddingToCart}
           >
             <ShoppingCart size={14} className={isAddingToCart ? "animate-pulse" : ""} />
-            {isRTL ? "افزودن" : "Add"}
+            {getLabel('Add', 'افزودن', 'اضافه کړئ')}
           </Button>
         </div>
       </div>
