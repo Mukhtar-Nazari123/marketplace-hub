@@ -50,10 +50,7 @@ export async function saveProduct(options: SaveProductOptions): Promise<SaveProd
       // Keep minimal metadata for non-translatable data
       metadata: {
         stockPerSize: formData.stockPerSize,
-        videoUrl, // Temporarily keep video URL in metadata until we fully migrate to product_media
       },
-      // Keep images array for backward compatibility during transition
-      images: imageUrls,
     };
 
     let finalProductId = productId;
