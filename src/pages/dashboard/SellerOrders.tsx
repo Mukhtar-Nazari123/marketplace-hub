@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { useLanguage } from '@/lib/i18n';
 import { formatCurrency } from '@/lib/currencyFormatter';
+import { useCurrencyRate } from '@/hooks/useCurrencyRate';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -151,6 +152,7 @@ const SellerOrders = () => {
   const { isRTL, language } = useLanguage();
   const { user } = useAuth();
   const { toast } = useToast();
+  const { convertToUSD, rate } = useCurrencyRate();
   const [orders, setOrders] = useState<SellerOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<SellerOrder | null>(null);
@@ -828,18 +830,27 @@ const SellerOrders = () => {
                                   </span>
                                 </div>
                                 <Separator />
-                                <div className="flex justify-between font-bold text-base">
-                                  <span>{t('total')}</span>
-                                  <span className="text-primary">
-                                    {hasMixedCurrency ? (
-                                      <>
-                                        {formatCurrency(usdTotal, 'USD', isRTL)} +{' '}
-                                        {formatCurrency(totalAfnWithDelivery, 'AFN', isRTL)}
-                                      </>
-                                    ) : (
-                                      formatCurrency(totalAfnWithDelivery, 'AFN', isRTL)
-                                    )}
-                                  </span>
+                                <div className="flex flex-col">
+                                  <div className="flex justify-between font-bold text-base">
+                                    <span>{t('total')}</span>
+                                    <span className="text-primary">
+                                      {hasMixedCurrency ? (
+                                        <>
+                                          {formatCurrency(usdTotal, 'USD', isRTL)} +{' '}
+                                          {formatCurrency(totalAfnWithDelivery, 'AFN', isRTL)}
+                                        </>
+                                      ) : (
+                                        formatCurrency(totalAfnWithDelivery, 'AFN', isRTL)
+                                      )}
+                                    </span>
+                                  </div>
+                                  {rate && totalAfnWithDelivery > 0 && (
+                                    <div className="flex justify-end">
+                                      <span className="text-xs text-muted-foreground">
+                                        ≈ ${convertToUSD(totalAfnWithDelivery).toFixed(2)} USD
+                                      </span>
+                                    </div>
+                                  )}
                                 </div>
                               </>
                             );
