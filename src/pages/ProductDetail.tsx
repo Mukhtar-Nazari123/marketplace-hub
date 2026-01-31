@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/lib/i18n';
 import { getCategoryName } from '@/lib/localizedContent';
+import { getLocalizedProductName, getLocalizedProductDescription, getLocalizedShortDescription } from '@/lib/localizedProduct';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useCart } from '@/hooks/useCart';
@@ -41,8 +42,17 @@ import {
 interface Product {
   id: string;
   name: string;
+  name_en?: string | null;
+  name_fa?: string | null;
+  name_ps?: string | null;
   slug: string;
   description: string | null;
+  description_en?: string | null;
+  description_fa?: string | null;
+  description_ps?: string | null;
+  short_description_en?: string | null;
+  short_description_fa?: string | null;
+  short_description_ps?: string | null;
   price_afn: number;
   compare_price_afn: number | null;
   images: string[] | null;
@@ -167,7 +177,7 @@ const ProductDetail = () => {
     };
 
     fetchProduct();
-  }, [productIdOrSlug]);
+  }, [productIdOrSlug, language]);
 
   const handleAddToCart = async () => {
     if (!user) {
@@ -277,6 +287,11 @@ const ProductDetail = () => {
   const currencySymbol = getCurrencySymbol();
   const isNew = new Date(product.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
   
+  // Localized content - resolved based on active language
+  const localizedName = getLocalizedProductName(product, language);
+  const localizedDescription = getLocalizedProductDescription(product, language);
+  const localizedShortDescription = getLocalizedShortDescription(product, language) || product.metadata?.shortDescription || '';
+  
   // Get specifications from metadata - can be either an object or within attributes
   const rawSpecifications = product.metadata?.specifications || {};
   const attributes = (product.metadata?.attributes as Record<string, unknown>) || {};
@@ -343,7 +358,7 @@ const ProductDetail = () => {
               </>
             )}
             {isRTL ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
-            <span className="text-primary">{product.name}</span>
+            <span className="text-primary">{localizedName}</span>
           </div>
         </div>
       </div>
@@ -366,7 +381,7 @@ const ProductDetail = () => {
               ) : (
                 <img
                   src={galleryItems[selectedImage]?.url || productImages[0]}
-                  alt={product.name}
+                  alt={localizedName}
                   className="w-full h-full object-cover"
                 />
               )}
@@ -420,13 +435,13 @@ const ProductDetail = () => {
           <div className="space-y-6">
             {/* Title */}
             <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-              {product.name}
+              {localizedName}
             </h1>
 
             {/* Short Description */}
-            {product.metadata?.shortDescription && (
+            {localizedShortDescription && (
               <p className="text-muted-foreground text-lg">
-                {product.metadata.shortDescription}
+                {localizedShortDescription}
               </p>
             )}
 
@@ -655,7 +670,7 @@ const ProductDetail = () => {
         {/* Tabs - default to specifications if no description but specs exist */}
         <Tabs 
           defaultValue={
-            !product.description && (Object.keys(specifications).length > 0 || technicalSpecsString)
+            !localizedDescription && (Object.keys(specifications).length > 0 || technicalSpecsString)
               ? "specifications"
               : "description"
           } 
@@ -686,8 +701,8 @@ const ProductDetail = () => {
 
           <TabsContent value="description" className="pt-6">
             <div className="prose prose-lg max-w-none text-muted-foreground">
-              {product.description ? (
-                <p className="leading-relaxed whitespace-pre-wrap">{product.description}</p>
+              {localizedDescription ? (
+                <p className="leading-relaxed whitespace-pre-wrap">{localizedDescription}</p>
               ) : (
                 <p className="italic">{isRTL ? 'توضیحاتی وارد نشده است' : 'No description available'}</p>
               )}
@@ -761,7 +776,7 @@ const ProductDetail = () => {
                   >
                     <ProductCard
                       id={p.id}
-                      name={p.name}
+                      name={getLocalizedProductName(p, language)}
                       price={currentPrice}
                       originalPrice={originalPrice}
                       rating={pRating}
