@@ -12,6 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/currencyFormatter';
+import { ProductContentDisplay } from '@/components/products/ProductContentDisplay';
 import {
   ArrowLeft,
   ArrowRight,
@@ -46,6 +47,16 @@ interface Product {
   updated_at: string;
   metadata: Record<string, unknown> | null;
   delivery_fee: number;
+  // Translation fields
+  name_en: string | null;
+  name_fa: string | null;
+  name_ps: string | null;
+  description_en: string | null;
+  description_fa: string | null;
+  description_ps: string | null;
+  short_description_en: string | null;
+  short_description_fa: string | null;
+  short_description_ps: string | null;
 }
 
 const SellerProductView = () => {
@@ -442,148 +453,8 @@ const SellerProductView = () => {
           </div>
         </div>
 
-        {/* Description */}
-        {product.description && (
-          <Card className="p-6">
-            <CardHeader className="p-0 pb-4">
-              <CardTitle className="text-base flex items-center gap-2">
-                <FileText className="h-4 w-4 text-muted-foreground" />
-                {isRTL ? 'توضیحات' : 'Description'}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-0">
-              <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
-                {product.description}
-              </p>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Specifications */}
-        {metadata.attributes && Object.keys(metadata.attributes as Record<string, unknown>).length > 0 && (
-          <Card className="overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b">
-              <CardTitle className="text-base flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-primary/10">
-                  <Settings className="h-4 w-4 text-primary" />
-                </div>
-                {isRTL ? 'مشخصات فنی' : 'Technical Specifications'}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6">
-              {(() => {
-                const attrs = metadata.attributes as Record<string, unknown>;
-                const hasWarranty = attrs.hasWarranty;
-                const warrantyDuration = attrs.warrantyDuration;
-                const hasWarrantyInfo = hasWarranty !== undefined || warrantyDuration;
-                
-                // Filter out warranty fields from other specs
-                const otherSpecs = Object.entries(attrs).filter(
-                  ([key]) => key !== 'hasWarranty' && key !== 'warrantyDuration'
-                );
-                const hasOtherSpecs = otherSpecs.some(([, value]) => value);
-
-                return (
-                  <div className="grid md:grid-cols-2 gap-6">
-                    {/* Specifications Card */}
-                    {hasOtherSpecs && (
-                      <div className="p-5 rounded-xl border bg-muted/30 hover:shadow-md transition-all duration-200">
-                        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
-                          <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
-                          {isRTL ? 'مشخصات' : 'Specifications'}
-                        </h4>
-                        <div className="space-y-2 text-sm text-foreground leading-relaxed">
-                          {otherSpecs.map(([key, value]) => {
-                            if (!value) return null;
-                            const formattedKey = key.replace(/([A-Z])/g, ' $1').trim();
-                            const displayValue = typeof value === 'boolean' 
-                              ? (value ? (isRTL ? 'بله' : 'Yes') : (isRTL ? 'خیر' : 'No'))
-                              : String(value);
-                            return (
-                              <div key={key} className="flex gap-2">
-                                <span className="font-medium capitalize">{formattedKey}:</span>
-                                <span>{displayValue}</span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Warranty Card */}
-                    {hasWarrantyInfo && (
-                      <div className="p-5 rounded-xl border bg-muted/30 hover:shadow-md transition-all duration-200">
-                        <div className="space-y-4">
-                          {/* Has Warranty */}
-                          <div>
-                            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
-                              <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-                              {isRTL ? 'گارانتی' : 'Has Warranty'}
-                            </h4>
-                            <span className={cn(
-                              "font-semibold text-lg",
-                              hasWarranty ? "text-green-600 dark:text-green-400" : "text-red-500"
-                            )}>
-                              {hasWarranty 
-                                ? (isRTL ? '✓ بله' : '✓ Yes') 
-                                : (isRTL ? '✗ خیر' : '✗ No')
-                              }
-                            </span>
-                          </div>
-
-                          {/* Warranty Duration */}
-                          {warrantyDuration && (
-                            <div className="pt-3 border-t border-border/50">
-                              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
-                                <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
-                                {isRTL ? 'مدت گارانتی' : 'Warranty Duration'}
-                              </h4>
-                              <span className="font-semibold text-lg text-foreground">
-                                {String(warrantyDuration)}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })()}
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Stock per Size (for clothing) */}
-        {metadata.stockPerSize && Object.keys(metadata.stockPerSize as Record<string, number>).length > 0 && (
-          <Card className="p-6">
-            <CardHeader className="p-0 pb-4">
-              <CardTitle className="text-base">
-                {isRTL ? 'موجودی بر اساس سایز' : 'Stock per Size'}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="flex flex-wrap gap-3">
-                {Object.entries(metadata.stockPerSize as Record<string, number>).map(([size, qty]) => (
-                  <div
-                    key={size}
-                    className={cn(
-                      "px-4 py-2 rounded-lg border text-center min-w-[80px]",
-                      qty > 0 ? "bg-success/10 border-success/30" : "bg-muted border-muted-foreground/20"
-                    )}
-                  >
-                    <p className="font-bold">{size}</p>
-                    <p className={cn(
-                      "text-sm",
-                      qty > 0 ? "text-success" : "text-muted-foreground"
-                    )}>
-                      {qty}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        {/* Product Content & Translations */}
+        <ProductContentDisplay product={product} />
 
         {/* Actions */}
         <div className={cn(
