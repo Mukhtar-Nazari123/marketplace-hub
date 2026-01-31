@@ -29,6 +29,7 @@ import {
   Star,
   X,
   Bell,
+  Check,
 } from 'lucide-react';
 import {
   AlertDialog,
@@ -40,6 +41,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useState, useEffect, useCallback } from 'react';
 
 interface MobileSidebarDrawerProps {
@@ -113,9 +120,12 @@ export const MobileSidebarDrawer = ({ open, onOpenChange }: MobileSidebarDrawerP
     navigate('/login');
   };
 
-  const toggleLanguage = () => {
-    setLanguage(language === 'fa' ? 'en' : 'fa');
-  };
+  const languages = [
+    { code: 'en' as const, label: 'English' },
+    { code: 'fa' as const, label: 'دری' },
+    { code: 'ps' as const, label: 'پښتو' },
+  ];
+  const currentLang = languages.find((l) => l.code === language) || languages[0];
 
   const isActive = (url: string) => {
     if (url === '/dashboard/admin' && role === 'admin') {
@@ -212,13 +222,26 @@ export const MobileSidebarDrawer = ({ open, onOpenChange }: MobileSidebarDrawerP
                 <Home className="h-5 w-5 shrink-0" />
                 <span>{isRTL ? 'صفحه اصلی' : 'Home'}</span>
               </button>
-              <button
-                onClick={toggleLanguage}
-                className="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium hover:bg-muted transition-colors min-h-[48px]"
-              >
-                <Globe className="h-5 w-5 shrink-0" />
-                <span>{language === 'fa' ? 'English' : 'دری'}</span>
-              </button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium hover:bg-muted transition-colors min-h-[48px]">
+                    <Globe className="h-5 w-5 shrink-0" />
+                    <span>{currentLang.label}</span>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align={isRTL ? 'end' : 'start'} className="min-w-[120px]">
+                  {languages.map((lang) => (
+                    <DropdownMenuItem
+                      key={lang.code}
+                      onClick={() => setLanguage(lang.code)}
+                      className="flex items-center justify-between cursor-pointer"
+                    >
+                      <span>{lang.label}</span>
+                      {language === lang.code && <Check className="h-4 w-4 text-primary" />}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </nav>
           </ScrollArea>
 

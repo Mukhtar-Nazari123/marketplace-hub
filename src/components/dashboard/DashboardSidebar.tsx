@@ -15,7 +15,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import {
-  LayoutDashboard, Users, Package, ShoppingCart, BadgeCheck, Image, Tag, FileText, Settings, LogOut, Store, Globe, User, MapPin, Heart, CreditCard, BarChart3, Plus, Home, Star, Bell, Languages,
+  LayoutDashboard, Users, Package, ShoppingCart, BadgeCheck, Image, Tag, FileText, Settings, LogOut, Store, Globe, User, MapPin, Heart, CreditCard, BarChart3, Plus, Home, Star, Bell, Languages, Check,
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -24,6 +24,12 @@ import { useNotifications } from '@/hooks/useNotifications';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useState } from 'react';
 
 export const DashboardSidebar = () => {
@@ -93,7 +99,12 @@ export const DashboardSidebar = () => {
   ];
 
   const handleLogout = async () => { await signOut(); navigate('/login'); };
-  const toggleLanguage = () => { setLanguage(language === 'fa' ? 'en' : 'fa'); };
+  const languages = [
+    { code: 'en' as const, label: 'English' },
+    { code: 'fa' as const, label: 'دری' },
+    { code: 'ps' as const, label: 'پښتو' },
+  ];
+  const currentLang = languages.find((l) => l.code === language) || languages[0];
   const isActive = (url: string) => {
     if (url === '/dashboard/admin' && role === 'admin') return location.pathname === '/dashboard/admin';
     return location.pathname.startsWith(url);
@@ -166,10 +177,26 @@ export const DashboardSidebar = () => {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton onClick={toggleLanguage} tooltip={language === 'en' ? 'دری' : 'English'}>
-                  <Globe className="shrink-0 text-muted-foreground" />
-                  {!isCollapsed && <span>{language === 'en' ? 'دری' : 'English'}</span>}
-                </SidebarMenuButton>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <SidebarMenuButton tooltip={getLabel('Language', 'زبان', 'ژبه')}>
+                      <Globe className="shrink-0 text-muted-foreground" />
+                      {!isCollapsed && <span>{currentLang.label}</span>}
+                    </SidebarMenuButton>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align={isRTL ? 'end' : 'start'} className="min-w-[120px]">
+                    {languages.map((lang) => (
+                      <DropdownMenuItem
+                        key={lang.code}
+                        onClick={() => setLanguage(lang.code)}
+                        className="flex items-center justify-between cursor-pointer"
+                      >
+                        <span>{lang.label}</span>
+                        {language === lang.code && <Check className="h-4 w-4 text-primary" />}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
