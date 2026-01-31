@@ -10,6 +10,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 import CompactRating from "@/components/ui/CompactRating";
 import DealCountdown from "./DealCountdown";
+import { useCurrencyRate } from "@/hooks/useCurrencyRate";
 
 interface ProductCardProps {
   id: string;
@@ -61,10 +62,14 @@ const ProductCard = ({
   const { addToCart } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { user, role } = useAuth();
+  const { convertToUSD, rate } = useCurrencyRate();
 
   const isWishlisted = isInWishlist(id);
   const isBuyer = role === 'buyer';
-  const currencySymbol = currency === 'USD' ? '$' : (isRTL ? 'افغانی' : 'AFN');
+  const currencySymbol = isRTL ? 'افغانی' : 'AFN';
+  
+  // Calculate USD equivalent
+  const usdPrice = rate ? convertToUSD(price) : null;
 
   // Show countdown if deal is active with valid end time
   const showDealCountdown = isDeal && dealEndAt;
@@ -175,13 +180,21 @@ const ProductCard = ({
       {/* Content */}
       <div className="p-1 md:p-2 flex flex-col flex-grow">
         {/* Price - Primary visual element */}
-        <div className="flex items-baseline gap-1.5 flex-shrink-0 mb-1.5">
-          <span className="text-base sm:text-lg md:text-xl font-bold text-primary truncate">
-            {formatPrice(price)} {currencySymbol}
-          </span>
-          {originalPrice && (
-            <span className="text-[10px] sm:text-xs text-muted-foreground line-through truncate">
-              {formatPrice(originalPrice)}
+        <div className="flex flex-col flex-shrink-0 mb-1.5">
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-base sm:text-lg md:text-xl font-bold text-primary truncate">
+              {formatPrice(price)} {currencySymbol}
+            </span>
+            {originalPrice && (
+              <span className="text-[10px] sm:text-xs text-muted-foreground line-through truncate">
+                {formatPrice(originalPrice)}
+              </span>
+            )}
+          </div>
+          {/* USD Equivalent */}
+          {usdPrice !== null && (
+            <span className="text-[10px] sm:text-xs text-muted-foreground">
+              ≈ ${usdPrice.toFixed(2)} USD
             </span>
           )}
         </div>
