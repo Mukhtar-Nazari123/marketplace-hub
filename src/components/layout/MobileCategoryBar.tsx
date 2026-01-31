@@ -44,7 +44,7 @@ const MobileCategoryBar = () => {
               to={`/categories?category=${category.slug}`}
               className="flex-shrink-0 px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors border-b-2 border-transparent hover:border-primary/50"
             >
-              {isRTL && category.name_fa ? category.name_fa : category.name}
+              {category.name}
             </Link>
           ))}
           </div>

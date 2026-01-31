@@ -1,7 +1,9 @@
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useLanguage, Language } from '@/lib/i18n';
 
-export interface Subcategory {
+// Raw database types (before localization)
+interface RawSubcategory {
   id: string;
   name: string;
   name_fa: string | null;
@@ -15,11 +17,36 @@ export interface Subcategory {
   created_at: string;
 }
 
-export interface Category {
+interface RawCategory {
   id: string;
   name: string;
-  name_fa?: string | null;
-  name_ps?: string | null;
+  name_fa: string | null;
+  name_ps: string | null;
+  slug: string;
+  description: string | null;
+  image_url: string | null;
+  parent_id: string | null;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+}
+
+// Localized types (returned to components - ready to render)
+export interface Subcategory {
+  id: string;
+  name: string; // Already localized based on active language
+  slug: string;
+  description: string | null;
+  image_url: string | null;
+  category_id: string;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+}
+
+export interface Category {
+  id: string;
+  name: string; // Already localized based on active language
   slug: string;
   description: string | null;
   image_url: string | null;
@@ -44,11 +71,26 @@ interface CategoriesContextType {
 
 const CategoriesContext = createContext<CategoriesContextType | undefined>(undefined);
 
+// Helper function to resolve localized name with fallback chain: ps -> fa -> en
+const resolveLocalizedName = (
+  item: { name: string; name_fa: string | null; name_ps: string | null },
+  language: Language
+): string => {
+  if (language === 'ps') {
+    return item.name_ps || item.name_fa || item.name;
+  }
+  if (language === 'fa') {
+    return item.name_fa || item.name;
+  }
+  return item.name;
+};
+
 export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
+  const [rawCategories, setRawCategories] = useState<RawCategory[]>([]);
+  const [rawSubcategories, setRawSubcategories] = useState<RawSubcategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { language } = useLanguage();
 
   const fetchCategories = useCallback(async () => {
     setLoading(true);
@@ -73,24 +115,8 @@ export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
       if (categoriesResult.error) throw categoriesResult.error;
       if (subcategoriesResult.error) throw subcategoriesResult.error;
 
-      const cats = (categoriesResult.data || []) as Category[];
-      const subs = (subcategoriesResult.data || []) as Subcategory[];
-
-      // Map subcategories to their parent categories
-      const subsByCategory = new Map<string, Subcategory[]>();
-      subs.forEach((sub) => {
-        const existing = subsByCategory.get(sub.category_id) || [];
-        existing.push(sub);
-        subsByCategory.set(sub.category_id, existing);
-      });
-
-      // Attach subcategories to categories
-      cats.forEach((cat) => {
-        cat.subcategories = subsByCategory.get(cat.id) || [];
-      });
-
-      setCategories(cats);
-      setSubcategories(subs);
+      setRawCategories((categoriesResult.data || []) as RawCategory[]);
+      setRawSubcategories((subcategoriesResult.data || []) as RawSubcategory[]);
     } catch (err) {
       console.error('Error fetching categories:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch categories');
@@ -102,6 +128,46 @@ export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     fetchCategories();
   }, [fetchCategories]);
+
+  // Memoized localized data - transforms raw data based on current language
+  const { categories, subcategories } = useMemo(() => {
+    // Transform subcategories with localized names
+    const localizedSubcategories: Subcategory[] = rawSubcategories.map((sub) => ({
+      id: sub.id,
+      name: resolveLocalizedName(sub, language),
+      slug: sub.slug,
+      description: sub.description,
+      image_url: sub.image_url,
+      category_id: sub.category_id,
+      is_active: sub.is_active,
+      sort_order: sub.sort_order,
+      created_at: sub.created_at,
+    }));
+
+    // Group subcategories by category_id
+    const subsByCategory = new Map<string, Subcategory[]>();
+    localizedSubcategories.forEach((sub) => {
+      const existing = subsByCategory.get(sub.category_id) || [];
+      existing.push(sub);
+      subsByCategory.set(sub.category_id, existing);
+    });
+
+    // Transform categories with localized names and attach subcategories
+    const localizedCategories: Category[] = rawCategories.map((cat) => ({
+      id: cat.id,
+      name: resolveLocalizedName(cat, language),
+      slug: cat.slug,
+      description: cat.description,
+      image_url: cat.image_url,
+      parent_id: cat.parent_id,
+      is_active: cat.is_active,
+      sort_order: cat.sort_order,
+      created_at: cat.created_at,
+      subcategories: subsByCategory.get(cat.id) || [],
+    }));
+
+    return { categories: localizedCategories, subcategories: localizedSubcategories };
+  }, [rawCategories, rawSubcategories, language]);
 
   const getCategoryBySlug = (slug: string) => {
     return categories.find(cat => cat.slug === slug);

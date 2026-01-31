@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/lib/i18n';
+import { getCategoryName } from '@/lib/localizedContent';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useCart } from '@/hooks/useCart';
@@ -65,6 +66,7 @@ interface Product {
     id: string;
     name: string;
     name_fa?: string | null;
+    name_ps?: string | null;
     slug: string;
   } | null;
   seller?: {
@@ -336,7 +338,7 @@ const ProductDetail = () => {
                   to={`/products?category=${product.category.slug}`} 
                   className="text-muted-foreground hover:text-primary"
                 >
-                  {isRTL && product.category.name_fa ? product.category.name_fa : product.category.name}
+                  {getCategoryName(product.category, language)}
                 </Link>
               </>
             )}
@@ -543,7 +545,7 @@ const ProductDetail = () => {
                     to={`/products?category=${product.category.slug}`}
                     className="text-primary hover:underline"
                   >
-                    {isRTL && product.category.name_fa ? product.category.name_fa : product.category.name}
+                    {getCategoryName(product.category, language)}
                   </Link>
                 </div>
               )}

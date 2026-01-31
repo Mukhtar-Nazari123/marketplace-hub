@@ -142,7 +142,7 @@ const CategoryRow = ({ category, isRTL, t }: CategoryRowProps) => {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <h3 className="font-display font-bold text-xl text-foreground">
-            {isRTL && category.name_fa ? category.name_fa : category.name}
+            {category.name}
           </h3>
           <Link
             to={`/products?category=${category.slug}`}

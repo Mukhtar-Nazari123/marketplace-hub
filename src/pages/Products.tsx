@@ -154,8 +154,7 @@ const Products = () => {
     if (categorySlug) {
       const category = rootCategories.find((c) => c.slug === categorySlug);
       if (category) {
-        if (language === 'ps') return category.name_ps || category.name_fa || category.name;
-        if (language === 'fa') return category.name_fa || category.name;
+        // Category name is already localized by useCategories hook
         return category.name;
       }
       return getLabel('All Products', 'همه محصولات', 'ټول محصولات');
