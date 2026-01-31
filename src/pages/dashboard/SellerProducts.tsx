@@ -84,6 +84,10 @@ interface Product {
   status: string;
   created_at: string;
   metadata: Record<string, unknown> | null;
+  category_id: string | null;
+  subcategory_id: string | null;
+  categories: { name: string; name_fa: string | null; name_ps: string | null } | null;
+  subcategories: { name: string; name_fa: string | null; name_ps: string | null } | null;
 }
 
 const SellerProducts = () => {
@@ -119,7 +123,11 @@ const SellerProducts = () => {
     try {
       const { data, error } = await supabase
         .from('products_with_translations')
-        .select('id, name, slug, description, price_afn, compare_price_afn, quantity, images, status, created_at, metadata')
+        .select(`
+          id, name, slug, description, price_afn, compare_price_afn, quantity, images, status, created_at, metadata, category_id, subcategory_id,
+          categories:category_id(name, name_fa, name_ps),
+          subcategories:subcategory_id(name, name_fa, name_ps)
+        `)
         .eq('seller_id', user.id)
         .order('created_at', { ascending: false });
 
@@ -326,10 +334,16 @@ const SellerProducts = () => {
                 <CardContent className="p-4">
                   <div className="space-y-2">
                     {/* Category */}
-                    {product.metadata && (product.metadata as Record<string, unknown>).categoryName && (
+                    {product.categories && (
                       <p className="text-xs text-muted-foreground truncate">
-                        {(product.metadata as Record<string, unknown>).categoryName as string}
-                        {(product.metadata as Record<string, unknown>).subCategoryName && ` / ${(product.metadata as Record<string, unknown>).subCategoryName}`}
+                        {lang === 'fa' ? (product.categories.name_fa || product.categories.name) 
+                          : lang === 'ps' ? (product.categories.name_ps || product.categories.name_fa || product.categories.name)
+                          : product.categories.name}
+                        {product.subcategories && ` / ${
+                          lang === 'fa' ? (product.subcategories.name_fa || product.subcategories.name) 
+                            : lang === 'ps' ? (product.subcategories.name_ps || product.subcategories.name_fa || product.subcategories.name)
+                            : product.subcategories.name
+                        }`}
                       </p>
                     )}
                     
