@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/lib/i18n';
 import { useCart } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
+import { useCurrencyRate } from '@/hooks/useCurrencyRate';
 import Header from '@/components/layout/Header';
 import Navigation from '@/components/layout/Navigation';
 import Footer from '@/components/layout/Footer';
@@ -30,6 +31,7 @@ const Cart = () => {
   const { t, isRTL } = useLanguage();
   const { items, loading, removeFromCart, updateQuantity, clearCart } = useCart();
   const { user, role, loading: authLoading } = useAuth();
+  const { convertToUSD, rate } = useCurrencyRate();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -385,15 +387,29 @@ const Cart = () => {
                   {/* Order totals */}
                   <div className="space-y-2">
                     <p className="text-sm font-medium">{texts.orderTotal}</p>
-                    {currencyTotals.map((currencyData) => (
-                      <div key={currencyData.currency} className="flex justify-between font-bold">
-                        <span>{currencyData.currency}</span>
-                        <span className="text-primary">
-                          {currencyData.productSubtotal.toLocaleString()} {currencyData.symbol}
-                        </span>
-                      </div>
-                    ))}
-                    {totalDeliveryFeeAFN > 0 && (
+                    {currencyTotals.map((currencyData) => {
+                      const totalWithDelivery = currencyData.productSubtotal + (currencyData.currency === 'AFN' ? totalDeliveryFeeAFN : 0);
+                      const usdEquivalent = rate ? convertToUSD(totalWithDelivery) : null;
+                      
+                      return (
+                        <div key={currencyData.currency} className="space-y-1">
+                          <div className="flex justify-between font-bold">
+                            <span>{currencyData.currency}</span>
+                            <span className="text-primary">
+                              {totalWithDelivery.toLocaleString()} {currencyData.symbol}
+                            </span>
+                          </div>
+                          {usdEquivalent !== null && (
+                            <div className="flex justify-end">
+                              <span className="text-sm text-muted-foreground">
+                                ≈ ${usdEquivalent.toFixed(2)} USD
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                    {totalDeliveryFeeAFN > 0 && currencyTotals.every(c => c.currency !== 'AFN') && (
                       <div className="flex justify-between text-sm text-muted-foreground">
                         <span>+ {texts.shipping}</span>
                         <span>{totalDeliveryFeeAFN.toLocaleString()} {afnSymbol}</span>

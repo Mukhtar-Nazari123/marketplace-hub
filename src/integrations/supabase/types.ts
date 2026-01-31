@@ -714,6 +714,39 @@ export type Database = {
         }
         Relationships: []
       }
+      currency_rates: {
+        Row: {
+          base_currency: string
+          created_at: string
+          exchange_rate: number
+          id: string
+          is_active: boolean
+          target_currency: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          base_currency?: string
+          created_at?: string
+          exchange_rate: number
+          id?: string
+          is_active?: boolean
+          target_currency?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          base_currency?: string
+          created_at?: string
+          exchange_rate?: number
+          id?: string
+          is_active?: boolean
+          target_currency?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       hero_banners: {
         Row: {
           background_color: string | null

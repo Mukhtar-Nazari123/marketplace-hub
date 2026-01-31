@@ -37,6 +37,7 @@ import {
   Bell,
   Check,
   Languages,
+  Coins,
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -101,6 +102,7 @@ export const AdminSidebar = () => {
   ];
 
   const settingsNavItems = [
+    { title: getLabel(lang, 'Currency', 'نرخ ارز', 'د اسعارو نرخ'), icon: Coins, url: '/dashboard/currency' },
     { title: getLabel(lang, 'Social Links', 'لینک‌های اجتماعی', 'ټولنیز لینکونه'), icon: Share2, url: '/dashboard/social-links' },
     { title: getLabel(lang, 'Contact Settings', 'تنظیمات تماس', 'د اړیکو تنظیمات'), icon: MessageSquare, url: '/dashboard/contact-settings' },
     { title: getLabel(lang, 'Settings', 'تنظیمات', 'ترتیبات'), icon: Settings, url: '/dashboard/settings' },

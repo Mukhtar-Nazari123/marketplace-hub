@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useCart } from '@/hooks/useCart';
 import { useWishlist } from '@/hooks/useWishlist';
 import { useProductRating, useProductRatings } from '@/hooks/useProductRatings';
+import { useCurrencyRate } from '@/hooks/useCurrencyRate';
 import Header from '@/components/layout/Header';
 import Navigation from '@/components/layout/Navigation';
 import Footer from '@/components/layout/Footer';
@@ -104,6 +105,9 @@ const ProductDetail = () => {
 
   // Fetch product rating
   const { averageRating, reviewCount, refetch: refetchRating } = useProductRating(product?.id || '');
+  
+  // Currency conversion
+  const { convertToUSD, rate } = useCurrencyRate();
   
   // Fetch related products ratings
   const relatedProductIds = useMemo(() => relatedProducts.map(p => p.id), [relatedProducts]);
@@ -451,7 +455,7 @@ const ProductDetail = () => {
             </div>
 
             {/* Price */}
-            <div className="flex items-center gap-4 flex-wrap">
+            <div className="flex flex-col gap-2">
               {(() => {
                 const currentPrice = product.price_afn;
                 const comparePrice = product.compare_price_afn;
@@ -459,24 +463,33 @@ const ProductDetail = () => {
                 const originalPrice = hasDiscount ? Math.max(currentPrice, comparePrice) : null;
                 const discountedPrice = hasDiscount ? Math.min(currentPrice, comparePrice) : currentPrice;
                 const discountPercent = originalPrice ? Math.round(((originalPrice - discountedPrice) / originalPrice) * 100) : 0;
+                const usdPrice = rate ? convertToUSD(discountedPrice) : null;
                 
                 return (
                   <>
-                    {originalPrice && (
-                      <span className="text-xl text-muted-foreground line-through">
-                        {originalPrice.toLocaleString()} {getProductCurrency()}
+                    <div className="flex items-center gap-4 flex-wrap">
+                      {originalPrice && (
+                        <span className="text-xl text-muted-foreground line-through">
+                          {originalPrice.toLocaleString()} {getProductCurrency()}
+                        </span>
+                      )}
+                      <span className="text-3xl font-bold text-primary">
+                        {discountedPrice.toLocaleString()} {getProductCurrency()}
                       </span>
-                    )}
-                    <span className="text-3xl font-bold text-primary">
-                      {discountedPrice.toLocaleString()} {getProductCurrency()}
-                    </span>
-                    <Badge variant="outline" className="text-sm">
-                      {getProductCurrency()}
-                    </Badge>
-                    {discountPercent > 0 && (
-                      <Badge variant="destructive" className="text-sm">
-                        {isRTL ? `${discountPercent}% تخفیف` : `${discountPercent}% OFF`}
+                      <Badge variant="outline" className="text-sm">
+                        {getProductCurrency()}
                       </Badge>
+                      {discountPercent > 0 && (
+                        <Badge variant="destructive" className="text-sm">
+                          {isRTL ? `${discountPercent}% تخفیف` : `${discountPercent}% OFF`}
+                        </Badge>
+                      )}
+                    </div>
+                    {/* USD Equivalent */}
+                    {usdPrice !== null && (
+                      <span className="text-sm text-muted-foreground">
+                        ≈ ${usdPrice.toFixed(2)} USD
+                      </span>
                     )}
                   </>
                 );
