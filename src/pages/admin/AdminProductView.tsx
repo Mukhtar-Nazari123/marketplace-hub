@@ -49,6 +49,12 @@ const getLabel = (lang: Language, en: string, fa: string, ps: string) => {
 };
 import { Json } from '@/integrations/supabase/types';
 
+interface ProductAttribute {
+  attribute_key: string;
+  attribute_value: string;
+  language_code: string | null;
+}
+
 interface ProductMetadata {
   shortDescription?: string;
   brand?: string;
@@ -101,6 +107,7 @@ const AdminProductView = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
+  const [attributes, setAttributes] = useState<ProductAttribute[]>([]);
   const [sellerName, setSellerName] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -116,21 +123,30 @@ const AdminProductView = () => {
     
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('products_with_translations')
-        .select('*')
-        .eq('id', id)
-        .single();
+      // Fetch product and attributes in parallel
+      const [productResult, attributesResult] = await Promise.all([
+        supabase
+          .from('products_with_translations')
+          .select('*')
+          .eq('id', id)
+          .single(),
+        supabase
+          .from('product_attributes')
+          .select('attribute_key, attribute_value, language_code')
+          .eq('product_id', id)
+          .order('sort_order')
+      ]);
 
-      if (error) throw error;
-      setProduct({ ...data, name: data.name || 'Untitled', description: data.description || '' } as any);
+      if (productResult.error) throw productResult.error;
+      setProduct({ ...productResult.data, name: productResult.data.name || 'Untitled', description: productResult.data.description || '' } as any);
+      setAttributes(attributesResult.data || []);
 
       // Fetch seller name
-      if (data?.seller_id) {
+      if (productResult.data?.seller_id) {
         const { data: profileData } = await supabase
           .from('profiles')
           .select('full_name')
-          .eq('user_id', data.seller_id)
+          .eq('user_id', productResult.data.seller_id)
           .single();
 
         if (profileData) {
@@ -556,7 +572,7 @@ const AdminProductView = () => {
             </Card>
 
             {/* Product Content & Translations */}
-            <ProductContentDisplay product={product as any} />
+            <ProductContentDisplay product={product as any} attributes={attributes} />
           </div>
         </div>
       </div>

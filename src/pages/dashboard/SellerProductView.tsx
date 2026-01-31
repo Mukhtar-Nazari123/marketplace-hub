@@ -32,6 +32,12 @@ import {
   Settings,
 } from 'lucide-react';
 
+interface ProductAttribute {
+  attribute_key: string;
+  attribute_value: string;
+  language_code: string | null;
+}
+
 interface Product {
   id: string;
   name: string;
@@ -66,6 +72,7 @@ const SellerProductView = () => {
   const navigate = useNavigate();
 
   const [product, setProduct] = useState<Product | null>(null);
+  const [attributes, setAttributes] = useState<ProductAttribute[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -77,22 +84,31 @@ const SellerProductView = () => {
 
   const fetchProduct = async () => {
     try {
-      const { data, error } = await supabase
-        .from('products_with_translations')
-        .select('*')
-        .eq('id', id)
-        .eq('seller_id', user?.id)
-        .single();
+      // Fetch product and attributes in parallel
+      const [productResult, attributesResult] = await Promise.all([
+        supabase
+          .from('products_with_translations')
+          .select('*')
+          .eq('id', id)
+          .eq('seller_id', user?.id)
+          .single(),
+        supabase
+          .from('product_attributes')
+          .select('attribute_key, attribute_value, language_code')
+          .eq('product_id', id!)
+          .order('sort_order')
+      ]);
 
-      if (error) throw error;
+      if (productResult.error) throw productResult.error;
 
-      if (!data) {
+      if (!productResult.data) {
         toast.error(isRTL ? 'محصول یافت نشد' : 'Product not found');
         navigate('/dashboard/seller/products');
         return;
       }
 
-      setProduct(data as unknown as Product);
+      setProduct(productResult.data as unknown as Product);
+      setAttributes(attributesResult.data || []);
     } catch (error) {
       console.error('Error fetching product:', error);
       toast.error(isRTL ? 'خطا در دریافت محصول' : 'Error fetching product');
@@ -454,7 +470,7 @@ const SellerProductView = () => {
         </div>
 
         {/* Product Content & Translations */}
-        <ProductContentDisplay product={product} />
+        <ProductContentDisplay product={product} attributes={attributes} />
 
         {/* Actions */}
         <div className={cn(

@@ -39,17 +39,42 @@ interface ProductMetadata {
   warrantyDuration?: string;
 }
 
+interface ProductAttribute {
+  attribute_key: string;
+  attribute_value: string;
+  language_code: string | null;
+}
+
 interface ProductContentDisplayProps {
   product: ProductTranslations & {
     metadata?: ProductMetadata | Record<string, unknown> | null;
   };
+  attributes?: ProductAttribute[];
   className?: string;
 }
 
-export const ProductContentDisplay = ({ product, className }: ProductContentDisplayProps) => {
+export const ProductContentDisplay = ({ product, attributes = [], className }: ProductContentDisplayProps) => {
   const { isRTL, language } = useLanguage();
   
   const metadata = (product.metadata || {}) as ProductMetadata;
+
+  // Convert attributes array to grouped object by language
+  const attributesByLang = attributes.reduce((acc, attr) => {
+    const lang = attr.language_code || 'universal';
+    if (!acc[lang]) acc[lang] = {};
+    acc[lang][attr.attribute_key] = attr.attribute_value;
+    return acc;
+  }, {} as Record<string, Record<string, string>>);
+
+  // Get merged attributes (universal + language-specific)
+  const getAttributesForLang = (lang: string) => {
+    return { ...(attributesByLang.universal || {}), ...(attributesByLang[lang] || {}) };
+  };
+
+  const universalAttrs = attributesByLang.universal || {};
+  const enAttrs = getAttributesForLang('en');
+  const faAttrs = getAttributesForLang('fa');
+  const psAttrs = getAttributesForLang('ps');
 
   // Check translation completeness
   const hasEnglish = !!(product.name_en || product.description_en || product.short_description_en);
@@ -129,14 +154,19 @@ export const ProductContentDisplay = ({ product, className }: ProductContentDisp
     );
   };
 
-  // Attributes/Specifications
-  const attributes = metadata.attributes || {};
-  const hasWarranty = metadata.hasWarranty || attributes.hasWarranty;
-  const warrantyDuration = metadata.warrantyDuration || attributes.warrantyDuration;
+  // Get brand from attributes or metadata
+  const brand = universalAttrs.brand || enAttrs.brand || metadata.brand;
   
-  // Filter out warranty fields from other specs
-  const otherSpecs = Object.entries(attributes).filter(
-    ([key]) => key !== 'hasWarranty' && key !== 'warrantyDuration'
+  // Get warranty info from attributes  
+  const hasWarranty = enAttrs.hasWarranty === 'true' || universalAttrs.hasWarranty === 'true' || metadata.hasWarranty;
+  const warrantyDuration = enAttrs.warrantyDuration || universalAttrs.warrantyDuration || metadata.warrantyDuration;
+  
+  // Filter out warranty and brand fields from specs display
+  const excludedKeys = ['hasWarranty', 'warrantyDuration', 'brand'];
+  const currentLangAttrs = language === 'fa' ? faAttrs : language === 'ps' ? psAttrs : enAttrs;
+  
+  const otherSpecs = Object.entries(currentLangAttrs).filter(
+    ([key]) => !excludedKeys.includes(key)
   );
   const hasOtherSpecs = otherSpecs.some(([, value]) => value !== undefined && value !== '' && value !== null);
 
@@ -223,7 +253,7 @@ export const ProductContentDisplay = ({ product, className }: ProductContentDisp
       </Card>
 
       {/* Brand */}
-      {metadata.brand && (
+      {brand && (
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-2">
             <Tag className="h-4 w-4 text-primary" />
@@ -231,12 +261,12 @@ export const ProductContentDisplay = ({ product, className }: ProductContentDisp
               {isRTL ? 'برند' : 'Brand'}
             </span>
           </div>
-          <p className="text-lg font-semibold">{metadata.brand}</p>
+          <p className="text-lg font-semibold">{brand}</p>
         </Card>
       )}
 
       {/* Technical Specifications */}
-      {(hasOtherSpecs || hasWarranty !== undefined) && (
+      {(hasOtherSpecs || hasWarranty) && (
         <Card className="overflow-hidden">
           <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b pb-3">
             <CardTitle className="text-base flex items-center gap-2">
@@ -255,17 +285,12 @@ export const ProductContentDisplay = ({ product, className }: ProductContentDisp
                   </h4>
                   <div className="space-y-2 text-sm">
                     {otherSpecs.map(([key, value]) => {
-                      if (!value && value !== false) return null;
+                      if (!value) return null;
                       const formattedKey = key.replace(/([A-Z])/g, ' $1').trim();
-                      const displayValue = typeof value === 'boolean' 
-                        ? (value ? (isRTL ? 'بله' : 'Yes') : (isRTL ? 'خیر' : 'No'))
-                        : Array.isArray(value) 
-                          ? value.join(', ')
-                          : String(value);
                       return (
                         <div key={key} className="flex gap-2 justify-between">
                           <span className="font-medium capitalize text-muted-foreground">{formattedKey}:</span>
-                          <span className="font-semibold">{displayValue}</span>
+                          <span className="font-semibold text-end flex-1">{value}</span>
                         </div>
                       );
                     })}
@@ -274,7 +299,7 @@ export const ProductContentDisplay = ({ product, className }: ProductContentDisp
               )}
 
               {/* Warranty */}
-              {hasWarranty !== undefined && (
+              {hasWarranty && (
                 <div className="p-4 rounded-lg border bg-muted/30">
                   <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
                     <ShieldCheck className="h-3.5 w-3.5 text-success" />
