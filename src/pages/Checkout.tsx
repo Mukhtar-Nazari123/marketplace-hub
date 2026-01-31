@@ -870,18 +870,25 @@ const Checkout = () => {
                         </span>
                       </div>
                       <Separator />
-                      {currencyBreakdowns.map((cb) => (
-                        <div key={cb.currency} className="flex justify-between text-lg font-bold">
-                          <span>{isRTL ? 'جمع' : 'Total'} ({cb.currency}):</span>
-                          <span className="text-primary">{cb.productSubtotal.toLocaleString()} {cb.symbol}</span>
-                        </div>
-                      ))}
-                      {deliveryBreakdown.totalDeliveryAFN > 0 && (
-                        <div className="flex justify-between text-sm text-muted-foreground">
-                          <span>+ {t.checkout.orderSummary.deliveryFee}:</span>
-                          <span>{deliveryBreakdown.totalDeliveryAFN.toLocaleString()} {afnSymbol}</span>
-                        </div>
-                      )}
+                      {/* Grand Total (Products + Delivery) */}
+                      {(() => {
+                        const afnBreakdown = currencyBreakdowns.find(cb => cb.currency === 'AFN');
+                        const grandTotalAFN = (afnBreakdown?.productSubtotal || 0) + deliveryBreakdown.totalDeliveryAFN;
+                        return (
+                          <div className="space-y-1">
+                            <div className="flex justify-between text-lg font-bold">
+                              <span>{isRTL ? 'جمع کل' : 'Total'} (AFN):</span>
+                              <span className="text-primary">{grandTotalAFN.toLocaleString()} {afnSymbol}</span>
+                            </div>
+                            {rate && (
+                              <div className="flex justify-between text-sm text-muted-foreground">
+                                <span></span>
+                                <span>≈ ${convertToUSD(grandTotalAFN).toFixed(2)} USD</span>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })()}
                     </div>
                   </div>
 
