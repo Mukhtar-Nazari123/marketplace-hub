@@ -12,6 +12,8 @@ import { format } from "date-fns";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useLanguage } from "@/lib/i18n";
+import { useCurrencyTranslations } from "@/lib/currency-translations";
 
 interface CurrencyRate {
   id: string;
@@ -25,6 +27,9 @@ interface CurrencyRate {
 
 const AdminCurrencySettings = () => {
   const { user } = useAuth();
+  const { language, isRTL } = useLanguage();
+  const { t } = useCurrencyTranslations(language);
+  
   const [currentRate, setCurrentRate] = useState<CurrencyRate | null>(null);
   const [newRate, setNewRate] = useState("");
   const [loading, setLoading] = useState(true);
@@ -53,7 +58,7 @@ const AdminCurrencySettings = () => {
       }
     } catch (err: any) {
       console.error('Error fetching rate:', err);
-      toast.error('Failed to load exchange rate');
+      toast.error(t('toast', 'loadError'));
     } finally {
       setLoading(false);
     }
@@ -62,14 +67,13 @@ const AdminCurrencySettings = () => {
   const handleUpdateRate = async () => {
     const rateValue = parseFloat(newRate);
     if (isNaN(rateValue) || rateValue <= 0) {
-      toast.error('Please enter a valid positive exchange rate');
+      toast.error(t('toast', 'invalidRate'));
       return;
     }
 
     setSaving(true);
     try {
       if (currentRate) {
-        // Update existing rate
         const { error } = await supabase
           .from('currency_rates')
           .update({
@@ -81,7 +85,6 @@ const AdminCurrencySettings = () => {
 
         if (error) throw error;
       } else {
-        // Create new rate
         const { error } = await supabase
           .from('currency_rates')
           .insert({
@@ -95,14 +98,22 @@ const AdminCurrencySettings = () => {
         if (error) throw error;
       }
 
-      toast.success('Exchange rate updated successfully');
+      toast.success(t('toast', 'updateSuccess'));
       fetchCurrentRate();
     } catch (err: any) {
       console.error('Error updating rate:', err);
-      toast.error('Failed to update exchange rate');
+      toast.error(t('toast', 'updateError'));
     } finally {
       setSaving(false);
     }
+  };
+
+  // Format number based on language
+  const formatNumber = (num: number) => {
+    if (isRTL) {
+      return num.toLocaleString('fa-IR');
+    }
+    return num.toLocaleString('en-US');
   };
 
   // Calculate example conversions
@@ -112,20 +123,19 @@ const AdminCurrencySettings = () => {
     : '0.00';
 
   return (
-    <AdminLayout title="Currency Settings" description="Manage USD exchange rate">
-      <div className="space-y-6">
+    <AdminLayout title={t('page', 'title')} description={t('page', 'description')}>
+      <div className="space-y-6" dir={isRTL ? 'rtl' : 'ltr'}>
         <div>
-          <h1 className="text-2xl font-bold">Currency Settings</h1>
+          <h1 className="text-2xl font-bold">{t('page', 'title')}</h1>
           <p className="text-muted-foreground">
-            Manage the USD exchange rate for price display across the platform
+            {t('page', 'description')}
           </p>
         </div>
 
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            AFN (Afghani) is the base currency. All product prices are stored in AFN. 
-            USD prices are calculated dynamically using the rate you set here.
+            {t('alert', 'baseCurrencyInfo')}
           </AlertDescription>
         </Alert>
 
@@ -135,10 +145,10 @@ const AdminCurrencySettings = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <DollarSign className="h-5 w-5" />
-                Current Exchange Rate
+                {t('currentRate', 'title')}
               </CardTitle>
               <CardDescription>
-                Active rate used for USD conversions
+                {t('currentRate', 'description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -149,24 +159,24 @@ const AdminCurrencySettings = () => {
               ) : currentRate ? (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between p-4 bg-secondary/50 rounded-lg">
-                    <span className="text-lg font-medium">1 USD =</span>
+                    <span className="text-lg font-medium">{t('currentRate', 'oneUsdEquals')}</span>
                     <span className="text-2xl font-bold text-primary">
-                      {currentRate.exchange_rate.toLocaleString()} AFN
+                      {formatNumber(currentRate.exchange_rate)} {t('currentRate', 'afnSuffix')}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <History className="h-4 w-4" />
                     <span>
-                      Last updated: {format(new Date(currentRate.updated_at), 'PPp')}
+                      {t('currentRate', 'lastUpdated')} {format(new Date(currentRate.updated_at), 'PPp')}
                     </span>
                   </div>
                   <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/30">
-                    Active
+                    {t('currentRate', 'active')}
                   </Badge>
                 </div>
               ) : (
                 <div className="text-center py-8 text-muted-foreground">
-                  No exchange rate configured yet
+                  {t('currentRate', 'noRateConfigured')}
                 </div>
               )}
             </CardContent>
@@ -177,21 +187,21 @@ const AdminCurrencySettings = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <RefreshCw className="h-5 w-5" />
-                Update Exchange Rate
+                {t('updateRate', 'title')}
               </CardTitle>
               <CardDescription>
-                Set a new AFN to USD conversion rate
+                {t('updateRate', 'description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="rate">1 USD equals (in AFN)</Label>
+                <Label htmlFor="rate">{t('updateRate', 'inputLabel')}</Label>
                 <Input
                   id="rate"
                   type="number"
                   step="0.01"
                   min="0.01"
-                  placeholder="e.g., 87.50"
+                  placeholder={t('updateRate', 'inputPlaceholder')}
                   value={newRate}
                   onChange={(e) => setNewRate(e.target.value)}
                   className="text-lg"
@@ -200,8 +210,11 @@ const AdminCurrencySettings = () => {
 
               {newRate && parseFloat(newRate) > 0 && (
                 <div className="p-3 bg-muted rounded-lg text-sm">
-                  <p className="font-medium mb-1">Preview:</p>
-                  <p>{exampleAFN.toLocaleString()} AFN ≈ ${(exampleAFN / parseFloat(newRate)).toFixed(2)} USD</p>
+                  <p className="font-medium mb-1">{t('updateRate', 'preview')}</p>
+                  <p>
+                    {formatNumber(exampleAFN)} {t('examples', 'afn')} {t('common', 'approximately')} $
+                    {(exampleAFN / parseFloat(newRate)).toFixed(2)} {t('examples', 'usd')}
+                  </p>
                 </div>
               )}
 
@@ -213,10 +226,10 @@ const AdminCurrencySettings = () => {
                 {saving ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    Saving...
+                    {t('updateRate', 'saving')}
                   </>
                 ) : (
-                  'Update Rate'
+                  t('updateRate', 'updateButton')
                 )}
               </Button>
             </CardContent>
@@ -228,9 +241,9 @@ const AdminCurrencySettings = () => {
         {/* Conversion Examples */}
         <Card>
           <CardHeader>
-            <CardTitle>Conversion Examples</CardTitle>
+            <CardTitle>{t('examples', 'title')}</CardTitle>
             <CardDescription>
-              How prices will appear across the platform with current rate
+              {t('examples', 'description')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -238,16 +251,16 @@ const AdminCurrencySettings = () => {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[500, 1000, 2500, 5000, 10000, 25000, 50000, 100000].map((afn) => (
                   <div key={afn} className="p-3 bg-secondary/50 rounded-lg text-center">
-                    <div className="font-bold">{afn.toLocaleString()} AFN</div>
+                    <div className="font-bold">{formatNumber(afn)} {t('examples', 'afn')}</div>
                     <div className="text-sm text-muted-foreground">
-                      ≈ ${(afn / currentRate.exchange_rate).toFixed(2)} USD
+                      {t('common', 'approximately')} ${(afn / currentRate.exchange_rate).toFixed(2)} {t('examples', 'usd')}
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
               <p className="text-muted-foreground text-center py-4">
-                Set an exchange rate to see conversion examples
+                {t('examples', 'noRateMessage')}
               </p>
             )}
           </CardContent>
