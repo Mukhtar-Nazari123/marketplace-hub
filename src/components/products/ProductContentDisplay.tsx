@@ -203,7 +203,7 @@ export const ProductContentDisplay = ({ product, attributes = [], className }: P
           </div>
 
           {/* Tabbed Content */}
-          <Tabs defaultValue="en" className="w-full">
+          <Tabs value={language} className="w-full">
             <TabsList className="w-full justify-start">
               <TabsTrigger value="en" className="gap-2">
                 🇺🇸 English
