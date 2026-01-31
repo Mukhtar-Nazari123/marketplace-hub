@@ -240,20 +240,24 @@ const SellerOrders = () => {
       // Fetch order items for each order with product SKUs
       const ordersWithItems = await Promise.all(
         transformedOrders.map(async (order) => {
-          const { data: items } = await supabase
+          const { data: items, error: itemsError } = await supabase
             .from('order_items')
             .select(`
               *,
-              products:product_id (sku, currency)
+              products:product_id (sku)
             `)
             .eq('order_id', order.order_id)
             .eq('seller_id', user.id);
 
-          // Map items to include product_sku and product_currency
+          if (itemsError) {
+            console.error('Error fetching order items:', itemsError);
+          }
+
+          // Map items to include product_sku
           const itemsWithSku = (items || []).map((item: any) => ({
             ...item,
             product_sku: item.products?.sku || null,
-            product_currency: item.products?.currency || order.currency,
+            product_currency: order.currency,
           }));
 
           return {
