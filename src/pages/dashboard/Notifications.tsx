@@ -267,9 +267,9 @@ const Notifications = () => {
                     </div>
 
                     {/* Content */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2">
-                      <div>
+                    <div className={`flex-1 min-w-0 ${isRTL ? 'text-right' : 'text-left'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+                      <div className={`flex items-start justify-between gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                        <div>
                           <p className={`font-medium ${!notification.is_read ? 'text-foreground' : 'text-muted-foreground'}`}>
                             {language === 'ps' ? (notification.title_ps || notification.title_fa) : (language === 'fa' ? notification.title_fa : notification.title_en)}
                           </p>
