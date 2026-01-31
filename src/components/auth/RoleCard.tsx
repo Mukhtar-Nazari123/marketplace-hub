@@ -1,30 +1,27 @@
 import { cn } from "@/lib/utils";
 import { ShoppingBag, Store } from "lucide-react";
+import { useAuthTranslations } from "@/lib/auth-translations";
 
 interface RoleCardProps {
   role: 'buyer' | 'seller';
   selected: boolean;
   onSelect: () => void;
-  isRTL?: boolean;
+  language: 'en' | 'fa' | 'ps';
 }
 
-const RoleCard = ({ role, selected, onSelect, isRTL }: RoleCardProps) => {
+const RoleCard = ({ role, selected, onSelect, language }: RoleCardProps) => {
+  const { t } = useAuthTranslations(language);
   const isBuyer = role === 'buyer';
-  
-  const titles = {
-    buyer: { en: 'Buyer', fa: 'خریدار' },
-    seller: { en: 'Seller', fa: 'فروشنده' }
-  };
-  
-  const descriptions = {
-    buyer: { en: 'Browse and purchase products easily', fa: 'محصولات را مرور کنید و به راحتی خرید کنید' },
-    seller: { en: 'Create a store and sell your products', fa: 'فروشگاه ایجاد کنید و محصولات خود را بفروشید' }
-  };
+  const isRTL = language === 'fa' || language === 'ps';
+
+  const title = isBuyer ? t('roles', 'buyer') : t('roles', 'seller');
+  const description = isBuyer ? t('roles', 'buyerDesc') : t('roles', 'sellerDesc');
 
   return (
     <button
       type="button"
       onClick={onSelect}
+      dir={isRTL ? 'rtl' : 'ltr'}
       className={cn(
         "relative flex flex-col items-center p-6 rounded-xl border-2 transition-all duration-300 w-full",
         "hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2",
@@ -38,7 +35,8 @@ const RoleCard = ({ role, selected, onSelect, isRTL }: RoleCardProps) => {
       {/* Selection indicator */}
       <div
         className={cn(
-          "absolute top-3 left-3 w-5 h-5 rounded-full border-2 transition-all duration-300",
+          "absolute top-3 w-5 h-5 rounded-full border-2 transition-all duration-300",
+          isRTL ? "right-3" : "left-3",
           selected
             ? isBuyer
               ? "bg-primary border-primary"
@@ -80,12 +78,12 @@ const RoleCard = ({ role, selected, onSelect, isRTL }: RoleCardProps) => {
             : "text-accent"
           : "text-foreground"
       )}>
-        {isRTL ? titles[role].fa : titles[role].en}
+        {title}
       </h3>
 
       {/* Description */}
       <p className="text-sm text-muted-foreground text-center">
-        {isRTL ? descriptions[role].fa : descriptions[role].en}
+        {description}
       </p>
     </button>
   );
