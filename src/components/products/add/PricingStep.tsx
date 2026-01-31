@@ -2,11 +2,10 @@ import { useMemo } from 'react';
 import { useLanguage } from '@/lib/i18n';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ProductFormData, CurrencyType } from '@/pages/dashboard/AddProduct';
+import { ProductFormData } from '@/pages/dashboard/AddProduct';
 import { cn } from '@/lib/utils';
-import { DollarSign, Tag, Package, Banknote, Truck, AlertCircle, CheckCircle2, Info, Hash } from 'lucide-react';
+import { Tag, Package, Banknote, Truck, AlertCircle, CheckCircle2, Info, Hash } from 'lucide-react';
 import { Card } from '@/components/ui/card';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { generateSKU } from '@/lib/skuGenerator';
 
@@ -64,10 +63,6 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
     });
   };
 
-  const handleCurrencyChange = (currency: string) => {
-    updateFormData({ currency: currency as CurrencyType });
-  };
-
   const calculateDiscount = (price: number, discountPrice: number | null) => {
     if (!discountPrice || discountPrice >= price) return null;
     const discount = ((price - discountPrice) / price) * 100;
@@ -75,8 +70,9 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
   };
 
   const discountPercentage = calculateDiscount(formData.price, formData.discountPrice);
-  const currencySymbol = formData.currency === 'AFN' ? '؋' : '$';
-  const currencyLabel = formData.currency;
+  // Always use AFN as the base currency
+  const currencySymbol = '؋';
+  const currencyLabel = 'AFN';
 
   // Validation states
   const priceValid = formData.price > 0;
@@ -93,9 +89,6 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
 
   // Get custom size stock
   const customSizeStock = formData.stockPerSize?.[OTHER_SIZE_KEY] || 0;
-
-  // Currency icon component
-  const CurrencyIcon = formData.currency === 'AFN' ? Banknote : DollarSign;
 
   return (
     <div className="space-y-6">
@@ -132,28 +125,6 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
         </p>
       </Card>
 
-      {/* Currency Selector - Only for Product Price */}
-      <Card className="p-4">
-        <Label className="text-sm font-medium mb-3 block">
-          {isRTL ? 'واحد پول' : 'Currency'}
-        </Label>
-        <Tabs value={formData.currency} onValueChange={handleCurrencyChange}>
-          <TabsList className="grid w-full grid-cols-2 max-w-xs">
-            <TabsTrigger value="AFN" className="gap-2">
-              <Banknote className="h-4 w-4" />
-              AFN (افغانی)
-            </TabsTrigger>
-            <TabsTrigger value="USD" className="gap-2">
-              <DollarSign className="h-4 w-4" />
-              USD (Dollar)
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
-        <p className="text-xs text-muted-foreground mt-2">
-          {isRTL ? 'واحد پول را برای قیمت‌گذاری محصول انتخاب کنید' : 'Select the currency for product pricing'}
-        </p>
-      </Card>
-
       {/* Prices */}
       <div className="grid gap-6 md:grid-cols-2">
         <Card className={cn(
@@ -161,7 +132,7 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
           !priceValid && formData.price !== 0 && "border-destructive/50"
         )}>
           <Label htmlFor="price" className="text-sm font-medium flex items-center gap-2">
-            <CurrencyIcon className={cn("w-4 h-4", formData.currency === 'AFN' ? 'text-primary' : 'text-green-600')} />
+            <Banknote className="w-4 h-4 text-primary" />
             {isRTL ? 'قیمت' : 'Price'} ({currencyLabel}) 
             <span className="text-destructive">*</span>
             {priceValid && <CheckCircle2 className="w-4 h-4 text-success" />}
@@ -201,7 +172,7 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
           !discountValid && "border-warning/50"
         )}>
           <Label htmlFor="discountPrice" className="text-sm font-medium flex items-center gap-2">
-            <Tag className={cn("w-4 h-4", formData.currency === 'AFN' ? 'text-accent' : 'text-green-600')} />
+            <Tag className="w-4 h-4 text-accent" />
             {isRTL ? 'قیمت با تخفیف' : 'Discount Price'} ({currencyLabel})
             <Badge variant="outline" className="text-xs font-normal">
               {isRTL ? 'اختیاری' : 'Optional'}
