@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/lib/i18n";
+import { useAuthTranslations } from "@/lib/auth-translations";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,19 +13,9 @@ import { Eye, EyeOff, Loader2, CheckCircle, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 
-const registerSchema = z.object({
-  fullName: z.string().min(2, "Full name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  confirmPassword: z.string(),
-  agreeTerms: z.literal(true, { errorMap: () => ({ message: "You must agree to the terms" }) })
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords do not match",
-  path: ["confirmPassword"]
-});
-
 const Register = () => {
-  const { isRTL } = useLanguage();
+  const { isRTL, language } = useLanguage();
+  const { t } = useAuthTranslations(language);
   const { signUp, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -40,6 +31,18 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Localized schema
+  const registerSchema = z.object({
+    fullName: z.string().min(2, t('validation', 'fullNameMin')),
+    email: z.string().email(t('validation', 'invalidEmail')),
+    password: z.string().min(8, t('validation', 'passwordMin')),
+    confirmPassword: z.string(),
+    agreeTerms: z.literal(true, { errorMap: () => ({ message: t('validation', 'agreeTermsRequired') }) })
+  }).refine((data) => data.password === data.confirmPassword, {
+    message: t('validation', 'passwordsNoMatch'),
+    path: ["confirmPassword"]
+  });
 
   // Redirect if already logged in
   useEffect(() => {
@@ -84,54 +87,37 @@ const Register = () => {
 
     if (error) {
       toast({
-        title: isRTL ? "خطا در ثبت‌نام" : "Registration Error",
+        title: t('register', 'registerError'),
         description: error.message,
         variant: "destructive"
       });
     } else {
       setSuccess(true);
       toast({
-        title: isRTL ? "ثبت‌نام موفق" : "Registration Successful",
-        description: isRTL ? "ایمیل تایید برای شما ارسال شد" : "A confirmation email has been sent to you"
+        title: t('register', 'registerSuccess'),
+        description: t('register', 'confirmEmailSent')
       });
-      // Redirect sellers to profile choice, buyers to login
       const redirectPath = selectedRole === 'seller' ? '/seller/profile-choice' : '/login';
       setTimeout(() => navigate(redirectPath), 2000);
     }
   };
 
-  const texts = {
-    title: isRTL ? "ایجاد حساب کاربری" : "Create Account",
-    subtitle: isRTL ? "نوع حساب خود را انتخاب کنید" : "Choose your account type",
-    fullName: isRTL ? "نام کامل" : "Full Name",
-    email: isRTL ? "ایمیل" : "Email",
-    password: isRTL ? "رمز عبور" : "Password",
-    confirmPassword: isRTL ? "تکرار رمز عبور" : "Confirm Password",
-    agreeTerms: isRTL ? "با قوانین و شرایط موافقم" : "I agree to the Terms and Conditions",
-    register: isRTL ? "ثبت‌نام" : "Register",
-    haveAccount: isRTL ? "حساب کاربری دارید؟" : "Already have an account?",
-    login: isRTL ? "ورود" : "Login",
-    successMessage: isRTL ? "ثبت‌نام با موفقیت انجام شد!" : "Registration successful!"
-  };
-
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <div className="min-h-screen flex items-center justify-center bg-background p-4" dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="text-center animate-fade-in">
           <div className="w-20 h-20 rounded-full bg-success/20 flex items-center justify-center mx-auto mb-6">
             <CheckCircle className="w-10 h-10 text-success" />
           </div>
-          <h1 className="text-2xl font-bold text-foreground mb-2">{texts.successMessage}</h1>
-          <p className="text-muted-foreground">
-            {isRTL ? "در حال انتقال به صفحه ورود..." : "Redirecting to login..."}
-          </p>
+          <h1 className="text-2xl font-bold text-foreground mb-2">{t('register', 'successMessage')}</h1>
+          <p className="text-muted-foreground">{t('register', 'redirecting')}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="w-full max-w-md space-y-8 animate-fade-in">
         {/* Back Button */}
         <Button
@@ -140,14 +126,14 @@ const Register = () => {
           onClick={() => navigate("/")}
           className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
         >
-          <ArrowLeft className="w-4 h-4" />
-          {isRTL ? "بازگشت" : "Back"}
+          <ArrowLeft className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
+          {t('register', 'back')}
         </Button>
 
         {/* Header */}
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-foreground mb-2">{texts.title}</h1>
-          <p className="text-muted-foreground">{texts.subtitle}</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">{t('register', 'title')}</h1>
+          <p className="text-muted-foreground">{t('register', 'subtitle')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -157,25 +143,25 @@ const Register = () => {
               role="buyer"
               selected={selectedRole === 'buyer'}
               onSelect={() => setSelectedRole('buyer')}
-              isRTL={isRTL}
+              language={language}
             />
             <RoleCard
               role="seller"
               selected={selectedRole === 'seller'}
               onSelect={() => setSelectedRole('seller')}
-              isRTL={isRTL}
+              language={language}
             />
           </div>
 
           {/* Full Name */}
           <div className="space-y-2">
-            <Label htmlFor="fullName">{texts.fullName}</Label>
+            <Label htmlFor="fullName">{t('register', 'fullName')}</Label>
             <Input
               id="fullName"
               type="text"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              placeholder={isRTL ? "نام و نام خانوادگی" : "John Doe"}
+              placeholder={t('register', 'fullNamePlaceholder')}
               className={errors.fullName ? "border-destructive" : ""}
             />
             {errors.fullName && <p className="text-sm text-destructive">{errors.fullName}</p>}
@@ -183,7 +169,7 @@ const Register = () => {
 
           {/* Email */}
           <div className="space-y-2">
-            <Label htmlFor="email">{texts.email}</Label>
+            <Label htmlFor="email">{t('register', 'email')}</Label>
             <Input
               id="email"
               type="email"
@@ -197,7 +183,7 @@ const Register = () => {
 
           {/* Password */}
           <div className="space-y-2">
-            <Label htmlFor="password">{texts.password}</Label>
+            <Label htmlFor="password">{t('register', 'password')}</Label>
             <div className="relative">
               <Input
                 id="password"
@@ -205,23 +191,23 @@ const Register = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className={errors.password ? "border-destructive pl-10" : "pl-10"}
+                className={`${errors.password ? "border-destructive" : ""} ${isRTL ? 'pr-10' : 'pl-10'}`}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground`}
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
             {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
-            <PasswordStrengthIndicator password={password} isRTL={isRTL} />
+            <PasswordStrengthIndicator password={password} language={language} />
           </div>
 
           {/* Confirm Password */}
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">{texts.confirmPassword}</Label>
+            <Label htmlFor="confirmPassword">{t('register', 'confirmPassword')}</Label>
             <div className="relative">
               <Input
                 id="confirmPassword"
@@ -229,12 +215,12 @@ const Register = () => {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••"
-                className={errors.confirmPassword ? "border-destructive pl-10" : "pl-10"}
+                className={`${errors.confirmPassword ? "border-destructive" : ""} ${isRTL ? 'pr-10' : 'pl-10'}`}
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground`}
               >
                 {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -250,7 +236,7 @@ const Register = () => {
               onCheckedChange={(checked) => setAgreeTerms(checked as boolean)}
             />
             <Label htmlFor="agreeTerms" className="text-sm cursor-pointer">
-              {texts.agreeTerms}
+              {t('register', 'agreeTerms')}
             </Label>
           </div>
           {errors.agreeTerms && <p className="text-sm text-destructive">{errors.agreeTerms}</p>}
@@ -264,20 +250,20 @@ const Register = () => {
           >
             {loading ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                {isRTL ? "در حال ثبت‌نام..." : "Registering..."}
+                <Loader2 className={`w-4 h-4 animate-spin ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                {t('register', 'registering')}
               </>
             ) : (
-              texts.register
+              t('register', 'registerBtn')
             )}
           </Button>
         </form>
 
         {/* Login Link */}
         <p className="text-center text-muted-foreground">
-          {texts.haveAccount}{" "}
+          {t('register', 'haveAccount')}{" "}
           <Link to="/login" className="text-primary hover:underline font-medium">
-            {texts.login}
+            {t('register', 'login')}
           </Link>
         </p>
       </div>

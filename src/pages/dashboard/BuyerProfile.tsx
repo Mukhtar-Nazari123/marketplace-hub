@@ -580,7 +580,7 @@ const BuyerProfile = () => {
                       {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
-                  {newPassword && <PasswordStrengthIndicator password={newPassword} isRTL={isRTL} />}
+                  {newPassword && <PasswordStrengthIndicator password={newPassword} language={language} />}
                 </div>
                 <div className="space-y-2">
                   <Label>{getLabel('Confirm New Password', 'تکرار رمز عبور جدید', 'نوی پاسورډ تایید کړئ')}</Label>

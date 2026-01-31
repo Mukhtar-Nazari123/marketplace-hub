@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/lib/i18n";
+import { useAuthTranslations } from "@/lib/auth-translations";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,13 +11,9 @@ import { Eye, EyeOff, Loader2, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 
-const loginSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(1, "Password is required"),
-});
-
 const Login = () => {
-  const { isRTL } = useLanguage();
+  const { isRTL, language } = useLanguage();
+  const { t } = useAuthTranslations(language);
   const { signIn, user, role, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -28,6 +25,12 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // Localized schema
+  const loginSchema = z.object({
+    email: z.string().email(t('validation', 'invalidEmail')),
+    password: z.string().min(1, t('validation', 'passwordRequired')),
+  });
+
   // Redirect based on role if already logged in
   useEffect(() => {
     if (user && !authLoading && role) {
@@ -36,11 +39,9 @@ const Login = () => {
   }, [user, authLoading, role]);
 
   const redirectBasedOnRole = (userRole: string) => {
-    // Admins go to dashboard, buyers and sellers go to home page
     if (userRole === "admin") {
       navigate("/dashboard/admin", { replace: true });
     } else {
-      // Buyers and sellers redirect to home page
       navigate("/", { replace: true });
     }
   };
@@ -78,42 +79,28 @@ const Login = () => {
     if (error) {
       let errorMessage = error.message;
 
-      // User-friendly error messages
       if (error.message.includes("Invalid login credentials")) {
-        errorMessage = isRTL ? "ایمیل یا رمز عبور اشتباه است" : "Invalid email or password";
+        errorMessage = t('login', 'invalidCredentials');
       } else if (error.message.includes("Email not confirmed")) {
-        errorMessage = isRTL ? "لطفا ایمیل خود را تایید کنید" : "Please confirm your email first";
+        errorMessage = t('login', 'confirmEmail');
       }
 
       toast({
-        title: isRTL ? "خطا در ورود" : "Login Error",
+        title: t('login', 'loginError'),
         description: errorMessage,
         variant: "destructive",
       });
     } else {
       toast({
-        title: isRTL ? "ورود موفق" : "Login Successful",
-        description: isRTL ? "خوش آمدید!" : "Welcome back!",
+        title: t('login', 'loginSuccess'),
+        description: t('login', 'welcomeBack'),
       });
-      // Navigate to home for buyers/sellers, dashboard resolver will handle admins
       navigate('/', { replace: true });
     }
   };
 
-  const texts = {
-    title: isRTL ? "ورود به حساب کاربری" : "Welcome Back",
-    subtitle: isRTL ? "برای ادامه وارد حساب خود شوید" : "Sign in to your account to continue",
-    email: isRTL ? "ایمیل" : "Email",
-    password: isRTL ? "رمز عبور" : "Password",
-    rememberMe: isRTL ? "مرا به خاطر بسپار" : "Remember me",
-    forgotPassword: isRTL ? "فراموشی رمز عبور؟" : "Forgot password?",
-    login: isRTL ? "ورود" : "Sign In",
-    noAccount: isRTL ? "حساب کاربری ندارید؟" : "Don't have an account?",
-    register: isRTL ? "ثبت‌نام" : "Register",
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="w-full max-w-md space-y-8 animate-fade-in">
         {/* Back Button */}
         <Button
@@ -122,20 +109,20 @@ const Login = () => {
           onClick={() => navigate("/")}
           className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
         >
-          <ArrowLeft className="w-4 h-4" />
-          {isRTL ? "بازگشت" : "Back"}
+          <ArrowLeft className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
+          {t('login', 'back')}
         </Button>
 
         {/* Header */}
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-foreground mb-2">{texts.title}</h1>
-          <p className="text-muted-foreground">{texts.subtitle}</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">{t('login', 'title')}</h1>
+          <p className="text-muted-foreground">{t('login', 'subtitle')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Email */}
           <div className="space-y-2">
-            <Label htmlFor="email">{texts.email}</Label>
+            <Label htmlFor="email">{t('login', 'email')}</Label>
             <Input
               id="email"
               type="email"
@@ -149,7 +136,7 @@ const Login = () => {
 
           {/* Password */}
           <div className="space-y-2">
-            <Label htmlFor="password">{texts.password}</Label>
+            <Label htmlFor="password">{t('login', 'password')}</Label>
             <div className="relative">
               <Input
                 id="password"
@@ -157,12 +144,12 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className={errors.password ? "border-destructive pl-10" : "pl-10"}
+                className={`${errors.password ? "border-destructive" : ""} ${isRTL ? 'pr-10' : 'pl-10'}`}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground`}
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -179,11 +166,11 @@ const Login = () => {
                 onCheckedChange={(checked) => setRememberMe(checked as boolean)}
               />
               <Label htmlFor="rememberMe" className="text-sm cursor-pointer">
-                {texts.rememberMe}
+                {t('login', 'rememberMe')}
               </Label>
             </div>
             <Link to="/forgot-password" className="text-sm text-primary hover:underline">
-              {texts.forgotPassword}
+              {t('login', 'forgotPassword')}
             </Link>
           </div>
 
@@ -191,20 +178,20 @@ const Login = () => {
           <Button type="submit" className="w-full" size="lg" disabled={!isFormValid || loading}>
             {loading ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                {isRTL ? "در حال ورود..." : "Signing in..."}
+                <Loader2 className={`w-4 h-4 animate-spin ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                {t('login', 'signingIn')}
               </>
             ) : (
-              texts.login
+              t('login', 'signIn')
             )}
           </Button>
         </form>
 
         {/* Register Link */}
         <p className="text-center text-muted-foreground">
-          {texts.noAccount}{" "}
+          {t('login', 'noAccount')}{" "}
           <Link to="/register" className="text-primary hover:underline font-medium">
-            {texts.register}
+            {t('login', 'register')}
           </Link>
         </p>
       </div>
