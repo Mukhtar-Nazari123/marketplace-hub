@@ -77,9 +77,8 @@ interface Product {
   name: string;
   slug: string;
   description: string | null;
-  price: number;
-  compare_at_price: number | null;
-  currency: string;
+  price_afn: number;
+  compare_price_afn: number | null;
   quantity: number;
   images: string[] | null;
   status: string;
@@ -183,9 +182,6 @@ const SellerProducts = () => {
     product.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const formatPriceWithCurrency = (price: number, currency: string) => {
-    return formatCurrency(price, currency, isRTL);
-  };
 
   const getDeleteConfirmationText = () => {
     if (!productToDelete) return '';
@@ -344,18 +340,18 @@ const SellerProducts = () => {
 
                     {/* Price */}
                     <div className={cn("flex flex-col gap-1", isRTL && "items-end")}>
-                      {product.compare_at_price && product.compare_at_price > product.price ? (
+                      {product.compare_price_afn && product.compare_price_afn > product.price_afn ? (
                         <>
                           <span className="text-xs text-muted-foreground line-through">
-                            {formatPriceWithCurrency(product.compare_at_price, product.currency || 'AFN')}
+                            {formatCurrency(product.compare_price_afn, 'AFN', isRTL)}
                           </span>
-                          <span className="font-bold text-amber-500">
-                            {formatPriceWithCurrency(product.price, product.currency || 'AFN')}
+                          <span className="font-bold text-orange">
+                            {formatCurrency(product.price_afn, 'AFN', isRTL)}
                           </span>
                         </>
                       ) : (
                         <span className="font-bold text-primary">
-                          {formatPriceWithCurrency(product.price, product.currency || 'AFN')}
+                          {formatCurrency(product.price_afn, 'AFN', isRTL)}
                         </span>
                       )}
                     </div>
