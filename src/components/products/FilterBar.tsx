@@ -53,10 +53,10 @@ const FilterBar = ({
   const selectedCategoryData = selectedCategory ? getCategoryBySlug(selectedCategory) : null;
   const subcategoriesForCategory = selectedCategoryData ? getSubcategories(selectedCategoryData.id) : [];
   
-  // Subcategory options
+  // Subcategory options - names are already localized by useCategories hook
   const subcategoryOptions: FilterOption[] = subcategoriesForCategory.map(sub => ({
     value: sub.slug,
-    label: isRTL && sub.name_fa ? sub.name_fa : sub.name,
+    label: sub.name,
   }));
 
   // Sort options
@@ -68,10 +68,10 @@ const FilterBar = ({
     { value: 'popularity', label: isRTL ? 'محبوب‌ترین' : 'Most Popular' },
   ];
 
-  // Category options from database
+  // Category options from database - names are already localized by useCategories hook
   const categoryOptions: FilterOption[] = rootCategories.map(cat => ({
     value: cat.slug,
-    label: isRTL && cat.name_fa ? cat.name_fa : cat.name,
+    label: cat.name,
   }));
 
   // Brand options

@@ -114,7 +114,7 @@ const CategoryBanners = () => {
                 {/* Content */}
                 <div className="relative z-10">
                   <h3 className="font-display text-xl font-bold text-primary-foreground mb-4">
-                    {isRTL && category.name_fa ? category.name_fa : category.name}
+                    {category.name}
                   </h3>
                   <div className="flex items-center gap-2 text-primary-foreground/80 group-hover:text-primary-foreground transition-colors">
                     <span className="font-medium">{t.hero.shopNow}</span>

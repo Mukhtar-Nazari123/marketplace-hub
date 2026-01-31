@@ -58,8 +58,8 @@ const CategoryGrid = () => {
           <div key={category.id} className="mb-8 last:mb-0">
             {/* Category Title */}
             <div className={`flex items-center justify-between mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
-              <h3 className={`text-lg font-semibold text-foreground ${isRTL ? 'text-right' : 'text-left'}`}>
-                {isRTL && category.name_fa ? category.name_fa : category.name}
+            <h3 className={`text-lg font-semibold text-foreground ${isRTL ? 'text-right' : 'text-left'}`}>
+                {category.name}
               </h3>
               <Link 
                 to={`/categories?category=${category.slug}`}
@@ -83,7 +83,7 @@ const CategoryGrid = () => {
                     {sub.image_url ? (
                       <img
                         src={sub.image_url}
-                        alt={isRTL && sub.name_fa ? sub.name_fa : sub.name}
+                        alt={sub.name}
                         className="w-full h-full object-cover"
                         loading="lazy"
                       />
@@ -96,7 +96,7 @@ const CategoryGrid = () => {
                   
                   {/* Subcategory Name */}
                   <span className={`mt-2 text-xs md:text-sm text-foreground group-hover:text-primary transition-colors line-clamp-2 max-w-[80px] md:max-w-[100px] ${isRTL ? 'text-center' : ''}`}>
-                    {isRTL && sub.name_fa ? sub.name_fa : sub.name}
+                    {sub.name}
                   </span>
                 </Link>
               ))}
@@ -117,7 +117,7 @@ const CategoryGrid = () => {
                   <Package className="h-6 w-6 md:h-8 md:w-8 text-muted-foreground group-hover:text-primary transition-colors" />
                 </div>
                 <span className={`mt-2 text-xs md:text-sm text-foreground group-hover:text-primary transition-colors line-clamp-2 ${isRTL ? 'text-center' : ''}`}>
-                  {isRTL && category.name_fa ? category.name_fa : category.name}
+                  {category.name}
                 </span>
               </Link>
             ))}

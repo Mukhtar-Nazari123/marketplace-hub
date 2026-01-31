@@ -6,7 +6,6 @@ import { useLanguage } from '@/lib/i18n';
 import { useCategories, Category } from '@/hooks/useCategories';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import { getCategoryName, getSubcategoryName } from '@/lib/localizedContent';
 
 const CategoryMegaMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -83,7 +82,7 @@ const CategoryMegaMenu = () => {
                     onMouseEnter={() => handleCategoryHover(category)}
                   >
                     <span className="font-medium text-sm">
-                      {getCategoryName(category, language)}
+                      {category.name}
                     </span>
                     {isRTL ? (
                       <ChevronLeft className="h-4 w-4 text-muted-foreground" />
@@ -112,7 +111,7 @@ const CategoryMegaMenu = () => {
                     className="text-lg font-bold text-foreground hover:text-primary transition-colors"
                     onClick={() => setIsOpen(false)}
                   >
-                    {getCategoryName(activeCategory, language)}
+                    {activeCategory.name}
                   </Link>
                 </div>
 
@@ -132,7 +131,7 @@ const CategoryMegaMenu = () => {
                             {sub.image_url ? (
                               <img
                                 src={sub.image_url}
-                                alt={getSubcategoryName(sub, language)}
+                                alt={sub.name}
                                 className="w-full h-full object-cover"
                                 loading="lazy"
                               />
@@ -155,7 +154,7 @@ const CategoryMegaMenu = () => {
 
                         {/* Subcategory Name */}
                         <span className="mt-2 text-xs text-foreground group-hover:text-primary transition-colors line-clamp-2 max-w-[80px]">
-                          {getSubcategoryName(sub, language)}
+                          {sub.name}
                         </span>
                       </Link>
                     ))}

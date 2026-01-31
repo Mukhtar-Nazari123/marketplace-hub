@@ -199,7 +199,7 @@ const ProductFilters = ({ onFilterChange, className = '' }: ProductFiltersProps)
                     checked={selectedCategories.includes(cat.slug)}
                     onCheckedChange={() => handleCategoryChange(cat.slug)}
                   />
-                  <span className="text-sm">{isRTL && cat.name_fa ? cat.name_fa : cat.name}</span>
+                  <span className="text-sm">{cat.name}</span>
                 </label>
               ))
             ) : (
