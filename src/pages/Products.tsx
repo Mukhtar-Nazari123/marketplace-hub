@@ -19,6 +19,7 @@ import { useCart } from "@/hooks/useCart";
 import { useWishlist } from "@/hooks/useWishlist";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
+import { useCurrencyRate } from "@/hooks/useCurrencyRate";
 
 const Products = () => {
   const { t, language, isRTL } = useLanguage();
@@ -365,12 +366,16 @@ const ProductCard = ({ product, getRating }: ProductCardProps) => {
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { user, role } = useAuth();
   const navigate = useNavigate();
+  const { convertToUSD, rate } = useCurrencyRate();
 
   const isWishlisted = isInWishlist(product.id);
   const isBuyer = role === "buyer";
-  const currencySymbol = product.currencySymbol || (product.currency === "USD" ? "$" : "AFN");
+  const currencySymbol = isRTL ? "افغانی" : "AFN";
 
   const { averageRating, reviewCount } = getRating(product.id);
+  
+  // Calculate USD equivalent
+  const usdPrice = rate ? convertToUSD(product.price) : null;
 
   // Name is already localized from the hook
   const getName = () => product.name;
@@ -457,15 +462,21 @@ const ProductCard = ({ product, getRating }: ProductCardProps) => {
       {/* Content */}
       <div className="p-2 md:p-3 flex flex-col flex-grow">
         {/* Price */}
-        <div className="flex items-baseline gap-1.5 flex-shrink-0 mb-1">
-          <span className="text-sm sm:text-base md:text-lg font-bold text-primary truncate">
-            {product.currency === "USD" ? "$" : ""}
-            {product.price.toLocaleString()} {product.currency !== "USD" ? currencySymbol : ""}
-          </span>
-          {product.originalPrice && product.originalPrice !== product.price && (
-            <span className="text-[10px] sm:text-xs text-muted-foreground line-through truncate">
-              {product.currency === "USD" ? "$" : ""}
-              {product.originalPrice.toLocaleString()}
+        <div className="flex flex-col flex-shrink-0 mb-1">
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-sm sm:text-base md:text-lg font-bold text-primary truncate">
+              {isRTL ? product.price.toLocaleString('fa-AF') : product.price.toLocaleString()} {currencySymbol}
+            </span>
+            {product.originalPrice && product.originalPrice !== product.price && (
+              <span className="text-[10px] sm:text-xs text-muted-foreground line-through truncate">
+                {isRTL ? product.originalPrice.toLocaleString('fa-AF') : product.originalPrice.toLocaleString()}
+              </span>
+            )}
+          </div>
+          {/* USD Equivalent */}
+          {usdPrice !== null && (
+            <span className="text-[10px] sm:text-xs text-muted-foreground">
+              ≈ ${usdPrice.toFixed(2)} USD
             </span>
           )}
         </div>
