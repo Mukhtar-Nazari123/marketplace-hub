@@ -6,10 +6,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useLanguage } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { useProductRatings } from "@/hooks/useProductRatings";
+import { getLocalizedProductName } from "@/lib/localizedProduct";
 
 interface Product {
   id: string;
   name: string;
+  name_en?: string | null;
+  name_fa?: string | null;
+  name_ps?: string | null;
   price_afn: number;
   compare_price_afn: number | null;
   images: string[];
@@ -69,7 +73,7 @@ const DiscoverProducts = () => {
 
   useEffect(() => {
     fetchProducts(0);
-  }, [fetchProducts]);
+  }, [fetchProducts, language]);
 
   const loadMore = () => {
     const nextPage = page + 1;
@@ -101,7 +105,7 @@ const DiscoverProducts = () => {
 
     return {
       id: product.id,
-      name: product.name,
+      name: getLocalizedProductName(product, language),
       price: currentPrice,
       originalPrice,
       rating: averageRating,
