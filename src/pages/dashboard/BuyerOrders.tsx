@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { OrderItemReview } from "@/components/reviews/OrderItemReview";
 import { formatCurrency } from "@/lib/currencyFormatter";
+import { useCurrencyRate } from "@/hooks/useCurrencyRate";
 import {
   Package,
   MapPin,
@@ -110,6 +111,7 @@ const BuyerOrders = () => {
   const { isRTL, language } = useLanguage();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { convertToUSD, rate } = useCurrencyRate();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -665,19 +667,28 @@ const BuyerOrders = () => {
                           </div>
                         )}
                         <Separator />
-                        <div className="flex justify-between font-bold text-sm">
-                          <span>{t.total}</span>
-                          <span className="text-primary">
-                            {order.total_usd > 0 && order.total_afn > 0 ? (
-                              <>
-                                {formatCurrency(order.total_usd, "USD", isRTL)} + {formatCurrency(order.total_afn, "AFN", isRTL)}
-                              </>
-                            ) : order.total_usd > 0 ? (
-                              formatCurrency(order.total_usd, "USD", isRTL)
-                            ) : (
-                              formatCurrency(order.total_afn, "AFN", isRTL)
-                            )}
-                          </span>
+                        <div className="flex flex-col">
+                          <div className="flex justify-between font-bold text-sm">
+                            <span>{t.total}</span>
+                            <span className="text-primary">
+                              {order.total_usd > 0 && order.total_afn > 0 ? (
+                                <>
+                                  {formatCurrency(order.total_usd, "USD", isRTL)} + {formatCurrency(order.total_afn, "AFN", isRTL)}
+                                </>
+                              ) : order.total_usd > 0 ? (
+                                formatCurrency(order.total_usd, "USD", isRTL)
+                              ) : (
+                                formatCurrency(order.total_afn, "AFN", isRTL)
+                              )}
+                            </span>
+                          </div>
+                          {rate && order.total_afn > 0 && (
+                            <div className="flex justify-end">
+                              <span className="text-[10px] text-muted-foreground">
+                                ≈ ${convertToUSD(order.total_afn).toFixed(2)} USD
+                              </span>
+                            </div>
+                          )}
                         </div>
                         <div className="flex justify-between text-[10px] text-muted-foreground pt-1">
                           <span>{t.payment}</span>
@@ -993,20 +1004,29 @@ const BuyerOrders = () => {
                             </div>
                           )}
                           <Separator />
-                          <div className="flex justify-between font-bold text-sm md:text-base">
-                            <span>{t.total}</span>
-                            <span className="text-primary">
-                              {order.total_usd > 0 && order.total_afn > 0 ? (
-                                <>
-                                  {formatCurrency(order.total_usd, "USD", isRTL)} +{" "}
-                                  {formatCurrency(order.total_afn, "AFN", isRTL)}
-                                </>
-                              ) : order.total_usd > 0 ? (
-                                formatCurrency(order.total_usd, "USD", isRTL)
-                              ) : (
-                                formatCurrency(order.total_afn, "AFN", isRTL)
-                              )}
-                            </span>
+                          <div className="flex flex-col">
+                            <div className="flex justify-between font-bold text-sm md:text-base">
+                              <span>{t.total}</span>
+                              <span className="text-primary">
+                                {order.total_usd > 0 && order.total_afn > 0 ? (
+                                  <>
+                                    {formatCurrency(order.total_usd, "USD", isRTL)} +{" "}
+                                    {formatCurrency(order.total_afn, "AFN", isRTL)}
+                                  </>
+                                ) : order.total_usd > 0 ? (
+                                  formatCurrency(order.total_usd, "USD", isRTL)
+                                ) : (
+                                  formatCurrency(order.total_afn, "AFN", isRTL)
+                                )}
+                              </span>
+                            </div>
+                            {rate && order.total_afn > 0 && (
+                              <div className="flex justify-end">
+                                <span className="text-xs text-muted-foreground">
+                                  ≈ ${convertToUSD(order.total_afn).toFixed(2)} USD
+                                </span>
+                              </div>
+                            )}
                           </div>
 
                           <div className="flex justify-between text-[10px] md:text-xs text-muted-foreground pt-2">
