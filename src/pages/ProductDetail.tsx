@@ -677,7 +677,7 @@ const ProductDetail = () => {
           className="mb-12"
           dir={isRTL ? 'rtl' : 'ltr'}
         >
-          <TabsList className={`w-full border-b rounded-none bg-transparent h-auto p-0 flex-wrap ${isRTL ? 'justify-end' : 'justify-start'}`}>
+          <TabsList className={`w-full flex border-b rounded-none bg-transparent h-auto p-0 flex-wrap ${isRTL ? 'flex-row-reverse justify-start' : 'justify-start'}`}>
             <TabsTrigger
               value="description"
               className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
