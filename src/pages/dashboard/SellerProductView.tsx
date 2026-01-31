@@ -36,9 +36,8 @@ interface Product {
   name: string;
   slug: string;
   description: string | null;
-  price: number;
-  compare_at_price: number | null;
-  currency: string;
+  price_afn: number;
+  compare_price_afn: number | null;
   quantity: number;
   sku: string | null;
   images: string[] | null;
@@ -118,9 +117,6 @@ const SellerProductView = () => {
 
   const metadata = product?.metadata || {};
   const productImages = product?.images || [];
-  const priceUSD = (metadata.priceUSD as number) || 0;
-  const discountPriceUSD = (metadata.discountPriceUSD as number) || null;
-  const productCurrency = product?.currency || 'AFN';
   const videoUrl = metadata.videoUrl as string | undefined;
 
   // Build gallery items: video first (if exists), then images
@@ -319,47 +315,28 @@ const SellerProductView = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-0 space-y-3">
-                {/* Primary Price */}
+                {/* Primary Price in AFN */}
                 <div className={cn("flex items-baseline gap-3 flex-wrap", isRTL && "flex-row-reverse")}>
-                  {product.compare_at_price && product.compare_at_price !== product.price ? (
+                  {product.compare_price_afn && product.compare_price_afn !== product.price_afn ? (
                     <>
                       {/* Original price (the higher one) lined through */}
                       <span className="text-lg text-muted-foreground line-through">
-                        {formatCurrency(Math.max(product.compare_at_price, product.price), productCurrency, isRTL)}
+                        {formatCurrency(Math.max(product.compare_price_afn, product.price_afn), 'AFN', isRTL)}
                       </span>
                       {/* Discounted price (the lower one) bold in orange */}
                       <span className="text-2xl font-bold text-orange">
-                        {formatCurrency(Math.min(product.compare_at_price, product.price), productCurrency, isRTL)}
+                        {formatCurrency(Math.min(product.compare_price_afn, product.price_afn), 'AFN', isRTL)}
                       </span>
                       <Badge variant="secondary" className="bg-success/10 text-success">
-                        {Math.round((Math.abs(product.compare_at_price - product.price) / Math.max(product.compare_at_price, product.price)) * 100)}% {isRTL ? 'تخفیف' : 'OFF'}
+                        {Math.round((Math.abs(product.compare_price_afn - product.price_afn) / Math.max(product.compare_price_afn, product.price_afn)) * 100)}% {isRTL ? 'تخفیف' : 'OFF'}
                       </Badge>
                     </>
                   ) : (
                     <span className="text-2xl font-bold">
-                      {formatCurrency(product.price, productCurrency, isRTL)}
+                      {formatCurrency(product.price_afn, 'AFN', isRTL)}
                     </span>
                   )}
                 </div>
-
-                {/* USD Price (if different currency and available) */}
-                {priceUSD > 0 && productCurrency !== 'USD' && (
-                  <div className={cn("flex items-baseline gap-3 flex-wrap", isRTL && "flex-row-reverse")}>
-                    <span className="text-sm text-muted-foreground">USD:</span>
-                    {discountPriceUSD && discountPriceUSD < priceUSD ? (
-                      <>
-                        <span className="text-muted-foreground line-through">
-                          {formatCurrency(priceUSD, 'USD', isRTL)}
-                        </span>
-                        <span className="text-xl font-bold text-orange">
-                          {formatCurrency(discountPriceUSD, 'USD', isRTL)}
-                        </span>
-                      </>
-                    ) : (
-                      <span className="text-xl font-bold">{formatCurrency(priceUSD, 'USD', isRTL)}</span>
-                    )}
-                  </div>
-                )}
 
                 <Separator className="my-2" />
 
@@ -377,7 +354,7 @@ const SellerProductView = () => {
                 </div>
 
                 <div className="text-xs text-muted-foreground">
-                  {isRTL ? 'واحد پول اصلی:' : 'Primary currency:'} {productCurrency}
+                  {isRTL ? 'واحد پول اصلی:' : 'Primary currency:'} AFN
                 </div>
               </CardContent>
             </Card>
