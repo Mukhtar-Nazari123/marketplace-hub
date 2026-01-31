@@ -166,7 +166,7 @@ const BuyerOrders = () => {
           *,
           order_items (
             *,
-            products:product_id (sku, currency)
+            products:product_id (sku)
           )
         `,
         )
@@ -180,11 +180,11 @@ const BuyerOrders = () => {
         (data || []).map(async (order) => {
           const { data: sellerOrders } = await supabase.from("seller_orders").select("*").eq("order_id", order.id);
 
-          // Map order items to include product_sku and product_currency
+          // Map order items to include product_sku - use order currency since products don't have currency column
           const orderItemsWithSku = (order.order_items || []).map((item: any) => ({
             ...item,
             product_sku: item.products?.sku || null,
-            product_currency: item.products?.currency || null,
+            product_currency: order.currency,
           }));
 
           // Group items by seller for seller sub-orders
