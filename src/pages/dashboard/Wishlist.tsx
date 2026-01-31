@@ -11,22 +11,25 @@ import { Heart, Package } from 'lucide-react';
 import ProductCard from '@/components/home/ProductCard';
 import { useProductRatings } from '@/hooks/useProductRatings';
 
+interface WishlistProduct {
+  id: string;
+  name_en: string | null;
+  name_fa: string | null;
+  name_ps: string | null;
+  price_afn: number | null;
+  compare_price_afn: number | null;
+  images: string[] | null;
+  status: string | null;
+  quantity: number | null;
+  is_featured: boolean | null;
+  created_at: string | null;
+}
+
 interface WishlistItem {
   id: string;
   product_id: string;
   created_at: string;
-  product: {
-    id: string;
-    name: string;
-    price: number;
-    compare_at_price: number | null;
-    images: string[] | null;
-    status: string;
-    quantity: number;
-    is_featured: boolean;
-    currency: string;
-    created_at: string;
-  } | null;
+  product: WishlistProduct | null;
 }
 
 const Wishlist = () => {
@@ -44,6 +47,14 @@ const Wishlist = () => {
     .map(item => item.product!.id);
   const { getRating } = useProductRatings(productIds);
 
+  // Helper for localized product name
+  const getProductName = (product: WishlistProduct | null): string => {
+    if (!product) return '';
+    if (language === 'ps') return product.name_ps || product.name_fa || product.name_en || '';
+    if (language === 'fa') return product.name_fa || product.name_en || '';
+    return product.name_en || '';
+  };
+
   useEffect(() => {
     if (!authLoading && user) {
       fetchWishlist();
@@ -60,16 +71,17 @@ const Wishlist = () => {
         id,
         product_id,
         created_at,
-        product:products (
+        product:products_with_translations (
           id,
-          name,
-          price,
-          compare_at_price,
+          name_en,
+          name_fa,
+          name_ps,
+          price_afn,
+          compare_price_afn,
           images,
           status,
           quantity,
           is_featured,
-          currency,
           created_at
         )
       `)
@@ -115,38 +127,40 @@ const Wishlist = () => {
 
   const t = texts[language as keyof typeof texts] || texts.en;
 
-  const getProductCardData = (product: WishlistItem['product']) => {
+  const getProductCardData = (product: WishlistProduct | null) => {
     if (!product) return null;
 
-    const currency = (product.currency as "AFN" | "USD") || "AFN";
-    const hasDiscount = product.compare_at_price && product.compare_at_price !== product.price;
+    const currency: "AFN" | "USD" = "AFN";
+    const price = product.price_afn || 0;
+    const comparePrice = product.compare_price_afn;
+    const hasDiscount = comparePrice && comparePrice !== price;
     let originalPrice: number | undefined;
-    let currentPrice = product.price;
+    let currentPrice = price;
     let discount: number | undefined;
 
     if (hasDiscount) {
-      if (product.compare_at_price! > product.price) {
-        originalPrice = product.compare_at_price!;
-        currentPrice = product.price;
+      if (comparePrice! > price) {
+        originalPrice = comparePrice!;
+        currentPrice = price;
       } else {
-        originalPrice = product.price;
-        currentPrice = product.compare_at_price!;
+        originalPrice = price;
+        currentPrice = comparePrice!;
       }
       discount = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
     }
 
-    const isNew = new Date(product.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const isNew = product.created_at ? new Date(product.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) : false;
     const { averageRating, reviewCount } = getRating(product.id);
 
     return {
       id: product.id,
-      name: product.name,
+      name: getProductName(product),
       price: currentPrice,
       originalPrice,
       rating: averageRating,
       reviews: reviewCount,
       isNew,
-      isHot: product.is_featured,
+      isHot: product.is_featured || false,
       discount,
       image: product.images?.[0],
       currency,
