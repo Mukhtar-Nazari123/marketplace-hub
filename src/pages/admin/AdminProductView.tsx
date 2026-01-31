@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ProductContentDisplay } from '@/components/products/ProductContentDisplay';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -83,6 +84,16 @@ interface Product {
   is_featured: boolean;
   delivery_fee: number;
   metadata: Json;
+  // Translation fields
+  name_en: string | null;
+  name_fa: string | null;
+  name_ps: string | null;
+  description_en: string | null;
+  description_fa: string | null;
+  description_ps: string | null;
+  short_description_en: string | null;
+  short_description_fa: string | null;
+  short_description_ps: string | null;
 }
 
 const AdminProductView = () => {
@@ -544,97 +555,8 @@ const AdminProductView = () => {
               </CardContent>
             </Card>
 
-            {/* Description */}
-            {(product.description || metadata?.shortDescription) && (
-              <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Info className="h-5 w-5 text-primary" />
-                  {getLabel(lang, 'Description', 'توضیحات', 'توضیحات')}
-                </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {metadata?.shortDescription && (
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground mb-1">
-                        {getLabel(lang, 'Short Description', 'توضیح کوتاه', 'لنډ توضیحات')}
-                      </p>
-                      <p>{metadata.shortDescription}</p>
-                    </div>
-                  )}
-                  {product.description && (
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground mb-1">
-                        {getLabel(lang, 'Full Description', 'توضیحات کامل', 'بشپړ توضیحات')}
-                      </p>
-                      <p className="whitespace-pre-wrap">{product.description}</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Attributes */}
-            {metadata?.attributes && Object.keys(metadata.attributes).length > 0 && (
-              <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Layers className="h-5 w-5 text-primary" />
-                  {getLabel(lang, 'Attributes', 'ویژگی‌ها', 'ځانګړتیاوې')}
-                </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {/* Sort attributes: boolean (warranty) first, then others */}
-                    {Object.entries(metadata.attributes)
-                      .sort(([, a], [, b]) => {
-                        // Boolean values (like warranty) come first
-                        const aIsBoolean = typeof a === 'boolean';
-                        const bIsBoolean = typeof b === 'boolean';
-                        if (aIsBoolean && !bIsBoolean) return -1;
-                        if (!aIsBoolean && bIsBoolean) return 1;
-                        return 0;
-                      })
-                      .map(([key, value]) => (
-                        <div key={key} className="p-3 bg-muted/50 rounded-lg">
-                          <p className="text-xs text-muted-foreground capitalize">
-                            {key.replace(/([A-Z])/g, ' $1').trim()}
-                          </p>
-                          <p className="font-medium">
-                            {typeof value === 'boolean' 
-                              ? (value ? getLabel(lang, 'Yes', 'بله', 'هو') : getLabel(lang, 'No', 'خیر', 'نه'))
-                              : Array.isArray(value)
-                                ? value.join(', ')
-                                : String(value)}
-                          </p>
-                        </div>
-                      ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Stock per Size */}
-            {metadata?.stockPerSize && Object.keys(metadata.stockPerSize).length > 0 && (
-              <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Package className="h-5 w-5 text-primary" />
-                  {getLabel(lang, 'Stock per Size', 'موجودی بر اساس سایز', 'د سایز له مخې ذخیره')}
-                </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-3">
-                    {Object.entries(metadata.stockPerSize).map(([size, qty]) => (
-                      <div key={size} className="px-4 py-2 bg-muted/50 rounded-lg text-center min-w-[80px]">
-                        <p className="text-sm font-bold">{size}</p>
-                        <p className="text-xs text-muted-foreground">{qty} {getLabel(lang, 'units', 'عدد', 'واحد')}</p>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+            {/* Product Content & Translations */}
+            <ProductContentDisplay product={product as any} />
           </div>
         </div>
       </div>
