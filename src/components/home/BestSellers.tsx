@@ -7,10 +7,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProductRatings } from "@/hooks/useProductRatings";
 import { Link } from "react-router-dom";
+import { getLocalizedProductName } from "@/lib/localizedProduct";
 
 interface Product {
   id: string;
   name: string;
+  name_en?: string | null;
+  name_fa?: string | null;
+  name_ps?: string | null;
   price_afn: number;
   compare_price_afn: number | null;
   images: string[];
@@ -19,7 +23,7 @@ interface Product {
 }
 
 const BestSellers = () => {
-  const { t, isRTL } = useLanguage();
+  const { t, isRTL, language } = useLanguage();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -31,7 +35,7 @@ const BestSellers = () => {
 
   useEffect(() => {
     fetchBestSellers();
-  }, []);
+  }, [language]);
 
   const fetchBestSellers = async () => {
     setIsLoading(true);
@@ -78,7 +82,7 @@ const BestSellers = () => {
 
     return {
       id: product.id,
-      name: product.name,
+      name: getLocalizedProductName(product, language),
       price: currentPrice,
       originalPrice,
       rating: averageRating,

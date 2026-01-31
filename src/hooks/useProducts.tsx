@@ -1,11 +1,18 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { getLocalizedProductName, getLocalizedProductDescription } from '@/lib/localizedProduct';
 
 export interface DBProduct {
   id: string;
   name: string;
+  name_en?: string | null;
+  name_fa?: string | null;
+  name_ps?: string | null;
   slug: string;
   description: string | null;
+  description_en?: string | null;
+  description_fa?: string | null;
+  description_ps?: string | null;
   price_afn: number;
   compare_price_afn: number | null;
   images: string[] | null;
@@ -239,7 +246,7 @@ export const formatProductForDisplay = (product: DBProduct, language: 'fa' | 'en
 
   return {
     id: product.id,
-    name: { fa: product.name, en: product.name },
+    name: getLocalizedProductName(product, language),
     slug: product.slug,
     price: currentPrice,
     originalPrice,
@@ -264,7 +271,7 @@ export const formatProductForDisplay = (product: DBProduct, language: 'fa' | 'en
       productCount: 0,
       avatar: '',
     },
-    description: { fa: product.description || '', en: product.description || '' },
+    description: getLocalizedProductDescription(product, language),
     specifications: [],
   };
 };

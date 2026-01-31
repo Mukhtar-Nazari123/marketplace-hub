@@ -343,7 +343,7 @@ const Products = () => {
 interface ProductCardProps {
   product: {
     id: string;
-    name: { fa: string; en: string } | string;
+    name: string;
     slug: string;
     price: number;
     originalPrice?: number;
@@ -372,11 +372,8 @@ const ProductCard = ({ product, getRating }: ProductCardProps) => {
 
   const { averageRating, reviewCount } = getRating(product.id);
 
-  const getName = () => {
-    if (typeof product.name === "string") return product.name;
-    if (language === 'ps') return (product.name as any).ps || product.name.fa || product.name.en;
-    return product.name[language] || product.name.en;
-  };
+  // Name is already localized from the hook
+  const getName = () => product.name;
 
   const getLabel = (en: string, fa: string, ps: string) => {
     if (language === 'ps') return ps;

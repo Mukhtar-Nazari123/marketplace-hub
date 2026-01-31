@@ -19,10 +19,14 @@ import { useCart } from "@/hooks/useCart";
 import { useWishlist } from "@/hooks/useWishlist";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
+import { getLocalizedProductName } from "@/lib/localizedProduct";
 
 interface DbProduct {
   id: string;
   name: string;
+  name_en?: string | null;
+  name_fa?: string | null;
+  name_ps?: string | null;
   slug: string;
   price_afn: number;
   compare_price_afn: number | null;
@@ -140,7 +144,7 @@ const Categories = () => {
         let query = supabase
           .from("products_with_translations")
           .select(
-            "id, name, slug, price_afn, compare_price_afn, images, category_id, quantity, is_featured, metadata",
+            "id, name, name_en, name_fa, name_ps, slug, price_afn, compare_price_afn, images, category_id, quantity, is_featured, metadata",
           )
           .eq("status", "active");
 
@@ -168,7 +172,7 @@ const Categories = () => {
     if (!categoriesLoading) {
       fetchProducts();
     }
-  }, [currentCategory?.id, currentSubcategory?.id, subcategories, categoriesLoading]);
+  }, [currentCategory?.id, currentSubcategory?.id, subcategories, categoriesLoading, language]);
 
   // Reset page when filters change
   useEffect(() => {
@@ -196,7 +200,7 @@ const Categories = () => {
 
       return {
         id: p.id,
-        name: { fa: p.name, en: p.name },
+        name: getLocalizedProductName(p, language),
         slug: p.slug,
         price: effectivePrice,
         originalPrice: effectiveOriginalPrice,
@@ -217,7 +221,7 @@ const Categories = () => {
         specifications: [],
       };
     });
-  }, [dbProducts, currentCategory, currentSubcategory]);
+  }, [dbProducts, currentCategory, currentSubcategory, language]);
 
   const filteredProducts = useMemo(() => {
     let result = [...displayProducts];
@@ -436,7 +440,7 @@ const Categories = () => {
 interface ProductCardProps {
   product: {
     id: string;
-    name: { fa: string; en: string } | string;
+    name: string;
     slug: string;
     price: number;
     originalPrice?: number;
@@ -465,11 +469,8 @@ const ProductCard = ({ product, getRating }: ProductCardProps) => {
 
   const { averageRating, reviewCount } = getRating(product.id);
 
-  const getName = () => {
-    if (typeof product.name === "string") return product.name;
-    if (language === 'ps') return (product.name as any).ps || product.name.fa || product.name.en;
-    return product.name[language] || product.name.en;
-  };
+  // Name is already localized
+  const getName = () => product.name;
 
   const getLabel = (en: string, fa: string, ps: string) => {
     if (language === 'ps') return ps;
