@@ -640,9 +640,9 @@ const ProductDetail = () => {
 
             {/* Seller Info */}
             {product.seller?.business_name && (
-              <div className="p-4 bg-muted/50 rounded-xl border border-border">
+              <div className={`p-4 bg-muted/50 rounded-xl border border-border ${isRTL ? 'text-right' : 'text-left'}`}>
                 <h4 className="font-medium mb-3">{isRTL ? 'اطلاعات فروشنده' : 'Seller Information'}</h4>
-                <div className="flex items-center gap-3">
+                <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                   {product.seller.store_logo ? (
                     <img
                       src={product.seller.store_logo}
@@ -654,9 +654,9 @@ const ProductDetail = () => {
                       <Store className="text-primary" size={24} />
                     </div>
                   )}
-                  <div>
+                  <div className={isRTL ? 'text-right' : 'text-left'}>
                     <p className="font-medium">{product.seller.business_name}</p>
-                    <p className="text-sm text-muted-foreground flex items-center gap-1">
+                    <p className={`text-sm text-muted-foreground flex items-center gap-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
                       <Calendar size={14} />
                       {isRTL ? 'عضویت:' : 'Member since'} {formatDate(product.created_at)}
                     </p>
@@ -675,8 +675,9 @@ const ProductDetail = () => {
               : "description"
           } 
           className="mb-12"
+          dir={isRTL ? 'rtl' : 'ltr'}
         >
-          <TabsList className="w-full justify-start border-b rounded-none bg-transparent h-auto p-0 flex-wrap">
+          <TabsList className={`w-full border-b rounded-none bg-transparent h-auto p-0 flex-wrap ${isRTL ? 'justify-end' : 'justify-start'}`}>
             <TabsTrigger
               value="description"
               className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
@@ -699,7 +700,7 @@ const ProductDetail = () => {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="description" className="pt-6">
+          <TabsContent value="description" className={`pt-6 ${isRTL ? 'text-right' : 'text-left'}`}>
             <div className="prose prose-lg max-w-none text-muted-foreground">
               {localizedDescription ? (
                 <p className="leading-relaxed whitespace-pre-wrap">{localizedDescription}</p>
@@ -710,7 +711,7 @@ const ProductDetail = () => {
           </TabsContent>
 
           {(Object.keys(specifications).length > 0 || technicalSpecsString) && (
-            <TabsContent value="specifications" className="pt-6">
+            <TabsContent value="specifications" className={`pt-6 ${isRTL ? 'text-right' : 'text-left'}`}>
               {/* Technical Specifications from textarea */}
               {technicalSpecsString && (
                 <div className="mb-6 p-4 bg-muted/50 rounded-lg border border-border">
@@ -725,7 +726,7 @@ const ProductDetail = () => {
               {Object.keys(specifications).length > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {Object.entries(specifications).map(([key, value]) => (
-                    <div key={key} className="flex justify-between p-3 bg-muted/50 rounded-lg border border-border">
+                    <div key={key} className={`flex ${isRTL ? 'flex-row-reverse' : ''} justify-between p-3 bg-muted/50 rounded-lg border border-border`}>
                       <span className="text-muted-foreground">{key}</span>
                       <span className="font-medium">{String(value)}</span>
                     </div>
