@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useCart } from '@/hooks/useCart';
 import { useLanguage } from '@/lib/i18n';
+import { useCurrencyRate } from '@/hooks/useCurrencyRate';
 import { supabase } from '@/integrations/supabase/client';
 import type { Json } from '@/integrations/supabase/types';
 import Header from '@/components/layout/Header';
@@ -106,6 +107,7 @@ const Checkout = () => {
   const { user, role, loading: authLoading } = useAuth();
   const { items: cartItems, clearCart, loading: cartLoading } = useCart();
   const { t, isRTL } = useLanguage();
+  const { convertToUSD, rate } = useCurrencyRate();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -662,7 +664,14 @@ const Checkout = () => {
                       <div className="space-y-2 bg-muted/30 p-4 rounded-lg">
                         <div className="flex justify-between font-bold text-lg">
                           <span>{isRTL ? 'جمع محصولات' : 'Products Total'} ({currencyData.currency})</span>
-                          <span className="text-primary">{currencyData.productSubtotal.toLocaleString()} {currencyData.symbol}</span>
+                          <div className="text-right">
+                            <span className="text-primary">{currencyData.productSubtotal.toLocaleString()} {currencyData.symbol}</span>
+                            {rate && currencyData.currency === 'AFN' && (
+                              <p className="text-sm font-normal text-muted-foreground">
+                                ≈ ${convertToUSD(currencyData.productSubtotal).toFixed(2)} USD
+                              </p>
+                            )}
+                          </div>
                         </div>
                       </div>
 
@@ -698,13 +707,20 @@ const Checkout = () => {
                       <Separator />
                       <div className="flex justify-between font-bold">
                         <span>{isRTL ? 'جمع هزینه ارسال' : 'Total Delivery'}</span>
-                        <span className="text-primary">
-                          {deliveryBreakdown.totalDeliveryAFN === 0 ? (
-                            <Badge variant="outline" className="text-success">{isRTL ? 'رایگان' : 'Free'}</Badge>
-                          ) : (
-                            `${deliveryBreakdown.totalDeliveryAFN.toLocaleString()} ${afnSymbol}`
+                        <div className="text-right">
+                          <span className="text-primary">
+                            {deliveryBreakdown.totalDeliveryAFN === 0 ? (
+                              <Badge variant="outline" className="text-success">{isRTL ? 'رایگان' : 'Free'}</Badge>
+                            ) : (
+                              `${deliveryBreakdown.totalDeliveryAFN.toLocaleString()} ${afnSymbol}`
+                            )}
+                          </span>
+                          {rate && deliveryBreakdown.totalDeliveryAFN > 0 && (
+                            <p className="text-sm font-normal text-muted-foreground">
+                              ≈ ${convertToUSD(deliveryBreakdown.totalDeliveryAFN).toFixed(2)} USD
+                            </p>
                           )}
-                        </span>
+                        </div>
                       </div>
                     </div>
                   </div>
