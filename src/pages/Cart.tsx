@@ -239,18 +239,25 @@ const Cart = () => {
                           >
                             {product?.name || 'Product'}
                           </Link>
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <p className="text-primary font-bold">
-                              {item.effectivePrice?.toLocaleString() || 0} {item.currencySymbol}
-                            </p>
-                            {item.hasDiscount && item.originalPrice && (
-                              <p className="text-muted-foreground text-sm line-through">
-                                {item.originalPrice.toLocaleString()} {item.currencySymbol}
+                          <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <p className="text-primary font-bold">
+                                {item.effectivePrice?.toLocaleString() || 0} {item.currencySymbol}
+                              </p>
+                              {item.hasDiscount && item.originalPrice && (
+                                <p className="text-muted-foreground text-sm line-through">
+                                  {item.originalPrice.toLocaleString()} {item.currencySymbol}
+                                </p>
+                              )}
+                              <Badge variant="outline" className="text-xs">
+                                {item.currency}
+                              </Badge>
+                            </div>
+                            {rate && (
+                              <p className="text-xs text-muted-foreground">
+                                ≈ ${convertToUSD(item.effectivePrice || 0).toFixed(2)} USD
                               </p>
                             )}
-                            <Badge variant="outline" className="text-xs">
-                              {item.currency}
-                            </Badge>
                           </div>
 
                           {/* Quantity Controls */}
