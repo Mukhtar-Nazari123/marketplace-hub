@@ -106,10 +106,17 @@ const STEPS = [
 const Checkout = () => {
   const { user, role, loading: authLoading } = useAuth();
   const { items: cartItems, clearCart, loading: cartLoading } = useCart();
-  const { t, isRTL } = useLanguage();
+  const { t, isRTL, language } = useLanguage();
   const { convertToUSD, rate } = useCurrencyRate();
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Trilingual label helper
+  const getLabel = (en: string, fa: string, ps: string) => {
+    if (language === 'ps') return ps;
+    if (language === 'fa') return fa;
+    return en;
+  };
 
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -247,7 +254,7 @@ const Checkout = () => {
         // Track delivery fee per seller (only once per seller, always AFN)
         if (!sellerDeliveryFees.has(sellerId)) {
           const deliveryFee = item.product?.delivery_fee || 0;
-          const sellerName = sellerGroups[sellerId].policy?.sellerName || (isRTL ? 'فروشنده' : 'Seller');
+          const sellerName = sellerGroups[sellerId].policy?.sellerName || getLabel('Seller', 'فروشنده', 'پلورونکی');
           sellerDeliveryFees.set(sellerId, { sellerId, sellerName, deliveryFee });
         }
       });
@@ -268,7 +275,7 @@ const Checkout = () => {
 
         return {
           sellerId,
-          sellerName: group.policy?.sellerName || (isRTL ? 'فروشنده' : 'Seller'),
+          sellerName: group.policy?.sellerName || getLabel('Seller', 'فروشنده', 'پلورونکی'),
           products,
           productSubtotal,
           deliveryFee, // in AFN
@@ -303,7 +310,7 @@ const Checkout = () => {
   const handleNext = () => {
     if (currentStep === 1 && !validateAddress()) {
       toast({
-        title: isRTL ? 'خطا' : 'Error',
+        title: getLabel('Error', 'خطا', 'تېروتنه'),
         description: t.checkout.errors.fillAllFields,
         variant: 'destructive',
       });
@@ -465,7 +472,7 @@ const Checkout = () => {
     } catch (error) {
       console.error('Error placing order:', error);
       toast({
-        title: isRTL ? 'خطا' : 'Error',
+        title: getLabel('Error', 'خطا', 'تېروتنه'),
         description: t.checkout.errors.orderFailed,
         variant: 'destructive',
       });
@@ -626,7 +633,7 @@ const Checkout = () => {
                           {currencyData.currency}
                         </Badge>
                         <span className="text-muted-foreground text-sm">
-                          {isRTL ? 'محصولات' : 'Products'}
+                          {getLabel('Products', 'محصولات', 'محصولات')}
                         </span>
                       </div>
 
@@ -657,7 +664,7 @@ const Checkout = () => {
                             {/* Seller Subtotals */}
                             <div className="space-y-2 text-sm">
                               <div className="flex justify-between font-medium">
-                                <span>{isRTL ? 'جمع محصولات' : 'Products Subtotal'}</span>
+                                <span>{getLabel('Products Subtotal', 'جمع محصولات', 'د محصولاتو مجموعه')}</span>
                                 <span>{seller.productSubtotal.toLocaleString()} {currencyData.symbol}</span>
                               </div>
                             </div>
@@ -668,7 +675,7 @@ const Checkout = () => {
                       {/* Currency Total */}
                       <div className="space-y-2 bg-muted/30 p-4 rounded-lg">
                         <div className="flex justify-between font-bold text-lg">
-                          <span>{isRTL ? 'جمع محصولات' : 'Products Total'} ({currencyData.currency})</span>
+                          <span>{getLabel('Products Total', 'جمع محصولات', 'د محصولاتو مجموعه')} ({currencyData.currency})</span>
                           <div className="text-right">
                             <span className="text-primary">{currencyData.productSubtotal.toLocaleString()} {currencyData.symbol}</span>
                             {rate && currencyData.currency === 'AFN' && (
@@ -692,7 +699,7 @@ const Checkout = () => {
                       </Badge>
                       <span className="text-muted-foreground text-sm flex items-center gap-1">
                         <Truck className="w-4 h-4" />
-                        {isRTL ? 'هزینه ارسال' : 'Delivery Fees'}
+                        {getLabel('Delivery Fees', 'هزینه ارسال', 'د لیږد فیس')}
                       </span>
                     </div>
 
@@ -702,7 +709,7 @@ const Checkout = () => {
                           <span className="text-muted-foreground">{seller.sellerName}</span>
                           <span>
                             {seller.deliveryFee === 0 ? (
-                              <Badge variant="outline" className="text-success">{isRTL ? 'رایگان' : 'Free'}</Badge>
+                              <Badge variant="outline" className="text-success">{getLabel('Free', 'رایگان', 'وړیا')}</Badge>
                             ) : (
                               `${seller.deliveryFee.toLocaleString()} ${afnSymbol}`
                             )}
@@ -711,11 +718,11 @@ const Checkout = () => {
                       ))}
                       <Separator />
                       <div className="flex justify-between font-bold">
-                        <span>{isRTL ? 'جمع هزینه ارسال' : 'Total Delivery'}</span>
+                        <span>{getLabel('Total Delivery', 'جمع هزینه ارسال', 'د لیږد ټوله')}</span>
                         <div className="text-right">
                           <span className="text-primary">
                             {deliveryBreakdown.totalDeliveryAFN === 0 ? (
-                              <Badge variant="outline" className="text-success">{isRTL ? 'رایگان' : 'Free'}</Badge>
+                              <Badge variant="outline" className="text-success">{getLabel('Free', 'رایگان', 'وړیا')}</Badge>
                             ) : (
                               `${deliveryBreakdown.totalDeliveryAFN.toLocaleString()} ${afnSymbol}`
                             )}
@@ -733,9 +740,11 @@ const Checkout = () => {
                   {currencyBreakdowns.length > 1 && (
                     <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg">
                       <p className="text-sm text-amber-700 dark:text-amber-400">
-                        {isRTL 
-                          ? 'توجه: سفارش شما شامل محصولات با ارز متفاوت است. مبالغ به صورت جداگانه محاسبه شده‌اند.' 
-                          : 'Note: Your order contains products in different currencies. Amounts are calculated separately.'}
+                        {getLabel(
+                          'Note: Your order contains products in different currencies. Amounts are calculated separately.',
+                          'توجه: سفارش شما شامل محصولات با ارز متفاوت است. مبالغ به صورت جداگانه محاسبه شده‌اند.',
+                          'یادونه: ستاسو سفارش مختلفې اسعارو کې محصولات لري. مبالغ جلا محاسبه شوي.'
+                        )}
                       </p>
                     </div>
                   )}
@@ -861,7 +870,7 @@ const Checkout = () => {
                       {/* Show totals per currency */}
                       {currencyBreakdowns.map((cb) => (
                         <div key={cb.currency} className="flex justify-between">
-                          <span className="text-muted-foreground">{isRTL ? 'محصولات' : 'Products'} ({cb.currency}):</span>
+                          <span className="text-muted-foreground">{getLabel('Products', 'محصولات', 'محصولات')} ({cb.currency}):</span>
                           <span className="font-medium">{cb.productSubtotal.toLocaleString()} {cb.symbol}</span>
                         </div>
                       ))}
@@ -869,7 +878,7 @@ const Checkout = () => {
                         <span className="text-muted-foreground">{t.checkout.orderSummary.deliveryFee} (AFN):</span>
                         <span className="font-medium">
                           {deliveryBreakdown.totalDeliveryAFN === 0 
-                            ? (isRTL ? 'رایگان' : 'Free') 
+                            ? getLabel('Free', 'رایگان', 'وړیا')
                             : `${deliveryBreakdown.totalDeliveryAFN.toLocaleString()} ${afnSymbol}`
                           }
                         </span>
@@ -882,7 +891,7 @@ const Checkout = () => {
                         return (
                           <div className="space-y-1">
                             <div className="flex justify-between text-lg font-bold">
-                              <span>{isRTL ? 'جمع کل' : 'Total'} (AFN):</span>
+                              <span>{getLabel('Total', 'جمع کل', 'مجموعه')} (AFN):</span>
                               <span className="text-primary">{grandTotalAFN.toLocaleString()} {afnSymbol}</span>
                             </div>
                             {rate && (
