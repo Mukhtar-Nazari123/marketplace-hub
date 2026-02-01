@@ -238,16 +238,6 @@ const Products = () => {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
           <div>
             <h1 className="text-2xl font-bold text-foreground">{getTitle()}</h1>
-            <p className="text-muted-foreground">
-              {loading ? (
-                <span className="inline-flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  {getLabel('Searching...', 'در حال جستجو...', 'لټون روان دی...')}
-                </span>
-              ) : (
-                `${filteredProducts.length} ${getLabel('products', 'محصول', 'محصولات')}`
-              )}
-            </p>
           </div>
         </div>
 

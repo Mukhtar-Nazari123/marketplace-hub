@@ -304,9 +304,6 @@ const Categories = () => {
                 (currentCategory && getLocalizedName(currentCategory)) ||
                 t.categories.allCategories}
             </h1>
-            <p className="text-muted-foreground">
-              {filteredProducts.length} {getLabel('products', 'محصول', 'محصولات')}
-            </p>
           </div>
         </div>
 
@@ -346,9 +343,6 @@ const Categories = () => {
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                       <div className="absolute bottom-0 left-0 right-0 p-3">
                         <h3 className="text-white font-bold text-sm sm:text-base">{catLabel}</h3>
-                        <p className="text-white/70 text-xs">
-                          {cat.subcategories?.length || 0} {t.categories.subcategories}
-                        </p>
                       </div>
                     </Link>
                   );
