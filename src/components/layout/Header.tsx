@@ -85,7 +85,7 @@ const Header = () => {
         <div className="container px-2 sm:px-4 py-2">
           <div className="flex items-center justify-between gap-1 sm:gap-2">
             {/* Logo - Only image */}
-            <Link to="/" className="flex-shrink-0">
+            <Link to="/" className="flex-shrink-0 ps-2 sm:ps-0">
               {logoUrl ? (
                 <img src={logoUrl} alt={siteName} className="h-8 sm:h-10 w-auto object-contain" />
               ) : (
