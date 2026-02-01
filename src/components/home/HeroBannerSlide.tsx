@@ -39,26 +39,26 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
         <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/20 to-transparent" />
       </div>
 
-      {/* Layer 2: Background Image with Fade Effect */}
+      {/* Layer 2: Background Image as Circle with Fade */}
       {banner.background_image && (
         <div
-          className={`absolute z-[2] bottom-0 top-0 pointer-events-none flex items-end
-            ${isRTL ? "left-0" : "right-0"}
+          className={`absolute z-[2] top-1/2 -translate-y-1/2 pointer-events-none
+            ${isRTL ? "left-[3%] sm:left-[5%]" : "right-[3%] sm:right-[5%]"}
           `}
-          style={{
-            maskImage: isRTL
-              ? "linear-gradient(to right, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)"
-              : "linear-gradient(to left, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)",
-            WebkitMaskImage: isRTL
-              ? "linear-gradient(to right, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)"
-              : "linear-gradient(to left, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)",
-          }}
         >
-          <img
-            src={banner.background_image}
-            alt=""
-            className="h-full w-auto max-w-[280px] sm:max-w-[350px] lg:max-w-[450px] xl:max-w-[500px] object-contain object-bottom"
-          />
+          <div 
+            className="w-[160px] h-[160px] sm:w-[200px] sm:h-[200px] lg:w-[240px] lg:h-[240px] xl:w-[280px] xl:h-[280px] rounded-full overflow-hidden"
+            style={{
+              maskImage: "radial-gradient(circle, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)",
+              WebkitMaskImage: "radial-gradient(circle, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)",
+            }}
+          >
+            <img
+              src={banner.background_image}
+              alt=""
+              className="w-full h-full object-cover"
+            />
+          </div>
         </div>
       )}
 
