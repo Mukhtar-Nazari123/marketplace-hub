@@ -211,12 +211,12 @@ const Cart = () => {
                 
                 return (
                   <Card key={item.id} className="overflow-hidden">
-                    <CardContent className="p-4">
-                      <div className="flex gap-4">
+                    <CardContent className="p-3 sm:p-4">
+                      <div className="flex gap-3 sm:gap-4">
                         {/* Product Image */}
                         <Link 
                           to={`/products/${productSlug}`}
-                          className="w-24 h-24 bg-muted rounded-lg overflow-hidden flex-shrink-0 hover:opacity-80 transition-opacity"
+                          className="w-20 h-20 sm:w-24 sm:h-24 bg-muted rounded-lg overflow-hidden flex-shrink-0 hover:opacity-80 transition-opacity"
                         >
                           {product?.images?.[0] ? (
                             <img
@@ -226,103 +226,108 @@ const Cart = () => {
                             />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                              <ShoppingBag size={32} />
+                              <ShoppingBag size={24} />
                             </div>
                           )}
                         </Link>
 
-                        {/* Product Details */}
+                        {/* Product Details - Full width on mobile */}
                         <div className="flex-1 min-w-0">
-                          <Link 
-                            to={`/products/${productSlug}`}
-                            className="font-medium text-foreground line-clamp-2 mb-1 hover:text-primary transition-colors"
-                          >
-                            {product?.name || 'Product'}
-                          </Link>
-                          <div className="flex flex-col gap-1">
+                          <div className="flex justify-between items-start gap-2">
+                            <Link 
+                              to={`/products/${productSlug}`}
+                              className="font-medium text-sm sm:text-base text-foreground line-clamp-2 hover:text-primary transition-colors"
+                            >
+                              {product?.name || 'Product'}
+                            </Link>
+                            
+                            {/* Action buttons - inline on mobile */}
+                            <div className="flex gap-0.5 flex-shrink-0">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7 sm:h-8 sm:w-8 text-primary hover:text-primary hover:bg-primary/10"
+                                onClick={() => navigate(`/products/${productSlug}`)}
+                                title={texts.viewDetails}
+                              >
+                                <Eye size={16} />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7 sm:h-8 sm:w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                onClick={() => removeFromCart(item.product_id)}
+                              >
+                                <Trash2 size={16} />
+                              </Button>
+                            </div>
+                          </div>
+
+                          {/* Price */}
+                          <div className="flex flex-col gap-0.5 mt-1">
                             <div className="flex items-center gap-2 flex-wrap">
-                              <p className="text-primary font-bold">
+                              <p className="text-primary font-bold text-sm sm:text-base">
                                 {item.effectivePrice?.toLocaleString() || 0} {item.currencySymbol}
                               </p>
                               {item.hasDiscount && item.originalPrice && (
-                                <p className="text-muted-foreground text-sm line-through">
+                                <p className="text-muted-foreground text-xs line-through">
                                   {item.originalPrice.toLocaleString()} {item.currencySymbol}
                                 </p>
                               )}
-                              <Badge variant="outline" className="text-xs">
+                              <Badge variant="outline" className="text-[10px] px-1.5 py-0">
                                 {item.currency}
                               </Badge>
                             </div>
                             {rate && (
-                              <p className="text-xs text-muted-foreground">
+                              <p className="text-[10px] sm:text-xs text-muted-foreground">
                                 ≈ ${convertToUSD(item.effectivePrice || 0).toFixed(2)} USD
                               </p>
                             )}
                           </div>
 
-                          {/* Quantity Controls */}
-                          <div className="flex items-center gap-2 mt-3">
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              className="h-8 w-8"
-                              onClick={() => updateQuantity(item.product_id, item.quantity - 1)}
-                              disabled={item.quantity <= 1}
-                            >
-                              <Minus size={14} />
-                            </Button>
-                            <Input
-                              type="number"
-                              value={item.quantity}
-                              onChange={(e) => {
-                                const val = parseInt(e.target.value);
-                                if (val >= 1) updateQuantity(item.product_id, val);
-                              }}
-                              className="w-16 h-8 text-center"
-                              min={1}
-                            />
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              className="h-8 w-8"
-                              onClick={() => updateQuantity(item.product_id, item.quantity + 1)}
-                              disabled={product?.quantity !== undefined && item.quantity >= product.quantity}
-                            >
-                              <Plus size={14} />
-                            </Button>
+                          {/* Quantity & Total - Same row on mobile */}
+                          <div className="flex items-center justify-between mt-2 gap-2">
+                            <div className="flex items-center gap-1.5">
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                className="h-7 w-7 sm:h-8 sm:w-8"
+                                onClick={() => updateQuantity(item.product_id, item.quantity - 1)}
+                                disabled={item.quantity <= 1}
+                              >
+                                <Minus size={12} />
+                              </Button>
+                              <Input
+                                type="number"
+                                value={item.quantity}
+                                onChange={(e) => {
+                                  const val = parseInt(e.target.value);
+                                  if (val >= 1) updateQuantity(item.product_id, val);
+                                }}
+                                className="w-12 sm:w-16 h-7 sm:h-8 text-center text-sm"
+                                min={1}
+                              />
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                className="h-7 w-7 sm:h-8 sm:w-8"
+                                onClick={() => updateQuantity(item.product_id, item.quantity + 1)}
+                                disabled={product?.quantity !== undefined && item.quantity >= product.quantity}
+                              >
+                                <Plus size={12} />
+                              </Button>
+                            </div>
+                            
+                            <p className="font-bold text-sm sm:text-base text-foreground whitespace-nowrap">
+                              {item.itemTotal.toLocaleString()} {item.currencySymbol}
+                            </p>
                           </div>
 
                           {product?.quantity !== undefined && item.quantity >= product.quantity && (
-                            <p className="text-xs text-destructive mt-1">
+                            <p className="text-[10px] sm:text-xs text-destructive mt-1">
                               {isRTL ? 'حداکثر موجودی' : 'Max stock reached'}
                             </p>
                           )}
-                        </div>
-
-                        {/* Item Total & Actions */}
-                        <div className="flex flex-col items-end justify-between">
-                          <div className="flex gap-1">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="text-primary hover:text-primary hover:bg-primary/10"
-                              onClick={() => navigate(`/products/${productSlug}`)}
-                              title={texts.viewDetails}
-                            >
-                              <Eye size={18} />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                              onClick={() => removeFromCart(item.product_id)}
-                            >
-                              <Trash2 size={18} />
-                            </Button>
-                          </div>
-                          <p className="font-bold text-foreground">
-                            {item.itemTotal.toLocaleString()} {item.currencySymbol}
-                          </p>
                         </div>
                       </div>
                     </CardContent>
