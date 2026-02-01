@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ProductContentDisplay } from '@/components/products/ProductContentDisplay';
+import { ProductSpecsDisplay } from '@/components/products/ProductSpecsDisplay';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -332,82 +333,87 @@ const AdminProductView = () => {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">
-          {/* Images/Video Gallery Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ImageIcon className="h-5 w-5 text-primary" />
-                {getLabel(lang, 'Product Media', 'رسانه محصول', 'د محصول رسنۍ')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {galleryItems.length > 0 ? (
-                <div className="space-y-4">
-                  {/* Main Display */}
-                  <div className="aspect-square rounded-xl overflow-hidden border bg-muted">
-                    {galleryItems[selectedMediaIndex]?.type === 'video' ? (
-                      <video
-                        controls
-                        autoPlay
-                        className="w-full h-full object-contain bg-black"
-                        poster={productImages[0]}
-                      >
-                        <source src={galleryItems[selectedMediaIndex].url} type="video/mp4" />
-                        {getLabel(lang, 'Your browser does not support the video tag.', 'مرورگر شما از ویدیو پشتیبانی نمی‌کند.', 'ستاسو براوزر د ویډیو ټګ نه ملاتړ نه کوي.')}
-                      </video>
-                    ) : (
-                      <img
-                        src={galleryItems[selectedMediaIndex]?.url || '/placeholder.svg'}
-                        alt={product.name}
-                        className="w-full h-full object-cover"
-                      />
+          {/* Images/Video Gallery & Specs Section */}
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ImageIcon className="h-5 w-5 text-primary" />
+                  {getLabel(lang, 'Product Media', 'رسانه محصول', 'د محصول رسنۍ')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {galleryItems.length > 0 ? (
+                  <div className="space-y-4">
+                    {/* Main Display */}
+                    <div className="aspect-square rounded-xl overflow-hidden border bg-muted">
+                      {galleryItems[selectedMediaIndex]?.type === 'video' ? (
+                        <video
+                          controls
+                          autoPlay
+                          className="w-full h-full object-contain bg-black"
+                          poster={productImages[0]}
+                        >
+                          <source src={galleryItems[selectedMediaIndex].url} type="video/mp4" />
+                          {getLabel(lang, 'Your browser does not support the video tag.', 'مرورگر شما از ویدیو پشتیبانی نمی‌کند.', 'ستاسو براوزر د ویډیو ټګ نه ملاتړ نه کوي.')}
+                        </video>
+                      ) : (
+                        <img
+                          src={galleryItems[selectedMediaIndex]?.url || '/placeholder.svg'}
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+                    </div>
+                    
+                    {/* Thumbnails */}
+                    {galleryItems.length > 1 && (
+                      <div className="flex gap-2 overflow-x-auto pb-2">
+                        {galleryItems.map((item, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => setSelectedMediaIndex(idx)}
+                            className={`w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-all relative ${
+                              selectedMediaIndex === idx ? 'border-primary ring-2 ring-primary/30' : 'border-border hover:border-muted-foreground/50'
+                            }`}
+                          >
+                            {item.type === 'video' ? (
+                              <>
+                                <img 
+                                  src={productImages[0] || '/placeholder.svg'} 
+                                  alt="" 
+                                  className="w-full h-full object-cover opacity-70" 
+                                />
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                                  <Play className="h-5 w-5 text-white fill-white" />
+                                </div>
+                              </>
+                            ) : (
+                              <img
+                                src={item.url}
+                                alt={`${product.name} ${idx}`}
+                                className="w-full h-full object-cover"
+                              />
+                            )}
+                          </button>
+                        ))}
+                      </div>
                     )}
                   </div>
-                  
-                  {/* Thumbnails */}
-                  {galleryItems.length > 1 && (
-                    <div className="flex gap-2 overflow-x-auto pb-2">
-                      {galleryItems.map((item, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => setSelectedMediaIndex(idx)}
-                          className={`w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-all relative ${
-                            selectedMediaIndex === idx ? 'border-primary ring-2 ring-primary/30' : 'border-border hover:border-muted-foreground/50'
-                          }`}
-                        >
-                          {item.type === 'video' ? (
-                            <>
-                              <img 
-                                src={productImages[0] || '/placeholder.svg'} 
-                                alt="" 
-                                className="w-full h-full object-cover opacity-70" 
-                              />
-                              <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                                <Play className="h-5 w-5 text-white fill-white" />
-                              </div>
-                            </>
-                          ) : (
-                            <img
-                              src={item.url}
-                              alt={`${product.name} ${idx}`}
-                              className="w-full h-full object-cover"
-                            />
-                          )}
-                        </button>
-                      ))}
+                ) : (
+                  <div className="aspect-square rounded-xl border-2 border-dashed flex items-center justify-center text-muted-foreground">
+                    <div className="text-center">
+                      <ImageIcon className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                      <p>{getLabel(lang, 'No images', 'بدون تصویر', 'انځورونه نشته')}</p>
                     </div>
-                  )}
-                </div>
-              ) : (
-                <div className="aspect-square rounded-xl border-2 border-dashed flex items-center justify-center text-muted-foreground">
-                  <div className="text-center">
-                    <ImageIcon className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                    <p>{getLabel(lang, 'No images', 'بدون تصویر', 'انځورونه نشته')}</p>
                   </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Technical Specifications & Brand - under media */}
+            <ProductSpecsDisplay metadata={product.metadata as Record<string, unknown>} attributes={attributes} />
+          </div>
 
           {/* Product Info */}
           <div className="space-y-6">
