@@ -39,26 +39,28 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
         <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/20 to-transparent" />
       </div>
 
-      {/* Layer 2: Background Image as Circle with Fade */}
+      {/* Layer 2: Background Image with Bottom & Side Fade */}
       {banner.background_image && (
         <div
-          className={`absolute z-[2] top-1/2 -translate-y-1/2 pointer-events-none
-            ${isRTL ? "left-[3%] sm:left-[5%]" : "right-[3%] sm:right-[5%]"}
+          className={`absolute z-[2] bottom-0 pointer-events-none
+            ${isRTL ? "left-0" : "right-0"}
           `}
+          style={{
+            maskImage: isRTL
+              ? "linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 20%), linear-gradient(to right, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)"
+              : "linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 20%), linear-gradient(to left, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)",
+            WebkitMaskImage: isRTL
+              ? "linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 20%), linear-gradient(to right, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)"
+              : "linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 20%), linear-gradient(to left, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)",
+            maskComposite: "intersect",
+            WebkitMaskComposite: "source-in",
+          }}
         >
-          <div 
-            className="w-[160px] h-[160px] sm:w-[200px] sm:h-[200px] lg:w-[240px] lg:h-[240px] xl:w-[280px] xl:h-[280px] rounded-full overflow-hidden"
-            style={{
-              maskImage: "radial-gradient(circle, rgba(0,0,0,1) 30%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0) 100%)",
-              WebkitMaskImage: "radial-gradient(circle, rgba(0,0,0,1) 30%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0) 100%)",
-            }}
-          >
-            <img
-              src={banner.background_image}
-              alt=""
-              className="w-full h-full object-cover"
-            />
-          </div>
+          <img
+            src={banner.background_image}
+            alt=""
+            className="h-full max-h-[280px] w-auto object-contain object-bottom"
+          />
         </div>
       )}
 
