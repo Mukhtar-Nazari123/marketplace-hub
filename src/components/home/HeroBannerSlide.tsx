@@ -1,5 +1,3 @@
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 import { useNavigate } from "react-router-dom";
@@ -96,9 +94,9 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
       >
         {/* Badge */}
         {badgeText && (
-          <Badge variant="sale" className="mb-2 sm:mb-3 px-3 py-1 text-xs sm:text-sm font-semibold rounded-full">
+          <span className="inline-block mb-2 sm:mb-3 px-4 py-1.5 text-xs sm:text-sm font-semibold rounded-full bg-[#b6b6b6] text-white">
             {badgeText}
-          </Badge>
+          </span>
         )}
 
         {/* Title */}
@@ -115,10 +113,8 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
 
         {/* CTA Button */}
         {ctaText && (
-          <Button
-            variant="default"
-            size="default"
-            className="hero-btn rounded-full font-semibold px-4 sm:px-6 text-sm group"
+          <button
+            className="hero-btn inline-flex items-center gap-2 rounded-full font-semibold px-5 sm:px-6 py-2.5 text-sm bg-[#b6b6b6] text-white hover:bg-[#a0a0a0] transition-colors group"
             onClick={handleCtaClick}
           >
             {ctaText}
@@ -127,7 +123,7 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
             ) : (
               <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 transition-transform group-hover:translate-x-1" />
             )}
-          </Button>
+          </button>
         )}
       </div>
     </div>
