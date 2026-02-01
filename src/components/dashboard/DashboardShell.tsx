@@ -248,7 +248,7 @@ export default function DashboardShell() {
               isMobile={isMobile}
             />
 
-            <main ref={mainContentRef} data-main-content className="flex-1 overflow-auto p-3 sm:p-4 md:p-6">
+            <main ref={mainContentRef} data-main-content className="flex-1 overflow-auto p-3 sm:p-4 md:p-6 pb-24 lg:pb-6">
               <Suspense fallback={<DashboardSkeleton />}>
                 <div className="animate-fade-in">
                   <Outlet />
