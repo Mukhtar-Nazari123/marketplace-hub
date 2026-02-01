@@ -121,7 +121,7 @@ const DiscoverProducts = () => {
   if (isLoading) {
     return (
       <section className="py-1 bg-background">
-        <div className="container px-2 sm:px-4">
+        <div className="container px-2 sm:px-3 lg:px-4">
           <div className="mb-6">
             <Skeleton className="h-8 w-48 mb-2" />
             <Skeleton className="h-4 w-72" />
@@ -154,7 +154,7 @@ const DiscoverProducts = () => {
 
   return (
     <section className="py-1 bg-background">
-      <div className="container px-2 sm:px-4">
+      <div className="container px-2 sm:px-3 lg:px-4">
         {/* Section Header */}
         <div className="mb-6">
           <h2 className="font-display font-bold text-2xl text-foreground mb-1">
