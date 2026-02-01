@@ -1,8 +1,9 @@
-import { Home, Grid3X3, Package, Heart, User } from "lucide-react";
+import { Home, ShoppingCart, Package, Heart, User } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useLanguage } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { useWishlist } from "@/hooks/useWishlist";
+import { useCart } from "@/hooks/useCart";
 import { cn } from "@/lib/utils";
 
 interface NavItem {
@@ -20,6 +21,7 @@ const BottomNavigation = () => {
   const { language, isRTL } = useLanguage();
   const { user, role } = useAuth();
   const { itemCount: wishlistCount } = useWishlist();
+  const { itemCount: cartCount } = useCart();
 
   const getLabel = (en: string, fa: string, ps: string) => {
     if (language === "fa") return fa;
@@ -44,11 +46,12 @@ const BottomNavigation = () => {
       href: "/",
     },
     {
-      icon: Grid3X3,
-      labelEn: "Categories",
-      labelFa: "دسته‌ها",
-      labelPs: "کټګورۍ",
-      href: "/categories",
+      icon: ShoppingCart,
+      labelEn: "Cart",
+      labelFa: "سبد",
+      labelPs: "کارټ",
+      href: "/cart",
+      badge: cartCount,
     },
     {
       icon: Package,
