@@ -101,7 +101,7 @@ const BottomNavigation = () => {
 
           return (
             <Link
-              key={item.href}
+              key={item.labelEn}
               to={item.href}
               className={cn(
                 "flex flex-col items-center justify-center flex-1 h-full py-2 px-1 transition-all duration-200 relative",
