@@ -13,6 +13,7 @@ import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/currencyFormatter';
 import { ProductContentDisplay } from '@/components/products/ProductContentDisplay';
+import { ProductSpecsDisplay } from '@/components/products/ProductSpecsDisplay';
 import { 
   getLocalizedProductName, 
   getLocalizedProductDescription, 
@@ -321,6 +322,9 @@ const SellerProductView = () => {
                 ))}
               </div>
             )}
+
+            {/* Technical Specifications & Brand - under media */}
+            <ProductSpecsDisplay metadata={product.metadata} attributes={attributes} />
           </div>
 
           {/* Product Info */}
