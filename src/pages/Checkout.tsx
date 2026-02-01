@@ -499,8 +499,8 @@ const Checkout = () => {
           <h1 className="text-2xl font-bold mb-8">{t.checkout.title}</h1>
 
           {/* Stepper */}
-          <Card className="mb-8">
-            <CardContent className="pt-6">
+          <Card className="mb-8 overflow-hidden">
+            <CardContent className="pt-6 px-2 sm:px-6">
               <div className={cn('flex items-center justify-between', isRTL && 'flex-row-reverse')}>
                 {STEPS.map((step, index) => {
                   const Icon = step.icon;
@@ -509,21 +509,21 @@ const Checkout = () => {
                   const stepLabel = t.checkout.steps[step.key as keyof typeof t.checkout.steps];
 
                   return (
-                    <div key={step.id} className="flex items-center">
-                      <div className="flex flex-col items-center">
+                    <div key={step.id} className="flex items-center flex-1 last:flex-none">
+                      <div className="flex flex-col items-center min-w-0">
                         <div
                           className={cn(
-                            'w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all',
+                            'w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-2 transition-all flex-shrink-0',
                             isActive && 'border-primary bg-primary text-primary-foreground',
                             isCompleted && 'border-primary bg-primary text-primary-foreground',
                             !isActive && !isCompleted && 'border-muted-foreground/30 text-muted-foreground'
                           )}
                         >
-                          {isCompleted ? <CheckCircle className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
+                          {isCompleted ? <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" /> : <Icon className="w-4 h-4 sm:w-5 sm:h-5" />}
                         </div>
                         <span
                           className={cn(
-                            'text-xs mt-2 text-center',
+                            'text-[10px] sm:text-xs mt-1 sm:mt-2 text-center max-w-[60px] sm:max-w-none truncate',
                             isActive && 'text-primary font-medium',
                             isCompleted && 'text-primary',
                             !isActive && !isCompleted && 'text-muted-foreground'
@@ -535,7 +535,7 @@ const Checkout = () => {
                       {index < STEPS.length - 1 && (
                         <div
                           className={cn(
-                            'w-12 sm:w-24 h-0.5 mx-2',
+                            'flex-1 h-0.5 mx-1 sm:mx-2 min-w-[12px] sm:min-w-[24px]',
                             currentStep > step.id ? 'bg-primary' : 'bg-muted-foreground/30'
                           )}
                         />
