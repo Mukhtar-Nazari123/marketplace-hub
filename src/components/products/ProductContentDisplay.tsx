@@ -226,12 +226,44 @@ export const ProductContentDisplay = ({ product, attributes = [], className }: P
   
   // Filter out warranty and brand fields from specs display
   const excludedKeys = ['hasWarranty', 'warrantyDuration', 'brand'];
-  const currentLangAttrs = language === 'fa' ? faAttrs : language === 'ps' ? psAttrs : enAttrs;
   
-  const otherSpecs = Object.entries(currentLangAttrs).filter(
-    ([key]) => !excludedKeys.includes(key)
-  );
-  const hasOtherSpecs = otherSpecs.some(([, value]) => value !== undefined && value !== '' && value !== null);
+  // Get specs with fallback chain: current language -> fa -> en -> universal
+  const getSpecsWithFallback = () => {
+    const currentLangAttrs = language === 'fa' ? faAttrs : language === 'ps' ? psAttrs : enAttrs;
+    const currentSpecs = Object.entries(currentLangAttrs).filter(
+      ([key, value]) => !excludedKeys.includes(key) && value !== undefined && value !== '' && value !== null
+    );
+    
+    // If current language has specs, use them
+    if (currentSpecs.length > 0) {
+      return currentSpecs;
+    }
+    
+    // Fallback chain for ps: try fa, then en
+    if (language === 'ps') {
+      const faSpecs = Object.entries(faAttrs).filter(
+        ([key, value]) => !excludedKeys.includes(key) && value !== undefined && value !== '' && value !== null
+      );
+      if (faSpecs.length > 0) return faSpecs;
+    }
+    
+    // Fallback to English for both fa and ps
+    if (language === 'fa' || language === 'ps') {
+      const enSpecs = Object.entries(enAttrs).filter(
+        ([key, value]) => !excludedKeys.includes(key) && value !== undefined && value !== '' && value !== null
+      );
+      if (enSpecs.length > 0) return enSpecs;
+    }
+    
+    // Final fallback: universal only
+    const universalSpecs = Object.entries(universalAttrs).filter(
+      ([key, value]) => !excludedKeys.includes(key) && value !== undefined && value !== '' && value !== null
+    );
+    return universalSpecs;
+  };
+  
+  const otherSpecs = getSpecsWithFallback();
+  const hasOtherSpecs = otherSpecs.length > 0;
 
   return (
     <div className={cn("space-y-6", className)}>
