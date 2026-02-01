@@ -38,6 +38,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/currencyFormatter';
+import { getLocalizedProductName } from '@/lib/localizedProduct';
 
 // Trilingual translations for Seller Products page
 const translations = {
@@ -75,8 +76,14 @@ const translations = {
 interface Product {
   id: string;
   name: string;
+  name_en: string | null;
+  name_fa: string | null;
+  name_ps: string | null;
   slug: string;
   description: string | null;
+  description_en: string | null;
+  description_fa: string | null;
+  description_ps: string | null;
   price_afn: number;
   compare_price_afn: number | null;
   quantity: number;
@@ -115,7 +122,7 @@ const SellerProducts = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, [user]);
+  }, [user, language]);
 
   const fetchProducts = async () => {
     if (!user) return;
@@ -124,7 +131,7 @@ const SellerProducts = () => {
       const { data, error } = await supabase
         .from('products_with_translations')
         .select(`
-          id, name, slug, description, price_afn, compare_price_afn, quantity, images, status, created_at, metadata, category_id, subcategory_id,
+          id, name, name_en, name_fa, name_ps, slug, description, description_en, description_fa, description_ps, price_afn, compare_price_afn, quantity, images, status, created_at, metadata, category_id, subcategory_id,
           categories:category_id(name, name_fa, name_ps),
           subcategories:subcategory_id(name, name_fa, name_ps)
         `)
@@ -186,14 +193,16 @@ const SellerProducts = () => {
     );
   };
 
-  const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredProducts = products.filter(product => {
+    const localizedName = getLocalizedProductName(product, language);
+    return localizedName.toLowerCase().includes(searchQuery.toLowerCase());
+  });
 
 
   const getDeleteConfirmationText = () => {
     if (!productToDelete) return '';
-    return translations.deleteConfirmation[lang](productToDelete.name);
+    const localizedName = getLocalizedProductName(productToDelete, language);
+    return translations.deleteConfirmation[lang](localizedName);
   };
 
   return (
@@ -272,10 +281,10 @@ const SellerProducts = () => {
               <Card key={product.id} className="overflow-hidden group hover:shadow-lg transition-shadow">
                 {/* Product Image */}
                 <div className="relative aspect-square bg-muted">
-                  {product.images && product.images.length > 0 ? (
+                {product.images && product.images.length > 0 ? (
                     <img
                       src={product.images[0]}
-                      alt={product.name}
+                      alt={getLocalizedProductName(product, language)}
                       className="w-full h-full object-cover transition-transform group-hover:scale-105"
                     />
                   ) : (
@@ -349,7 +358,7 @@ const SellerProducts = () => {
                     
                     {/* Product Name */}
                     <h3 className="font-semibold text-sm line-clamp-2 min-h-[2.5rem]">
-                      {product.name}
+                      {getLocalizedProductName(product, language)}
                     </h3>
 
                     {/* Price */}

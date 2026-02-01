@@ -13,6 +13,11 @@ import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/currencyFormatter';
 import { ProductContentDisplay } from '@/components/products/ProductContentDisplay';
+import { 
+  getLocalizedProductName, 
+  getLocalizedProductDescription, 
+  getLocalizedShortDescription 
+} from '@/lib/localizedProduct';
 import {
   ArrowLeft,
   ArrowRight,
@@ -67,7 +72,7 @@ interface Product {
 
 const SellerProductView = () => {
   const { id } = useParams<{ id: string }>();
-  const { isRTL } = useLanguage();
+  const { isRTL, language } = useLanguage();
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -80,7 +85,7 @@ const SellerProductView = () => {
     if (id && user) {
       fetchProduct();
     }
-  }, [id, user]);
+  }, [id, user, language]);
 
   const fetchProduct = async () => {
     try {
@@ -242,7 +247,7 @@ const SellerProductView = () => {
                     ) : (
                       <img
                         src={galleryItems[currentImageIndex]?.url || '/placeholder.svg'}
-                        alt={product.name}
+                        alt={getLocalizedProductName(product, language)}
                         className="w-full h-full object-cover"
                       />
                     )}
@@ -325,9 +330,9 @@ const SellerProductView = () => {
               <div className="flex items-start gap-3 flex-wrap mb-3">
                 {getStatusBadge(product.status)}
               </div>
-              <h1 className="text-2xl md:text-3xl font-bold mb-2">{product.name}</h1>
-              {metadata.shortDescription && (
-                <p className="text-muted-foreground">{metadata.shortDescription as string}</p>
+              <h1 className="text-2xl md:text-3xl font-bold mb-2">{getLocalizedProductName(product, language)}</h1>
+              {getLocalizedShortDescription(product, language) && (
+                <p className="text-muted-foreground">{getLocalizedShortDescription(product, language)}</p>
               )}
             </div>
 
