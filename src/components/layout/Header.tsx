@@ -84,8 +84,41 @@ const Header = () => {
       <header className="bg-background border-b border-muted-foreground/20 shadow-sm sticky top-0 z-50">
         <div className="container px-1 sm:px-1.5 lg:px-2 py-2">
           <div className="flex items-center justify-between gap-1 sm:gap-2">
+            {/* Mobile Menu Button - Left side for mobile/tablet */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="lg:hidden flex-shrink-0"
+              onClick={() => setIsMenuOpen(true)}
+              aria-label={t.header.menu}
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+
+            {/* Mobile/Tablet Search Bar - Center */}
+            <div className="flex-1 lg:hidden">
+              <form onSubmit={handleSearch} className="relative w-full">
+                <Input
+                  type="text"
+                  placeholder={t.header.searchPlaceholder}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className={`w-full h-9 sm:h-10 rounded-full border border-muted-foreground/30 focus:border-primary text-sm ${isRTL ? "pr-3 pl-10 text-right" : "pl-3 pr-10 text-left"}`}
+                  dir={isRTL ? "rtl" : "ltr"}
+                />
+                <Button
+                  type="submit"
+                  size="icon"
+                  className={`absolute top-1/2 -translate-y-1/2 rounded-full h-7 w-7 sm:h-8 sm:w-8 ${isRTL ? "left-1" : "right-1"}`}
+                >
+                  <Search className="h-3.5 w-3.5" />
+                </Button>
+              </form>
+            </div>
+
             {/* Logo - Only image */}
-            <Link to="/" className="flex-shrink-0 ps-2 sm:ps-0">
+            <Link to="/" className="flex-shrink-0 ps-2 sm:ps-0 lg:ps-0">
               {logoUrl ? (
                 <img src={logoUrl} alt={siteName} className="h-8 sm:h-10 w-auto object-contain" />
               ) : (
@@ -256,40 +289,9 @@ const Header = () => {
                 </Link>
               )}
 
-              {/* Mobile Menu Button */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="lg:hidden"
-                onClick={() => setIsMenuOpen(true)}
-                aria-label={t.header.menu}
-              >
-                <Menu className="h-5 w-5" />
-              </Button>
             </div>
           </div>
 
-          {/* Mobile Search */}
-          <div className="mt-4 md:hidden">
-            <form onSubmit={handleSearch} className="relative w-full">
-              <Input
-                type="text"
-                placeholder={t.header.searchPlaceholder}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={handleKeyDown}
-                className={`w-full h-10 rounded-full border border-muted-foreground/30 focus:border-primary ${isRTL ? "pr-4 pl-20 text-right" : "pl-4 pr-20 text-left"}`}
-                dir={isRTL ? "rtl" : "ltr"}
-              />
-              <Button
-                type="submit"
-                size="sm"
-                className={`absolute top-1/2 -translate-y-1/2 rounded-full px-3 hover:translate-y-[-50%] active:translate-y-[-50%] hover:scale-100 active:scale-100 ${isRTL ? "left-1" : "right-1"}`}
-              >
-                <Search className="h-3.5 w-3.5" />
-              </Button>
-            </form>
-          </div>
         </div>
       </header>
 
