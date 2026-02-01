@@ -352,7 +352,10 @@ export const ProductContentDisplay = ({ product, attributes = [], className }: P
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4">
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className={cn(
+              "grid gap-4",
+              hasOtherSpecs && hasWarranty ? "md:grid-cols-2" : "grid-cols-1"
+            )}>
               {/* Specifications */}
               {hasOtherSpecs && (
                 <div className="p-4 rounded-lg border bg-muted/30">
@@ -360,14 +363,28 @@ export const ProductContentDisplay = ({ product, attributes = [], className }: P
                     <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
                     {isRTL ? 'مشخصات' : 'Specifications'}
                   </h4>
-                  <div className="space-y-2 text-sm">
+                  <div className="space-y-3 text-sm">
                     {otherSpecs.map(([key, value]) => {
                       if (!value) return null;
                       const formattedKey = key.replace(/([A-Z])/g, ' $1').trim();
+                      const isLongValue = String(value).length > 50;
                       return (
-                        <div key={key} className="flex gap-2 justify-between">
-                          <span className="font-medium capitalize text-muted-foreground">{formattedKey}:</span>
-                          <span className="font-semibold text-end flex-1">{value}</span>
+                        <div key={key} className={cn(
+                          isLongValue ? "flex flex-col gap-1" : "flex gap-2 items-start"
+                        )}>
+                          <span className={cn(
+                            "font-medium capitalize text-muted-foreground shrink-0",
+                            !isLongValue && "min-w-[120px]"
+                          )}>
+                            {formattedKey}:
+                          </span>
+                          <span className={cn(
+                            "font-semibold break-words",
+                            isRTL ? "text-start" : "text-start",
+                            isLongValue ? "whitespace-pre-wrap" : ""
+                          )}>
+                            {value}
+                          </span>
                         </div>
                       );
                     })}
