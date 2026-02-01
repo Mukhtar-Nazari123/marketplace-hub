@@ -21,6 +21,7 @@ const Index = () => {
       {/* Mobile/Tablet Header - Visible only on mobile/tablet */}
       <div className="lg:hidden sticky top-0 z-50 bg-background border-b border-muted-foreground/20 shadow-sm">
         <Header />
+        <MobileCategoryBar />
       </div>
 
       {/* Main Content - Add bottom padding for mobile/tablet bottom nav */}
