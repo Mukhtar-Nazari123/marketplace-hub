@@ -11,20 +11,20 @@ import DiscoverProducts from "@/components/home/DiscoverProducts";
 const Index = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      {/* Auto-hide Sticky Navbar - Hidden on mobile */}
-      <StickyNavbar className="hidden md:block">
+      {/* Auto-hide Sticky Navbar - Hidden on mobile/tablet */}
+      <StickyNavbar className="hidden lg:block">
         <Header />
         <MobileCategoryBar />
         <Navigation />
       </StickyNavbar>
 
-      {/* Mobile Header - Visible only on mobile */}
-      <div className="md:hidden sticky top-0 z-50 bg-background border-b border-muted-foreground/20 shadow-sm">
+      {/* Mobile/Tablet Header - Visible only on mobile/tablet */}
+      <div className="lg:hidden sticky top-0 z-50 bg-background border-b border-muted-foreground/20 shadow-sm">
         <Header />
       </div>
 
-      {/* Main Content - Add bottom padding for mobile bottom nav */}
-      <main className="flex-1 pb-20 md:pb-0">
+      {/* Main Content - Add bottom padding for mobile/tablet bottom nav */}
+      <main className="flex-1 pb-20 lg:pb-0">
         {/* Hero Section */}
         <HeroSection />
 

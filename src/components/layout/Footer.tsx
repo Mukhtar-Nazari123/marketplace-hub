@@ -59,7 +59,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-[#1a1a1a] text-white">
+    <footer className="hidden lg:block bg-[#1a1a1a] text-white">
       {/* Features Bar */}
       <div className="border-b border-white/10">
         <div className="container py-8">

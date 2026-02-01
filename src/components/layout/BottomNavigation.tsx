@@ -91,7 +91,7 @@ const BottomNavigation = () => {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-muted-foreground/20 shadow-[0_-2px_10px_rgba(0,0,0,0.1)] md:hidden safe-area-pb"
+      className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-muted-foreground/20 shadow-[0_-2px_10px_rgba(0,0,0,0.1)] lg:hidden safe-area-pb"
       dir={isRTL ? "rtl" : "ltr"}
     >
       <div className="flex items-center justify-around h-16 px-2">
