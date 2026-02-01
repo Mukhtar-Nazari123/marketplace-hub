@@ -24,8 +24,8 @@ const Index = () => {
         <MobileCategoryBar />
       </div>
 
-      {/* Main Content - Add bottom padding for mobile/tablet bottom nav */}
-      <main className="flex-1 pb-20 lg:pb-0">
+      {/* Main Content */}
+      <main className="flex-1">
         {/* Hero Section */}
         <HeroSection />
 

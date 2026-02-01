@@ -83,6 +83,7 @@ const App = () => (
                   <BrowserRouter>
                     <ScrollToTop />
                     <BottomNavigation />
+                    <div className="pb-20 lg:pb-0">
                     <Routes>
                       {/* Public Routes */}
                       <Route path="/" element={<Index />} />
@@ -167,6 +168,7 @@ const App = () => (
 
                       <Route path="*" element={<NotFound />} />
                     </Routes>
+                    </div>
                   </BrowserRouter>
                 </TooltipProvider>
               </WishlistProvider>
