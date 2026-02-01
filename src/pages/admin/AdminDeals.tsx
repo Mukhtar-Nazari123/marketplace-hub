@@ -33,10 +33,14 @@ import {
 import { toast } from 'sonner';
 import { useLanguage, formatDate, type Language } from '@/lib/i18n';
 import { getDealStatus, type DealStatus } from '@/hooks/useDealCountdown';
+import { getLocalizedProductName, type LocalizableProduct } from '@/lib/localizedProduct';
 
 interface Product {
   id: string;
   name: string;
+  name_en?: string | null;
+  name_fa?: string | null;
+  name_ps?: string | null;
   price_afn: number;
   status: string;
   images: string[];
@@ -69,12 +73,17 @@ const AdminDeals = () => {
   const [dealStartAt, setDealStartAt] = useState('');
   const [dealEndAt, setDealEndAt] = useState('');
 
+  // Helper to get localized product name
+  const getProductDisplayName = (product: Product): string => {
+    return getLocalizedProductName(product as LocalizableProduct, lang) || product.name || 'Untitled';
+  };
+
   const fetchProducts = async () => {
     setIsLoading(true);
     try {
       const { data, error } = await supabase
         .from('products_with_translations')
-        .select('id, name, price_afn, status, images, is_deal, deal_start_at, deal_end_at')
+        .select('id, name, name_en, name_fa, name_ps, price_afn, status, images, is_deal, deal_start_at, deal_end_at')
         .eq('status', 'active')
         .order('is_deal', { ascending: false })
         .order('deal_end_at', { ascending: true, nullsFirst: false });
@@ -92,18 +101,18 @@ const AdminDeals = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [language]);
 
   useEffect(() => {
     let filtered = [...products];
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter((product) =>
-        product.name.toLowerCase().includes(query)
+        getProductDisplayName(product).toLowerCase().includes(query)
       );
     }
     setFilteredProducts(filtered);
-  }, [searchQuery, products]);
+  }, [searchQuery, products, language]);
 
   const getDealStatusBadge = (product: Product) => {
     const status = getDealStatus(product.is_deal, product.deal_start_at, product.deal_end_at);
@@ -347,11 +356,11 @@ const AdminDeals = () => {
                             {product.images?.[0] && (
                               <img 
                                 src={product.images[0]} 
-                                alt={product.name}
+                                alt={getProductDisplayName(product)}
                                 className="h-10 w-10 rounded object-cover"
                               />
                             )}
-                            <span className="font-medium">{product.name}</span>
+                            <span className="font-medium">{getProductDisplayName(product)}</span>
                           </div>
                         </TableCell>
                         <TableCell>
@@ -413,7 +422,7 @@ const AdminDeals = () => {
             <DialogHeader>
               <DialogTitle>{getLabel(lang, 'Deal Settings', 'تنظیمات تخفیف', 'د تخفیف ترتیبات')}</DialogTitle>
               <DialogDescription>
-                {selectedProduct?.name}
+                {selectedProduct && getProductDisplayName(selectedProduct)}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
