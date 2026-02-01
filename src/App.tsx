@@ -10,6 +10,7 @@ import { CartProvider } from "@/hooks/useCart";
 import { WishlistProvider } from "@/hooks/useWishlist";
 import { CategoriesProvider } from "@/hooks/useCategories";
 import { ThemeProvider } from "next-themes";
+import BottomNavigation from "@/components/layout/BottomNavigation";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Products from "./pages/Products";
@@ -81,6 +82,7 @@ const App = () => (
                   <Sonner />
                   <BrowserRouter>
                     <ScrollToTop />
+                    <BottomNavigation />
                     <Routes>
                       {/* Public Routes */}
                       <Route path="/" element={<Index />} />
