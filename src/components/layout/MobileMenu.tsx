@@ -1,4 +1,4 @@
-import { X, Package, Zap, BookOpen, Phone, Info, LayoutDashboard, LogOut, Moon, Sun } from "lucide-react";
+import { X, Package, Zap, BookOpen, Phone, Info, LayoutDashboard, LogOut, Moon, Sun, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link, useNavigate } from "react-router-dom";
@@ -121,6 +121,18 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
 
           {/* User Actions - Dashboard, Theme Toggle & Logout at bottom */}
           <div className="mt-6 pt-4 border-t border-border space-y-1">
+            {/* Login/Register Link - Only for guests */}
+            {!user && (
+              <Link
+                to="/login"
+                className="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                onClick={onClose}
+              >
+                <User className="h-5 w-5" />
+                <span className="font-medium">{isRTL ? "ورود / ثبت‌نام" : "Login / Register"}</span>
+              </Link>
+            )}
+
             {/* Dashboard Link - Only for logged in users */}
             {user && (
               <Link
