@@ -12,7 +12,7 @@ const HeroSection = () => {
 
   return (
     <section className="relative w-full overflow-hidden">
-      <div className="container mx-auto px-4 pt-2 pb-2">
+      <div className="container px-2 sm:px-4 pt-2 pb-2">
         <div className="flex flex-col gap-4 sm:gap-6">
           {/* Main Hero - Full Width */}
           {heroLoading ? (
