@@ -50,15 +50,15 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
           <div 
             className="absolute inset-0 rounded-full"
             style={{
-              background: "radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.2) 40%, rgba(255,255,255,0) 70%)",
-              transform: "scale(1.3)",
+              background: "radial-gradient(circle, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.35) 45%, rgba(255,255,255,0) 75%)",
+              transform: "scale(1.5)",
             }}
           />
           {/* Circular image container */}
           <div 
             className="relative rounded-full overflow-hidden w-[140px] h-[140px] sm:w-[180px] sm:h-[180px] lg:w-[220px] lg:h-[220px] xl:w-[240px] xl:h-[240px]"
             style={{
-              boxShadow: "0 0 40px 15px rgba(255,255,255,0.25)",
+              boxShadow: "0 0 50px 20px rgba(255,255,255,0.35)",
             }}
           >
             <img
