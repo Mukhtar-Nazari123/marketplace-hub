@@ -28,11 +28,18 @@ interface CartItemProduct {
 }
 
 const Cart = () => {
-  const { t, isRTL } = useLanguage();
+  const { t, isRTL, language } = useLanguage();
   const { items, loading, removeFromCart, updateQuantity, clearCart } = useCart();
   const { user, role, loading: authLoading } = useAuth();
   const { convertToUSD, rate } = useCurrencyRate();
   const navigate = useNavigate();
+
+  // Trilingual label helper
+  const getLabel = (en: string, fa: string, ps: string) => {
+    if (language === 'ps') return ps;
+    if (language === 'fa') return fa;
+    return en;
+  };
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -126,21 +133,21 @@ const Cart = () => {
   })();
 
   const texts = {
-    title: isRTL ? 'سبد خرید' : 'Shopping Cart',
-    empty: isRTL ? 'سبد خرید شما خالی است' : 'Your cart is empty',
-    continueShopping: isRTL ? 'ادامه خرید' : 'Continue Shopping',
-    product: isRTL ? 'محصول' : 'Product',
-    price: isRTL ? 'قیمت' : 'Price',
-    quantity: isRTL ? 'تعداد' : 'Quantity',
-    total: isRTL ? 'جمع' : 'Total',
-    subtotal: isRTL ? 'جمع جزئی' : 'Subtotal',
-    shipping: isRTL ? 'هزینه ارسال' : 'Delivery Fee',
-    orderTotal: isRTL ? 'جمع کل' : 'Order Total',
-    checkout: isRTL ? 'تکمیل خرید' : 'Checkout',
-    clearCart: isRTL ? 'پاک کردن سبد' : 'Clear Cart',
-    loading: isRTL ? 'در حال بارگذاری...' : 'Loading...',
-    outOfStock: isRTL ? 'ناموجود' : 'Out of Stock',
-    viewDetails: isRTL ? 'مشاهده جزئیات' : 'View Details',
+    title: getLabel('Shopping Cart', 'سبد خرید', 'د پېرود کارټ'),
+    empty: getLabel('Your cart is empty', 'سبد خرید شما خالی است', 'ستاسو کارټ خالي دی'),
+    continueShopping: getLabel('Continue Shopping', 'ادامه خرید', 'پېرود ته دوام ورکړئ'),
+    product: getLabel('Product', 'محصول', 'محصول'),
+    price: getLabel('Price', 'قیمت', 'بیه'),
+    quantity: getLabel('Quantity', 'تعداد', 'مقدار'),
+    total: getLabel('Total', 'جمع', 'مجموعه'),
+    subtotal: getLabel('Subtotal', 'جمع جزئی', 'فرعي مجموعه'),
+    shipping: getLabel('Delivery Fee', 'هزینه ارسال', 'د لیږد فیس'),
+    orderTotal: getLabel('Order Total', 'جمع کل', 'د سفارش مجموعه'),
+    checkout: getLabel('Checkout', 'تکمیل خرید', 'تادیه'),
+    clearCart: getLabel('Clear Cart', 'پاک کردن سبد', 'کارټ پاک کړئ'),
+    loading: getLabel('Loading...', 'در حال بارگذاری...', 'لوډ کیږي...'),
+    outOfStock: getLabel('Out of Stock', 'ناموجود', 'شتون نلري'),
+    viewDetails: getLabel('View Details', 'مشاهده جزئیات', 'توضیحات وګورئ'),
   };
 
   if (authLoading || loading) {
@@ -186,7 +193,7 @@ const Cart = () => {
           {texts.title}
           {items.length > 0 && (
             <span className="text-muted-foreground font-normal text-lg">
-              ({items.length} {isRTL ? 'محصول' : 'items'})
+              ({items.length} {getLabel('items', 'محصول', 'توکي')})
             </span>
           )}
         </h1>
@@ -325,7 +332,7 @@ const Cart = () => {
 
                           {product?.quantity !== undefined && item.quantity >= product.quantity && (
                             <p className="text-[10px] sm:text-xs text-destructive mt-1">
-                              {isRTL ? 'حداکثر موجودی' : 'Max stock reached'}
+                              {getLabel('Max stock reached', 'حداکثر موجودی', 'اعظمي ذخیره ترلاسه شوه')}
                             </p>
                           )}
                         </div>
@@ -350,7 +357,7 @@ const Cart = () => {
             <div>
               <Card className="sticky top-4">
                 <CardHeader>
-                  <CardTitle>{isRTL ? 'خلاصه سفارش' : 'Order Summary'}</CardTitle>
+                  <CardTitle>{getLabel('Order Summary', 'خلاصه سفارش', 'د سفارش لنډیز')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {/* Product totals per currency */}
@@ -359,7 +366,7 @@ const Cart = () => {
                       <div className="flex items-center gap-2">
                         <Badge variant="secondary">{currencyData.currency}</Badge>
                         <span className="text-xs text-muted-foreground">
-                          {isRTL ? 'محصولات' : 'Products'}
+                          {getLabel('Products', 'محصولات', 'محصولات')}
                         </span>
                       </div>
                       
@@ -386,7 +393,7 @@ const Cart = () => {
                       <span className="text-muted-foreground">{texts.shipping}</span>
                       <span className="font-medium">
                         {totalDeliveryFeeAFN === 0 ? (
-                          <Badge variant="outline" className="text-success">{isRTL ? 'رایگان' : 'Free'}</Badge>
+                          <Badge variant="outline" className="text-success">{getLabel('Free', 'رایگان', 'وړیا')}</Badge>
                         ) : (
                           `${totalDeliveryFeeAFN.toLocaleString()} ${afnSymbol}`
                         )}
@@ -431,9 +438,11 @@ const Cart = () => {
                   
                   {currencyTotals.length > 1 && (
                     <p className="text-xs text-muted-foreground text-center pt-2">
-                      {isRTL 
-                        ? 'توجه: سبد خرید شامل محصولات با ارز متفاوت است' 
-                        : 'Note: Cart contains items in different currencies'}
+                      {getLabel(
+                        'Note: Cart contains items in different currencies',
+                        'توجه: سبد خرید شامل محصولات با ارز متفاوت است',
+                        'یادونه: کارټ مختلفې اسعارو کې توکي لري'
+                      )}
                     </p>
                   )}
                 </CardContent>
