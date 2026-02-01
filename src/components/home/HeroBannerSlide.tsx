@@ -39,28 +39,34 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
         <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/20 to-transparent" />
       </div>
 
-      {/* Layer 2: Background Image with Bottom & Side Fade */}
+      {/* Layer 2: Background Image in Circle with White Fade */}
       {banner.background_image && (
         <div
-          className={`absolute z-[2] bottom-0 pointer-events-none
-            ${isRTL ? "left-0" : "right-0"}
+          className={`absolute z-[2] top-1/2 -translate-y-1/2 pointer-events-none
+            ${isRTL ? "left-[8%]" : "right-[8%]"}
           `}
-          style={{
-            maskImage: isRTL
-              ? "linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 20%), linear-gradient(to right, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 80%)"
-              : "linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 20%), linear-gradient(to left, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 80%)",
-            WebkitMaskImage: isRTL
-              ? "linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 20%), linear-gradient(to right, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 80%)"
-              : "linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 20%), linear-gradient(to left, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 80%)",
-            maskComposite: "intersect",
-            WebkitMaskComposite: "source-in",
-          }}
         >
-          <img
-            src={banner.background_image}
-            alt=""
-            className="h-full max-h-[280px] w-auto object-contain object-bottom"
+          {/* White glow/fade behind the circle */}
+          <div 
+            className="absolute inset-0 rounded-full"
+            style={{
+              background: "radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.2) 40%, rgba(255,255,255,0) 70%)",
+              transform: "scale(1.3)",
+            }}
           />
+          {/* Circular image container */}
+          <div 
+            className="relative rounded-full overflow-hidden w-[140px] h-[140px] sm:w-[180px] sm:h-[180px] lg:w-[220px] lg:h-[220px] xl:w-[240px] xl:h-[240px]"
+            style={{
+              boxShadow: "0 0 40px 15px rgba(255,255,255,0.25)",
+            }}
+          >
+            <img
+              src={banner.background_image}
+              alt=""
+              className="w-full h-full object-cover"
+            />
+          </div>
         </div>
       )}
 
