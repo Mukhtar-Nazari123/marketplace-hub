@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
-import { useLanguage } from '@/lib/i18n';
+import { useLanguage, Language } from '@/lib/i18n';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Heart, Package } from 'lucide-react';
 import ProductCard from '@/components/home/ProductCard';
 import { useProductRatings } from '@/hooks/useProductRatings';
+import { getLocalizedProductName, LocalizableProduct } from '@/lib/localizedProduct';
 
 interface WishlistProduct {
   id: string;
@@ -47,12 +48,10 @@ const Wishlist = () => {
     .map(item => item.product!.id);
   const { getRating } = useProductRatings(productIds);
 
-  // Helper for localized product name
-  const getProductName = (product: WishlistProduct | null): string => {
+  // Helper for localized product name using shared utility
+  const getProductDisplayName = (product: WishlistProduct | null): string => {
     if (!product) return '';
-    if (language === 'ps') return product.name_ps || product.name_fa || product.name_en || '';
-    if (language === 'fa') return product.name_fa || product.name_en || '';
-    return product.name_en || '';
+    return getLocalizedProductName(product as LocalizableProduct, language as Language);
   };
 
   useEffect(() => {
@@ -154,7 +153,7 @@ const Wishlist = () => {
 
     return {
       id: product.id,
-      name: getProductName(product),
+      name: getProductDisplayName(product),
       price: currentPrice,
       originalPrice,
       rating: averageRating,
