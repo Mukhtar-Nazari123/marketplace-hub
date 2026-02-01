@@ -3,7 +3,6 @@ import Navigation from "@/components/layout/Navigation";
 import MobileCategoryBar from "@/components/layout/MobileCategoryBar";
 import Footer from "@/components/layout/Footer";
 import StickyNavbar from "@/components/layout/StickyNavbar";
-import BottomNavigation from "@/components/layout/BottomNavigation";
 import HeroSection from "@/components/home/HeroSection";
 import TodayDeals from "@/components/home/TodayDeals";
 import BestSellers from "@/components/home/BestSellers";
@@ -41,9 +40,6 @@ const Index = () => {
 
       {/* Footer - Hidden on mobile to avoid overlap with bottom nav */}
       <Footer />
-
-      {/* Bottom Navigation - Mobile only */}
-      <BottomNavigation />
     </div>
   );
 };
