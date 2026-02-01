@@ -52,7 +52,6 @@ interface OrderItem {
   quantity: number;
   total_price: number;
   seller_id: string;
-  product_currency?: string | null;
   product?: {
     sku: string | null;
   } | null;
@@ -140,20 +139,24 @@ const AdminOrderDetail = () => {
             quantity,
             total_price,
             seller_id,
-            products:product_id (sku, currency)
+            products:product_id (sku)
           )
         `)
         .eq('id', id)
-        .single();
+        .maybeSingle();
 
       if (orderError) throw orderError;
+      if (!orderData) {
+        setIsLoading(false);
+        return;
+      }
 
       // Fetch buyer profile
       const { data: profileData } = await supabase
         .from('profiles')
         .select('full_name, email, phone')
         .eq('user_id', orderData.buyer_id)
-        .single();
+        .maybeSingle();
 
       // Get all product IDs to fetch localized names
       const productIds = (orderData.order_items || [])
@@ -180,7 +183,6 @@ const AdminOrderDetail = () => {
       const processedItems = (orderData.order_items || []).map((item: any) => ({
         ...item,
         product: item.products || null,
-        product_currency: item.products?.currency || null,
         name_en: item.product_id ? productTranslations[item.product_id]?.name_en : null,
         name_fa: item.product_id ? productTranslations[item.product_id]?.name_fa : null,
         name_ps: item.product_id ? productTranslations[item.product_id]?.name_ps : null,
@@ -385,17 +387,13 @@ const AdminOrderDetail = () => {
                         )}
                       <div className="flex flex-wrap items-center gap-4 mt-2 text-sm">
                         <span className="text-muted-foreground">
-                          {getLabel(lang, 'Unit:', 'قیمت واحد:', 'واحد:')} {item.product_currency === 'USD' 
-                            ? `$${Number(item.unit_price).toLocaleString()}` 
-                            : `${Number(item.unit_price).toLocaleString()} AFN`}
+                          {getLabel(lang, 'Unit:', 'قیمت واحد:', 'واحد:')} {Number(item.unit_price).toLocaleString()} AFN
                         </span>
                         <span className="text-muted-foreground">
                           {getLabel(lang, 'Qty:', 'تعداد:', 'شمېر:')} {item.quantity}
                         </span>
                         <span className="font-semibold text-primary">
-                          {getLabel(lang, 'Total:', 'جمع:', 'ټول:')} {item.product_currency === 'USD' 
-                            ? `$${Number(item.total_price).toLocaleString()}` 
-                            : `${Number(item.total_price).toLocaleString()} AFN`}
+                          {getLabel(lang, 'Total:', 'جمع:', 'ټول:')} {Number(item.total_price).toLocaleString()} AFN
                         </span>
                       </div>
                     </div>
