@@ -1,4 +1,4 @@
-import { X, Package, Zap, BookOpen, Phone, Info, LayoutDashboard, LogOut, Moon, Sun, User } from "lucide-react";
+import { X, Package, Grid3X3, Zap, BookOpen, Phone, Info, LayoutDashboard, LogOut, Moon, Sun, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link, useNavigate } from "react-router-dom";
@@ -57,6 +57,7 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
 
   const navLinks = [
     { label: t.nav.products, icon: Package, href: "/products" },
+    { label: t.nav.categories, icon: Grid3X3, href: "/categories" },
     { label: t.nav.newArrivals, icon: Zap, href: "/products?filter=new", badge: isRTL ? "جدید" : "New" },
     { label: t.nav.blog, icon: BookOpen, href: "/blog" },
     { label: t.nav.contactUs, icon: Phone, href: "/contact" },
