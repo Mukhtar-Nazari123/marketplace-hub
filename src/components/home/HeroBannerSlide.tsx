@@ -47,11 +47,11 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
           `}
           style={{
             maskImage: isRTL
-              ? "linear-gradient(to right, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)"
-              : "linear-gradient(to left, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)",
+              ? "linear-gradient(to right, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)"
+              : "linear-gradient(to left, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)",
             WebkitMaskImage: isRTL
-              ? "linear-gradient(to right, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)"
-              : "linear-gradient(to left, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)",
+              ? "linear-gradient(to right, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)"
+              : "linear-gradient(to left, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%)",
           }}
         >
           <img
