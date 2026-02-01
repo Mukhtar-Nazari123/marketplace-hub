@@ -34,6 +34,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLanguage, formatDate, formatCurrency, Language } from '@/lib/i18n';
+import { getLocalizedProductName, LocalizableProduct } from '@/lib/localizedProduct';
 
 // Trilingual helper
 const getLabel = (lang: Language, en: string, fa: string, ps: string) => {
@@ -55,6 +56,10 @@ interface OrderItem {
   product?: {
     sku: string | null;
   } | null;
+  // Localized fields from products_with_translations
+  name_en?: string | null;
+  name_fa?: string | null;
+  name_ps?: string | null;
 }
 
 interface ShippingAddress {
@@ -108,6 +113,14 @@ const AdminOrderDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
 
+  // Helper for localized item name
+  const getItemDisplayName = (item: OrderItem): string => {
+    if (item.name_en || item.name_fa || item.name_ps) {
+      return getLocalizedProductName(item as LocalizableProduct, lang as Language) || item.product_name;
+    }
+    return item.product_name;
+  };
+
   const fetchOrder = async () => {
     if (!id) return;
 
@@ -142,11 +155,35 @@ const AdminOrderDetail = () => {
         .eq('user_id', orderData.buyer_id)
         .single();
 
-      // Process order items
+      // Get all product IDs to fetch localized names
+      const productIds = (orderData.order_items || [])
+        .map((item: any) => item.product_id)
+        .filter((id: string | null): id is string => id !== null);
+
+      // Fetch localized names from products_with_translations
+      let productTranslations: Record<string, { name_en: string | null; name_fa: string | null; name_ps: string | null }> = {};
+      if (productIds.length > 0) {
+        const { data: productsData } = await supabase
+          .from('products_with_translations')
+          .select('id, name_en, name_fa, name_ps')
+          .in('id', productIds);
+
+        if (productsData) {
+          productTranslations = productsData.reduce((acc, p) => {
+            acc[p.id] = { name_en: p.name_en, name_fa: p.name_fa, name_ps: p.name_ps };
+            return acc;
+          }, {} as Record<string, { name_en: string | null; name_fa: string | null; name_ps: string | null }>);
+        }
+      }
+
+      // Process order items with localized names
       const processedItems = (orderData.order_items || []).map((item: any) => ({
         ...item,
         product: item.products || null,
         product_currency: item.products?.currency || null,
+        name_en: item.product_id ? productTranslations[item.product_id]?.name_en : null,
+        name_fa: item.product_id ? productTranslations[item.product_id]?.name_fa : null,
+        name_ps: item.product_id ? productTranslations[item.product_id]?.name_ps : null,
       }));
 
       setOrder({
@@ -166,7 +203,7 @@ const AdminOrderDetail = () => {
 
   useEffect(() => {
     fetchOrder();
-  }, [id]);
+  }, [id, lang]);
 
   const handleStatusUpdate = async (newStatus: string) => {
     if (!order) return;
@@ -332,20 +369,20 @@ const AdminOrderDetail = () => {
                 {order.order_items.map((item) => (
                   <div key={item.id} className="p-4 flex gap-4 hover:bg-muted/50 transition-colors">
                     <div className="w-20 h-20 rounded-lg overflow-hidden bg-muted flex-shrink-0 border border-border">
-                      <img
-                        src={item.product_image || '/placeholder.svg'}
-                        alt={item.product_name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-foreground truncate">{item.product_name}</h4>
-                      {item.product?.sku && (
-                        <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
-                          <Hash className="h-3 w-3" />
-                          SKU: {item.product.sku}
-                        </p>
-                      )}
+                        <img
+                          src={item.product_image || '/placeholder.svg'}
+                          alt={getItemDisplayName(item)}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-medium text-foreground truncate">{getItemDisplayName(item)}</h4>
+                        {item.product?.sku && (
+                          <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
+                            <Hash className="h-3 w-3" />
+                            SKU: {item.product.sku}
+                          </p>
+                        )}
                       <div className="flex flex-wrap items-center gap-4 mt-2 text-sm">
                         <span className="text-muted-foreground">
                           {getLabel(lang, 'Unit:', 'قیمت واحد:', 'واحد:')} {item.product_currency === 'USD' 
