@@ -47,25 +47,22 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
           `}
         >
           {/* White glow/fade behind the circle */}
-          <div 
+          <div
             className="absolute inset-0 rounded-full"
             style={{
-              background: "radial-gradient(circle, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.35) 45%, rgba(255,255,255,0) 75%)",
+              background:
+                "radial-gradient(circle, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.35) 45%, rgba(255,255,255,0) 75%)",
               transform: "scale(1.5)",
             }}
           />
           {/* Circular image container */}
-          <div 
+          <div
             className="relative rounded-full overflow-hidden w-[140px] h-[140px] sm:w-[180px] sm:h-[180px] lg:w-[220px] lg:h-[220px] xl:w-[240px] xl:h-[240px]"
             style={{
               boxShadow: "0 0 50px 20px rgba(255,255,255,0.35)",
             }}
           >
-            <img
-              src={banner.background_image}
-              alt=""
-              className="w-full h-full object-cover"
-            />
+            <img src={banner.background_image} alt="" className="w-full h-full object-cover" />
           </div>
         </div>
       )}
@@ -96,7 +93,7 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
 
       {/* Layer 3: Content (Text + CTA) */}
       <div
-        className={`hero-content absolute z-[3] top-1/2 -translate-y-1/2 px-4 sm:px-8 lg:px-12 py-4 sm:py-5 lg:py-6 max-w-[480px]
+        className={`hero-content absolute z-[3] top-1/2 -translate-y-1/2 px-2 sm:px-4 lg:px-6 py-4 sm:py-5 lg:py-6 max-w-[480px]
           ${isRTL ? "right-[5%] sm:right-[8%] text-right" : "left-[5%] sm:left-[8%] text-left"}
         `}
         dir={isRTL ? "rtl" : "ltr"}
