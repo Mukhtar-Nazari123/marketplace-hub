@@ -352,10 +352,7 @@ export const ProductContentDisplay = ({ product, attributes = [], className }: P
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4">
-            <div className={cn(
-              "grid gap-4",
-              hasOtherSpecs && hasWarranty ? "md:grid-cols-2" : "grid-cols-1"
-            )}>
+            <div className="flex flex-col gap-4">
               {/* Specifications */}
               {hasOtherSpecs && (
                 <div className="p-4 rounded-lg border bg-muted/30">
