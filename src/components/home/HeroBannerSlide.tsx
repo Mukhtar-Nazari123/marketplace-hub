@@ -35,8 +35,8 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-[#0f2027] via-[#203a43] to-[#2c5364]" />
         )}
-        {/* Subtle overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/20 to-transparent" />
+        {/* Very subtle overlay for text readability - reduced to preserve original colors */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/15 via-black/5 to-transparent" />
       </div>
 
       {/* Layer 2: Background Image in Circle with White Fade */}
