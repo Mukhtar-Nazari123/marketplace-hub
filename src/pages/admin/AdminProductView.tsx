@@ -40,6 +40,8 @@ import {
 import { toast } from 'sonner';
 import { useLanguage, formatDate, type Language } from '@/lib/i18n';
 import { formatCurrency } from '@/lib/currencyFormatter';
+import { getLocalizedProductName, LocalizableProduct } from '@/lib/localizedProduct';
+import { Json } from '@/integrations/supabase/types';
 
 // Trilingual helper function
 const getLabel = (lang: Language, en: string, fa: string, ps: string) => {
@@ -47,7 +49,6 @@ const getLabel = (lang: Language, en: string, fa: string, ps: string) => {
   if (lang === 'fa') return fa;
   return en;
 };
-import { Json } from '@/integrations/supabase/types';
 
 interface ProductAttribute {
   attribute_key: string;
@@ -114,9 +115,15 @@ const AdminProductView = () => {
   const isRTL = direction === 'rtl';
   const lang = language;
 
+  // Helper for localized product name
+  const getProductDisplayName = (): string => {
+    if (!product) return '';
+    return getLocalizedProductName(product as LocalizableProduct, language as Language) || product.name || 'Untitled';
+  };
+
   useEffect(() => {
     fetchProduct();
-  }, [id]);
+  }, [id, language]);
 
   const fetchProduct = async () => {
     if (!id) return;
@@ -260,7 +267,7 @@ const AdminProductView = () => {
   return (
     <AdminLayout 
       title={getLabel(lang, 'Product Details', 'جزئیات محصول', 'د محصول تفصیلات')} 
-      description={product.name}
+      description={getProductDisplayName()}
     >
       <div className="space-y-6 animate-fade-in">
         {/* Header Actions */}
@@ -409,7 +416,7 @@ const AdminProductView = () => {
               <CardHeader>
                 <div className="flex items-start justify-between gap-4">
                   <div className="space-y-1">
-                    <CardTitle className="text-2xl">{product.name}</CardTitle>
+                    <CardTitle className="text-2xl">{getProductDisplayName()}</CardTitle>
                     <p className="text-sm text-muted-foreground">SKU: {product.sku || 'N/A'}</p>
                   </div>
                   {getStatusBadge(product.status)}
