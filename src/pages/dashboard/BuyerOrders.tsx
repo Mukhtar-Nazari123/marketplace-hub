@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { useLanguage } from "@/lib/i18n";
+import { useLanguage, Language } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +13,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { OrderItemReview } from "@/components/reviews/OrderItemReview";
 import { formatCurrency } from "@/lib/currencyFormatter";
 import { useCurrencyRate } from "@/hooks/useCurrencyRate";
+import { getLocalizedProductName, LocalizableProduct } from "@/lib/localizedProduct";
 import {
   Package,
   MapPin,
@@ -39,6 +40,10 @@ interface OrderItem {
   product_id: string | null;
   product_sku?: string | null;
   product_currency?: string | null;
+  // Localized product fields (fetched from products_with_translations)
+  name_en?: string | null;
+  name_fa?: string | null;
+  name_ps?: string | null;
 }
 
 interface SellerPolicy {
@@ -157,6 +162,16 @@ const BuyerOrders = () => {
   };
   const t = texts;
 
+  // Helper to get localized product name for order items
+  const getItemDisplayName = (item: OrderItem): string => {
+    // If we have localized fields, use the localization helper
+    if (item.name_en || item.name_fa || item.name_ps) {
+      return getLocalizedProductName(item as LocalizableProduct, language as Language) || item.product_name;
+    }
+    // Fallback to stored product_name
+    return item.product_name;
+  };
+
   const fetchOrders = async () => {
     if (!user) return;
 
@@ -177,17 +192,49 @@ const BuyerOrders = () => {
 
       if (error) throw error;
 
+      // Get all unique product IDs to fetch translations
+      const allProductIds = (data || [])
+        .flatMap((order) => order.order_items || [])
+        .map((item: any) => item.product_id)
+        .filter((id: string | null): id is string => id !== null);
+      
+      const uniqueProductIds = [...new Set(allProductIds)];
+      
+      // Fetch product translations for all products
+      let productTranslations: Record<string, { name_en: string | null; name_fa: string | null; name_ps: string | null }> = {};
+      if (uniqueProductIds.length > 0) {
+        const { data: productsData } = await supabase
+          .from("products_with_translations")
+          .select("id, name_en, name_fa, name_ps")
+          .in("id", uniqueProductIds);
+        
+        if (productsData) {
+          productTranslations = productsData.reduce((acc, p) => {
+            if (p.id) {
+              acc[p.id] = { name_en: p.name_en, name_fa: p.name_fa, name_ps: p.name_ps };
+            }
+            return acc;
+          }, {} as Record<string, { name_en: string | null; name_fa: string | null; name_ps: string | null }>);
+        }
+      }
+
       // Fetch seller sub-orders for each order
       const ordersWithSellerOrders = await Promise.all(
         (data || []).map(async (order) => {
           const { data: sellerOrders } = await supabase.from("seller_orders").select("*").eq("order_id", order.id);
 
-          // Map order items to include product_sku - use order currency since products don't have currency column
-          const orderItemsWithSku = (order.order_items || []).map((item: any) => ({
-            ...item,
-            product_sku: item.products?.sku || null,
-            product_currency: order.currency,
-          }));
+          // Map order items to include product_sku and localized names
+          const orderItemsWithSku = (order.order_items || []).map((item: any) => {
+            const translations = item.product_id ? productTranslations[item.product_id] : null;
+            return {
+              ...item,
+              product_sku: item.products?.sku || null,
+              product_currency: order.currency,
+              name_en: translations?.name_en || null,
+              name_fa: translations?.name_fa || null,
+              name_ps: translations?.name_ps || null,
+            };
+          });
 
           // Group items by seller for seller sub-orders
           const sellerOrdersWithItems = (sellerOrders || []).map((so: any) => ({
@@ -215,7 +262,7 @@ const BuyerOrders = () => {
 
   useEffect(() => {
     fetchOrders();
-  }, [user]);
+  }, [user, language]);
 
   // Separate effect for real-time subscription
   useEffect(() => {
@@ -588,7 +635,7 @@ const BuyerOrders = () => {
                               <div key={item.id} className="flex items-center gap-3 p-2 bg-muted/50 rounded-lg">
                                 <div className="w-10 h-10 rounded-lg overflow-hidden bg-muted flex-shrink-0">
                                   {item.product_image ? (
-                                    <img src={item.product_image} alt={item.product_name} className="w-full h-full object-cover" />
+                                    <img src={item.product_image} alt={getItemDisplayName(item)} className="w-full h-full object-cover" />
                                   ) : (
                                     <div className="w-full h-full flex items-center justify-center">
                                       <Package className="w-4 h-4 text-muted-foreground" />
@@ -596,7 +643,7 @@ const BuyerOrders = () => {
                                   )}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <p className="font-medium truncate text-xs">{item.product_name}</p>
+                                  <p className="font-medium truncate text-xs">{getItemDisplayName(item)}</p>
                                   <p className="text-[10px] text-muted-foreground">
                                     {item.quantity} × {formatCurrency(item.unit_price, item.product_currency || 'AFN', isRTL)}
                                   </p>
@@ -898,7 +945,7 @@ const BuyerOrders = () => {
                                       {item.product_image ? (
                                         <img
                                           src={item.product_image}
-                                          alt={item.product_name}
+                                          alt={getItemDisplayName(item)}
                                           className="w-full h-full object-cover"
                                         />
                                       ) : (
@@ -908,7 +955,7 @@ const BuyerOrders = () => {
                                       )}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                      <p className="font-medium truncate text-sm">{item.product_name}</p>
+                                      <p className="font-medium truncate text-sm">{getItemDisplayName(item)}</p>
                                       <p className="text-xs text-muted-foreground">
                                         {item.quantity} × {formatCurrency(item.unit_price, item.product_currency || 'AFN', isRTL)}
                                       </p>
@@ -921,7 +968,7 @@ const BuyerOrders = () => {
                                       <OrderItemReview
                                         orderId={order.id}
                                         productId={item.product_id}
-                                        productName={item.product_name}
+                                        productName={getItemDisplayName(item)}
                                         productImage={item.product_image}
                                         orderStatus={order.status}
                                       />
