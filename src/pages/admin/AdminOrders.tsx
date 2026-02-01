@@ -23,13 +23,19 @@ import {
 } from '@/components/ui/select';
 import { Search, Filter, RefreshCw, Eye } from 'lucide-react';
 import { toast } from 'sonner';
-import { useLanguage, formatDate } from '@/lib/i18n';
+import { useLanguage, formatDate, Language } from '@/lib/i18n';
 import { formatCurrency } from '@/lib/currencyFormatter';
+import { getLocalizedProductName, LocalizableProduct } from '@/lib/localizedProduct';
 
 interface OrderItem {
   id: string;
   product_id: string | null;
   product_sku?: string | null;
+  product_name: string;
+  // Localized fields from products_with_translations
+  name_en?: string | null;
+  name_fa?: string | null;
+  name_ps?: string | null;
 }
 
 interface Order {
@@ -63,23 +69,31 @@ const formatPriceWithCurrency = (price: number, currency: string, isRTL: boolean
   return isRTL ? `${formattedPrice} ${symbol}` : `${symbol}${formattedPrice}`;
 };
 
-// Helper to format SKUs for display
-const formatProductSKUs = (items: OrderItem[] | undefined, isRTL: boolean): string => {
-  if (!items || items.length === 0) return isRTL ? 'بدون SKU' : 'No SKU';
+// Helper to format product names for display (localized)
+const formatProductNames = (
+  items: OrderItem[] | undefined, 
+  isRTL: boolean, 
+  language: Language
+): string => {
+  if (!items || items.length === 0) return isRTL ? 'بدون محصول' : 'No products';
   
-  const skus = items
-    .map(item => item.product_sku)
-    .filter((sku): sku is string => sku !== null && sku !== undefined && sku.trim() !== '');
+  const names = items.map(item => {
+    // Try localized name first
+    if (item.name_en || item.name_fa || item.name_ps) {
+      return getLocalizedProductName(item as LocalizableProduct, language) || item.product_name;
+    }
+    return item.product_name;
+  }).filter(name => name && name.trim() !== '');
   
-  if (skus.length === 0) return isRTL ? 'بدون SKU' : 'No SKU';
-  if (skus.length === 1) return skus[0];
-  if (skus.length === 2) return skus.join(isRTL ? ' ، ' : ', ');
-  return `${skus[0]}${isRTL ? ' و ' : ', '}+${skus.length - 1}`;
+  if (names.length === 0) return isRTL ? 'بدون محصول' : 'No products';
+  if (names.length === 1) return names[0];
+  if (names.length === 2) return names.join(isRTL ? ' ، ' : ', ');
+  return `${names[0]}${isRTL ? ' و ' : ', '}+${names.length - 1}`;
 };
 
 const AdminOrders = () => {
   const navigate = useNavigate();
-  const { t, direction } = useLanguage();
+  const { t, direction, language } = useLanguage();
   const [orders, setOrders] = useState<Order[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -96,6 +110,7 @@ const AdminOrders = () => {
           order_items (
             id,
             product_id,
+            product_name,
             products:product_id (sku)
           ),
           seller_orders (
@@ -106,17 +121,44 @@ const AdminOrders = () => {
 
       if (error) throw error;
 
-      // Map orders to include product SKUs
-      const ordersWithSku = (data || []).map((order: any) => ({
+      // Get all product IDs to fetch localized names
+      const allProductIds = (data || []).flatMap((order: any) => 
+        (order.order_items || [])
+          .map((item: any) => item.product_id)
+          .filter((id: string | null): id is string => id !== null)
+      );
+      const uniqueProductIds = [...new Set(allProductIds)];
+
+      // Fetch localized names from products_with_translations
+      let productTranslations: Record<string, { name_en: string | null; name_fa: string | null; name_ps: string | null }> = {};
+      if (uniqueProductIds.length > 0) {
+        const { data: productsData } = await supabase
+          .from('products_with_translations')
+          .select('id, name_en, name_fa, name_ps')
+          .in('id', uniqueProductIds);
+
+        if (productsData) {
+          productTranslations = productsData.reduce((acc, p) => {
+            acc[p.id] = { name_en: p.name_en, name_fa: p.name_fa, name_ps: p.name_ps };
+            return acc;
+          }, {} as Record<string, { name_en: string | null; name_fa: string | null; name_ps: string | null }>);
+        }
+      }
+
+      // Map orders to include product names with localized translations
+      const ordersWithLocalizedNames = (data || []).map((order: any) => ({
         ...order,
         order_items: (order.order_items || []).map((item: any) => ({
           ...item,
           product_sku: item.products?.sku || null,
+          name_en: item.product_id ? productTranslations[item.product_id]?.name_en : null,
+          name_fa: item.product_id ? productTranslations[item.product_id]?.name_fa : null,
+          name_ps: item.product_id ? productTranslations[item.product_id]?.name_ps : null,
         })),
       }));
 
-      setOrders(ordersWithSku);
-      setFilteredOrders(ordersWithSku);
+      setOrders(ordersWithLocalizedNames);
+      setFilteredOrders(ordersWithLocalizedNames);
     } catch (error) {
       console.error('Error fetching orders:', error);
       toast.error(t.admin.orders.loadError);
@@ -127,41 +169,7 @@ const AdminOrders = () => {
 
   useEffect(() => {
     fetchOrders();
-
-    // Real-time subscription for order updates
-    const channel = supabase
-      .channel('admin-orders-realtime')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'orders',
-        },
-        (payload) => {
-          console.log('Admin orders real-time update:', payload);
-          if (payload.eventType === 'UPDATE') {
-            const updatedOrder = payload.new as any;
-            setOrders((prevOrders) =>
-              prevOrders.map((order) =>
-                order.id === updatedOrder.id
-                  ? { ...order, status: updatedOrder.status, payment_status: updatedOrder.payment_status }
-                  : order
-              )
-            );
-          } else if (payload.eventType === 'INSERT') {
-            fetchOrders(); // Refetch for new orders
-          }
-        }
-      )
-      .subscribe((status) => {
-        console.log('Admin orders realtime subscription:', status);
-      });
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
+  }, [language]);
 
   useEffect(() => {
     let filtered = [...orders];
@@ -291,10 +299,8 @@ const AdminOrders = () => {
                   ) : (
                     filteredOrders.map((order) => (
                       <TableRow key={order.id} className="hover:bg-muted/50 transition-colors">
-                        <TableCell className="font-mono text-sm">
-                          <span className="bg-primary/10 text-primary px-2 py-1 rounded border border-primary/20">
-                            {formatProductSKUs(order.order_items, isRTL)}
-                          </span>
+                        <TableCell className="font-medium text-sm max-w-[200px] truncate">
+                          {formatProductNames(order.order_items, isRTL, language as Language)}
                         </TableCell>
                         <TableCell>{getStatusBadge(order.status)}</TableCell>
                         <TableCell>{getPaymentBadge(order.payment_status)}</TableCell>
