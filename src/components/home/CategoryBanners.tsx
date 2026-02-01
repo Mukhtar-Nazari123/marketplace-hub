@@ -35,7 +35,7 @@ const CategoryBanners = () => {
   if (loading) {
     return (
       <section className="py-12">
-        <div className="container">
+        <div className="container px-2 sm:px-4">
           <div className="flex gap-6 overflow-hidden">
             {[...Array(4)].map((_, index) => (
               <Skeleton key={index} className="h-[180px] min-w-[300px] rounded-xl flex-shrink-0" />
@@ -49,7 +49,7 @@ const CategoryBanners = () => {
   if (rootCategories.length === 0) {
     return (
       <section className="py-12">
-        <div className="container">
+        <div className="container px-2 sm:px-4">
           <div className="text-center py-12 text-muted-foreground">
             {isRTL ? 'هنوز دسته‌بندی‌ای وجود ندارد' : 'No categories available yet'}
           </div>
@@ -60,7 +60,7 @@ const CategoryBanners = () => {
 
   return (
     <section className="py-12">
-      <div className="container">
+      <div className="container px-2 sm:px-4">
         <div className="relative group/scroll">
           {/* Navigation Arrows */}
           <Button
