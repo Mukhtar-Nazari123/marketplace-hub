@@ -41,22 +41,26 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
         <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/20 to-transparent" />
       </div>
 
-      {/* Layer 2: Background Image as Circle */}
+      {/* Layer 2: Background Image with Fade Effect */}
       {banner.background_image && (
         <div
-          className={`absolute z-[2] top-1/2 -translate-y-1/2 pointer-events-none
-            ${isRTL ? "left-[3%] sm:left-[5%]" : "right-[3%] sm:right-[5%]"}
+          className={`absolute z-[2] bottom-0 top-0 pointer-events-none flex items-end
+            ${isRTL ? "left-0" : "right-0"}
           `}
+          style={{
+            maskImage: isRTL
+              ? "linear-gradient(to right, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)"
+              : "linear-gradient(to left, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)",
+            WebkitMaskImage: isRTL
+              ? "linear-gradient(to right, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)"
+              : "linear-gradient(to left, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)",
+          }}
         >
-          <div 
-            className="w-[140px] h-[140px] sm:w-[180px] sm:h-[180px] lg:w-[220px] lg:h-[220px] xl:w-[260px] xl:h-[260px] rounded-full overflow-hidden border-4 border-white/20 shadow-2xl"
-          >
-            <img
-              src={banner.background_image}
-              alt=""
-              className="w-full h-full object-cover"
-            />
-          </div>
+          <img
+            src={banner.background_image}
+            alt=""
+            className="h-full w-auto max-w-[280px] sm:max-w-[350px] lg:max-w-[450px] xl:max-w-[500px] object-contain object-bottom"
+          />
         </div>
       )}
 
