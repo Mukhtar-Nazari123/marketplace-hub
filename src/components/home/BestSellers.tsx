@@ -131,7 +131,7 @@ const BestSellers = () => {
 
   return (
     <section className="py-1 bg-secondary/30">
-      <div className="container px-2 sm:px-4">
+      <div className="container px-2 sm:px-3 lg:px-4">
         <div className="flex items-center gap-4 mb-8">
           <div className="flex items-center gap-2 bg-orange px-4 py-2 rounded-lg">
             <h2 className="font-display font-bold text-lg text-accent-foreground">{t.bestSellers.weeklyBestSellers}</h2>
