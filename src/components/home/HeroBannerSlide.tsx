@@ -93,7 +93,7 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
 
       {/* Layer 3: Content (Text + CTA) */}
       <div
-        className={`hero-content absolute z-[3] top-1/2 -translate-y-1/2 px-1 sm:px-2 lg:px-4 py-4 sm:py-5 lg:py-6 max-w-[480px]
+        className={`hero-content absolute z-[3] top-1/2 -translate-y-1/2 px-1 sm:px-2 lg:px-2 py-4 sm:py-5 lg:py-6 max-w-[480px]
           ${isRTL ? "right-[5%] sm:right-[8%] text-right" : "left-[5%] sm:left-[8%] text-left"}
         `}
         dir={isRTL ? "rtl" : "ltr"}
