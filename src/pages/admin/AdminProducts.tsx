@@ -49,11 +49,15 @@ import {
   Trash2,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useLanguage, formatDate, formatCurrency } from '@/lib/i18n';
+import { useLanguage, formatDate, formatCurrency, Language } from '@/lib/i18n';
+import { getLocalizedProductName, LocalizableProduct } from '@/lib/localizedProduct';
 
 interface Product {
   id: string;
   name: string;
+  name_en: string | null;
+  name_fa: string | null;
+  name_ps: string | null;
   slug: string;
   price_afn: number;
   compare_price_afn: number | null;
@@ -76,9 +80,14 @@ const formatPriceWithCurrency = (price: number, isRTL: boolean): string => {
 };
 
 const AdminProducts = () => {
-  const { t, direction } = useLanguage();
+  const { t, direction, language } = useLanguage();
   const isRTL = direction === 'rtl';
   const navigate = useNavigate();
+
+  // Helper for localized product name
+  const getProductDisplayName = (product: Product): string => {
+    return getLocalizedProductName(product as LocalizableProduct, language as Language) || product.name || 'Untitled';
+  };
 
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
@@ -114,7 +123,7 @@ const AdminProducts = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [language]);
 
   useEffect(() => {
     let filtered = [...products];
@@ -122,7 +131,7 @@ const AdminProducts = () => {
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter((product) =>
-        product.name.toLowerCase().includes(query)
+        getProductDisplayName(product).toLowerCase().includes(query)
       );
     }
 
@@ -318,7 +327,7 @@ const AdminProducts = () => {
                     filteredProducts.map((product) => (
                       <TableRow key={product.id} className="hover:bg-muted/50 transition-colors">
                         <TableCell>
-                          <div className="font-medium">{product.name}</div>
+                          <div className="font-medium">{getProductDisplayName(product)}</div>
                         </TableCell>
                         <TableCell>
                           <div className="flex flex-col gap-1">
