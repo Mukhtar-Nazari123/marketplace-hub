@@ -47,11 +47,11 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
           `}
           style={{
             maskImage: isRTL
-              ? "linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 20%), linear-gradient(to right, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)"
-              : "linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 20%), linear-gradient(to left, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)",
+              ? "linear-gradient(to top, rgba(0,0,0,0) 10%, rgba(0,0,0,1) 20%), linear-gradient(to right, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)"
+              : "linear-gradient(to top, rgba(0,0,0,0) 10%, rgba(0,0,0,1) 20%), linear-gradient(to left, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)",
             WebkitMaskImage: isRTL
-              ? "linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 20%), linear-gradient(to right, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)"
-              : "linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 20%), linear-gradient(to left, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)",
+              ? "linear-gradient(to top, rgba(0,0,0,0) 10%, rgba(0,0,0,1) 20%), linear-gradient(to right, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)"
+              : "linear-gradient(to top, rgba(0,0,0,0) 10%, rgba(0,0,0,1) 20%), linear-gradient(to left, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)",
             maskComposite: "intersect",
             WebkitMaskComposite: "source-in",
           }}
