@@ -26,7 +26,7 @@ const MobileCategoryBar = () => {
 
   return (
     <div className="lg:hidden bg-background border-b border-muted-foreground/20" dir={isRTL ? 'rtl' : 'ltr'}>
-      <div className="container px-2 sm:px-3 lg:px-4">
+      <div className="container px-1 sm:px-1.5 lg:px-2">
         <ScrollArea className="w-full whitespace-nowrap">
           <div className={`flex gap-1 py-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
             {/* All Categories Link */}
