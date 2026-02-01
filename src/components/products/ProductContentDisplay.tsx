@@ -3,7 +3,12 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
-import { useLanguage } from '@/lib/i18n';
+import { useLanguage, Language } from '@/lib/i18n';
+import {
+  getLocalizedProductName,
+  getLocalizedProductDescription,
+  getLocalizedShortDescription,
+} from '@/lib/localizedProduct';
 import {
   FileText,
   Globe,
@@ -12,6 +17,7 @@ import {
   Tag,
   Settings,
   ShieldCheck,
+  Info,
 } from 'lucide-react';
 
 interface ProductTranslations {
@@ -98,12 +104,30 @@ export const ProductContentDisplay = ({ product, attributes = [], className }: P
     );
   };
 
+  // Helper to get fallback content for a specific language
+  const getFallbackContent = (targetLang: Language) => {
+    const name = getLocalizedProductName(product, targetLang);
+    const shortDesc = getLocalizedShortDescription(product, targetLang);
+    const desc = getLocalizedProductDescription(product, targetLang);
+    return { name, shortDesc, desc };
+  };
+
+  // Check if content is native (not from fallback)
+  const isNativeContent = (targetLang: Language) => {
+    if (targetLang === 'en') return !!(product.name_en || product.description_en || product.short_description_en);
+    if (targetLang === 'fa') return !!(product.name_fa || product.description_fa || product.short_description_fa);
+    if (targetLang === 'ps') return !!(product.name_ps || product.description_ps || product.short_description_ps);
+    return false;
+  };
+
   const renderContent = (
     name: string | null | undefined,
     shortDesc: string | null | undefined,
     desc: string | null | undefined,
     langLabel: string,
-    direction: 'ltr' | 'rtl' = 'ltr'
+    direction: 'ltr' | 'rtl' = 'ltr',
+    isFallback: boolean = false,
+    fallbackLangLabel?: string
   ) => {
     const hasContent = name || shortDesc || desc;
     
@@ -118,6 +142,18 @@ export const ProductContentDisplay = ({ product, attributes = [], className }: P
 
     return (
       <div className={cn("space-y-4", direction === 'rtl' && "text-right")} dir={direction}>
+        {/* Fallback Notice */}
+        {isFallback && fallbackLangLabel && (
+          <div className="flex items-center gap-2 p-3 bg-warning/10 border border-warning/30 rounded-lg text-warning-foreground">
+            <Info className="h-4 w-4 flex-shrink-0" />
+            <p className="text-sm">
+              {isRTL 
+                ? `محتوای ${langLabel} موجود نیست. در حال نمایش محتوای ${fallbackLangLabel}.`
+                : `No ${langLabel} content available. Showing ${fallbackLangLabel} content.`}
+            </p>
+          </div>
+        )}
+
         {/* Name */}
         {name && (
           <div className="space-y-1">
@@ -151,6 +187,33 @@ export const ProductContentDisplay = ({ product, attributes = [], className }: P
           </div>
         )}
       </div>
+    );
+  };
+
+  // Get content for each tab with fallback logic
+  const getTabContent = (targetLang: Language, langLabel: string, direction: 'ltr' | 'rtl') => {
+    const isNative = isNativeContent(targetLang);
+    const fallback = getFallbackContent(targetLang);
+    
+    // Determine fallback language label
+    let fallbackLangLabel: string | undefined;
+    if (!isNative && (fallback.name || fallback.shortDesc || fallback.desc)) {
+      // Figure out which language the fallback is from
+      if (targetLang === 'ps') {
+        fallbackLangLabel = hasPersian ? (isRTL ? 'فارسی' : 'Persian') : (hasEnglish ? (isRTL ? 'انگلیسی' : 'English') : undefined);
+      } else if (targetLang === 'fa') {
+        fallbackLangLabel = hasEnglish ? (isRTL ? 'انگلیسی' : 'English') : undefined;
+      }
+    }
+
+    return renderContent(
+      fallback.name || null,
+      fallback.shortDesc || null,
+      fallback.desc || null,
+      langLabel,
+      direction,
+      !isNative && !!(fallback.name || fallback.shortDesc || fallback.desc),
+      fallbackLangLabel
     );
   };
 
@@ -220,33 +283,15 @@ export const ProductContentDisplay = ({ product, attributes = [], className }: P
             </TabsList>
 
             <TabsContent value="en" className="mt-4 border rounded-lg p-4">
-              {renderContent(
-                product.name_en,
-                product.short_description_en,
-                product.description_en,
-                'English',
-                'ltr'
-              )}
+              {getTabContent('en', 'English', 'ltr')}
             </TabsContent>
 
             <TabsContent value="fa" className="mt-4 border rounded-lg p-4">
-              {renderContent(
-                product.name_fa,
-                product.short_description_fa,
-                product.description_fa,
-                'Persian',
-                'rtl'
-              )}
+              {getTabContent('fa', isRTL ? 'فارسی' : 'Persian', 'rtl')}
             </TabsContent>
 
             <TabsContent value="ps" className="mt-4 border rounded-lg p-4">
-              {renderContent(
-                product.name_ps,
-                product.short_description_ps,
-                product.description_ps,
-                'Pashto',
-                'rtl'
-              )}
+              {getTabContent('ps', isRTL ? 'پښتو' : 'Pashto', 'rtl')}
             </TabsContent>
           </Tabs>
         </CardContent>
