@@ -130,7 +130,7 @@ const BestSellers = () => {
   };
 
   return (
-    <section className="py-1 bg-secondary/30">
+    <section id="best-sellers" className="py-1 bg-secondary/30">
       <div className="container px-1 sm:px-1.5 lg:px-2">
         <div className="flex items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
           <div className="flex items-center gap-1.5 sm:gap-2 bg-orange px-2.5 sm:px-4 py-1 sm:py-2 rounded-lg">
