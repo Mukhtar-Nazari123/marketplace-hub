@@ -73,10 +73,10 @@ const HomepageCategories = () => {
     return null;
   }
 
-  // Fixed items per row - first row fills completely, rest goes to second row
-  const itemsPerRow = 5;
-  const firstRow = categories.slice(0, itemsPerRow);
-  const secondRow = categories.slice(itemsPerRow, itemsPerRow * 2);
+  // Split categories evenly - first row fills with first half, second row gets the rest
+  const halfLength = Math.ceil(categories.length / 2);
+  const firstRow = categories.slice(0, halfLength);
+  const secondRow = categories.slice(halfLength);
 
   const CategoryItem = ({ category }: { category: typeof categories[0] }) => {
     const productImage = categoryImages.get(category.id);
