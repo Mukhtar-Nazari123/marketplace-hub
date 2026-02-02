@@ -35,6 +35,11 @@ const Index = () => {
         {/* Hero Section */}
         <HeroSection />
 
+        {/* TopBar for Mobile/Tablet - Below Hero */}
+        <div className="lg:hidden">
+          <TopBar />
+        </div>
+
         {/* Today's Deals */}
         <TodayDeals />
 
