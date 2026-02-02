@@ -87,15 +87,15 @@ const Header = () => {
       <header className="bg-background border-b border-muted-foreground/20 shadow-sm sticky top-0 z-50">
         <div className="container px-1 sm:px-1.5 lg:px-2 py-2">
           <div className="flex items-center justify-between gap-2 sm:gap-3">
-            {/* Mobile Menu Button - Left side */}
+            {/* Mobile Search Icon - Left side on mobile */}
             <Button
               variant="ghost"
               size="icon"
               className="lg:hidden flex-shrink-0"
-              onClick={() => setIsMenuOpen(true)}
-              aria-label={t.header.menu}
+              onClick={() => setIsSearchOpen(true)}
+              aria-label={t.header.searchPlaceholder}
             >
-              <Menu className="h-5 w-5" />
+              <Search className="h-5 w-5" />
             </Button>
 
             {/* Logo - Centered on mobile/tablet, left on desktop */}
@@ -107,15 +107,15 @@ const Header = () => {
               )}
             </Link>
 
-            {/* Mobile Search Icon - Right side on mobile */}
+            {/* Mobile Menu Button - Right side */}
             <Button
               variant="ghost"
               size="icon"
               className="lg:hidden flex-shrink-0"
-              onClick={() => setIsSearchOpen(true)}
-              aria-label={t.header.searchPlaceholder}
+              onClick={() => setIsMenuOpen(true)}
+              aria-label={t.header.menu}
             >
-              <Search className="h-5 w-5" />
+              <Menu className="h-5 w-5" />
             </Button>
 
             {/* Search Bar - Desktop only */}
