@@ -86,9 +86,9 @@ const Header = () => {
     <>
       <header className="bg-background border-b border-muted-foreground/20 shadow-sm sticky top-0 z-50">
         <div className="container px-1 sm:px-1.5 lg:px-2 py-2">
-          <div className="flex items-center justify-between gap-2 sm:gap-3">
+          <div className="flex items-center justify-between gap-2 sm:gap-3 relative">
             {/* Mobile Icons - Left side (Menu + Search) */}
-            <div className="flex items-center gap-1 lg:hidden flex-shrink-0">
+            <div className="flex items-center gap-1 lg:hidden flex-shrink-0 z-10">
               <Button
                 variant="ghost"
                 size="icon"
@@ -107,16 +107,19 @@ const Header = () => {
               </Button>
             </div>
 
-            {/* Logo - Centered on mobile/tablet, left on desktop */}
-            <Link to="/" className="flex-1 lg:flex-none flex justify-center lg:justify-start">
+            {/* Logo - Absolutely centered on mobile/tablet */}
+            <Link 
+              to="/" 
+              className="absolute left-1/2 -translate-x-1/2 lg:relative lg:left-0 lg:translate-x-0 lg:flex-shrink-0"
+            >
               {logoUrl ? (
-                <img src={logoUrl} alt={siteName} className="h-8 sm:h-10 w-auto object-contain" />
+                <img src={logoUrl} alt={siteName} className="h-10 sm:h-12 w-auto object-contain" />
               ) : (
-                <span className="text-primary font-bold text-xl sm:text-2xl">{siteName}</span>
+                <span className="text-primary font-bold text-2xl">{siteName}</span>
               )}
             </Link>
 
-            {/* Spacer for mobile to center logo */}
+            {/* Spacer for mobile to balance layout */}
             <div className="w-[88px] lg:hidden flex-shrink-0"></div>
 
             {/* Search Bar - Desktop only */}
