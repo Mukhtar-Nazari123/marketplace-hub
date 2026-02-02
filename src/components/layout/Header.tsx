@@ -22,10 +22,13 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import MobileMenu from "./MobileMenu";
+import MobileSearchOverlay from "./MobileSearchOverlay";
 import { useTheme } from "next-themes";
 import LanguageSwitcher from "./LanguageSwitcher";
+
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const { t, isRTL, language } = useLanguage();
   const { theme, setTheme } = useTheme();
@@ -83,8 +86,8 @@ const Header = () => {
     <>
       <header className="bg-background border-b border-muted-foreground/20 shadow-sm sticky top-0 z-50">
         <div className="container px-1 sm:px-1.5 lg:px-2 py-2">
-          <div className="flex items-center justify-between gap-1 sm:gap-2">
-            {/* Mobile Menu Button - Left side for mobile/tablet */}
+          <div className="flex items-center justify-between gap-2 sm:gap-3">
+            {/* Mobile Menu Button - Left side */}
             <Button
               variant="ghost"
               size="icon"
@@ -95,39 +98,28 @@ const Header = () => {
               <Menu className="h-5 w-5" />
             </Button>
 
-            {/* Mobile/Tablet Search Bar - Center */}
-            <div className="flex-1 lg:hidden">
-              <form onSubmit={handleSearch} className="relative w-full">
-                <Input
-                  type="text"
-                  placeholder={t.header.searchPlaceholder}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  className={`w-full h-9 sm:h-10 rounded-full border border-muted-foreground/30 focus:border-primary text-sm ${isRTL ? "pr-3 pl-10 text-right" : "pl-3 pr-10 text-left"}`}
-                  dir={isRTL ? "rtl" : "ltr"}
-                />
-                <Button
-                  type="submit"
-                  size="icon"
-                  className={`absolute top-1/2 -translate-y-1/2 rounded-full h-7 w-7 sm:h-8 sm:w-8 ${isRTL ? "left-1" : "right-1"}`}
-                >
-                  <Search className="h-3.5 w-3.5" />
-                </Button>
-              </form>
-            </div>
-
-            {/* Logo - Only image */}
-            <Link to="/" className="flex-shrink-0 ps-2 sm:ps-0 lg:ps-0">
+            {/* Logo - Centered on mobile/tablet, left on desktop */}
+            <Link to="/" className="flex-1 lg:flex-none flex justify-center lg:justify-start">
               {logoUrl ? (
                 <img src={logoUrl} alt={siteName} className="h-8 sm:h-10 w-auto object-contain" />
               ) : (
-                <span className="text-primary font-bold text-2xl">{siteName}</span>
+                <span className="text-primary font-bold text-xl sm:text-2xl">{siteName}</span>
               )}
             </Link>
 
-            {/* Search Bar - Red accent on focus */}
-            <div className="flex-1 max-w-2xl hidden md:flex">
+            {/* Mobile Search Icon - Right side on mobile */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="lg:hidden flex-shrink-0"
+              onClick={() => setIsSearchOpen(true)}
+              aria-label={t.header.searchPlaceholder}
+            >
+              <Search className="h-5 w-5" />
+            </Button>
+
+            {/* Search Bar - Desktop only */}
+            <div className="flex-1 max-w-2xl hidden lg:flex">
               <form onSubmit={handleSearch} className="relative w-full">
                 <Input
                   type="text"
@@ -297,6 +289,9 @@ const Header = () => {
 
       {/* Mobile Menu */}
       <MobileMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+
+      {/* Mobile Search Overlay */}
+      <MobileSearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </>
   );
 };
