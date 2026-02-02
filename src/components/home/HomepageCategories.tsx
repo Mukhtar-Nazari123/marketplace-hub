@@ -5,6 +5,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Package } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 const HomepageCategories = () => {
   const { isRTL } = useLanguage();
@@ -54,12 +55,12 @@ const HomepageCategories = () => {
   if (loading) {
     return (
       <section className="py-4 bg-background">
-        <div className="container px-1 sm:px-1.5 lg:px-2">
-          <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-3">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="flex flex-col items-center gap-2">
-                <Skeleton className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full" />
-                <Skeleton className="h-3 w-12" />
+        <div className="container px-2">
+          <div className="flex gap-4 overflow-hidden">
+            {[...Array(10)].map((_, i) => (
+              <div key={i} className="flex flex-col items-center gap-2 flex-shrink-0">
+                <Skeleton className="w-16 h-16 rounded-full" />
+                <Skeleton className="h-3 w-14" />
               </div>
             ))}
           </div>
@@ -72,44 +73,67 @@ const HomepageCategories = () => {
     return null;
   }
 
-  return (
-    <section className="py-4 bg-background" dir={isRTL ? 'rtl' : 'ltr'}>
-      <div className="container px-1 sm:px-1.5 lg:px-2">
-        <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-3 md:gap-4">
-          {categories.map((category) => {
-            const productImage = categoryImages.get(category.id);
-            const displayImage = category.image_url || productImage;
+  // Split categories into 2 rows
+  const halfLength = Math.ceil(categories.length / 2);
+  const firstRow = categories.slice(0, halfLength);
+  const secondRow = categories.slice(halfLength);
 
-            return (
-              <Link
-                key={category.id}
-                to={`/categories?category=${category.slug}`}
-                className="group flex flex-col items-center text-center"
-              >
-                {/* Circular Image */}
-                <div className="relative w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full overflow-hidden bg-muted border-2 border-transparent group-hover:border-primary/50 transition-all duration-300 group-hover:shadow-lg group-hover:scale-105">
-                  {displayImage ? (
-                    <img
-                      src={displayImage}
-                      alt={category.name}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-muted">
-                      <Package className="h-6 w-6 md:h-8 md:w-8 text-muted-foreground" />
-                    </div>
-                  )}
-                </div>
-                
-                {/* Category Name */}
-                <span className="mt-2 text-[10px] sm:text-xs md:text-sm text-foreground group-hover:text-primary transition-colors line-clamp-2 max-w-[70px] sm:max-w-[80px] md:max-w-[100px] font-medium">
-                  {category.name}
-                </span>
-              </Link>
-            );
-          })}
+  const CategoryItem = ({ category }: { category: typeof categories[0] }) => {
+    const productImage = categoryImages.get(category.id);
+    const displayImage = category.image_url || productImage;
+
+    return (
+      <Link
+        to={`/categories?category=${category.slug}`}
+        className="group flex flex-col items-center text-center flex-shrink-0"
+      >
+        {/* Circular Image */}
+        <div className="relative w-14 h-14 sm:w-16 sm:h-16 md:w-18 md:h-18 rounded-full overflow-hidden bg-muted border-2 border-transparent group-hover:border-primary/50 transition-all duration-300 group-hover:shadow-lg group-hover:scale-105">
+          {displayImage ? (
+            <img
+              src={displayImage}
+              alt={category.name}
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-muted">
+              <Package className="h-5 w-5 md:h-6 md:w-6 text-muted-foreground" />
+            </div>
+          )}
         </div>
+        
+        {/* Category Name */}
+        <span className="mt-1.5 text-[10px] sm:text-xs text-foreground group-hover:text-primary transition-colors line-clamp-2 max-w-[60px] sm:max-w-[70px] font-medium leading-tight">
+          {category.name}
+        </span>
+      </Link>
+    );
+  };
+
+  return (
+    <section className="py-3 bg-background" dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="container px-2">
+        <ScrollArea className="w-full" dir={isRTL ? 'rtl' : 'ltr'}>
+          <div className="flex flex-col gap-3">
+            {/* First Row */}
+            <div className={`flex gap-4 sm:gap-5 md:gap-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              {firstRow.map((category) => (
+                <CategoryItem key={category.id} category={category} />
+              ))}
+            </div>
+            
+            {/* Second Row */}
+            {secondRow.length > 0 && (
+              <div className={`flex gap-4 sm:gap-5 md:gap-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                {secondRow.map((category) => (
+                  <CategoryItem key={category.id} category={category} />
+                ))}
+              </div>
+            )}
+          </div>
+          <ScrollBar orientation="horizontal" className="h-2" />
+        </ScrollArea>
       </div>
     </section>
   );
