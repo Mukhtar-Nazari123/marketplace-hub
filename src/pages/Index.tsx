@@ -5,6 +5,7 @@ import Footer from "@/components/layout/Footer";
 import StickyNavbar from "@/components/layout/StickyNavbar";
 import TopBar from "@/components/layout/TopBar";
 import HeroSection from "@/components/home/HeroSection";
+import HomepageCategories from "@/components/home/HomepageCategories";
 import TodayDeals from "@/components/home/TodayDeals";
 import BestSellers from "@/components/home/BestSellers";
 import DiscoverProducts from "@/components/home/DiscoverProducts";
@@ -39,6 +40,9 @@ const Index = () => {
         <div className="lg:hidden">
           <TopBar />
         </div>
+
+        {/* Category Grid - Below Hero (desktop) / Below TopBar (mobile) */}
+        <HomepageCategories />
 
         {/* Today's Deals */}
         <TodayDeals />
