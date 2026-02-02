@@ -1,5 +1,5 @@
 import { Home, ShoppingCart, TrendingUp, Heart, User } from "lucide-react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useLanguage } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import { useWishlist } from "@/hooks/useWishlist";
@@ -14,12 +14,10 @@ interface NavItem {
   href: string;
   authRequired?: boolean;
   badge?: number;
-  scrollTo?: string;
 }
 
 const BottomNavigation = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const { language, isRTL } = useLanguage();
   const { user, role } = useAuth();
   const { itemCount: wishlistCount } = useWishlist();
@@ -60,8 +58,7 @@ const BottomNavigation = () => {
       labelEn: "Best Sellers",
       labelFa: "پرفروش‌ترین",
       labelPs: "غوره پلورل",
-      href: "/",
-      scrollTo: "best-sellers",
+      href: "/products",
     },
     {
       icon: Heart,
@@ -102,28 +99,13 @@ const BottomNavigation = () => {
     >
       <div className="flex items-center justify-around h-16 px-2">
         {navItems.map((item) => {
-          const active = item.scrollTo ? false : isActive(item.href);
+          const active = isActive(item.href);
           const Icon = item.icon;
-
-          const handleClick = (e: React.MouseEvent) => {
-            if (item.scrollTo) {
-              e.preventDefault();
-              if (location.pathname !== "/") {
-                navigate("/");
-                setTimeout(() => {
-                  document.getElementById(item.scrollTo!)?.scrollIntoView({ behavior: "smooth" });
-                }, 100);
-              } else {
-                document.getElementById(item.scrollTo)?.scrollIntoView({ behavior: "smooth" });
-              }
-            }
-          };
 
           return (
             <Link
               key={item.labelEn}
               to={item.href}
-              onClick={handleClick}
               className={cn(
                 "flex flex-col items-center justify-center flex-1 h-full py-2 px-1 transition-all duration-200 relative",
                 "active:scale-95 touch-manipulation",
