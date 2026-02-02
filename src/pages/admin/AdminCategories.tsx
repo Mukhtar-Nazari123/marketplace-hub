@@ -247,6 +247,7 @@ const AdminCategories = () => {
           name_ps: formData.name_ps || null,
           slug: formData.slug,
           description: formData.description || null,
+          image_url: formData.image_url || null,
           is_active: formData.is_active,
           sort_order: formData.sort_order,
           parent_id: null,
@@ -734,16 +735,16 @@ const AdminCategories = () => {
                 </p>
               </div>
 
-              {/* Image Upload (only for subcategories) */}
-              {isSubcategory && (
-                <ImageUpload
-                  label={getLabel(lang, 'Subcategory Image', 'تصویر زیردسته‌بندی', 'د فرعي کټګورۍ انځور')}
-                  value={formData.image_url}
-                  onChange={(url) => setFormData(prev => ({ ...prev, image_url: url }))}
-                  folder="categories"
-                  bucket="site-assets"
-                />
-              )}
+              {/* Image Upload */}
+              <ImageUpload
+                label={isSubcategory 
+                  ? getLabel(lang, 'Subcategory Image', 'تصویر زیردسته‌بندی', 'د فرعي کټګورۍ انځور')
+                  : getLabel(lang, 'Category Image', 'تصویر دسته‌بندی', 'د کټګورۍ انځور')}
+                value={formData.image_url}
+                onChange={(url) => setFormData(prev => ({ ...prev, image_url: url }))}
+                folder="categories"
+                bucket="site-assets"
+              />
 
               {/* Description */}
               <div className="space-y-2">
