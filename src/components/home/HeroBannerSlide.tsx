@@ -27,7 +27,7 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
   };
 
   return (
-    <div className="hero-container relative overflow-hidden rounded-2xl min-h-[120px] sm:min-h-[150px] lg:min-h-[220px] xl:min-h-[260px] 2xl:min-h-[280px] max-h-[300px] flex items-center animate-fade-in">
+    <div className="hero-container relative overflow-hidden rounded-2xl min-h-[160px] sm:min-h-[180px] lg:min-h-[220px] xl:min-h-[260px] 2xl:min-h-[280px] max-h-[300px] flex items-center animate-fade-in">
       {/* Layer 1: Solid Background Color */}
       <div className="hero-bg absolute inset-0 z-[1]">
         {banner.background_color ? (
@@ -55,7 +55,7 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
           />
           {/* Circular image container */}
           <div
-            className="relative rounded-full overflow-hidden w-[100px] h-[100px] sm:w-[140px] sm:h-[140px] lg:w-[220px] lg:h-[220px] xl:w-[240px] xl:h-[240px]"
+            className="relative rounded-full overflow-hidden w-[140px] h-[140px] sm:w-[180px] sm:h-[180px] lg:w-[220px] lg:h-[220px] xl:w-[240px] xl:h-[240px]"
             style={{
               boxShadow: "0 0 50px 20px rgba(255,255,255,0.35)",
             }}
@@ -98,19 +98,19 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
       >
         {/* Badge */}
         {badgeText && (
-          <span className="inline-block mb-1.5 sm:mb-2 lg:mb-3 px-3 sm:px-4 py-1 sm:py-1.5 text-[10px] sm:text-xs lg:text-sm font-semibold rounded-full bg-[#b6b6b6] text-white">
+          <span className="inline-block mb-2 sm:mb-3 px-4 py-1.5 text-xs sm:text-sm font-semibold rounded-full bg-[#b6b6b6] text-white">
             {badgeText}
           </span>
         )}
 
         {/* Title */}
-        <h2 className="hero-title text-base sm:text-xl lg:text-3xl xl:text-4xl font-extrabold text-white leading-tight mb-1 sm:mb-2 lg:mb-3">
+        <h2 className="hero-title text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-extrabold text-white leading-tight mb-2 sm:mb-3">
           {title}
         </h2>
 
         {/* Description */}
         {description && (
-          <p className="hero-text text-white/85 text-[10px] sm:text-xs lg:text-base mb-2 sm:mb-3 lg:mb-4 line-clamp-2">
+          <p className="hero-text text-white/85 text-xs sm:text-sm lg:text-base mb-3 sm:mb-4 line-clamp-2">
             {description}
           </p>
         )}
@@ -118,7 +118,7 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
         {/* CTA Button */}
         {ctaText && (
           <button
-            className="hero-btn inline-flex items-center gap-1.5 sm:gap-2 rounded-full font-semibold px-3 sm:px-5 lg:px-6 py-1.5 sm:py-2 lg:py-2.5 text-xs sm:text-sm bg-[#b6b6b6] text-white hover:bg-[#a0a0a0] transition-colors group"
+            className="hero-btn inline-flex items-center gap-2 rounded-full font-semibold px-5 sm:px-6 py-2.5 text-sm bg-[#b6b6b6] text-white hover:bg-[#a0a0a0] transition-colors group"
             onClick={handleCtaClick}
           >
             {ctaText}
