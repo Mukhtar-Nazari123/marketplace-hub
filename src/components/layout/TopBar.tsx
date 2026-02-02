@@ -59,7 +59,7 @@ const TopBar = () => {
       </div>
 
       {/* Mobile/Tablet Layout - 2 columns */}
-      <div className="lg:hidden px-2">
+      <div className="lg:hidden px-1 sm:px-1.5">
         <div className="flex items-center justify-between">
           {/* Left - Free Shipping */}
           <div className="flex items-center gap-1.5 text-[10px]">
