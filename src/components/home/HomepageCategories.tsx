@@ -1,16 +1,30 @@
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useLanguage } from '@/lib/i18n';
 import { useCategories } from '@/hooks/useCategories';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Package } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 const HomepageCategories = () => {
   const { isRTL } = useLanguage();
-  const { categories, loading } = useCategories();
+  const [searchParams] = useSearchParams();
+  const selectedCategorySlug = searchParams.get('category');
+  
+  const { categories, getSubcategories, getCategoryBySlug, loading } = useCategories();
   const [categoryImages, setCategoryImages] = useState<Map<string, string>>(new Map());
+  const [subcategoryImages, setSubcategoryImages] = useState<Map<string, string>>(new Map());
+
+  // Get selected category and its subcategories
+  const selectedCategory = selectedCategorySlug ? getCategoryBySlug(selectedCategorySlug) : null;
+  const subcategories = useMemo(() => {
+    return selectedCategory ? getSubcategories(selectedCategory.id) : [];
+  }, [selectedCategory?.id, getSubcategories]);
+
+  // Determine what to show: subcategories if category selected, otherwise categories
+  const showSubcategories = selectedCategory && subcategories.length > 0;
+  const items = showSubcategories ? subcategories : categories;
 
   // Fetch product images for categories without images
   useEffect(() => {
@@ -52,6 +66,48 @@ const HomepageCategories = () => {
     }
   }, [categories]);
 
+  // Fetch product images for subcategories without images
+  useEffect(() => {
+    const fetchSubcategoryImages = async () => {
+      if (!showSubcategories) return;
+      
+      const subcatsNeedingImages = subcategories.filter(sub => !sub.image_url);
+      if (subcatsNeedingImages.length === 0) return;
+
+      const imageMap = new Map<string, string>();
+      
+      await Promise.all(
+        subcatsNeedingImages.map(async (subcategory) => {
+          const { data: products } = await supabase
+            .from('products')
+            .select('id')
+            .eq('subcategory_id', subcategory.id)
+            .eq('status', 'approved')
+            .limit(1);
+
+          if (products && products.length > 0) {
+            const { data: media } = await supabase
+              .from('product_media')
+              .select('url')
+              .eq('product_id', products[0].id)
+              .eq('is_primary', true)
+              .limit(1);
+
+            if (media && media.length > 0) {
+              imageMap.set(subcategory.id, media[0].url);
+            }
+          }
+        })
+      );
+
+      setSubcategoryImages(imageMap);
+    };
+
+    if (subcategories.length > 0) {
+      fetchSubcategoryImages();
+    }
+  }, [subcategories, showSubcategories]);
+
   if (loading) {
     return (
       <section className="py-4 bg-background">
@@ -69,22 +125,35 @@ const HomepageCategories = () => {
     );
   }
 
-  if (categories.length === 0) {
+  if (items.length === 0) {
     return null;
   }
 
-  // Split categories evenly - first row fills with first half, second row gets the rest
-  const halfLength = Math.ceil(categories.length / 2);
-  const firstRow = categories.slice(0, halfLength);
-  const secondRow = categories.slice(halfLength);
+  // Split items evenly - first row fills with first half, second row gets the rest
+  const halfLength = Math.ceil(items.length / 2);
+  const firstRow = items.slice(0, halfLength);
+  const secondRow = items.slice(halfLength);
 
-  const CategoryItem = ({ category }: { category: typeof categories[0] }) => {
-    const productImage = categoryImages.get(category.id);
-    const displayImage = category.image_url || productImage;
+  const CategoryItem = ({ item, isSubcategory }: { item: typeof items[0]; isSubcategory: boolean }) => {
+    // Get appropriate image based on item type
+    const getDisplayImage = () => {
+      if (item.image_url) return item.image_url;
+      if (isSubcategory) {
+        return subcategoryImages.get(item.id);
+      }
+      return categoryImages.get(item.id);
+    };
+
+    const displayImage = getDisplayImage();
+
+    // Build the link URL
+    const linkUrl = isSubcategory && selectedCategory
+      ? `/categories?category=${selectedCategory.slug}&subcategory=${item.slug}`
+      : `/categories?category=${item.slug}`;
 
     return (
       <Link
-        to={`/categories?category=${category.slug}`}
+        to={linkUrl}
         className="group flex flex-col items-center text-center flex-shrink-0"
       >
         {/* Circular Image */}
@@ -92,7 +161,7 @@ const HomepageCategories = () => {
           {displayImage ? (
             <img
               src={displayImage}
-              alt={category.name}
+              alt={item.name}
               className="w-full h-full object-cover"
               loading="lazy"
             />
@@ -103,9 +172,9 @@ const HomepageCategories = () => {
           )}
         </div>
         
-        {/* Category Name */}
+        {/* Item Name */}
         <span className="mt-1.5 text-[10px] sm:text-xs text-foreground group-hover:text-primary transition-colors line-clamp-2 max-w-[60px] sm:max-w-[70px] font-medium leading-tight">
-          {category.name}
+          {item.name}
         </span>
       </Link>
     );
@@ -118,16 +187,16 @@ const HomepageCategories = () => {
           <div className="flex flex-col gap-3">
             {/* First Row */}
             <div className={`flex gap-4 sm:gap-5 md:gap-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
-              {firstRow.map((category) => (
-                <CategoryItem key={category.id} category={category} />
+              {firstRow.map((item) => (
+                <CategoryItem key={item.id} item={item} isSubcategory={showSubcategories} />
               ))}
             </div>
             
             {/* Second Row */}
             {secondRow.length > 0 && (
               <div className={`flex gap-4 sm:gap-5 md:gap-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                {secondRow.map((category) => (
-                  <CategoryItem key={category.id} category={category} />
+                {secondRow.map((item) => (
+                  <CategoryItem key={item.id} item={item} isSubcategory={showSubcategories} />
                 ))}
               </div>
             )}
