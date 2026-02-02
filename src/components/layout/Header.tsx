@@ -87,16 +87,8 @@ const Header = () => {
       <header className="bg-background border-b border-muted-foreground/20 shadow-sm sticky top-0 z-50">
         <div className="container px-1 sm:px-1.5 lg:px-2 py-2">
           <div className="flex items-center justify-between gap-2 sm:gap-3">
-            {/* Mobile Icons - Left side (Search + Menu) */}
+            {/* Mobile Icons - Left side (Menu + Search) */}
             <div className="flex items-center gap-1 lg:hidden flex-shrink-0">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsSearchOpen(true)}
-                aria-label={t.header.searchPlaceholder}
-              >
-                <Search className="h-5 w-5" />
-              </Button>
               <Button
                 variant="ghost"
                 size="icon"
@@ -104,6 +96,14 @@ const Header = () => {
                 aria-label={t.header.menu}
               >
                 <Menu className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsSearchOpen(true)}
+                aria-label={t.header.searchPlaceholder}
+              >
+                <Search className="h-5 w-5" />
               </Button>
             </div>
 
