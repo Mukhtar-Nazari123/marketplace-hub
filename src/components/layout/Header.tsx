@@ -87,16 +87,25 @@ const Header = () => {
       <header className="bg-background border-b border-muted-foreground/20 shadow-sm sticky top-0 z-50">
         <div className="container px-1 sm:px-1.5 lg:px-2 py-2">
           <div className="flex items-center justify-between gap-2 sm:gap-3">
-            {/* Mobile Search Icon - Left side on mobile */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="lg:hidden flex-shrink-0"
-              onClick={() => setIsSearchOpen(true)}
-              aria-label={t.header.searchPlaceholder}
-            >
-              <Search className="h-5 w-5" />
-            </Button>
+            {/* Mobile Icons - Left side (Search + Menu) */}
+            <div className="flex items-center gap-1 lg:hidden flex-shrink-0">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsSearchOpen(true)}
+                aria-label={t.header.searchPlaceholder}
+              >
+                <Search className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsMenuOpen(true)}
+                aria-label={t.header.menu}
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+            </div>
 
             {/* Logo - Centered on mobile/tablet, left on desktop */}
             <Link to="/" className="flex-1 lg:flex-none flex justify-center lg:justify-start">
@@ -107,16 +116,8 @@ const Header = () => {
               )}
             </Link>
 
-            {/* Mobile Menu Button - Right side */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="lg:hidden flex-shrink-0"
-              onClick={() => setIsMenuOpen(true)}
-              aria-label={t.header.menu}
-            >
-              <Menu className="h-5 w-5" />
-            </Button>
+            {/* Spacer for mobile to center logo */}
+            <div className="w-[88px] lg:hidden flex-shrink-0"></div>
 
             {/* Search Bar - Desktop only */}
             <div className="flex-1 max-w-2xl hidden lg:flex">
