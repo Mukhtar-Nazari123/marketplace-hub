@@ -23,7 +23,7 @@ const TopBar = () => {
   ];
 
   return (
-    <div className="bg-[#f5f0e6] py-1.5 hidden lg:block" dir={isRTL ? "rtl" : "ltr"}>
+    <div className="bg-[#b6b6b6] py-1.5 hidden lg:block" dir={isRTL ? "rtl" : "ltr"}>
       <div className="container">
         <div className="flex items-center justify-center gap-16">
           {features.map((feature, index) => {
