@@ -41,18 +41,17 @@ const TopBar = () => {
 
   return (
     <TooltipProvider>
-      {/* Features Bar */}
-      <div className="bg-primary text-primary-foreground py-1" dir={isRTL ? "rtl" : "ltr"}>
+      {/* Features Bar - SHEIN style */}
+      <div className="bg-[#f5f0e6] py-1.5 hidden lg:block" dir={isRTL ? "rtl" : "ltr"}>
         <div className="container">
-          <div className="flex items-center justify-center gap-6 md:gap-12">
+          <div className="flex items-center justify-center gap-16">
             {features.map((feature, index) => {
               const Icon = feature.icon;
               return (
-                <div key={index} className="flex items-center gap-1.5 text-xs">
-                  <Icon className="h-3.5 w-3.5 flex-shrink-0" />
-                  <span className="font-medium hidden sm:inline">{feature.text}</span>
-                  <span className="text-primary-foreground/80 hidden md:inline">- {feature.subtext}</span>
-                  <span className="font-medium sm:hidden">{feature.text}</span>
+                <div key={index} className="flex items-center gap-2 text-xs">
+                  <Icon className="h-4 w-4 text-black/70 flex-shrink-0" />
+                  <span className="font-semibold text-black">{feature.text}</span>
+                  <span className="text-black/60">{feature.subtext}</span>
                 </div>
               );
             })}
