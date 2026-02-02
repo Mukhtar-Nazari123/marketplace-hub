@@ -1,22 +1,18 @@
+import { useState, useEffect } from "react";
 import { Truck, Shield, RotateCcw } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 
 const TopBar = () => {
   const { t, isRTL } = useLanguage();
+  const [showSecurePayment, setShowSecurePayment] = useState(false);
 
-  // Static features for mobile (left and right)
-  const staticFeatures = [
-    {
-      icon: Truck,
-      text: t.footer.freeShipping,
-      subtext: t.footer.ordersOver,
-    },
-    {
-      icon: RotateCcw,
-      text: t.footer.easyReturns,
-      subtext: t.footer.daysReturn,
-    },
-  ];
+  // Toggle between Free Returns and Secure Payment every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setShowSecurePayment((prev) => !prev);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   // All features for desktop
   const allFeatures = [
@@ -36,6 +32,13 @@ const TopBar = () => {
       subtext: t.footer.daysReturn,
     },
   ];
+
+  // Dynamic right feature for mobile
+  const rightFeature = showSecurePayment
+    ? { icon: Shield, text: t.footer.securePayment, subtext: t.footer.protected }
+    : { icon: RotateCcw, text: t.footer.easyReturns, subtext: t.footer.daysReturn };
+
+  const RightIcon = rightFeature.icon;
 
   return (
     <div className="bg-[#b6b6b6] py-1.5" dir={isRTL ? "rtl" : "ltr"}>
@@ -62,17 +65,17 @@ const TopBar = () => {
           <div className="flex items-center gap-1.5 text-[10px]">
             <Truck className="h-4 w-4 text-black/70 flex-shrink-0" />
             <div className="flex flex-col leading-tight">
-              <span className="font-semibold text-black">{staticFeatures[0].text}</span>
-              <span className="text-black/60">{staticFeatures[0].subtext}</span>
+              <span className="font-semibold text-black">{t.footer.freeShipping}</span>
+              <span className="text-black/60">{t.footer.ordersOver}</span>
             </div>
           </div>
 
-          {/* Right - Free Returns */}
-          <div className="flex items-center gap-1.5 text-[10px]">
-            <RotateCcw className="h-4 w-4 text-black/70 flex-shrink-0" />
+          {/* Right - Rotating between Free Returns and Secure Payment */}
+          <div className="flex items-center gap-1.5 text-[10px] transition-opacity duration-300">
+            <RightIcon className="h-4 w-4 text-black/70 flex-shrink-0" />
             <div className="flex flex-col leading-tight">
-              <span className="font-semibold text-black">{staticFeatures[1].text}</span>
-              <span className="text-black/60">{staticFeatures[1].subtext}</span>
+              <span className="font-semibold text-black">{rightFeature.text}</span>
+              <span className="text-black/60">{rightFeature.subtext}</span>
             </div>
           </div>
         </div>
