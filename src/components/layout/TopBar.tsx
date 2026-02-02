@@ -1,4 +1,4 @@
-import { Phone, Globe, User } from "lucide-react";
+import { Phone, Globe, User, Truck, Shield, RotateCcw } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/lib/i18n";
 import { useContactSettings } from "@/hooks/useContactSettings";
@@ -21,8 +21,46 @@ const TopBar = () => {
     setLanguage(language === "fa" ? "en" : "fa");
   };
 
+  const features = [
+    {
+      icon: Truck,
+      text: t.footer.freeShipping,
+      subtext: t.footer.ordersOver,
+    },
+    {
+      icon: Shield,
+      text: t.footer.securePayment,
+      subtext: t.footer.protected,
+    },
+    {
+      icon: RotateCcw,
+      text: t.footer.easyReturns,
+      subtext: t.footer.daysReturn,
+    },
+  ];
+
   return (
     <TooltipProvider>
+      {/* Features Bar */}
+      <div className="bg-primary text-primary-foreground py-1" dir={isRTL ? "rtl" : "ltr"}>
+        <div className="container">
+          <div className="flex items-center justify-center gap-6 md:gap-12">
+            {features.map((feature, index) => {
+              const Icon = feature.icon;
+              return (
+                <div key={index} className="flex items-center gap-1.5 text-xs">
+                  <Icon className="h-3.5 w-3.5 flex-shrink-0" />
+                  <span className="font-medium hidden sm:inline">{feature.text}</span>
+                  <span className="text-primary-foreground/80 hidden md:inline">- {feature.subtext}</span>
+                  <span className="font-medium sm:hidden">{feature.text}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Main TopBar */}
       <div className="bg-[#b6b6b6] text-black py-1 text-sm" dir={isRTL ? "rtl" : "ltr"}>
         <div className="container flex items-center justify-between">
           <div className="flex items-center gap-6">
