@@ -8,6 +8,7 @@ import FilterBar from "@/components/products/FilterBar";
 import Header from "@/components/layout/Header";
 import Navigation from "@/components/layout/Navigation";
 import Footer from "@/components/layout/Footer";
+import HomepageCategories from "@/components/home/HomepageCategories";
 import StickyNavbar from "@/components/layout/StickyNavbar";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Package, Heart, ShoppingCart, Eye } from "lucide-react";
@@ -294,6 +295,9 @@ const Categories = () => {
           }
         }}
       />
+
+      {/* Subcategories Scroll - shows when category is selected */}
+      {selectedCategorySlug && <HomepageCategories />}
 
       <div className="container mx-auto px-4 py-1">
         {/* Header */}
