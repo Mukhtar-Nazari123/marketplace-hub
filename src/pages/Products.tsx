@@ -5,6 +5,7 @@ import { useProducts, formatProductForDisplay } from "@/hooks/useProducts";
 import { useCategories } from "@/hooks/useCategories";
 import { FilterState } from "@/components/ui/ProductFilters";
 import FilterBar from "@/components/products/FilterBar";
+import HomepageCategories from "@/components/home/HomepageCategories";
 import Header from "@/components/layout/Header";
 import Navigation from "@/components/layout/Navigation";
 import Footer from "@/components/layout/Footer";
@@ -212,6 +213,9 @@ const Products = () => {
           }));
         }}
       />
+
+      {/* Categories Scroll */}
+      <HomepageCategories />
 
       {/* Hero Banner for New Products */}
       {filterType === "new" && (
