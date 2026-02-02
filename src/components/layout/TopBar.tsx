@@ -61,7 +61,7 @@ const TopBar = () => {
       </div>
 
       {/* Mobile/Tablet Layout - 2 columns with margins to align with other sections */}
-      <div className="lg:hidden mx-1 sm:mx-1.5 :mx-3" dir={isRTL ? "rtl" : "ltr"}>
+      <div className="lg:hidden mx-1 sm:mx-3 " dir={isRTL ? "rtl" : "ltr"}>
         <div className="bg-[#b6b6b6] px-3 sm:px-4 py-1.5 rounded-sm">
           <div className="flex items-center justify-between">
             {/* Left - Free Shipping */}
