@@ -132,12 +132,12 @@ const BestSellers = () => {
   return (
     <section className="py-1 bg-secondary/30">
       <div className="container px-1 sm:px-1.5 lg:px-2">
-        <div className="flex items-center gap-4 mb-8">
-          <div className="flex items-center gap-2 bg-orange px-4 py-2 rounded-lg">
-            <h2 className="font-display font-bold text-lg text-accent-foreground">{t.bestSellers.weeklyBestSellers}</h2>
+        <div className="flex items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
+          <div className="flex items-center gap-1.5 sm:gap-2 bg-orange px-2.5 sm:px-4 py-1 sm:py-2 rounded-lg">
+            <h2 className="font-display font-bold text-sm sm:text-lg text-accent-foreground">{t.bestSellers.weeklyBestSellers}</h2>
           </div>
-          <Link to="/products" className="text-muted-foreground hover:text-cyan flex items-center gap-1">
-            {t.deals.seeAll} {isRTL ? <ArrowLeft className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
+          <Link to="/products" className="text-muted-foreground hover:text-cyan flex items-center gap-1 text-xs sm:text-sm">
+            {t.deals.seeAll} {isRTL ? <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> : <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
           </Link>
         </div>
         <div className="relative group">
