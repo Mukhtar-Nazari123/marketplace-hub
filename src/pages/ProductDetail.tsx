@@ -105,7 +105,6 @@ const ProductDetail = () => {
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [colorMedia, setColorMedia] = useState<{ color_value: string; url: string }[]>([]);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
-  const [productColors, setProductColors] = useState<string[]>([]);
 
   // Fetch product rating
   const { averageRating, reviewCount, refetch: refetchRating } = useProductRating(product?.id || '');
@@ -162,7 +161,7 @@ const ProductDetail = () => {
 
         setProduct({ ...(data as any), seller: seller ?? null } as Product);
 
-        // Fetch color-specific media (images linked to colors)
+        // Fetch color-specific media
         const { data: colorMediaData } = await supabase
           .from('product_media')
           .select('color_value, url')
@@ -176,22 +175,6 @@ const ProductDetail = () => {
           setColorMedia([]);
         }
         setSelectedColor(null);
-
-        // Fetch product colors from product_attributes table
-        const { data: colorAttr } = await supabase
-          .from('product_attributes')
-          .select('attribute_value')
-          .eq('product_id', data.id)
-          .eq('attribute_key', 'colors')
-          .maybeSingle();
-        
-        if (colorAttr?.attribute_value) {
-          // Parse comma-separated colors (e.g., "white, red, black")
-          const colors = colorAttr.attribute_value.split(',').map((c: string) => c.trim().toLowerCase());
-          setProductColors(colors);
-        } else {
-          setProductColors([]);
-        }
 
         // Fetch related products
         if (data.category_id) {
@@ -501,14 +484,11 @@ const ProductDetail = () => {
             )}
             
             {/* Color Swatches */}
-            {productColors.length > 0 && (
-              <ProductColorSwatches 
-                productColors={productColors}
-                colorMedia={colorMedia}
-                selectedColor={selectedColor}
-                onColorSelect={handleColorSelect}
-              />
-            )}
+            <ProductColorSwatches 
+              colorMedia={colorMedia}
+              selectedColor={selectedColor}
+              onColorSelect={handleColorSelect}
+            />
           </div>
 
           {/* Product Info */}

@@ -10,28 +10,19 @@ interface ColorMedia {
 }
 
 interface ProductColorSwatchesProps {
-  /** List of color values the product is available in */
-  productColors: string[];
-  /** Optional: media items linked to specific colors (for image switching) */
-  colorMedia?: ColorMedia[];
-  /** Currently selected color value */
+  colorMedia: ColorMedia[];
   selectedColor: string | null;
-  /** Callback when a color swatch is clicked */
   onColorSelect: (colorValue: string) => void;
 }
 
 const ProductColorSwatches = ({ 
-  productColors,
-  colorMedia = [],
+  colorMedia, 
   selectedColor, 
   onColorSelect 
 }: ProductColorSwatchesProps) => {
   const { isRTL } = useLanguage();
 
-  if (productColors.length === 0) return null;
-
-  // Create a map of color -> image URL for quick lookup
-  const colorImageMap = new Map(colorMedia.map(m => [m.color_value, m.url]));
+  if (colorMedia.length === 0) return null;
 
   return (
     <div className="mt-3">
@@ -40,30 +31,28 @@ const ProductColorSwatches = ({
       </p>
       <TooltipProvider>
         <div className="flex gap-2 flex-wrap">
-          {productColors.map((colorValue) => {
-            const colorDef = getColorByValue(colorValue);
-            const isMulticolor = colorValue === 'multicolor';
-            const isSelected = selectedColor === colorValue;
-            const colorName = getLocalizedColorName(colorValue, isRTL);
-            const needsBorder = ['white', 'cream', 'ivory', 'beige'].includes(colorValue);
-            const hasLinkedImage = colorImageMap.has(colorValue);
+          {colorMedia.map((media) => {
+            const colorDef = getColorByValue(media.color_value);
+            const isMulticolor = media.color_value === 'multicolor';
+            const isSelected = selectedColor === media.color_value;
+            const colorName = getLocalizedColorName(media.color_value, isRTL);
+            const needsBorder = ['white', 'cream', 'ivory', 'beige'].includes(media.color_value);
             
             return (
-              <Tooltip key={colorValue}>
+              <Tooltip key={media.color_value}>
                 <TooltipTrigger asChild>
                   <button
-                    onClick={() => onColorSelect(colorValue)}
+                    onClick={() => onColorSelect(media.color_value)}
                     className={cn(
                       "w-8 h-8 rounded-full transition-all flex items-center justify-center",
                       "hover:scale-110 hover:shadow-md",
                       isSelected && "ring-2 ring-offset-2 ring-primary",
-                      needsBorder && "border border-border",
-                      !hasLinkedImage && "opacity-80"
+                      needsBorder && "border border-border"
                     )}
                     style={{
                       background: isMulticolor 
                         ? colorDef?.hex 
-                        : colorDef?.hex || colorValue,
+                        : colorDef?.hex || media.color_value,
                     }}
                     aria-label={colorName}
                   >
@@ -71,7 +60,7 @@ const ProductColorSwatches = ({
                       <Check 
                         className={cn(
                           "w-4 h-4",
-                          needsBorder || ['yellow', 'gold', 'cream', 'ivory', 'beige', 'peach', 'mint', 'lightblue', 'lavender'].includes(colorValue)
+                          needsBorder || ['yellow', 'gold', 'cream', 'ivory', 'beige', 'peach', 'mint', 'lightblue', 'lavender'].includes(media.color_value)
                             ? "text-gray-800"
                             : "text-white"
                         )} 

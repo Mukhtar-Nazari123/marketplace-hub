@@ -200,11 +200,9 @@ async function saveProductMedia(
     toAdd.push({ url: videoUrl, type: 'video', order: imageUrls.length, colorValue: null });
   }
 
-  // Color-specific images - these are often linked from existing general images
-  // We need to track which existing images should get a color_value update
+  // Color-specific images
   let colorOrderOffset = imageUrls.length + (videoUrl ? 1 : 0);
   Object.entries(colorImageUrls).forEach(([colorValue, url], index) => {
-    // Only add as new if the URL doesn't already exist in the database
     if (!existingUrls.has(url)) {
       toAdd.push({ 
         url, 
@@ -213,7 +211,6 @@ async function saveProductMedia(
         colorValue 
       });
     }
-    // If URL exists, we'll update its color_value later (in the update section below)
   });
 
   // Find media to remove (in existing but not in new URLs)
@@ -259,32 +256,15 @@ async function saveProductMedia(
     }
   }
 
-  // Update existing images with their color_value when linked to a color
-  // This handles the case where a general image is linked to a color
+  // Update existing color images with their color_value
   for (const [colorValue, url] of Object.entries(colorImageUrls)) {
-    // Find the media entry for this URL (could be in existing or just inserted)
     const existing = existingMedia?.find(m => m.url === url);
     if (existing) {
-      const { error } = await supabase
+      await supabase
         .from('product_media')
         .update({ color_value: colorValue })
         .eq('id', existing.id);
-      
-      if (error) console.error('Error updating color_value:', error);
     }
-  }
-
-  // Clear color_value from images that are no longer linked to any color
-  const linkedUrls = new Set(Object.values(colorImageUrls));
-  const mediaToClearColor = existingMedia?.filter(
-    m => m.color_value && !linkedUrls.has(m.url)
-  ) || [];
-  
-  for (const media of mediaToClearColor) {
-    await supabase
-      .from('product_media')
-      .update({ color_value: null })
-      .eq('id', media.id);
   }
 }
 
@@ -423,17 +403,6 @@ export async function loadProductWithTranslations(
   const videoMedia = media?.find(m => m.media_type === 'video');
   const videoUrl = videoMedia?.url || (product.metadata as any)?.videoUrl || '';
 
-  // Color-linked media (used for swatches & edit form)
-  const colorMedia = (media || [])
-    .filter(m => m.media_type === 'image' && m.color_value)
-    .map(m => ({ color_value: m.color_value as string, url: m.url }));
-
-  // Convenience mapping: one URL per color (first wins)
-  const colorImageUrls: Record<string, string> = {};
-  for (const m of colorMedia) {
-    if (!colorImageUrls[m.color_value]) colorImageUrls[m.color_value] = m.url;
-  }
-
   return {
     product,
     translation,
@@ -441,8 +410,6 @@ export async function loadProductWithTranslations(
     brand,
     imageUrls,
     videoUrl,
-    colorMedia,
-    colorImageUrls,
   };
 }
 
