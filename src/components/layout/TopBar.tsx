@@ -61,24 +61,24 @@ const TopBar = () => {
       </div>
 
       {/* Mobile/Tablet Layout - 2 columns with margins to align with other sections */}
-      <div className="lg:hidden mx-1 sm:mx-1.5" dir={isRTL ? "rtl" : "ltr"}>
-        <div className="bg-[#b6b6b6] px-3 sm:px-4 py-1.5 rounded-sm">
-          <div className="flex items-center justify-between">
+      <div className="lg:hidden px-1 sm:px-1.5" dir={isRTL ? "rtl" : "ltr"}>
+        <div className="bg-[#b6b6b6] px-2 sm:px-3 py-1.5 rounded-sm">
+          <div className="flex items-center justify-between gap-2">
             {/* Left - Free Shipping */}
-            <div className="flex items-center gap-1.5 text-[10px]">
-              <Truck className="h-4 w-4 text-black/70 flex-shrink-0" />
-              <div className="flex flex-col leading-tight">
-                <span className="font-semibold text-black">{t.footer.freeShipping}</span>
-                <span className="text-black/60">{t.footer.ordersOver}</span>
+            <div className="flex items-center gap-1 sm:gap-1.5 text-[9px] sm:text-[10px] min-w-0 flex-1">
+              <Truck className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-black/70 flex-shrink-0" />
+              <div className="flex flex-col leading-tight min-w-0">
+                <span className="font-semibold text-black truncate">{t.footer.freeShipping}</span>
+                <span className="text-black/60 truncate">{t.footer.ordersOver}</span>
               </div>
             </div>
 
             {/* Right - Rotating between Free Returns and Secure Payment */}
-            <div className="flex items-center gap-1.5 text-[10px] transition-opacity duration-300">
-              <RightIcon className="h-4 w-4 text-black/70 flex-shrink-0" />
-              <div className="flex flex-col leading-tight">
-                <span className="font-semibold text-black">{rightFeature.text}</span>
-                <span className="text-black/60">{rightFeature.subtext}</span>
+            <div className="flex items-center gap-1 sm:gap-1.5 text-[9px] sm:text-[10px] transition-opacity duration-300 min-w-0 flex-1 justify-end">
+              <RightIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-black/70 flex-shrink-0" />
+              <div className="flex flex-col leading-tight min-w-0">
+                <span className="font-semibold text-black truncate">{rightFeature.text}</span>
+                <span className="text-black/60 truncate">{rightFeature.subtext}</span>
               </div>
             </div>
           </div>
