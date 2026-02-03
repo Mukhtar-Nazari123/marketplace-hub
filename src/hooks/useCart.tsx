@@ -44,13 +44,15 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const { user, role } = useAuth();
   const { isRTL } = useLanguage();
 
-  const fetchCart = useCallback(async () => {
+  const fetchCart = useCallback(async (showLoading: boolean = true) => {
     if (!user) {
       setItems([]);
       return;
     }
 
-    setLoading(true);
+    if (showLoading) {
+      setLoading(true);
+    }
     try {
       const { data, error } = await supabase
         .from('cart')
@@ -82,7 +84,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error('Error fetching cart:', error);
     } finally {
-      setLoading(false);
+      if (showLoading) {
+        setLoading(false);
+      }
     }
   }, [user]);
 
@@ -128,7 +132,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         if (error) throw error;
       }
 
-      await fetchCart();
+      await fetchCart(false);
       toast({
         title: isRTL ? 'موفق' : 'Success',
         description: isRTL ? 'محصول به سبد خرید اضافه شد' : 'Product added to cart',
