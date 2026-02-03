@@ -154,7 +154,7 @@ const CartRecommendations = ({ excludeProductIds = [] }: CartRecommendationsProp
   if (isLoading) {
     return (
       <section className="py-8 bg-muted/30 mt-8">
-        <div className="container px-4">
+        <div className="px-1 sm:px-1.5 lg:px-2">
           <div className="mb-6">
             <Skeleton className="h-8 w-48 mb-2" />
             <Skeleton className="h-4 w-72" />
@@ -179,7 +179,7 @@ const CartRecommendations = ({ excludeProductIds = [] }: CartRecommendationsProp
 
   return (
     <section className="py-8 bg-muted/30 mt-8">
-      <div className="container px-4">
+      <div className="px-1 sm:px-1.5 lg:px-2">
         {/* Section Header */}
         <div className="mb-6">
           <h2 className="font-display font-bold text-xl sm:text-2xl text-foreground mb-1">
