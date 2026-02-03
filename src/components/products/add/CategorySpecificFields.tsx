@@ -21,6 +21,48 @@ import {
   Layers,
 } from "lucide-react";
 
+// Comprehensive color palette with names and hex codes
+const PRODUCT_COLORS = [
+  { value: 'black', name: 'Black', nameFa: 'مشکی', hex: '#000000' },
+  { value: 'white', name: 'White', nameFa: 'سفید', hex: '#FFFFFF' },
+  { value: 'gray', name: 'Gray', nameFa: 'خاکستری', hex: '#808080' },
+  { value: 'silver', name: 'Silver', nameFa: 'نقره‌ای', hex: '#C0C0C0' },
+  { value: 'red', name: 'Red', nameFa: 'قرمز', hex: '#EF4444' },
+  { value: 'maroon', name: 'Maroon', nameFa: 'زرشکی', hex: '#800000' },
+  { value: 'burgundy', name: 'Burgundy', nameFa: 'شرابی', hex: '#722F37' },
+  { value: 'pink', name: 'Pink', nameFa: 'صورتی', hex: '#EC4899' },
+  { value: 'rose', name: 'Rose', nameFa: 'گلی', hex: '#F43F5E' },
+  { value: 'orange', name: 'Orange', nameFa: 'نارنجی', hex: '#F97316' },
+  { value: 'coral', name: 'Coral', nameFa: 'مرجانی', hex: '#FF7F50' },
+  { value: 'peach', name: 'Peach', nameFa: 'هلویی', hex: '#FFCBA4' },
+  { value: 'yellow', name: 'Yellow', nameFa: 'زرد', hex: '#EAB308' },
+  { value: 'gold', name: 'Gold', nameFa: 'طلایی', hex: '#FFD700' },
+  { value: 'cream', name: 'Cream', nameFa: 'کرم', hex: '#FFFDD0' },
+  { value: 'beige', name: 'Beige', nameFa: 'بژ', hex: '#F5F5DC' },
+  { value: 'brown', name: 'Brown', nameFa: 'قهوه‌ای', hex: '#92400E' },
+  { value: 'tan', name: 'Tan', nameFa: 'برنزه', hex: '#D2B48C' },
+  { value: 'chocolate', name: 'Chocolate', nameFa: 'شکلاتی', hex: '#7B3F00' },
+  { value: 'green', name: 'Green', nameFa: 'سبز', hex: '#22C55E' },
+  { value: 'olive', name: 'Olive', nameFa: 'زیتونی', hex: '#808000' },
+  { value: 'mint', name: 'Mint', nameFa: 'سبز نعنایی', hex: '#98FF98' },
+  { value: 'teal', name: 'Teal', nameFa: 'سبز آبی', hex: '#14B8A6' },
+  { value: 'turquoise', name: 'Turquoise', nameFa: 'فیروزه‌ای', hex: '#40E0D0' },
+  { value: 'blue', name: 'Blue', nameFa: 'آبی', hex: '#3B82F6' },
+  { value: 'navy', name: 'Navy', nameFa: 'سرمه‌ای', hex: '#000080' },
+  { value: 'sky', name: 'Sky Blue', nameFa: 'آبی آسمانی', hex: '#87CEEB' },
+  { value: 'royal', name: 'Royal Blue', nameFa: 'آبی شاهانه', hex: '#4169E1' },
+  { value: 'purple', name: 'Purple', nameFa: 'بنفش', hex: '#A855F7' },
+  { value: 'violet', name: 'Violet', nameFa: 'بنفش روشن', hex: '#8B5CF6' },
+  { value: 'lavender', name: 'Lavender', nameFa: 'یاسی', hex: '#E6E6FA' },
+  { value: 'plum', name: 'Plum', nameFa: 'آلویی', hex: '#8E4585' },
+  { value: 'magenta', name: 'Magenta', nameFa: 'سرخابی', hex: '#FF00FF' },
+  { value: 'indigo', name: 'Indigo', nameFa: 'نیلی', hex: '#4B0082' },
+  { value: 'khaki', name: 'Khaki', nameFa: 'خاکی', hex: '#C3B091' },
+  { value: 'charcoal', name: 'Charcoal', nameFa: 'زغالی', hex: '#36454F' },
+  { value: 'ivory', name: 'Ivory', nameFa: 'عاجی', hex: '#FFFFF0' },
+  { value: 'multicolor', name: 'Multicolor', nameFa: 'چند رنگ', hex: 'linear-gradient(90deg, #EF4444, #F97316, #EAB308, #22C55E, #3B82F6, #A855F7)' },
+];
+
 interface CategorySpecificFieldsProps {
   categoryId: string;
   categoryName: string;
@@ -223,12 +265,48 @@ export const CategorySpecificFields = ({
             <Palette className="w-4 h-4" />
             {isRTL ? "رنگ" : "Color"}
           </Label>
-          <Input
-            value={(attributes.color as string) || ""}
-            onChange={(e) => updateAttribute("color", e.target.value)}
-            placeholder={isRTL ? "رنگ محصول" : "Product color"}
-            className={cn(isRTL && "text-right")}
-          />
+          <div className="flex flex-wrap gap-2">
+            {PRODUCT_COLORS.map((colorOption) => {
+              const selectedColors = (attributes.colors as string[]) || [];
+              const isSelected = selectedColors.includes(colorOption.value);
+              return (
+                <button
+                  key={colorOption.value}
+                  type="button"
+                  onClick={() => {
+                    const newColors = isSelected 
+                      ? selectedColors.filter((c) => c !== colorOption.value) 
+                      : [...selectedColors, colorOption.value];
+                    updateAttribute("colors", newColors);
+                  }}
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md border transition-all duration-200",
+                    isSelected
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-background text-foreground border-border hover:border-primary/50"
+                  )}
+                  title={colorOption.name}
+                >
+                  <span
+                    className="w-4 h-4 rounded-full border border-border/50"
+                    style={{ backgroundColor: colorOption.hex }}
+                  />
+                  <span>{isRTL ? colorOption.nameFa : colorOption.name}</span>
+                </button>
+              );
+            })}
+          </div>
+          <div className="space-y-2 pt-2">
+            <Label className="text-sm text-muted-foreground">
+              {isRTL ? "رنگ دیگر (اختیاری)" : "Custom Color (optional)"}
+            </Label>
+            <Input
+              value={(attributes.customColor as string) || ""}
+              onChange={(e) => updateAttribute("customColor", e.target.value)}
+              placeholder={isRTL ? "مثال: طلایی، نقره‌ای" : "e.g., Gold, Silver"}
+              className={cn(isRTL && "text-right")}
+            />
+          </div>
         </div>
 
         <div className="space-y-2">
@@ -306,14 +384,53 @@ export const CategorySpecificFields = ({
           />
         </div>
 
-        <div className="space-y-2">
-          <Label>{isRTL ? "رنگ" : "Color"}</Label>
-          <Input
-            value={(attributes.color as string) || ""}
-            onChange={(e) => updateAttribute("color", e.target.value)}
-            placeholder={isRTL ? "رنگ محصول" : "Product color"}
-            className={cn(isRTL && "text-right")}
-          />
+        <div className="md:col-span-2 space-y-2">
+          <Label className="flex items-center gap-2">
+            <Palette className="w-4 h-4" />
+            {isRTL ? "رنگ" : "Color"}
+          </Label>
+          <div className="flex flex-wrap gap-2">
+            {PRODUCT_COLORS.map((colorOption) => {
+              const selectedColors = (attributes.colors as string[]) || [];
+              const isSelected = selectedColors.includes(colorOption.value);
+              return (
+                <button
+                  key={colorOption.value}
+                  type="button"
+                  onClick={() => {
+                    const newColors = isSelected 
+                      ? selectedColors.filter((c) => c !== colorOption.value) 
+                      : [...selectedColors, colorOption.value];
+                    updateAttribute("colors", newColors);
+                  }}
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md border transition-all duration-200",
+                    isSelected
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-background text-foreground border-border hover:border-primary/50"
+                  )}
+                  title={colorOption.name}
+                >
+                  <span
+                    className="w-4 h-4 rounded-full border border-border/50"
+                    style={{ backgroundColor: colorOption.hex }}
+                  />
+                  <span>{isRTL ? colorOption.nameFa : colorOption.name}</span>
+                </button>
+              );
+            })}
+          </div>
+          <div className="space-y-2 pt-2">
+            <Label className="text-sm text-muted-foreground">
+              {isRTL ? "رنگ دیگر (اختیاری)" : "Custom Color (optional)"}
+            </Label>
+            <Input
+              value={(attributes.customColor as string) || ""}
+              onChange={(e) => updateAttribute("customColor", e.target.value)}
+              placeholder={isRTL ? "مثال: طلایی، نقره‌ای" : "e.g., Gold, Silver"}
+              className={cn(isRTL && "text-right")}
+            />
+          </div>
         </div>
 
         <Card className="md:col-span-2 p-4 space-y-3 bg-muted/30">
