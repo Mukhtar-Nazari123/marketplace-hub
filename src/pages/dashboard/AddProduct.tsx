@@ -368,29 +368,18 @@ const AddProduct = () => {
                 {isRTL ? <ArrowLeft className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
               </Button>
             ) : (
-              <>
-                <Button
-                  variant="secondary"
-                  onClick={() => submitProduct(true)}
-                  disabled={isSubmitting || isUploading}
-                  className="gap-2"
-                >
-                  <FileText className="h-4 w-4" />
-                  {isRTL ? 'ذخیره پیش‌نویس' : 'Save as Draft'}
-                </Button>
-                <Button
-                  onClick={() => submitProduct(false)}
-                  disabled={isSubmitting || isUploading || !canProceed}
-                  className="gap-2"
-                >
-                  <Send className="h-4 w-4" />
-                  {isSubmitting
-                    ? (isRTL ? 'در حال ارسال...' : 'Submitting...')
-                    : isVerifiedSeller
-                      ? (isRTL ? 'ارسال برای بررسی' : 'Submit for Review')
-                      : (isRTL ? 'ذخیره (نیاز به تأیید)' : 'Save (Needs Verification)')}
-                </Button>
-              </>
+              <Button
+                onClick={() => submitProduct(false)}
+                disabled={isSubmitting || isUploading || !canProceed}
+                className="gap-2"
+              >
+                <Send className="h-4 w-4" />
+                {isSubmitting
+                  ? (isRTL ? 'در حال ارسال...' : 'Submitting...')
+                  : isVerifiedSeller
+                    ? (isRTL ? 'ارسال برای بررسی' : 'Submit for Review')
+                    : (isRTL ? 'ذخیره (نیاز به تأیید)' : 'Save (Needs Verification)')}
+              </Button>
             )}
           </div>
         </div>
