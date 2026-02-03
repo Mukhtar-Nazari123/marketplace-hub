@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { useLanguage } from '@/lib/i18n';
 import { ProductFormData } from '@/pages/dashboard/AddProduct';
 import { Button } from '@/components/ui/button';
@@ -17,9 +17,52 @@ import {
   AlertCircle,
   CheckCircle2,
   Info,
-  Star
+  Star,
+  Palette
 } from 'lucide-react';
 import { toast } from 'sonner';
+
+// Color palette matching CategorySpecificFields
+const PRODUCT_COLORS = [
+  { value: 'black', name: 'Black', nameFa: 'مشکی', hex: '#000000' },
+  { value: 'white', name: 'White', nameFa: 'سفید', hex: '#FFFFFF' },
+  { value: 'gray', name: 'Gray', nameFa: 'خاکستری', hex: '#808080' },
+  { value: 'silver', name: 'Silver', nameFa: 'نقره‌ای', hex: '#C0C0C0' },
+  { value: 'red', name: 'Red', nameFa: 'قرمز', hex: '#EF4444' },
+  { value: 'maroon', name: 'Maroon', nameFa: 'زرشکی', hex: '#800000' },
+  { value: 'burgundy', name: 'Burgundy', nameFa: 'شرابی', hex: '#722F37' },
+  { value: 'pink', name: 'Pink', nameFa: 'صورتی', hex: '#EC4899' },
+  { value: 'rose', name: 'Rose', nameFa: 'گلی', hex: '#F43F5E' },
+  { value: 'orange', name: 'Orange', nameFa: 'نارنجی', hex: '#F97316' },
+  { value: 'coral', name: 'Coral', nameFa: 'مرجانی', hex: '#FF7F50' },
+  { value: 'peach', name: 'Peach', nameFa: 'هلویی', hex: '#FFCBA4' },
+  { value: 'yellow', name: 'Yellow', nameFa: 'زرد', hex: '#EAB308' },
+  { value: 'gold', name: 'Gold', nameFa: 'طلایی', hex: '#FFD700' },
+  { value: 'cream', name: 'Cream', nameFa: 'کرم', hex: '#FFFDD0' },
+  { value: 'beige', name: 'Beige', nameFa: 'بژ', hex: '#F5F5DC' },
+  { value: 'brown', name: 'Brown', nameFa: 'قهوه‌ای', hex: '#92400E' },
+  { value: 'tan', name: 'Tan', nameFa: 'برنزه', hex: '#D2B48C' },
+  { value: 'chocolate', name: 'Chocolate', nameFa: 'شکلاتی', hex: '#7B3F00' },
+  { value: 'green', name: 'Green', nameFa: 'سبز', hex: '#22C55E' },
+  { value: 'olive', name: 'Olive', nameFa: 'زیتونی', hex: '#808000' },
+  { value: 'mint', name: 'Mint', nameFa: 'سبز نعنایی', hex: '#98FF98' },
+  { value: 'teal', name: 'Teal', nameFa: 'سبز آبی', hex: '#14B8A6' },
+  { value: 'turquoise', name: 'Turquoise', nameFa: 'فیروزه‌ای', hex: '#40E0D0' },
+  { value: 'blue', name: 'Blue', nameFa: 'آبی', hex: '#3B82F6' },
+  { value: 'navy', name: 'Navy', nameFa: 'سرمه‌ای', hex: '#000080' },
+  { value: 'sky', name: 'Sky Blue', nameFa: 'آبی آسمانی', hex: '#87CEEB' },
+  { value: 'royal', name: 'Royal Blue', nameFa: 'آبی شاهانه', hex: '#4169E1' },
+  { value: 'purple', name: 'Purple', nameFa: 'بنفش', hex: '#A855F7' },
+  { value: 'violet', name: 'Violet', nameFa: 'بنفش روشن', hex: '#8B5CF6' },
+  { value: 'lavender', name: 'Lavender', nameFa: 'یاسی', hex: '#E6E6FA' },
+  { value: 'plum', name: 'Plum', nameFa: 'آلویی', hex: '#8E4585' },
+  { value: 'magenta', name: 'Magenta', nameFa: 'سرخابی', hex: '#FF00FF' },
+  { value: 'indigo', name: 'Indigo', nameFa: 'نیلی', hex: '#4B0082' },
+  { value: 'khaki', name: 'Khaki', nameFa: 'خاکی', hex: '#C3B091' },
+  { value: 'charcoal', name: 'Charcoal', nameFa: 'زغالی', hex: '#36454F' },
+  { value: 'ivory', name: 'Ivory', nameFa: 'عاجی', hex: '#FFFFF0' },
+  { value: 'multicolor', name: 'Multicolor', nameFa: 'چند رنگ', hex: 'linear-gradient(90deg, #EF4444, #F97316, #EAB308, #22C55E, #3B82F6, #A855F7)' },
+];
 
 interface MediaStepProps {
   formData: ProductFormData;
@@ -37,10 +80,18 @@ export const MediaStep = ({ formData, updateFormData, isUploading }: MediaStepPr
   const { isRTL } = useLanguage();
   const imageInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
+  const colorImageInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [colorImagePreviews, setColorImagePreviews] = useState<Record<string, string>>({});
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
+
+  // Get selected colors from attributes
+  const selectedColors = useMemo(() => {
+    const colors = (formData.attributes?.colors as string[]) || [];
+    return PRODUCT_COLORS.filter(c => colors.includes(c.value));
+  }, [formData.attributes?.colors]);
 
   // Simulate upload progress
   useEffect(() => {
@@ -153,6 +204,67 @@ export const MediaStep = ({ formData, updateFormData, isUploading }: MediaStepPr
   const removeVideo = () => {
     updateFormData({ video: null, videoUrl: '' });
     toast.success(isRTL ? 'ویدیو حذف شد' : 'Video removed');
+  };
+
+  // Color image handling
+  const handleColorImageSelect = useCallback((colorValue: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      toast.error(isRTL ? 'فرمت تصویر نامعتبر است' : 'Invalid image format');
+      return;
+    }
+
+    if (file.size > MAX_IMAGE_SIZE) {
+      toast.error(isRTL ? 'حجم تصویر بیشتر از ۵ مگابایت است' : 'Image exceeds 5MB limit');
+      return;
+    }
+
+    // Create preview
+    const previewUrl = URL.createObjectURL(file);
+    setColorImagePreviews(prev => ({ ...prev, [colorValue]: previewUrl }));
+
+    // Update form data
+    updateFormData({
+      colorImages: { ...formData.colorImages, [colorValue]: file }
+    });
+
+    toast.success(isRTL ? 'تصویر رنگ اضافه شد' : 'Color image added');
+
+    // Reset input
+    if (colorImageInputRefs.current[colorValue]) {
+      colorImageInputRefs.current[colorValue]!.value = '';
+    }
+  }, [formData.colorImages, isRTL, updateFormData]);
+
+  const removeColorImage = (colorValue: string) => {
+    // Revoke preview URL
+    if (colorImagePreviews[colorValue]) {
+      URL.revokeObjectURL(colorImagePreviews[colorValue]);
+    }
+
+    const newPreviews = { ...colorImagePreviews };
+    delete newPreviews[colorValue];
+    setColorImagePreviews(newPreviews);
+
+    const newColorImages = { ...formData.colorImages };
+    delete newColorImages[colorValue];
+
+    const newColorImageUrls = { ...formData.colorImageUrls };
+    delete newColorImageUrls[colorValue];
+
+    updateFormData({
+      colorImages: newColorImages,
+      colorImageUrls: newColorImageUrls
+    });
+
+    toast.success(isRTL ? 'تصویر رنگ حذف شد' : 'Color image removed');
+  };
+
+  const getColorImageSrc = (colorValue: string): string | null => {
+    // Priority: preview (new file) -> uploaded URL
+    return colorImagePreviews[colorValue] || formData.colorImageUrls[colorValue] || null;
   };
 
   const handleDragStart = (index: number) => {
@@ -364,6 +476,104 @@ export const MediaStep = ({ formData, updateFormData, isUploading }: MediaStepPr
           </div>
         </div>
       </div>
+
+      {/* Color Images Section - Only show if colors are selected */}
+      {selectedColors.length > 0 && (
+        <div className="space-y-4 pt-6 border-t">
+          <div className="flex items-center justify-between">
+            <Label className="text-base font-medium flex items-center gap-2">
+              <Palette className="w-4 h-4 text-primary" />
+              {isRTL ? 'تصاویر رنگ‌ها' : 'Color Images'}
+            </Label>
+            <Badge variant="outline" className="text-xs font-normal">
+              {isRTL ? 'یک تصویر برای هر رنگ' : 'One image per color'}
+            </Badge>
+          </div>
+
+          <p className="text-sm text-muted-foreground">
+            {isRTL 
+              ? 'برای هر رنگ انتخاب شده، یک تصویر اختصاصی آپلود کنید. این تصاویر هنگام انتخاب رنگ توسط مشتری نمایش داده می‌شوند.'
+              : 'Upload a specific image for each selected color. These images will be shown when customers select a color.'}
+          </p>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            {selectedColors.map((color) => {
+              const imageSrc = getColorImageSrc(color.value);
+              const hasImage = !!imageSrc;
+
+              return (
+                <div key={color.value} className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="w-4 h-4 rounded-full border border-border/50 flex-shrink-0"
+                      style={{ backgroundColor: color.hex }}
+                    />
+                    <span className="text-sm font-medium">
+                      {isRTL ? color.nameFa : color.name}
+                    </span>
+                  </div>
+
+                  {hasImage ? (
+                    <Card className="relative aspect-square overflow-hidden group">
+                      <img
+                        src={imageSrc}
+                        alt={`${color.name} variant`}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-foreground/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => removeColorImage(color.value)}
+                          disabled={isUploading}
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                      <div className="absolute bottom-1 left-1">
+                        <CheckCircle2 className="w-4 h-4 text-success" />
+                      </div>
+                    </Card>
+                  ) : (
+                    <Card
+                      className={cn(
+                        "aspect-square flex flex-col items-center justify-center cursor-pointer border-dashed",
+                        "hover:border-primary hover:bg-primary/5 transition-colors",
+                        isUploading && "pointer-events-none opacity-50"
+                      )}
+                      onClick={() => colorImageInputRefs.current[color.value]?.click()}
+                    >
+                      <Upload className="w-6 h-6 text-muted-foreground mb-1" />
+                      <span className="text-xs text-muted-foreground text-center px-2">
+                        {isRTL ? 'آپلود' : 'Upload'}
+                      </span>
+                    </Card>
+                  )}
+
+                  <input
+                    ref={(el) => { colorImageInputRefs.current[color.value] = el; }}
+                    type="file"
+                    accept={ALLOWED_IMAGE_TYPES.join(',')}
+                    className="hidden"
+                    onChange={(e) => handleColorImageSelect(color.value, e)}
+                    disabled={isUploading}
+                  />
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="flex items-start gap-2 text-xs text-muted-foreground">
+            <Info className="w-4 h-4 shrink-0 mt-0.5" />
+            <p>
+              {isRTL 
+                ? 'تصاویر رنگ‌ها اختیاری هستند اما به مشتریان کمک می‌کنند تا محصول در هر رنگ را ببینند.'
+                : 'Color images are optional but help customers see the product in each color.'}
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Video Section */}
       <div className="space-y-4 pt-6 border-t">

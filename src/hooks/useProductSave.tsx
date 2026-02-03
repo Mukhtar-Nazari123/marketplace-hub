@@ -8,6 +8,7 @@ interface SaveProductOptions {
   formData: ProductFormData;
   imageUrls: string[];
   videoUrl: string;
+  colorImageUrls?: Record<string, string>;  // color value -> uploaded URL
   status: 'draft' | 'pending' | 'active';
   currentLanguage: 'en' | 'fa' | 'ps';
 }
@@ -26,7 +27,7 @@ interface SaveProductResult {
  * - product_attributes: specifications and category-specific attributes
  */
 export async function saveProduct(options: SaveProductOptions): Promise<SaveProductResult> {
-  const { userId, productId, formData, imageUrls, videoUrl, status, currentLanguage } = options;
+  const { userId, productId, formData, imageUrls, videoUrl, colorImageUrls = {}, status, currentLanguage } = options;
 
   try {
     // Generate SKU
@@ -50,6 +51,7 @@ export async function saveProduct(options: SaveProductOptions): Promise<SaveProd
       // Keep minimal metadata for non-translatable data
       metadata: {
         stockPerSize: formData.stockPerSize,
+        colorImageUrls: colorImageUrls, // Store for reference
       },
     };
 
@@ -88,8 +90,8 @@ export async function saveProduct(options: SaveProductOptions): Promise<SaveProd
       meta_description: formData.shortDescription || formData.description?.substring(0, 160),
     });
 
-    // 3. Save media to product_media table
-    await saveProductMedia(finalProductId, imageUrls, videoUrl);
+    // 3. Save media to product_media table (including color-specific images)
+    await saveProductMedia(finalProductId, imageUrls, videoUrl, colorImageUrls);
 
     // 4. Save attributes to product_attributes table
     await saveProductAttributes(finalProductId, formData.attributes, formData.brand, currentLanguage);
@@ -161,32 +163,58 @@ async function saveProductTranslation(
 
 /**
  * Save product media (images and videos) to product_media table
+ * Now supports color-specific images with color_value column
  */
-async function saveProductMedia(productId: string, imageUrls: string[], videoUrl: string) {
+async function saveProductMedia(
+  productId: string, 
+  imageUrls: string[], 
+  videoUrl: string,
+  colorImageUrls: Record<string, string> = {}
+) {
   // Get existing media for this product
   const { data: existingMedia } = await supabase
     .from('product_media')
-    .select('id, url')
+    .select('id, url, color_value')
     .eq('product_id', productId);
 
-  const existingUrls = new Set(existingMedia?.map(m => m.url) || []);
-  const newUrls = new Set([...imageUrls, videoUrl].filter(Boolean));
+  // Build set of all URLs we want to keep
+  const allNewUrls = new Set([
+    ...imageUrls, 
+    videoUrl,
+    ...Object.values(colorImageUrls)
+  ].filter(Boolean));
 
-  // Find media to add (in new but not in existing)
-  const toAdd: { url: string; type: 'image' | 'video'; order: number }[] = [];
+  // Find media to add
+  const toAdd: { url: string; type: 'image' | 'video'; order: number; colorValue: string | null }[] = [];
+  const existingUrls = new Set(existingMedia?.map(m => m.url) || []);
   
+  // General images (no color association)
   imageUrls.forEach((url, index) => {
     if (!existingUrls.has(url)) {
-      toAdd.push({ url, type: 'image', order: index });
+      toAdd.push({ url, type: 'image', order: index, colorValue: null });
     }
   });
 
+  // Video
   if (videoUrl && !existingUrls.has(videoUrl)) {
-    toAdd.push({ url: videoUrl, type: 'video', order: imageUrls.length });
+    toAdd.push({ url: videoUrl, type: 'video', order: imageUrls.length, colorValue: null });
   }
 
-  // Find media to remove (in existing but not in new)
-  const toRemove = existingMedia?.filter(m => !newUrls.has(m.url)).map(m => m.id) || [];
+  // Color-specific images
+  let colorOrderOffset = imageUrls.length + (videoUrl ? 1 : 0);
+  Object.entries(colorImageUrls).forEach(([colorValue, url], index) => {
+    if (!existingUrls.has(url)) {
+      toAdd.push({ 
+        url, 
+        type: 'image', 
+        order: colorOrderOffset + index, 
+        colorValue 
+      });
+    }
+  });
+
+  // Find media to remove (in existing but not in new URLs)
+  const toRemove = existingMedia?.filter(m => !allNewUrls.has(m.url)).map(m => m.id) || [];
 
   // Delete removed media
   if (toRemove.length > 0) {
@@ -205,7 +233,8 @@ async function saveProductMedia(productId: string, imageUrls: string[], videoUrl
       media_type: m.type,
       url: m.url,
       sort_order: m.order,
-      is_primary: m.order === 0 && m.type === 'image',
+      is_primary: m.order === 0 && m.type === 'image' && m.colorValue === null,
+      color_value: m.colorValue,
     }));
 
     const { error } = await supabase
@@ -215,14 +244,25 @@ async function saveProductMedia(productId: string, imageUrls: string[], videoUrl
     if (error) console.error('Error inserting media:', error);
   }
 
-  // Update sort order for existing images
+  // Update sort order for existing general images
   for (let i = 0; i < imageUrls.length; i++) {
     const url = imageUrls[i];
     const existing = existingMedia?.find(m => m.url === url);
     if (existing) {
       await supabase
         .from('product_media')
-        .update({ sort_order: i, is_primary: i === 0 })
+        .update({ sort_order: i, is_primary: i === 0, color_value: null })
+        .eq('id', existing.id);
+    }
+  }
+
+  // Update existing color images with their color_value
+  for (const [colorValue, url] of Object.entries(colorImageUrls)) {
+    const existing = existingMedia?.find(m => m.url === url);
+    if (existing) {
+      await supabase
+        .from('product_media')
+        .update({ color_value: colorValue })
         .eq('id', existing.id);
     }
   }

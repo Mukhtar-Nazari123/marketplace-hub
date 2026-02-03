@@ -42,6 +42,10 @@ export interface ProductFormData {
   video: File | null;
   videoUrl: string;
   
+  // Color-specific images (one image per selected color)
+  colorImages: Record<string, File | null>;  // color value -> File
+  colorImageUrls: Record<string, string>;    // color value -> uploaded URL
+  
   // Pricing & Inventory (saved to products table)
   price: number;
   priceUSD: number;
@@ -67,6 +71,8 @@ const initialFormData: ProductFormData = {
   imageUrls: [],
   video: null,
   videoUrl: '',
+  colorImages: {},
+  colorImageUrls: {},
   price: 0,
   priceUSD: 0,
   discountPrice: null,
@@ -143,13 +149,18 @@ const AddProduct = () => {
     }
   };
 
-  const uploadMedia = async (): Promise<{ imageUrls: string[]; videoUrl: string }> => {
+  const uploadMedia = async (): Promise<{ 
+    imageUrls: string[]; 
+    videoUrl: string;
+    colorImageUrls: Record<string, string>;
+  }> => {
     setIsUploading(true);
     const uploadedImageUrls: string[] = [...formData.imageUrls];
     let uploadedVideoUrl = formData.videoUrl;
+    const uploadedColorImageUrls: Record<string, string> = { ...formData.colorImageUrls };
 
     try {
-      // Upload images - path must start with user ID for RLS policy
+      // Upload general images - path must start with user ID for RLS policy
       for (const image of formData.images) {
         const fileName = `${user?.id}/products/${Date.now()}-${image.name}`;
         const { data, error } = await supabase.storage
@@ -181,7 +192,29 @@ const AddProduct = () => {
         uploadedVideoUrl = urlData.publicUrl;
       }
 
-      return { imageUrls: uploadedImageUrls, videoUrl: uploadedVideoUrl };
+      // Upload color-specific images
+      for (const [colorValue, file] of Object.entries(formData.colorImages)) {
+        if (file) {
+          const fileName = `${user?.id}/products/colors/${Date.now()}-${colorValue}-${file.name}`;
+          const { data, error } = await supabase.storage
+            .from('seller-assets')
+            .upload(fileName, file);
+
+          if (error) throw error;
+
+          const { data: urlData } = supabase.storage
+            .from('seller-assets')
+            .getPublicUrl(fileName);
+
+          uploadedColorImageUrls[colorValue] = urlData.publicUrl;
+        }
+      }
+
+      return { 
+        imageUrls: uploadedImageUrls, 
+        videoUrl: uploadedVideoUrl,
+        colorImageUrls: uploadedColorImageUrls
+      };
     } finally {
       setIsUploading(false);
     }
@@ -191,9 +224,10 @@ const AddProduct = () => {
     if (!user) return;
 
     try {
-      const { imageUrls, videoUrl } = formData.images.length > 0 || formData.video
+      const hasNewMedia = formData.images.length > 0 || formData.video || Object.keys(formData.colorImages).length > 0;
+      const { imageUrls, videoUrl, colorImageUrls } = hasNewMedia
         ? await uploadMedia()
-        : { imageUrls: formData.imageUrls, videoUrl: formData.videoUrl };
+        : { imageUrls: formData.imageUrls, videoUrl: formData.videoUrl, colorImageUrls: formData.colorImageUrls };
 
       const result = await saveProduct({
         userId: user.id,
@@ -201,6 +235,7 @@ const AddProduct = () => {
         formData,
         imageUrls,
         videoUrl,
+        colorImageUrls,
         status: 'draft',
         currentLanguage,
       });
@@ -228,9 +263,10 @@ const AddProduct = () => {
     setIsSubmitting(true);
 
     try {
-      const { imageUrls, videoUrl } = formData.images.length > 0 || formData.video
+      const hasNewMedia = formData.images.length > 0 || formData.video || Object.keys(formData.colorImages).length > 0;
+      const { imageUrls, videoUrl, colorImageUrls } = hasNewMedia
         ? await uploadMedia()
-        : { imageUrls: formData.imageUrls, videoUrl: formData.videoUrl };
+        : { imageUrls: formData.imageUrls, videoUrl: formData.videoUrl, colorImageUrls: formData.colorImageUrls };
 
       if (imageUrls.length === 0) {
         toast.error(isRTL ? 'حداقل یک تصویر لازم است' : 'At least one image is required');
@@ -249,6 +285,7 @@ const AddProduct = () => {
         formData,
         imageUrls,
         videoUrl,
+        colorImageUrls,
         status,
         currentLanguage,
       });
