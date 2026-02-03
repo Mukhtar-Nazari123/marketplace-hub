@@ -209,9 +209,9 @@ const Cart = () => {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid lg:grid-cols-3 gap-8">
-            {/* Cart Items */}
-            <div className="lg:col-span-2 space-y-4">
+          <div className="flex flex-col lg:grid lg:grid-cols-3 gap-8">
+            {/* Cart Items - Always first on mobile */}
+            <div className="order-2 lg:order-1 lg:col-span-2 space-y-4">
               {itemsWithDetails.map((item) => {
                 const product = item.product as CartItemProduct | undefined;
                 const productSlug = product?.slug || product?.id || item.product_id;
@@ -353,9 +353,9 @@ const Cart = () => {
               </div>
             </div>
 
-            {/* Order Summary - Separate totals per currency */}
-            <div>
-              <Card className="sticky top-4">
+            {/* Order Summary - Appears second on mobile, first position visually but order-1 on lg */}
+            <div className="order-1 lg:order-2">
+              <Card className="lg:sticky lg:top-4">
                 <CardHeader>
                   <CardTitle>{getLabel('Order Summary', 'خلاصه سفارش', 'د سفارش لنډیز')}</CardTitle>
                 </CardHeader>
