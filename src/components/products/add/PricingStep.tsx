@@ -303,7 +303,7 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
                   value={formData.stockPerSize?.[size] || ''}
                   onChange={(e) => handleStockPerSizeChange(size, e.target.value)}
                   placeholder="0"
-                  className="text-center h-10"
+                  className="text-center h-10 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
               </div>
             ))}
@@ -322,7 +322,7 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
                 value={formData.stockPerSize?.[OTHER_SIZE_KEY] || ''}
                 onChange={(e) => handleStockPerSizeChange(OTHER_SIZE_KEY, e.target.value)}
                 placeholder="0"
-                className="w-24 text-center h-10"
+                className="w-24 text-center h-10 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
               <span className="text-sm text-muted-foreground">
                 {isRTL ? 'عدد برای سایزهای سفارشی (مانند 38، 40، 42)' : 'items for custom sizes (e.g., 38, 40, 42)'}
