@@ -98,7 +98,7 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
       >
         {/* Badge */}
         {badgeText && (
-          <span className="inline-block mb-1.5 sm:mb-3 px-2.5 sm:px-4 py-1 sm:py-1.5 text-[10px] sm:text-sm font-semibold rounded-full bg-[#b6b6b6] text-white">
+          <span className="inline-block mb-1.5 sm:mb-3 px-3 sm:px-5 py-1.5 sm:py-2 text-xs sm:text-base font-semibold rounded-full bg-white text-black">
             {badgeText}
           </span>
         )}
@@ -118,7 +118,7 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
         {/* CTA Button */}
         {ctaText && (
           <button
-            className="hero-btn inline-flex items-center gap-1.5 sm:gap-2 rounded-full font-semibold px-3 sm:px-6 py-1.5 sm:py-2.5 text-xs sm:text-sm bg-[#b6b6b6] text-white hover:bg-[#a0a0a0] transition-colors group"
+            className="hero-btn inline-flex items-center gap-1.5 sm:gap-2 rounded-full font-semibold px-3 sm:px-6 py-1.5 sm:py-2.5 text-xs sm:text-sm bg-white text-black hover:bg-gray-100 transition-colors group"
             onClick={handleCtaClick}
           >
             {ctaText}
