@@ -39,11 +39,12 @@ export const MediaStep = ({ formData, updateFormData, isUploading }: MediaStepPr
   const { isRTL } = useLanguage();
   const imageInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
+  const colorImageInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [colorImagePreviews, setColorImagePreviews] = useState<Record<string, string>>({});
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
-  const [selectingColorImage, setSelectingColorImage] = useState<string | null>(null);
 
   // Get selected colors from attributes
   const selectedColors = useMemo(() => {
@@ -164,49 +165,66 @@ export const MediaStep = ({ formData, updateFormData, isUploading }: MediaStepPr
     toast.success(isRTL ? 'ویدیو حذف شد' : 'Video removed');
   };
 
-  // Color image linking - link an existing product image to a color
-  const linkImageToColor = useCallback((colorValue: string, imageIndex: number) => {
-    const allImageSources = [
-      ...formData.imageUrls,
-      ...imagePreviews
-    ];
-    
-    const selectedImageUrl = allImageSources[imageIndex];
-    if (!selectedImageUrl) return;
+  // Color image handling
+  const handleColorImageSelect = useCallback((colorValue: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      toast.error(isRTL ? 'فرمت تصویر نامعتبر است' : 'Invalid image format');
+      return;
+    }
+
+    if (file.size > MAX_IMAGE_SIZE) {
+      toast.error(isRTL ? 'حجم تصویر بیشتر از ۵ مگابایت است' : 'Image exceeds 5MB limit');
+      return;
+    }
+
+    // Create preview
+    const previewUrl = URL.createObjectURL(file);
+    setColorImagePreviews(prev => ({ ...prev, [colorValue]: previewUrl }));
+
+    // Update form data
     updateFormData({
-      colorImageUrls: { ...formData.colorImageUrls, [colorValue]: selectedImageUrl }
+      colorImages: { ...formData.colorImages, [colorValue]: file }
     });
 
-    setSelectingColorImage(null);
-    toast.success(isRTL ? 'تصویر به رنگ متصل شد' : 'Image linked to color');
-  }, [formData.imageUrls, imagePreviews, formData.colorImageUrls, isRTL, updateFormData]);
+    toast.success(isRTL ? 'تصویر رنگ اضافه شد' : 'Color image added');
 
-  const unlinkColorImage = (colorValue: string) => {
-    const newColorImageUrls = { ...formData.colorImageUrls };
-    delete newColorImageUrls[colorValue];
+    // Reset input
+    if (colorImageInputRefs.current[colorValue]) {
+      colorImageInputRefs.current[colorValue]!.value = '';
+    }
+  }, [formData.colorImages, isRTL, updateFormData]);
 
-    // Also clear colorImages if any
+  const removeColorImage = (colorValue: string) => {
+    // Revoke preview URL
+    if (colorImagePreviews[colorValue]) {
+      URL.revokeObjectURL(colorImagePreviews[colorValue]);
+    }
+
+    const newPreviews = { ...colorImagePreviews };
+    delete newPreviews[colorValue];
+    setColorImagePreviews(newPreviews);
+
     const newColorImages = { ...formData.colorImages };
     delete newColorImages[colorValue];
+
+    const newColorImageUrls = { ...formData.colorImageUrls };
+    delete newColorImageUrls[colorValue];
 
     updateFormData({
       colorImages: newColorImages,
       colorImageUrls: newColorImageUrls
     });
 
-    toast.success(isRTL ? 'اتصال تصویر حذف شد' : 'Image link removed');
+    toast.success(isRTL ? 'تصویر رنگ حذف شد' : 'Color image removed');
   };
 
-  const getColorLinkedImage = (colorValue: string): string | null => {
-    return formData.colorImageUrls[colorValue] || null;
+  const getColorImageSrc = (colorValue: string): string | null => {
+    // Priority: preview (new file) -> uploaded URL
+    return colorImagePreviews[colorValue] || formData.colorImageUrls[colorValue] || null;
   };
-
-  // Get all available images for linking
-  const allAvailableImages = useMemo(() => [
-    ...formData.imageUrls,
-    ...imagePreviews
-  ], [formData.imageUrls, imagePreviews]);
 
   const handleDragStart = (index: number) => {
     setDraggedIndex(index);
@@ -418,30 +436,29 @@ export const MediaStep = ({ formData, updateFormData, isUploading }: MediaStepPr
         </div>
       </div>
 
-      {/* Color Images Section - Only show if colors are selected AND images exist */}
-      {selectedColors.length > 0 && allAvailableImages.length > 0 && (
+      {/* Color Images Section - Only show if colors are selected */}
+      {selectedColors.length > 0 && (
         <div className="space-y-4 pt-6 border-t">
           <div className="flex items-center justify-between">
             <Label className="text-base font-medium flex items-center gap-2">
               <Palette className="w-4 h-4 text-primary" />
-              {isRTL ? 'اتصال تصاویر به رنگ‌ها' : 'Link Images to Colors'}
+              {isRTL ? 'تصاویر رنگ‌ها' : 'Color Images'}
             </Label>
             <Badge variant="outline" className="text-xs font-normal">
-              {isRTL ? 'اختیاری' : 'Optional'}
+              {isRTL ? 'یک تصویر برای هر رنگ' : 'One image per color'}
             </Badge>
           </div>
 
           <p className="text-sm text-muted-foreground">
             {isRTL 
-              ? 'از تصاویر بالا یکی را برای هر رنگ انتخاب کنید. مشتریان با کلیک روی رنگ، تصویر مربوطه را می‌بینند.'
-              : 'Link one of the uploaded images to each color. Customers will see the linked image when selecting a color.'}
+              ? 'برای هر رنگ انتخاب شده، یک تصویر اختصاصی آپلود کنید. این تصاویر هنگام انتخاب رنگ توسط مشتری نمایش داده می‌شوند.'
+              : 'Upload a specific image for each selected color. These images will be shown when customers select a color.'}
           </p>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {selectedColors.map((color) => {
-              const linkedImage = getColorLinkedImage(color.value);
-              const hasLinkedImage = !!linkedImage;
-              const isSelecting = selectingColorImage === color.value;
+              const imageSrc = getColorImageSrc(color.value);
+              const hasImage = !!imageSrc;
 
               return (
                 <div key={color.value} className="space-y-2">
@@ -450,15 +467,15 @@ export const MediaStep = ({ formData, updateFormData, isUploading }: MediaStepPr
                       className="w-4 h-4 rounded-full border border-border/50 flex-shrink-0"
                       style={{ backgroundColor: color.hex }}
                     />
-                    <span className="text-sm font-medium truncate">
+                    <span className="text-sm font-medium">
                       {isRTL ? color.nameFa : color.name}
                     </span>
                   </div>
 
-                  {hasLinkedImage && !isSelecting ? (
+                  {hasImage ? (
                     <Card className="relative aspect-square overflow-hidden group">
                       <img
-                        src={linkedImage}
+                        src={imageSrc}
                         alt={`${color.name} variant`}
                         className="w-full h-full object-cover"
                       />
@@ -467,43 +484,16 @@ export const MediaStep = ({ formData, updateFormData, isUploading }: MediaStepPr
                           variant="destructive"
                           size="icon"
                           className="h-8 w-8"
-                          onClick={() => unlinkColorImage(color.value)}
+                          onClick={() => removeColorImage(color.value)}
                           disabled={isUploading}
                         >
                           <X className="w-4 h-4" />
                         </Button>
                       </div>
                       <div className="absolute bottom-1 left-1">
-                        <CheckCircle2 className="w-4 h-4 text-primary" />
+                        <CheckCircle2 className="w-4 h-4 text-success" />
                       </div>
                     </Card>
-                  ) : isSelecting ? (
-                    <div className="space-y-2">
-                      <div className="grid grid-cols-3 gap-1 max-h-32 overflow-y-auto p-1 border rounded-lg bg-muted/30">
-                        {allAvailableImages.map((imgSrc, idx) => (
-                          <button
-                            key={idx}
-                            type="button"
-                            className="aspect-square rounded overflow-hidden border-2 border-transparent hover:border-primary transition-colors focus:outline-none focus:border-primary"
-                            onClick={() => linkImageToColor(color.value, idx)}
-                          >
-                            <img
-                              src={imgSrc}
-                              alt={`Select image ${idx + 1}`}
-                              className="w-full h-full object-cover"
-                            />
-                          </button>
-                        ))}
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="w-full text-xs h-7"
-                        onClick={() => setSelectingColorImage(null)}
-                      >
-                        {isRTL ? 'انصراف' : 'Cancel'}
-                      </Button>
-                    </div>
                   ) : (
                     <Card
                       className={cn(
@@ -511,14 +501,23 @@ export const MediaStep = ({ formData, updateFormData, isUploading }: MediaStepPr
                         "hover:border-primary hover:bg-primary/5 transition-colors",
                         isUploading && "pointer-events-none opacity-50"
                       )}
-                      onClick={() => setSelectingColorImage(color.value)}
+                      onClick={() => colorImageInputRefs.current[color.value]?.click()}
                     >
-                      <ImageIcon className="w-6 h-6 text-muted-foreground mb-1" />
+                      <Upload className="w-6 h-6 text-muted-foreground mb-1" />
                       <span className="text-xs text-muted-foreground text-center px-2">
-                        {isRTL ? 'انتخاب تصویر' : 'Select Image'}
+                        {isRTL ? 'آپلود' : 'Upload'}
                       </span>
                     </Card>
                   )}
+
+                  <input
+                    ref={(el) => { colorImageInputRefs.current[color.value] = el; }}
+                    type="file"
+                    accept={ALLOWED_IMAGE_TYPES.join(',')}
+                    className="hidden"
+                    onChange={(e) => handleColorImageSelect(color.value, e)}
+                    disabled={isUploading}
+                  />
                 </div>
               );
             })}
@@ -528,8 +527,8 @@ export const MediaStep = ({ formData, updateFormData, isUploading }: MediaStepPr
             <Info className="w-4 h-4 shrink-0 mt-0.5" />
             <p>
               {isRTL 
-                ? 'اتصال تصویر به رنگ اختیاری است. مشتریان با کلیک روی رنگ، تصویر متصل شده را خواهند دید.'
-                : 'Linking images to colors is optional. Customers will see the linked image when they click on a color.'}
+                ? 'تصاویر رنگ‌ها اختیاری هستند اما به مشتریان کمک می‌کنند تا محصول در هر رنگ را ببینند.'
+                : 'Color images are optional but help customers see the product in each color.'}
             </p>
           </div>
         </div>
