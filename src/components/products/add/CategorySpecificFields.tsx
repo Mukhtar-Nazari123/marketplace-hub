@@ -161,7 +161,7 @@ export const CategorySpecificFields = ({
             <Ruler className="w-4 h-4" />
             {isRTL ? "سایزهای موجود" : "Available Sizes"}
           </Label>
-          <div className="grid grid-cols-4 gap-2 sm:grid-cols-8">
+          <div className="flex flex-wrap gap-2">
             {["XS", "S", "M", "L", "XL", "XXL"].map((size) => {
               const selectedSizes = (attributes.sizes as string[]) || [];
               const isSelected = selectedSizes.includes(size);
@@ -195,7 +195,7 @@ export const CategorySpecificFields = ({
                 updateAttribute("sizes", newSizes);
               }}
               className={cn(
-                "col-span-2 sm:col-span-1 px-3 py-2 text-sm font-medium rounded-md border transition-all duration-200",
+                "px-3 py-2 text-sm font-medium rounded-md border transition-all duration-200",
                 ((attributes.sizes as string[]) || []).includes("freesize")
                   ? "bg-primary text-primary-foreground border-primary"
                   : "bg-background text-foreground border-border hover:border-primary/50",
