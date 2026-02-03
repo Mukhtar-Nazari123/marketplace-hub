@@ -113,7 +113,7 @@ const Header = () => {
               className="absolute left-1/2 -translate-x-1/2 lg:relative lg:left-0 lg:translate-x-0 lg:flex-shrink-0"
             >
               {logoUrl ? (
-                <img src={logoUrl} alt={siteName} className="h-10 sm:h-12 w-auto object-contain" />
+                <img src={logoUrl} alt={siteName} className="h-16 lg:h-[72px] w-auto object-contain" />
               ) : (
                 <span className="text-primary font-bold text-2xl">{siteName}</span>
               )}
