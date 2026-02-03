@@ -13,7 +13,8 @@ import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ShoppingCart, Trash2, Plus, Minus, ChevronLeft, ChevronRight, ShoppingBag, Eye } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
+import CartRecommendations from '@/components/cart/CartRecommendations';
 
 interface CartItemProduct {
   id: string;
@@ -199,15 +200,17 @@ const Cart = () => {
         </h1>
 
         {items.length === 0 ? (
-          <Card className="text-center py-12">
-            <CardContent>
-              <ShoppingBag className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-              <p className="text-lg text-muted-foreground mb-4">{texts.empty}</p>
-              <Button asChild variant="cyan">
-                <Link to="/products">{texts.continueShopping}</Link>
-              </Button>
-            </CardContent>
-          </Card>
+          <>
+            <Card className="text-center py-12">
+              <CardContent>
+                <ShoppingBag className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+                <p className="text-lg text-muted-foreground mb-4">{texts.empty}</p>
+                <Button asChild variant="cyan">
+                  <Link to="/products">{texts.continueShopping}</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </>
         ) : (
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Cart Items */}
@@ -455,6 +458,9 @@ const Cart = () => {
             </div>
           </div>
         )}
+
+        {/* Product Recommendations Section */}
+        <CartRecommendations excludeProductIds={items.map(item => item.product_id)} />
       </div>
 
       <Footer />
