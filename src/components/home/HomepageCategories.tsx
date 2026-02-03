@@ -167,7 +167,7 @@ const HomepageCategories = () => {
         className="group flex flex-col items-center text-center flex-shrink-0"
       >
         {/* Circular Image */}
-        <div className="relative w-14 h-14 sm:w-16 sm:h-16 md:w-18 md:h-18 rounded-full overflow-hidden bg-muted border-2 border-transparent group-hover:border-primary/50 transition-all duration-300 group-hover:shadow-lg group-hover:scale-105">
+        <div className="relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full overflow-hidden bg-muted border-2 border-transparent group-hover:border-primary/50 transition-all duration-300 group-hover:shadow-lg group-hover:scale-105">
           {displayImage ? (
             <img
               src={displayImage}
