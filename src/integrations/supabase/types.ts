@@ -1134,6 +1134,7 @@ export type Database = {
           alt_text_en: string | null
           alt_text_fa: string | null
           alt_text_ps: string | null
+          color_value: string | null
           created_at: string
           id: string
           is_primary: boolean
@@ -1148,6 +1149,7 @@ export type Database = {
           alt_text_en?: string | null
           alt_text_fa?: string | null
           alt_text_ps?: string | null
+          color_value?: string | null
           created_at?: string
           id?: string
           is_primary?: boolean
@@ -1162,6 +1164,7 @@ export type Database = {
           alt_text_en?: string | null
           alt_text_fa?: string | null
           alt_text_ps?: string | null
+          color_value?: string | null
           created_at?: string
           id?: string
           is_primary?: boolean
