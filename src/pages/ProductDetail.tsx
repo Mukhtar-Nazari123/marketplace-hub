@@ -14,6 +14,7 @@ import Navigation from '@/components/layout/Navigation';
 import Footer from '@/components/layout/Footer';
 import StickyNavbar from '@/components/layout/StickyNavbar';
 import ProductCard from '@/components/home/ProductCard';
+import ProductColorSwatches from '@/components/products/ProductColorSwatches';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -102,6 +103,8 @@ const ProductDetail = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [colorMedia, setColorMedia] = useState<{ color_value: string; url: string }[]>([]);
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
 
   // Fetch product rating
   const { averageRating, reviewCount, refetch: refetchRating } = useProductRating(product?.id || '');
@@ -157,6 +160,21 @@ const ProductDetail = () => {
           .maybeSingle();
 
         setProduct({ ...(data as any), seller: seller ?? null } as Product);
+
+        // Fetch color-specific media
+        const { data: colorMediaData } = await supabase
+          .from('product_media')
+          .select('color_value, url')
+          .eq('product_id', data.id)
+          .not('color_value', 'is', null)
+          .order('sort_order');
+        
+        if (colorMediaData && colorMediaData.length > 0) {
+          setColorMedia(colorMediaData.filter(m => m.color_value) as { color_value: string; url: string }[]);
+        } else {
+          setColorMedia([]);
+        }
+        setSelectedColor(null);
 
         // Fetch related products
         if (data.category_id) {
@@ -277,8 +295,8 @@ const ProductDetail = () => {
   const productImages = product.images?.length ? product.images : ['/placeholder.svg'];
   const videoUrl = product.metadata?.videoUrl;
   
-  // Build gallery items: video first (if exists), then images
-  type GalleryItem = { type: 'video'; url: string } | { type: 'image'; url: string };
+  // Build gallery items: video first (if exists), then general images, then color images
+  type GalleryItem = { type: 'video'; url: string } | { type: 'image'; url: string; colorValue?: string };
   const galleryItems: GalleryItem[] = [];
   if (videoUrl) {
     galleryItems.push({ type: 'video', url: videoUrl });
@@ -286,6 +304,37 @@ const ProductDetail = () => {
   productImages.forEach((img) => {
     galleryItems.push({ type: 'image', url: img });
   });
+  // Add color-specific images (avoid duplicates if already in general images)
+  const generalImageUrls = new Set(productImages);
+  colorMedia.forEach((cm) => {
+    if (!generalImageUrls.has(cm.url)) {
+      galleryItems.push({ type: 'image', url: cm.url, colorValue: cm.color_value });
+    }
+  });
+
+  // Handle color swatch selection - find the color-specific image and update gallery
+  const handleColorSelect = (colorValue: string) => {
+    if (selectedColor === colorValue) {
+      // Deselect and return to first general image
+      setSelectedColor(null);
+      setSelectedImage(0);
+      return;
+    }
+    
+    setSelectedColor(colorValue);
+    
+    // Find the color-specific image URL
+    const colorItem = colorMedia.find(m => m.color_value === colorValue);
+    if (colorItem) {
+      // Find the index of this color image in the gallery
+      const colorImageIndex = galleryItems.findIndex(
+        item => item.type === 'image' && item.url === colorItem.url
+      );
+      if (colorImageIndex !== -1) {
+        setSelectedImage(colorImageIndex);
+      }
+    }
+  };
   
   const discount = getDiscount();
   const currencySymbol = getCurrencySymbol();
@@ -433,6 +482,13 @@ const ProductDetail = () => {
                 ))}
               </div>
             )}
+            
+            {/* Color Swatches */}
+            <ProductColorSwatches 
+              colorMedia={colorMedia}
+              selectedColor={selectedColor}
+              onColorSelect={handleColorSelect}
+            />
           </div>
 
           {/* Product Info */}
