@@ -81,7 +81,7 @@ const EditProduct = () => {
   const fetchProduct = async () => {
     try {
       // Use the new function that loads from normalized tables
-      const { product, translation, attributes, brand, imageUrls, videoUrl } = 
+      const { product, translation, attributes, brand, imageUrls, videoUrl, colorImageUrls } = 
         await loadProductWithTranslations(id!, currentLanguage);
 
       if (!product) {
@@ -98,6 +98,23 @@ const EditProduct = () => {
       }
 
       const metadata = (product.metadata as Record<string, unknown>) || {};
+
+      // Normalize colors attribute (DB stores arrays as comma-separated strings)
+      const normalizedAttributes: Record<string, string | boolean | string[]> = {
+        ...(attributes as unknown as Record<string, string | boolean | string[]>),
+      };
+      const rawColors = normalizedAttributes.colors;
+      if (typeof rawColors === 'string') {
+        normalizedAttributes.colors = rawColors
+          .split(',')
+          .map(c => c.trim().toLowerCase())
+          .filter(Boolean);
+      }
+
+      const legacyColorImageUrls = (metadata.colorImageUrls as Record<string, string>) || {};
+      const resolvedColorImageUrls = Object.keys(colorImageUrls || {}).length > 0
+        ? colorImageUrls
+        : legacyColorImageUrls;
       
       setFormData({
         categoryId: product.category_id || '',
@@ -109,13 +126,14 @@ const EditProduct = () => {
         shortDescription: translation?.short_description || (metadata.shortDescription as string) || '',
         description: translation?.description || '',
         brand: brand || (metadata.brand as string) || '',
-        attributes: attributes || (metadata.attributes as Record<string, string | boolean | string[]>) || {},
+        attributes: normalizedAttributes || (metadata.attributes as Record<string, string | boolean | string[]>) || {},
         images: [],
         imageUrls: imageUrls,
         video: null,
         videoUrl: videoUrl,
         colorImages: {},
-        colorImageUrls: (metadata.colorImageUrls as Record<string, string>) || {},
+        // Prefer normalized table data; fallback to legacy metadata
+        colorImageUrls: resolvedColorImageUrls,
         price: product.price_afn,
         priceUSD: 0,
         discountPrice: product.compare_price_afn,
@@ -175,10 +193,15 @@ const EditProduct = () => {
     }
   };
 
-  const uploadMedia = async (): Promise<{ imageUrls: string[]; videoUrl: string }> => {
+  const uploadMedia = async (): Promise<{ 
+    imageUrls: string[]; 
+    videoUrl: string;
+    colorImageUrls: Record<string, string>;
+  }> => {
     setIsUploading(true);
     const uploadedImageUrls: string[] = [...formData.imageUrls];
     let uploadedVideoUrl = formData.videoUrl;
+    const uploadedColorImageUrls: Record<string, string> = { ...formData.colorImageUrls };
 
     try {
       for (const image of formData.images) {
@@ -211,7 +234,25 @@ const EditProduct = () => {
         uploadedVideoUrl = urlData.publicUrl;
       }
 
-      return { imageUrls: uploadedImageUrls, videoUrl: uploadedVideoUrl };
+      // Upload color-specific images (if user selected dedicated files)
+      for (const [colorValue, file] of Object.entries(formData.colorImages)) {
+        if (file) {
+          const fileName = `${user?.id}/products/colors/${Date.now()}-${colorValue}-${file.name}`;
+          const { error } = await supabase.storage
+            .from('seller-assets')
+            .upload(fileName, file);
+
+          if (error) throw error;
+
+          const { data: urlData } = supabase.storage
+            .from('seller-assets')
+            .getPublicUrl(fileName);
+
+          uploadedColorImageUrls[colorValue] = urlData.publicUrl;
+        }
+      }
+
+      return { imageUrls: uploadedImageUrls, videoUrl: uploadedVideoUrl, colorImageUrls: uploadedColorImageUrls };
     } finally {
       setIsUploading(false);
     }
@@ -223,9 +264,14 @@ const EditProduct = () => {
     setIsSubmitting(true);
 
     try {
-      const { imageUrls, videoUrl } = formData.images.length > 0 || formData.video
+      const hasNewMedia =
+        formData.images.length > 0 ||
+        !!formData.video ||
+        Object.values(formData.colorImages || {}).some(Boolean);
+
+      const { imageUrls, videoUrl, colorImageUrls } = hasNewMedia
         ? await uploadMedia()
-        : { imageUrls: formData.imageUrls, videoUrl: formData.videoUrl };
+        : { imageUrls: formData.imageUrls, videoUrl: formData.videoUrl, colorImageUrls: formData.colorImageUrls };
 
       if (imageUrls.length === 0) {
         toast.error(isRTL ? 'حداقل یک تصویر لازم است' : 'At least one image is required');
@@ -241,6 +287,7 @@ const EditProduct = () => {
         formData,
         imageUrls,
         videoUrl,
+        colorImageUrls,
         status,
         currentLanguage,
       });

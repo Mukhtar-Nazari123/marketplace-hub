@@ -166,21 +166,38 @@ export const MediaStep = ({ formData, updateFormData, isUploading }: MediaStepPr
 
   // Color image linking - link an existing product image to a color
   const linkImageToColor = useCallback((colorValue: string, imageIndex: number) => {
-    const allImageSources = [
-      ...formData.imageUrls,
-      ...imagePreviews
-    ];
-    
-    const selectedImageUrl = allImageSources[imageIndex];
-    if (!selectedImageUrl) return;
+    // NOTE: imageIndex is based on `allAvailableImages` which is:
+    // [ ...formData.imageUrls, ...imagePreviews ]
+    const isExistingUrl = imageIndex < formData.imageUrls.length;
+
+    const nextColorImageUrls = { ...formData.colorImageUrls };
+    const nextColorImages = { ...formData.colorImages };
+
+    if (isExistingUrl) {
+      const selectedUrl = formData.imageUrls[imageIndex];
+      if (!selectedUrl) return;
+      nextColorImageUrls[colorValue] = selectedUrl;
+      // Ensure we don't also upload a dedicated file for this color
+      delete nextColorImages[colorValue];
+    } else {
+      const previewIdx = imageIndex - formData.imageUrls.length;
+      const selectedPreview = imagePreviews[previewIdx];
+      const selectedFile = formData.images[previewIdx];
+      if (!selectedPreview || !selectedFile) return;
+      // Store preview for immediate UI feedback...
+      nextColorImageUrls[colorValue] = selectedPreview;
+      // ...but also store the file so Add/Edit uploadMedia can replace it with a real public URL.
+      nextColorImages[colorValue] = selectedFile;
+    }
 
     updateFormData({
-      colorImageUrls: { ...formData.colorImageUrls, [colorValue]: selectedImageUrl }
+      colorImages: nextColorImages,
+      colorImageUrls: nextColorImageUrls,
     });
 
     setSelectingColorImage(null);
     toast.success(isRTL ? 'تصویر به رنگ متصل شد' : 'Image linked to color');
-  }, [formData.imageUrls, imagePreviews, formData.colorImageUrls, isRTL, updateFormData]);
+  }, [formData.imageUrls, formData.images, imagePreviews, formData.colorImageUrls, formData.colorImages, isRTL, updateFormData]);
 
   const unlinkColorImage = (colorValue: string) => {
     const newColorImageUrls = { ...formData.colorImageUrls };
