@@ -423,6 +423,17 @@ export async function loadProductWithTranslations(
   const videoMedia = media?.find(m => m.media_type === 'video');
   const videoUrl = videoMedia?.url || (product.metadata as any)?.videoUrl || '';
 
+  // Color-linked media (used for swatches & edit form)
+  const colorMedia = (media || [])
+    .filter(m => m.media_type === 'image' && m.color_value)
+    .map(m => ({ color_value: m.color_value as string, url: m.url }));
+
+  // Convenience mapping: one URL per color (first wins)
+  const colorImageUrls: Record<string, string> = {};
+  for (const m of colorMedia) {
+    if (!colorImageUrls[m.color_value]) colorImageUrls[m.color_value] = m.url;
+  }
+
   return {
     product,
     translation,
@@ -430,6 +441,8 @@ export async function loadProductWithTranslations(
     brand,
     imageUrls,
     videoUrl,
+    colorMedia,
+    colorImageUrls,
   };
 }
 
