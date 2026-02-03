@@ -28,9 +28,17 @@ interface ReviewStepProps {
   formData: ProductFormData;
 }
 
-export const ReviewStep = ({ formData }: ReviewStepProps) => {
-  const { isRTL } = useLanguage();
+// Trilingual helper
+const getLabel = (en: string, fa: string, ps: string, language: string) => {
+  if (language === 'ps') return ps;
+  if (language === 'fa') return fa;
+  return en;
+};
 
+export const ReviewStep = ({ formData }: ReviewStepProps) => {
+  const { isRTL, language } = useLanguage();
+
+  const pcsLabel = getLabel('pcs', 'عدد', 'عدد', language);
   const allImages = [...formData.imageUrls];
   const hasImages = allImages.length > 0 || formData.images.length > 0;
   const hasVideo = formData.video || formData.videoUrl;
@@ -402,7 +410,7 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
                     if (key === 'sizes' && Array.isArray(value)) {
                       const sizesWithStock = value.map((size: string) => {
                         const stock = formData.stockPerSize?.[size] || 0;
-                        return `${size}(${stock})`;
+                        return `${size}(${stock}${pcsLabel})`;
                       }).join(', ');
                       
                       return (
