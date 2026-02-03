@@ -200,9 +200,11 @@ async function saveProductMedia(
     toAdd.push({ url: videoUrl, type: 'video', order: imageUrls.length, colorValue: null });
   }
 
-  // Color-specific images
+  // Color-specific images - these are often linked from existing general images
+  // We need to track which existing images should get a color_value update
   let colorOrderOffset = imageUrls.length + (videoUrl ? 1 : 0);
   Object.entries(colorImageUrls).forEach(([colorValue, url], index) => {
+    // Only add as new if the URL doesn't already exist in the database
     if (!existingUrls.has(url)) {
       toAdd.push({ 
         url, 
@@ -211,6 +213,7 @@ async function saveProductMedia(
         colorValue 
       });
     }
+    // If URL exists, we'll update its color_value later (in the update section below)
   });
 
   // Find media to remove (in existing but not in new URLs)
@@ -256,15 +259,32 @@ async function saveProductMedia(
     }
   }
 
-  // Update existing color images with their color_value
+  // Update existing images with their color_value when linked to a color
+  // This handles the case where a general image is linked to a color
   for (const [colorValue, url] of Object.entries(colorImageUrls)) {
+    // Find the media entry for this URL (could be in existing or just inserted)
     const existing = existingMedia?.find(m => m.url === url);
     if (existing) {
-      await supabase
+      const { error } = await supabase
         .from('product_media')
         .update({ color_value: colorValue })
         .eq('id', existing.id);
+      
+      if (error) console.error('Error updating color_value:', error);
     }
+  }
+
+  // Clear color_value from images that are no longer linked to any color
+  const linkedUrls = new Set(Object.values(colorImageUrls));
+  const mediaToClearColor = existingMedia?.filter(
+    m => m.color_value && !linkedUrls.has(m.url)
+  ) || [];
+  
+  for (const media of mediaToClearColor) {
+    await supabase
+      .from('product_media')
+      .update({ color_value: null })
+      .eq('id', media.id);
   }
 }
 
