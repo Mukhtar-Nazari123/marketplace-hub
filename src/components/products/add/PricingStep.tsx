@@ -14,7 +14,7 @@ interface PricingStepProps {
   updateFormData: (updates: Partial<ProductFormData>) => void;
 }
 
-const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
+const ALL_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
 const OTHER_SIZE_KEY = 'other';
 
 export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
@@ -80,6 +80,21 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
   const stockValid = isClothing 
     ? Object.values(formData.stockPerSize || {}).some(v => (Number(v) || 0) > 0)
     : formData.quantity > 0;
+
+  // Get selected sizes from attributes (from CategorySpecificFields)
+  const selectedSizes = useMemo(() => {
+    const sizesFromAttributes = formData.attributes?.sizes as string[] || [];
+    // Filter to only standard sizes that were selected
+    return ALL_SIZES.filter(size => sizesFromAttributes.includes(size));
+  }, [formData.attributes?.sizes]);
+
+  // Check if "freesize" or custom size is selected
+  const hasCustomSize = useMemo(() => {
+    const sizesFromAttributes = formData.attributes?.sizes as string[] || [];
+    const hasFreeSizeSelected = sizesFromAttributes.includes('freesize');
+    const hasCustomSizeText = !!(formData.attributes?.customSize as string);
+    return hasFreeSizeSelected || hasCustomSizeText;
+  }, [formData.attributes?.sizes, formData.attributes?.customSize]);
 
   // Total stock for clothing (including custom sizes)
   const totalClothingStock = Object.values(formData.stockPerSize || {}).reduce(
@@ -290,45 +305,53 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
             {stockValid && <CheckCircle2 className="w-4 h-4 text-success" />}
           </Label>
           
-          <div className="grid grid-cols-4 sm:grid-cols-7 gap-3">
-            {SIZES.map((size) => (
-              <div key={size} className="space-y-1">
-                <Label htmlFor={`size-${size}`} className="text-xs font-medium text-center block">
-                  {size}
-                </Label>
+          {selectedSizes.length > 0 ? (
+            <div className="grid grid-cols-4 sm:grid-cols-7 gap-3">
+              {selectedSizes.map((size) => (
+                <div key={size} className="space-y-1">
+                  <Label htmlFor={`size-${size}`} className="text-xs font-medium text-center block">
+                    {size}
+                  </Label>
+                  <Input
+                    id={`size-${size}`}
+                    type="number"
+                    min="0"
+                    value={formData.stockPerSize?.[size] || ''}
+                    onChange={(e) => handleStockPerSizeChange(size, e.target.value)}
+                    placeholder="0"
+                    className="text-center h-10 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground italic">
+              {isRTL ? 'ابتدا سایزهای موجود را در مرحله قبل انتخاب کنید' : 'Please select available sizes in the previous step first'}
+            </p>
+          )}
+
+          {/* Custom/Other Size Stock - only show if freesize or custom size selected */}
+          {hasCustomSize && (
+            <div className="pt-4 border-t space-y-3">
+              <Label className="text-sm font-medium">
+                {isRTL ? 'موجودی سایز سفارشی/فری' : 'Custom/Free Size Stock'}
+              </Label>
+              <div className="flex items-center gap-4">
                 <Input
-                  id={`size-${size}`}
+                  id="custom-size-stock"
                   type="number"
                   min="0"
-                  value={formData.stockPerSize?.[size] || ''}
-                  onChange={(e) => handleStockPerSizeChange(size, e.target.value)}
+                  value={formData.stockPerSize?.[OTHER_SIZE_KEY] || ''}
+                  onChange={(e) => handleStockPerSizeChange(OTHER_SIZE_KEY, e.target.value)}
                   placeholder="0"
-                  className="text-center h-10 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  className="w-24 text-center h-10 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
+                <span className="text-sm text-muted-foreground">
+                  {isRTL ? 'عدد برای سایزهای سفارشی (مانند 38، 40، 42)' : 'items for custom sizes (e.g., 38, 40, 42)'}
+                </span>
               </div>
-            ))}
-          </div>
-
-          {/* Custom/Other Size Stock */}
-          <div className="pt-4 border-t space-y-3">
-            <Label className="text-sm font-medium">
-              {isRTL ? 'موجودی سایز سفارشی' : 'Custom Size Stock'}
-            </Label>
-            <div className="flex items-center gap-4">
-              <Input
-                id="custom-size-stock"
-                type="number"
-                min="0"
-                value={formData.stockPerSize?.[OTHER_SIZE_KEY] || ''}
-                onChange={(e) => handleStockPerSizeChange(OTHER_SIZE_KEY, e.target.value)}
-                placeholder="0"
-                className="w-24 text-center h-10 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-              />
-              <span className="text-sm text-muted-foreground">
-                {isRTL ? 'عدد برای سایزهای سفارشی (مانند 38، 40، 42)' : 'items for custom sizes (e.g., 38, 40, 42)'}
-              </span>
             </div>
-          </div>
+          )}
 
           <div className="flex items-center justify-between pt-2 border-t">
             <span className="text-sm text-muted-foreground">
