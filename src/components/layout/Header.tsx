@@ -65,9 +65,9 @@ const Header = () => {
       admin: { en: "Admin Dashboard", fa: "داشبورد مدیر", ps: "اډمین ډشبورډ" },
       seller: { en: "Seller Dashboard", fa: "داشبورد فروشنده", ps: "پلورونکي ډشبورډ" },
       buyer: { en: "Buyer Dashboard", fa: "داشبورد خریدار", ps: "پیرودونکي ډشبورډ" },
-      default: { en: "Dashboard", fa: "داشبورد", ps: "ډشبورډ" }
+      default: { en: "Dashboard", fa: "داشبورد", ps: "ډشبورډ" },
     };
-    const key = role && labels[role as keyof typeof labels] ? role as keyof typeof labels : 'default';
+    const key = role && labels[role as keyof typeof labels] ? (role as keyof typeof labels) : "default";
     return labels[key][language] || labels[key].en;
   };
   const handleLogout = async () => {
@@ -89,12 +89,7 @@ const Header = () => {
           <div className="flex items-center justify-between gap-2 sm:gap-3 relative">
             {/* Mobile Icons - Left side (Menu + Search) */}
             <div className="flex items-center gap-1 lg:hidden flex-shrink-0 z-10">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsMenuOpen(true)}
-                aria-label={t.header.menu}
-              >
+              <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(true)} aria-label={t.header.menu}>
                 <Menu className="h-5 w-5" />
               </Button>
               <Button
@@ -108,12 +103,12 @@ const Header = () => {
             </div>
 
             {/* Logo - Absolutely centered on mobile/tablet */}
-            <Link 
-              to="/" 
+            <Link
+              to="/"
               className="absolute left-1/2 -translate-x-1/2 lg:relative lg:left-0 lg:translate-x-0 lg:flex-shrink-0"
             >
               {logoUrl ? (
-                <img src={logoUrl} alt={siteName} className="h-16 lg:h-[72px] w-auto object-contain" />
+                <img src={logoUrl} alt={siteName} className="h-16 lg:h-[62px] w-auto object-contain" />
               ) : (
                 <span className="text-primary font-bold text-2xl">{siteName}</span>
               )}
@@ -166,9 +161,7 @@ const Header = () => {
                     )}
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>
-                  {t.header.themeToggle}
-                </TooltipContent>
+                <TooltipContent>{t.header.themeToggle}</TooltipContent>
               </Tooltip>
 
               {/* Wishlist - Only visible when logged in, hidden on mobile/tablet */}
@@ -214,9 +207,7 @@ const Header = () => {
               )}
 
               {/* Notifications - Only visible when logged in */}
-              {user && (role === 'buyer' || role === 'seller') && (
-                <NotificationBell />
-              )}
+              {user && (role === "buyer" || role === "seller") && <NotificationBell />}
 
               {/* Account / Dashboard / Logout - Hidden on mobile, shown on lg+ */}
               {user ? (
@@ -258,14 +249,10 @@ const Header = () => {
                     <AlertDialogContent dir={isRTL ? "rtl" : "ltr"}>
                       <AlertDialogHeader>
                         <AlertDialogTitle>{t.header.logoutTitle}</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          {t.header.logoutConfirm}
-                        </AlertDialogDescription>
+                        <AlertDialogDescription>{t.header.logoutConfirm}</AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter className={isRTL ? "flex-row-reverse gap-2" : ""}>
-                        <AlertDialogCancel className="border-muted-foreground/30">
-                          {t.common.cancel}
-                        </AlertDialogCancel>
+                        <AlertDialogCancel className="border-muted-foreground/30">{t.common.cancel}</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={handleLogout}
                           className="bg-primary text-primary-foreground hover:bg-primary/90"
@@ -284,10 +271,8 @@ const Header = () => {
                   </div>
                 </Link>
               )}
-
             </div>
           </div>
-
         </div>
       </header>
 
