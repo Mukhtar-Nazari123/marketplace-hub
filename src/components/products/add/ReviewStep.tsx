@@ -397,6 +397,24 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {Object.entries(formData.attributes).map(([key, value]) => {
                     if (!value) return null;
+                    
+                    // Special handling for sizes - show stock per size
+                    if (key === 'sizes' && Array.isArray(value)) {
+                      const sizesWithStock = value.map((size: string) => {
+                        const stock = formData.stockPerSize?.[size] || 0;
+                        return `${size}(${stock})`;
+                      }).join(', ');
+                      
+                      return (
+                        <div key={key} className="text-sm">
+                          <span className="text-muted-foreground capitalize">
+                            {isRTL ? 'سایزها' : 'Sizes'}:
+                          </span>{' '}
+                          <span className="font-medium">{sizesWithStock}</span>
+                        </div>
+                      );
+                    }
+                    
                     return (
                       <div key={key} className="text-sm">
                         <span className="text-muted-foreground capitalize">
@@ -405,7 +423,7 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
                         <span className="font-medium">
                           {typeof value === 'boolean' 
                             ? (value ? (isRTL ? 'بله' : 'Yes') : (isRTL ? 'خیر' : 'No'))
-                            : String(value)}
+                            : Array.isArray(value) ? value.join(', ') : String(value)}
                         </span>
                       </div>
                     );
