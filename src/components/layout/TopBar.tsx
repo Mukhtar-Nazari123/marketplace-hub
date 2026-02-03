@@ -61,9 +61,9 @@ const TopBar = () => {
       </div>
 
       {/* Mobile/Tablet Layout - 2 columns with margins to align with other sections */}
-      <div className="lg:hidden px-1 sm:px-1.5" dir={isRTL ? "rtl" : "ltr"}>
-        <div className="bg-[#b6b6b6] px-2 sm:px-3 py-1.5 rounded-sm">
-          <div className="flex items-center justify-between gap-2">
+      <div className="lg:hidden px-1 sm:px-1.5 w-full overflow-hidden" dir={isRTL ? "rtl" : "ltr"}>
+        <div className="bg-[#b6b6b6] px-2 sm:px-3 py-1.5 rounded-sm w-full overflow-hidden">
+          <div className="flex items-center justify-between gap-2 w-full overflow-hidden">
             {/* Left - Free Shipping */}
             <div className="flex items-center gap-1 sm:gap-1.5 text-[9px] sm:text-[10px] min-w-0 flex-1">
               <Truck className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-black/70 flex-shrink-0" />
