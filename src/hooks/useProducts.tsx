@@ -75,7 +75,11 @@ export const useProducts = (options: UseProductsOptions = {}) => {
       let sellerMap: Map<string, string> = new Map();
       let matchingSellerIds: string[] = [];
       
+      // Fetch product attributes for color/size search
+      let productAttributesMap: Map<string, { colors: string[], sizes: string[], tags: string[] }> = new Map();
+      
       if (hasSearch) {
+        // Fetch sellers
         const { data: sellerData } = await supabase
           .from('seller_verifications')
           .select('seller_id, business_name')
@@ -85,10 +89,32 @@ export const useProducts = (options: UseProductsOptions = {}) => {
           sellerData.forEach(s => {
             if (s.business_name) {
               sellerMap.set(s.seller_id, s.business_name);
-              // Check if seller store name matches search
               if (s.business_name.toLowerCase().includes(searchLower)) {
                 matchingSellerIds.push(s.seller_id);
               }
+            }
+          });
+        }
+
+        // Fetch product attributes (color, size, tags)
+        const { data: attributesData } = await supabase
+          .from('product_attributes')
+          .select('product_id, attribute_key, attribute_value')
+          .in('attribute_key', ['color', 'size', 'tags', 'material', 'style']);
+        
+        if (attributesData) {
+          attributesData.forEach(attr => {
+            if (!productAttributesMap.has(attr.product_id)) {
+              productAttributesMap.set(attr.product_id, { colors: [], sizes: [], tags: [] });
+            }
+            const entry = productAttributesMap.get(attr.product_id)!;
+            const key = attr.attribute_key.toLowerCase();
+            if (key === 'color') {
+              entry.colors.push(attr.attribute_value.toLowerCase());
+            } else if (key === 'size') {
+              entry.sizes.push(attr.attribute_value.toLowerCase());
+            } else {
+              entry.tags.push(attr.attribute_value.toLowerCase());
             }
           });
         }
@@ -125,12 +151,13 @@ export const useProducts = (options: UseProductsOptions = {}) => {
 
       if (fetchError) throw fetchError;
 
-      // Map products with seller names
+      // Map products with seller names and attributes
       let filteredData = (data || []).map(p => ({
         ...p,
         seller_verification: sellerMap.has(p.seller_id) 
           ? { business_name: sellerMap.get(p.seller_id) || null }
-          : null
+          : null,
+        _attributes: productAttributesMap.get(p.id) || { colors: [], sizes: [], tags: [] }
       }));
 
       // If filtering by category slug, filter after fetch
@@ -140,7 +167,7 @@ export const useProducts = (options: UseProductsOptions = {}) => {
         );
       }
 
-      // Multi-field search filtering
+      // Multi-field search filtering (SKU, name, category, subcategory, color, size, brand, keywords, seller, description)
       if (hasSearch) {
         filteredData = filteredData.filter((p) => {
           // Parse metadata safely
@@ -148,7 +175,9 @@ export const useProducts = (options: UseProductsOptions = {}) => {
             ? p.metadata as Record<string, unknown>
             : {};
           
-          // Extract searchable fields
+          // Extract all searchable fields
+          const sku = (p.sku || '').toLowerCase();
+          const barcode = (p.barcode || '').toLowerCase();
           const productName = p.name.toLowerCase();
           const description = (p.description || '').toLowerCase();
           const brand = (typeof metadata.brand === 'string' ? metadata.brand : '').toLowerCase();
@@ -156,22 +185,38 @@ export const useProducts = (options: UseProductsOptions = {}) => {
             ? (metadata.keywords as string[]).map((k) => String(k).toLowerCase())
             : [];
           const categoryName = (p.category?.name || '').toLowerCase();
+          const subcategoryName = (p.subcategory?.name || '').toLowerCase();
           const sellerName = (p.seller_verification?.business_name || '').toLowerCase();
           
+          // Get attributes (color, size, tags)
+          const attrs = p._attributes;
+          const colors = attrs.colors;
+          const sizes = attrs.sizes;
+          const tags = attrs.tags;
+          
           // Check all search fields
+          const matchesSku = sku.includes(searchLower) || barcode.includes(searchLower);
           const matchesName = productName.includes(searchLower);
           const matchesDescription = description.includes(searchLower);
           const matchesBrand = brand.includes(searchLower);
           const matchesKeywords = keywords.some((k) => k.includes(searchLower));
           const matchesCategory = categoryName.includes(searchLower);
+          const matchesSubcategory = subcategoryName.includes(searchLower);
           const matchesSeller = sellerName.includes(searchLower) || matchingSellerIds.includes(p.seller_id);
+          const matchesColor = colors.some(c => c.includes(searchLower));
+          const matchesSize = sizes.some(s => s.includes(searchLower));
+          const matchesTags = tags.some(t => t.includes(searchLower));
           
-          return matchesName || matchesDescription || matchesBrand || matchesKeywords || matchesCategory || matchesSeller;
+          return matchesSku || matchesName || matchesDescription || matchesBrand || 
+                 matchesKeywords || matchesCategory || matchesSubcategory || 
+                 matchesSeller || matchesColor || matchesSize || matchesTags;
         });
 
-        // Relevance ranking - priority: name > brand > keywords > category > seller > description
+        // Relevance ranking - priority: SKU > name > brand > color/size > keywords > category/subcategory > seller > description
         filteredData.sort((a, b) => {
           const getScore = (p: typeof a) => {
+            const sku = (p.sku || '').toLowerCase();
+            const barcode = (p.barcode || '').toLowerCase();
             const productName = p.name.toLowerCase();
             const metadata = (p.metadata && typeof p.metadata === 'object' && !Array.isArray(p.metadata)) 
               ? p.metadata as Record<string, unknown>
@@ -181,21 +226,35 @@ export const useProducts = (options: UseProductsOptions = {}) => {
               ? (metadata.keywords as string[]).map((k) => String(k).toLowerCase())
               : [];
             const categoryName = (p.category?.name || '').toLowerCase();
+            const subcategoryName = (p.subcategory?.name || '').toLowerCase();
+            const attrs = p._attributes;
             
-            // Exact name match - highest priority
+            // Exact SKU match - highest priority
+            if (sku === searchLower || barcode === searchLower) return 110;
+            // SKU starts with search term
+            if (sku.startsWith(searchLower) || barcode.startsWith(searchLower)) return 105;
+            // Exact name match
             if (productName === searchLower) return 100;
             // Name starts with search term
             if (productName.startsWith(searchLower)) return 90;
             // Name contains search term
             if (productName.includes(searchLower)) return 80;
             // Brand matches
-            if (brand.includes(searchLower)) return 70;
+            if (brand.includes(searchLower)) return 75;
+            // Color/Size exact match
+            if (attrs.colors.includes(searchLower) || attrs.sizes.includes(searchLower)) return 70;
+            // Color/Size partial match
+            if (attrs.colors.some(c => c.includes(searchLower)) || attrs.sizes.some(s => s.includes(searchLower))) return 65;
             // Keywords match
             if (keywords.some((k) => k.includes(searchLower))) return 60;
+            // Subcategory matches
+            if (subcategoryName.includes(searchLower)) return 55;
             // Category matches
             if (categoryName.includes(searchLower)) return 50;
             // Seller matches
             if ((p.seller_verification?.business_name || '').toLowerCase().includes(searchLower)) return 40;
+            // Tags match
+            if (attrs.tags.some(t => t.includes(searchLower))) return 35;
             // Description matches
             return 30;
           };
@@ -204,7 +263,9 @@ export const useProducts = (options: UseProductsOptions = {}) => {
         });
       }
 
-      setProducts(filteredData as DBProduct[]);
+      // Remove internal _attributes before setting state
+      const cleanedData = filteredData.map(({ _attributes, ...rest }) => rest);
+      setProducts(cleanedData as DBProduct[]);
     } catch (err) {
       console.error('Error fetching products:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch products');
