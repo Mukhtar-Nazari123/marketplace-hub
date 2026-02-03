@@ -38,48 +38,51 @@ const CartRecommendations = ({ excludeProductIds = [] }: CartRecommendationsProp
   const productIds = products.map((p) => p.id);
   const { getRating } = useProductRatings(productIds);
 
-  const fetchProducts = useCallback(async (pageNum: number, append: boolean = false) => {
-    if (pageNum === 0) {
-      setIsLoading(true);
-    } else {
-      setIsLoadingMore(true);
-    }
-
-    try {
-      let query = supabase
-        .from("products_with_translations")
-        .select("id, name, name_en, name_fa, name_ps, price_afn, compare_price_afn, images, is_featured, created_at")
-        .eq("status", "active")
-        .order("created_at", { ascending: false });
-
-      // Exclude products already in cart
-      if (excludeProductIds.length > 0) {
-        query = query.not("id", "in", `(${excludeProductIds.join(",")})`);
-      }
-
-      const { data, error } = await query.range(pageNum * PRODUCTS_PER_PAGE, (pageNum + 1) * PRODUCTS_PER_PAGE - 1);
-
-      if (error) throw error;
-
-      const newProducts = ((data || []).map(p => ({ ...p, name: p.name || 'Untitled' }))) as Product[];
-
-      // Shuffle products for random appearance
-      const shuffled = [...newProducts].sort(() => Math.random() - 0.5);
-
-      if (append) {
-        setProducts((prev) => [...prev, ...shuffled]);
+  const fetchProducts = useCallback(
+    async (pageNum: number, append: boolean = false) => {
+      if (pageNum === 0) {
+        setIsLoading(true);
       } else {
-        setProducts(shuffled);
+        setIsLoadingMore(true);
       }
 
-      setHasMore(newProducts.length === PRODUCTS_PER_PAGE);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-    } finally {
-      setIsLoading(false);
-      setIsLoadingMore(false);
-    }
-  }, [excludeProductIds]);
+      try {
+        let query = supabase
+          .from("products_with_translations")
+          .select("id, name, name_en, name_fa, name_ps, price_afn, compare_price_afn, images, is_featured, created_at")
+          .eq("status", "active")
+          .order("created_at", { ascending: false });
+
+        // Exclude products already in cart
+        if (excludeProductIds.length > 0) {
+          query = query.not("id", "in", `(${excludeProductIds.join(",")})`);
+        }
+
+        const { data, error } = await query.range(pageNum * PRODUCTS_PER_PAGE, (pageNum + 1) * PRODUCTS_PER_PAGE - 1);
+
+        if (error) throw error;
+
+        const newProducts = (data || []).map((p) => ({ ...p, name: p.name || "Untitled" })) as Product[];
+
+        // Shuffle products for random appearance
+        const shuffled = [...newProducts].sort(() => Math.random() - 0.5);
+
+        if (append) {
+          setProducts((prev) => [...prev, ...shuffled]);
+        } else {
+          setProducts(shuffled);
+        }
+
+        setHasMore(newProducts.length === PRODUCTS_PER_PAGE);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      } finally {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+      }
+    },
+    [excludeProductIds],
+  );
 
   useEffect(() => {
     fetchProducts(0);
@@ -130,24 +133,24 @@ const CartRecommendations = ({ excludeProductIds = [] }: CartRecommendationsProp
 
   // Localized text
   const texts = {
-    en: { 
-      title: "You May Also Like", 
-      subtitle: "Explore more products you might be interested in", 
-      loadMore: "Load More", 
-      loading: "Loading..." 
+    en: {
+      title: "You May Also Like",
+      subtitle: "Explore more products you might be interested in",
+      loadMore: "Load More",
+      loading: "Loading...",
     },
-    fa: { 
-      title: "شاید بپسندید", 
-      subtitle: "محصولات بیشتری که ممکن است علاقه‌مند باشید را کاوش کنید", 
-      loadMore: "نمایش بیشتر", 
-      loading: "در حال بارگذاری..." 
+    fa: {
+      title: "شاید بپسندید",
+      subtitle: "محصولات بیشتری که ممکن است علاقه‌مند باشید را کاوش کنید",
+      loadMore: "نمایش بیشتر",
+      loading: "در حال بارگذاری...",
     },
-    ps: { 
-      title: "تاسو هم خوښ کړئ", 
-      subtitle: "نور محصولات وپلټئ چې تاسو یې علاقمند یاست", 
-      loadMore: "نور وښایاست", 
-      loading: "پورته کیږي..." 
-    }
+    ps: {
+      title: "تاسو هم خوښ کړئ",
+      subtitle: "نور محصولات وپلټئ چې تاسو یې علاقمند یاست",
+      loadMore: "نور وښایاست",
+      loading: "پورته کیږي...",
+    },
   };
   const localText = texts[language as keyof typeof texts] || texts.en;
 
@@ -179,15 +182,11 @@ const CartRecommendations = ({ excludeProductIds = [] }: CartRecommendationsProp
 
   return (
     <section className="py-8 bg-muted/30 mt-8">
-      <div className="px-1 sm:px-1.5 lg:px-2">
+      <div>
         {/* Section Header */}
         <div className="mb-6">
-          <h2 className="font-display font-bold text-xl sm:text-2xl text-foreground mb-1">
-            {localText.title}
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            {localText.subtitle}
-          </p>
+          <h2 className="font-display font-bold text-xl sm:text-2xl text-foreground mb-1">{localText.title}</h2>
+          <p className="text-sm text-muted-foreground">{localText.subtitle}</p>
         </div>
 
         {/* Product Grid - Responsive */}
