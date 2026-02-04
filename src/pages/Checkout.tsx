@@ -720,13 +720,14 @@ const Checkout = () => {
                                 const colorName = colorDef ? (isRTL ? colorDef.nameFa : colorDef.name) : '';
                                 return (
                                   <div key={idx} className="flex items-center justify-between text-sm gap-2">
-                                    <div className="flex items-center gap-1.5 flex-1 min-w-0 flex-wrap">
+                                    <div className="flex items-center gap-2 flex-1 min-w-0 flex-wrap">
                                       <span className="text-muted-foreground">
                                         {product.name} × {product.quantity} {getLabel('pcs', 'عدد', 'ټوټه')}
                                       </span>
                                       {/* Color indicator */}
                                       {colorDef && (
-                                        <span className="inline-flex items-center gap-1 text-muted-foreground">
+                                        <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+                                          <span className="text-muted-foreground">•</span>
                                           <span className="lowercase">{colorName}</span>
                                           <span
                                             className="w-4 h-4 rounded-full border border-border flex-shrink-0"
@@ -739,7 +740,8 @@ const Checkout = () => {
                                       )}
                                       {/* Size indicator */}
                                       {product.selectedSize && (
-                                        <span className="text-muted-foreground">
+                                        <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+                                          <span className="text-muted-foreground">•</span>
                                           {getLabel('size', 'سایز', 'اندازه')}({product.selectedSize})
                                         </span>
                                       )}
