@@ -4,7 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { PRODUCT_COLORS, getLocalizedColorName, getColorByValue } from '@/lib/productColors';
-import { Truck } from 'lucide-react';
+import { Truck, Calendar } from 'lucide-react';
+import { addHours, format } from 'date-fns';
 
 interface DeliveryOption {
   id: string;
@@ -32,18 +33,113 @@ interface ProductVariants {
   deliveryOptions: DeliveryOption[];
 }
 
-const CartItemVariantSelector = ({
+// Inline color/size selectors
+export const CartItemVariantInline = ({
   productId,
   selectedColor,
   selectedSize,
-  selectedDeliveryOptionId,
   onColorChange,
   onSizeChange,
-  onDeliveryOptionChange,
-}: CartItemVariantSelectorProps) => {
+  variants,
+}: {
+  productId: string;
+  selectedColor: string | null;
+  selectedSize: string | null;
+  onColorChange: (color: string | null) => void;
+  onSizeChange: (size: string | null) => void;
+  variants: ProductVariants;
+}) => {
   const { language, isRTL } = useLanguage();
-  const [variants, setVariants] = useState<ProductVariants>({ colors: [], sizes: [], deliveryOptions: [] });
-  const [loading, setLoading] = useState(true);
+
+  const getLabel = (en: string, fa: string, ps: string) => {
+    if (language === 'ps') return ps;
+    if (language === 'fa') return fa;
+    return en;
+  };
+
+  const hasColors = variants.colors.length > 0;
+  const hasSizes = variants.sizes.length > 0;
+
+  if (!hasColors && !hasSizes) return null;
+
+  return (
+    <div className="flex flex-wrap gap-3 mt-2 items-center">
+      {/* Color Selector */}
+      {hasColors && (
+        <div className="flex items-center gap-2">
+          <Label className="text-xs text-muted-foreground whitespace-nowrap">
+            {getLabel('Color:', 'رنگ:', 'رنګ:')}
+          </Label>
+          <Select
+            value={selectedColor || undefined}
+            onValueChange={(val) => onColorChange(val)}
+          >
+            <SelectTrigger className="h-7 w-[120px] text-xs">
+              <SelectValue placeholder={getLabel('Select', 'انتخاب', 'وټاکئ')} />
+            </SelectTrigger>
+            <SelectContent>
+              {variants.colors.map((colorValue) => {
+                const colorDef = getColorByValue(colorValue);
+                return (
+                  <SelectItem key={colorValue} value={colorValue} className="text-xs">
+                    <div className="flex items-center gap-2">
+                      {colorDef && (
+                        <span
+                          className="w-3 h-3 rounded-full border border-border flex-shrink-0"
+                          style={{
+                            background: colorDef.hex.startsWith('linear') ? colorDef.hex : colorDef.hex,
+                            backgroundColor: colorDef.hex.startsWith('linear') ? undefined : colorDef.hex,
+                          }}
+                        />
+                      )}
+                      <span>{getLocalizedColorName(colorValue, isRTL)}</span>
+                    </div>
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
+      {/* Size Selector */}
+      {hasSizes && (
+        <div className="flex items-center gap-2">
+          <Label className="text-xs text-muted-foreground whitespace-nowrap">
+            {getLabel('Size:', 'سایز:', 'اندازه:')}
+          </Label>
+          <Select
+            value={selectedSize || undefined}
+            onValueChange={(val) => onSizeChange(val)}
+          >
+            <SelectTrigger className="h-7 w-[80px] text-xs">
+              <SelectValue placeholder={getLabel('Select', 'انتخاب', 'وټاکئ')} />
+            </SelectTrigger>
+            <SelectContent>
+              {variants.sizes.map((size) => (
+                <SelectItem key={size} value={size} className="text-xs">
+                  {size}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Delivery option selector at bottom with date
+export const CartItemDeliverySelector = ({
+  selectedDeliveryOptionId,
+  onDeliveryOptionChange,
+  variants,
+}: {
+  selectedDeliveryOptionId: string | null;
+  onDeliveryOptionChange: (optionId: string | null) => void;
+  variants: ProductVariants;
+}) => {
+  const { language, isRTL } = useLanguage();
 
   const getLabel = (en: string, fa: string, ps: string) => {
     if (language === 'ps') return ps;
@@ -56,6 +152,86 @@ const CartItemVariantSelector = ({
     if (language === 'fa' && option.label_fa) return option.label_fa;
     return option.label_en;
   };
+
+  const hasDeliveryOptions = variants.deliveryOptions.length > 0;
+  if (!hasDeliveryOptions) return null;
+
+  const selectedOption = variants.deliveryOptions.find(o => o.id === selectedDeliveryOptionId);
+  const afnSymbol = isRTL ? '؋' : 'AFN ';
+
+  // Calculate estimated delivery date
+  const getEstimatedDate = (hours: number) => {
+    const estimatedDate = addHours(new Date(), hours);
+    return format(estimatedDate, 'MMM d, yyyy');
+  };
+
+  return (
+    <div className="mt-3 pt-3 border-t border-border">
+      <div className="flex items-center gap-2 mb-2">
+        <Truck className="h-4 w-4 text-primary" />
+        <span className="text-xs font-medium text-foreground">
+          {getLabel('Delivery Options', 'گزینه‌های ارسال', 'د لیږد اختیارونه')}
+        </span>
+      </div>
+      
+      <Select
+        value={selectedDeliveryOptionId || undefined}
+        onValueChange={(val) => onDeliveryOptionChange(val)}
+      >
+        <SelectTrigger className="h-9 w-full text-xs">
+          <SelectValue placeholder={getLabel('Select delivery option', 'انتخاب روش ارسال', 'د لیږد اختیار غوره کړئ')} />
+        </SelectTrigger>
+        <SelectContent>
+          {variants.deliveryOptions.map((option) => (
+            <SelectItem key={option.id} value={option.id} className="text-xs py-2">
+              <div className="flex flex-col gap-0.5">
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">{getDeliveryLabel(option)}</span>
+                  <span className="text-primary font-semibold">
+                    {option.price_afn === 0 
+                      ? getLabel('Free', 'رایگان', 'وړیا') 
+                      : `${option.price_afn.toLocaleString()} ${afnSymbol}`
+                    }
+                  </span>
+                </div>
+                <div className="flex items-center gap-1 text-muted-foreground">
+                  <Calendar className="h-3 w-3" />
+                  <span>{getLabel('Est.', 'تخمینی:', 'اټکل:')} {getEstimatedDate(option.delivery_hours)}</span>
+                </div>
+              </div>
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      {/* Show selected delivery info */}
+      {selectedOption && (
+        <div className="mt-2 flex items-center gap-2 text-xs bg-muted/50 rounded-md px-2 py-1.5">
+          <Calendar className="h-3.5 w-3.5 text-primary" />
+          <span className="text-muted-foreground">
+            {getLabel('Estimated delivery:', 'تحویل تخمینی:', 'اټکل شوی لیږد:')}
+          </span>
+          <span className="font-medium text-foreground">
+            {getEstimatedDate(selectedOption.delivery_hours)}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Main wrapper component that fetches variants
+const CartItemVariantSelector = ({
+  productId,
+  selectedColor,
+  selectedSize,
+  selectedDeliveryOptionId,
+  onColorChange,
+  onSizeChange,
+  onDeliveryOptionChange,
+}: CartItemVariantSelectorProps) => {
+  const [variants, setVariants] = useState<ProductVariants>({ colors: [], sizes: [], deliveryOptions: [] });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchVariants = async () => {
@@ -127,105 +303,24 @@ const CartItemVariantSelector = ({
     return null;
   }
 
-  const selectedDeliveryOption = variants.deliveryOptions.find(o => o.id === selectedDeliveryOptionId);
-  const afnSymbol = isRTL ? '؋' : 'AFN ';
-
   return (
-    <div className="flex flex-wrap gap-3 mt-2 items-center">
-      {/* Color Selector */}
-      {hasColors && (
-        <div className="flex items-center gap-2">
-          <Label className="text-xs text-muted-foreground whitespace-nowrap">
-            {getLabel('Color:', 'رنگ:', 'رنګ:')}
-          </Label>
-          <Select
-            value={selectedColor || undefined}
-            onValueChange={(val) => onColorChange(val)}
-          >
-            <SelectTrigger className="h-7 w-[120px] text-xs">
-              <SelectValue placeholder={getLabel('Select', 'انتخاب', 'وټاکئ')} />
-            </SelectTrigger>
-            <SelectContent>
-              {variants.colors.map((colorValue) => {
-                const colorDef = getColorByValue(colorValue);
-                return (
-                  <SelectItem key={colorValue} value={colorValue} className="text-xs">
-                    <div className="flex items-center gap-2">
-                      {colorDef && (
-                        <span
-                          className="w-3 h-3 rounded-full border border-border flex-shrink-0"
-                          style={{
-                            background: colorDef.hex.startsWith('linear') ? colorDef.hex : colorDef.hex,
-                            backgroundColor: colorDef.hex.startsWith('linear') ? undefined : colorDef.hex,
-                          }}
-                        />
-                      )}
-                      <span>{getLocalizedColorName(colorValue, isRTL)}</span>
-                    </div>
-                  </SelectItem>
-                );
-              })}
-            </SelectContent>
-          </Select>
-        </div>
-      )}
-
-      {/* Size Selector */}
-      {hasSizes && (
-        <div className="flex items-center gap-2">
-          <Label className="text-xs text-muted-foreground whitespace-nowrap">
-            {getLabel('Size:', 'سایز:', 'اندازه:')}
-          </Label>
-          <Select
-            value={selectedSize || undefined}
-            onValueChange={(val) => onSizeChange(val)}
-          >
-            <SelectTrigger className="h-7 w-[80px] text-xs">
-              <SelectValue placeholder={getLabel('Select', 'انتخاب', 'وټاکئ')} />
-            </SelectTrigger>
-            <SelectContent>
-              {variants.sizes.map((size) => (
-                <SelectItem key={size} value={size} className="text-xs">
-                  {size}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      )}
-
-      {/* Delivery Option Selector */}
-      {hasDeliveryOptions && (
-        <div className="flex items-center gap-2">
-          <Truck className="h-3.5 w-3.5 text-muted-foreground" />
-          <Label className="text-xs text-muted-foreground whitespace-nowrap">
-            {getLabel('Delivery:', 'ارسال:', 'لیږد:')}
-          </Label>
-          <Select
-            value={selectedDeliveryOptionId || undefined}
-            onValueChange={(val) => onDeliveryOptionChange(val)}
-          >
-            <SelectTrigger className="h-7 w-[160px] text-xs">
-              <SelectValue placeholder={getLabel('Select', 'انتخاب', 'وټاکئ')} />
-            </SelectTrigger>
-            <SelectContent>
-              {variants.deliveryOptions.map((option) => (
-                <SelectItem key={option.id} value={option.id} className="text-xs">
-                  <div className="flex items-center gap-1.5">
-                    <span>{getDeliveryLabel(option)}</span>
-                    <span className="text-muted-foreground">
-                      {option.price_afn === 0 
-                        ? `(${getLabel('Free', 'رایگان', 'وړیا')})` 
-                        : `(${option.price_afn} ${afnSymbol})`
-                      }
-                    </span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      )}
+    <div className="flex flex-col">
+      {/* Color & Size inline */}
+      <CartItemVariantInline
+        productId={productId}
+        selectedColor={selectedColor}
+        selectedSize={selectedSize}
+        onColorChange={onColorChange}
+        onSizeChange={onSizeChange}
+        variants={variants}
+      />
+      
+      {/* Delivery at bottom */}
+      <CartItemDeliverySelector
+        selectedDeliveryOptionId={selectedDeliveryOptionId}
+        onDeliveryOptionChange={onDeliveryOptionChange}
+        variants={variants}
+      />
     </div>
   );
 };
