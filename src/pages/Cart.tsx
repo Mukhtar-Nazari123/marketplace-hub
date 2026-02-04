@@ -12,8 +12,10 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { ShoppingCart, Trash2, Plus, Minus, ChevronLeft, ChevronRight, ShoppingBag, Eye } from 'lucide-react';
-import { useEffect, useMemo } from 'react';
+import { ShoppingCart, Trash2, Plus, Minus, ChevronLeft, ChevronRight, ShoppingBag, Eye, Truck, Calendar } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { addHours, format } from 'date-fns';
 import CartRecommendations from '@/components/cart/CartRecommendations';
 import CartItemVariantSelector from '@/components/cart/CartItemVariantSelector';
 
@@ -33,12 +35,23 @@ interface CartItemProduct {
   } | null;
 }
 
+interface DeliveryOptionData {
+  id: string;
+  label_en: string;
+  label_fa: string | null;
+  label_ps: string | null;
+  price_afn: number;
+  delivery_hours: number;
+  product_id: string;
+}
+
 const Cart = () => {
   const { t, isRTL, language } = useLanguage();
   const { items, loading, removeFromCart, updateQuantity, updateVariants, updateDeliveryOption, clearCart } = useCart();
   const { user, role, loading: authLoading } = useAuth();
   const { convertToUSD, rate } = useCurrencyRate();
   const navigate = useNavigate();
+  const [deliveryOptionsMap, setDeliveryOptionsMap] = useState<Record<string, DeliveryOptionData>>({});
 
   // Trilingual label helper
   const getLabel = (en: string, fa: string, ps: string) => {
@@ -46,6 +59,36 @@ const Cart = () => {
     if (language === 'fa') return fa;
     return en;
   };
+
+  const getDeliveryLabel = (option: DeliveryOptionData) => {
+    if (language === 'ps' && option.label_ps) return option.label_ps;
+    if (language === 'fa' && option.label_fa) return option.label_fa;
+    return option.label_en;
+  };
+
+  // Fetch delivery options for selected items
+  useEffect(() => {
+    const fetchDeliveryOptions = async () => {
+      const optionIds = items
+        .map(item => item.selected_delivery_option_id)
+        .filter(Boolean) as string[];
+      
+      if (optionIds.length === 0) return;
+
+      const { data } = await supabase
+        .from('delivery_options')
+        .select('id, label_en, label_fa, label_ps, price_afn, delivery_hours, product_id')
+        .in('id', optionIds);
+
+      if (data) {
+        const map: Record<string, DeliveryOptionData> = {};
+        data.forEach(opt => { map[opt.id] = opt; });
+        setDeliveryOptionsMap(map);
+      }
+    };
+
+    fetchDeliveryOptions();
+  }, [items]);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -127,16 +170,44 @@ const Cart = () => {
     };
   });
 
-  // Calculate total delivery fees across all sellers (always in AFN)
-  const totalDeliveryFeeAFN = (() => {
-    const sellerDeliveryFees = new Map<string, number>();
-    itemsWithDetails.forEach(item => {
-      if (!sellerDeliveryFees.has(item.sellerId)) {
-        sellerDeliveryFees.set(item.sellerId, item.deliveryFee);
+  // Calculate total delivery fees from selected delivery options (always in AFN)
+  const selectedDeliveryDetails = useMemo(() => {
+    const details: Array<{
+      productId: string;
+      productName: string;
+      option: DeliveryOptionData;
+    }> = [];
+    
+    items.forEach(item => {
+      if (item.selected_delivery_option_id && deliveryOptionsMap[item.selected_delivery_option_id]) {
+        details.push({
+          productId: item.product_id,
+          productName: item.product?.name || 'Product',
+          option: deliveryOptionsMap[item.selected_delivery_option_id],
+        });
       }
     });
-    return Array.from(sellerDeliveryFees.values()).reduce((sum, fee) => sum + fee, 0);
-  })();
+    
+    return details;
+  }, [items, deliveryOptionsMap]);
+
+  const totalDeliveryFeeAFN = useMemo(() => {
+    return selectedDeliveryDetails.reduce((sum, d) => sum + d.option.price_afn, 0);
+  }, [selectedDeliveryDetails]);
+
+  // Helper to format hours
+  const formatHours = (hours: number) => {
+    if (hours < 24) return `${hours}h`;
+    const days = Math.floor(hours / 24);
+    const remainingHours = hours % 24;
+    if (remainingHours === 0) return `${days}d`;
+    return `${days}d ${remainingHours}h`;
+  };
+
+  // Helper to get delivery end date
+  const getDeliveryEndDate = (hours: number) => {
+    return format(addHours(new Date(), hours), 'MMM d, yyyy');
+  };
 
   const texts = {
     title: getLabel('Shopping Cart', 'سبد خرید', 'د پېرود کارټ'),
@@ -400,24 +471,61 @@ const Cart = () => {
                     </div>
                   ))}
                   
-                  {/* Delivery fees - always in AFN */}
-                  <div className="space-y-2 pt-2 border-t">
+                  {/* Delivery Options - with dates and details */}
+                  <div className="space-y-3 pt-2 border-t">
                     <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="bg-primary/10">AFN</Badge>
-                      <span className="text-xs text-muted-foreground">
-                        {texts.shipping}
+                      <Truck className="h-4 w-4 text-primary" />
+                      <span className="text-sm font-medium">
+                        {getLabel('Delivery', 'ارسال', 'لیږد')}
                       </span>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">{texts.shipping}</span>
-                      <span className="font-medium">
-                        {totalDeliveryFeeAFN === 0 ? (
-                          <Badge variant="outline" className="text-success">{getLabel('Free', 'رایگان', 'وړیا')}</Badge>
-                        ) : (
-                          `${totalDeliveryFeeAFN.toLocaleString()} ${afnSymbol}`
-                        )}
-                      </span>
-                    </div>
+                    
+                    {selectedDeliveryDetails.length > 0 ? (
+                      <div className="space-y-2">
+                        {selectedDeliveryDetails.map((detail) => (
+                          <div key={detail.productId} className="bg-muted/50 rounded-md p-2.5 space-y-1.5">
+                            <div className="flex justify-between items-start gap-2">
+                              <span className="text-xs text-muted-foreground line-clamp-1 flex-1">
+                                {detail.productName}
+                              </span>
+                              <span className="text-xs font-medium text-primary whitespace-nowrap">
+                                {detail.option.price_afn === 0 
+                                  ? getLabel('Free', 'رایگان', 'وړیا')
+                                  : `${detail.option.price_afn.toLocaleString()} ${afnSymbol}`
+                                }
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-xs">
+                              <span className="font-medium">{getDeliveryLabel(detail.option)}</span>
+                              <span className="text-muted-foreground">•</span>
+                              <span className="text-muted-foreground">{formatHours(detail.option.delivery_hours)}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                              <Calendar className="h-3 w-3" />
+                              <span>{format(new Date(), 'MMM d')}</span>
+                              <span>→</span>
+                              <span className="font-medium text-foreground">{getDeliveryEndDate(detail.option.delivery_hours)}</span>
+                            </div>
+                          </div>
+                        ))}
+                        
+                        {/* Total delivery fee */}
+                        <div className="flex justify-between text-sm pt-1">
+                          <span className="text-muted-foreground">{getLabel('Total Delivery', 'مجموع ارسال', 'ټول لیږد')}</span>
+                          <span className="font-medium">
+                            {totalDeliveryFeeAFN === 0 ? (
+                              <Badge variant="outline" className="text-success">{getLabel('Free', 'رایگان', 'وړیا')}</Badge>
+                            ) : (
+                              `${totalDeliveryFeeAFN.toLocaleString()} ${afnSymbol}`
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-xs text-muted-foreground italic">
+                        {getLabel('Select delivery options for each item', 'گزینه‌های ارسال را برای هر محصول انتخاب کنید', 'د هر توکي لپاره د لیږد اختیارونه غوره کړئ')}
+                      </p>
+                    )}
                   </div>
                   
                   <Separator />
