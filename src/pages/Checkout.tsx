@@ -717,31 +717,31 @@ const Checkout = () => {
                             <div className="space-y-3">
                               {seller.products.map((product, idx) => {
                                 const colorDef = product.selectedColor ? getColorByValue(product.selectedColor) : null;
+                                const colorName = colorDef ? (isRTL ? colorDef.nameFa : colorDef.name) : '';
                                 return (
                                   <div key={idx} className="flex items-center justify-between text-sm gap-2">
-                                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                                      <span className="text-muted-foreground truncate">
-                                        {product.name} × {product.quantity}
+                                    <div className="flex items-center gap-1.5 flex-1 min-w-0 flex-wrap">
+                                      <span className="text-muted-foreground">
+                                        {product.name} × {product.quantity} {getLabel('pcs', 'عدد', 'ټوټه')}
                                       </span>
-                                      {/* Color and Size indicators */}
-                                      {(colorDef || product.selectedSize) && (
-                                        <div className="flex items-center gap-1.5 flex-shrink-0">
-                                          {colorDef && (
-                                            <span
-                                              className="w-4 h-4 rounded-full border border-border flex-shrink-0"
-                                              style={{
-                                                background: colorDef.hex.startsWith('linear') ? colorDef.hex : colorDef.hex,
-                                                backgroundColor: colorDef.hex.startsWith('linear') ? undefined : colorDef.hex,
-                                              }}
-                                              title={isRTL ? colorDef.nameFa : colorDef.name}
-                                            />
-                                          )}
-                                          {product.selectedSize && (
-                                            <span className="w-6 h-6 rounded-full border border-border bg-muted flex items-center justify-center text-[10px] font-medium flex-shrink-0">
-                                              {product.selectedSize}
-                                            </span>
-                                          )}
-                                        </div>
+                                      {/* Color indicator */}
+                                      {colorDef && (
+                                        <span className="inline-flex items-center gap-1 text-muted-foreground">
+                                          <span className="lowercase">{colorName}</span>
+                                          <span
+                                            className="w-4 h-4 rounded-full border border-border flex-shrink-0"
+                                            style={{
+                                              background: colorDef.hex.startsWith('linear') ? colorDef.hex : colorDef.hex,
+                                              backgroundColor: colorDef.hex.startsWith('linear') ? undefined : colorDef.hex,
+                                            }}
+                                          />
+                                        </span>
+                                      )}
+                                      {/* Size indicator */}
+                                      {product.selectedSize && (
+                                        <span className="text-muted-foreground">
+                                          {getLabel('size', 'سایز', 'اندازه')}({product.selectedSize})
+                                        </span>
                                       )}
                                     </div>
                                     <span className="flex-shrink-0">{product.price.toLocaleString()} {currencyData.symbol}</span>
