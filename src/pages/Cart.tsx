@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { ShoppingCart, Trash2, Plus, Minus, ChevronLeft, ChevronRight, ShoppingBag, Eye } from 'lucide-react';
 import { useEffect, useMemo } from 'react';
 import CartRecommendations from '@/components/cart/CartRecommendations';
+import CartItemVariantSelector from '@/components/cart/CartItemVariantSelector';
 
 interface CartItemProduct {
   id: string;
@@ -26,11 +27,15 @@ interface CartItemProduct {
   slug?: string;
   seller_id?: string;
   delivery_fee?: number;
+  metadata?: {
+    stockPerSize?: Record<string, number>;
+    [key: string]: unknown;
+  } | null;
 }
 
 const Cart = () => {
   const { t, isRTL, language } = useLanguage();
-  const { items, loading, removeFromCart, updateQuantity, clearCart } = useCart();
+  const { items, loading, removeFromCart, updateQuantity, updateVariants, clearCart } = useCart();
   const { user, role, loading: authLoading } = useAuth();
   const { convertToUSD, rate } = useCurrencyRate();
   const navigate = useNavigate();
@@ -272,6 +277,15 @@ const Cart = () => {
                               </Button>
                             </div>
                           </div>
+
+                          {/* Variant Selectors (Color/Size) */}
+                          <CartItemVariantSelector
+                            productId={item.product_id}
+                            selectedColor={item.selected_color}
+                            selectedSize={item.selected_size}
+                            onColorChange={(color) => updateVariants(item.product_id, color, item.selected_size)}
+                            onSizeChange={(size) => updateVariants(item.product_id, item.selected_color, size)}
+                          />
 
                           {/* Price */}
                           <div className="flex flex-col gap-0.5 mt-1">

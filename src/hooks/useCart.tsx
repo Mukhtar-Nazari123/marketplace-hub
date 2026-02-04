@@ -8,6 +8,8 @@ interface CartItem {
   id: string;
   product_id: string;
   quantity: number;
+  selected_color: string | null;
+  selected_size: string | null;
   product?: {
     id: string;
     name: string;
@@ -20,6 +22,7 @@ interface CartItem {
     delivery_fee?: number;
     metadata?: {
       videoUrl?: string;
+      stockPerSize?: Record<string, number>;
       [key: string]: unknown;
     } | null;
   };
@@ -32,6 +35,7 @@ interface CartContextType {
   addToCart: (productId: string, quantity?: number) => Promise<boolean>;
   removeFromCart: (productId: string) => Promise<void>;
   updateQuantity: (productId: string, quantity: number) => Promise<void>;
+  updateVariants: (productId: string, color: string | null, size: string | null) => Promise<void>;
   clearCart: () => Promise<void>;
   isInCart: (productId: string) => boolean;
 }
@@ -60,6 +64,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           id,
           product_id,
           quantity,
+          selected_color,
+          selected_size,
           products:products_with_translations (
             id,
             name,
@@ -79,6 +85,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       
       setItems((data || []).map(item => ({
         ...item,
+        selected_color: item.selected_color || null,
+        selected_size: item.selected_size || null,
         product: item.products as CartItem['product']
       })));
     } catch (error) {
@@ -191,6 +199,28 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const updateVariants = async (productId: string, color: string | null, size: string | null) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('cart')
+        .update({ selected_color: color, selected_size: size })
+        .eq('user_id', user.id)
+        .eq('product_id', productId);
+
+      if (error) throw error;
+
+      setItems(prev => prev.map(item =>
+        item.product_id === productId 
+          ? { ...item, selected_color: color, selected_size: size } 
+          : item
+      ));
+    } catch (error) {
+      console.error('Error updating variants:', error);
+    }
+  };
+
   const clearCart = async () => {
     if (!user) return;
 
@@ -221,6 +251,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       addToCart,
       removeFromCart,
       updateQuantity,
+      updateVariants,
       clearCart,
       isInCart,
     }}>
