@@ -274,6 +274,12 @@ const TranslationEditDialog = ({
     meta_description: '',
   });
 
+  const t = (section: keyof typeof sellerTranslations, key: string) => {
+    const sectionData = sellerTranslations[section] as Record<string, Record<string, string>>;
+    if (!sectionData || !sectionData[key]) return key;
+    return sectionData[key][language] || sectionData[key].en || key;
+  };
+
   const handleDelete = () => {
     deleteTranslation({
       productId,
@@ -294,12 +300,6 @@ const TranslationEditDialog = ({
         console.error(error);
       },
     });
-  };
-
-  const t = (section: keyof typeof sellerTranslations, key: string) => {
-    const sectionData = sellerTranslations[section] as Record<string, Record<string, string>>;
-    if (!sectionData || !sectionData[key]) return key;
-    return sectionData[key][language] || sectionData[key].en || key;
   };
 
   // Load translation data when tab changes
