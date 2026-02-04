@@ -489,6 +489,24 @@ const ProductDetail = () => {
               selectedColor={selectedColor}
               onColorSelect={handleColorSelect}
             />
+            
+            {/* Size Stock (if available) - placed under colors */}
+            {Object.keys(stockPerSize).length > 0 && (
+              <div className="space-y-2">
+                <h4 className="font-medium">{isRTL ? 'موجودی سایزها' : 'Size Availability'}</h4>
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(stockPerSize).map(([size, stock]) => (
+                    <Badge
+                      key={size}
+                      variant={Number(stock) > 0 ? 'outline' : 'secondary'}
+                      className={Number(stock) > 0 ? 'border-primary' : 'opacity-50'}
+                    >
+                      {size}: {stock}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Product Info */}
@@ -552,21 +570,6 @@ const ProductDetail = () => {
               })()}
             </div>
 
-            {/* Delivery Fee - Always in AFN */}
-            <div className="flex items-center gap-2 p-3 bg-primary/5 rounded-lg border border-primary/20">
-              <Truck className="text-primary" size={20} />
-              <div>
-                <span className="text-sm text-muted-foreground">
-                  {isRTL ? 'هزینه ارسال:' : 'Delivery Fee:'}
-                </span>
-                <span className="font-semibold text-foreground ml-2">
-                  {(product.delivery_fee || 0) === 0 
-                    ? (isRTL ? 'رایگان' : 'Free')
-                    : `${(product.delivery_fee || 0).toLocaleString()} ${isRTL ? '؋' : 'AFN'}`
-                  }
-                </span>
-              </div>
-            </div>
 
             {/* Availability */}
             <div className="flex items-center gap-4 flex-wrap">
@@ -601,23 +604,6 @@ const ProductDetail = () => {
               )}
             </div>
 
-            {/* Size Stock (if available) */}
-            {Object.keys(stockPerSize).length > 0 && (
-              <div className="space-y-2">
-                <h4 className="font-medium">{isRTL ? 'موجودی سایزها' : 'Size Availability'}</h4>
-                <div className="flex flex-wrap gap-2">
-                  {Object.entries(stockPerSize).map(([size, stock]) => (
-                    <Badge
-                      key={size}
-                      variant={Number(stock) > 0 ? 'outline' : 'secondary'}
-                      className={Number(stock) > 0 ? 'border-primary' : 'opacity-50'}
-                    >
-                      {size}: {stock}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            )}
 
             {/* Category & Brand */}
             <div className="flex flex-wrap gap-4 text-sm">
