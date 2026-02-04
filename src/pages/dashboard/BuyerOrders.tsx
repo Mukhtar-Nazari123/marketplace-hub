@@ -1027,7 +1027,10 @@ const BuyerOrders = () => {
                               {sellerOrder && getStatusBadge(sellerOrder.status)}
                             </div>
                             <div className="space-y-2 md:pl-6">
-                              {group.items.map((item) => (
+                              {group.items.map((item) => {
+                                const colorDef = item.selected_color ? getColorByValue(item.selected_color) : null;
+                                const colorName = colorDef ? (isRTL ? colorDef.nameFa : colorDef.name) : '';
+                                return (
                                 <div key={item.id} className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 bg-muted/50 rounded-lg">
                                   {/* Product Image */}
                                   <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -1045,9 +1048,35 @@ const BuyerOrders = () => {
                                       )}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                      <p className="font-medium truncate text-sm">{getItemDisplayName(item)}</p>
+                                      <div className="flex items-center gap-1.5 flex-wrap">
+                                        <span className="font-medium truncate text-sm">{getItemDisplayName(item)}</span>
+                                        <span className="text-xs text-muted-foreground">
+                                          {item.quantity} {getLabel('pcs', 'عدد', 'ټوټه')}
+                                        </span>
+                                        {/* Color indicator */}
+                                        {colorDef && (
+                                          <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                                            <span>•</span>
+                                            <span className="lowercase">{colorName}</span>
+                                            <span
+                                              className="w-3.5 h-3.5 rounded-full border border-border flex-shrink-0"
+                                              style={{
+                                                background: colorDef.hex.startsWith('linear') ? colorDef.hex : colorDef.hex,
+                                                backgroundColor: colorDef.hex.startsWith('linear') ? undefined : colorDef.hex,
+                                              }}
+                                            />
+                                          </span>
+                                        )}
+                                        {/* Size indicator */}
+                                        {item.selected_size && (
+                                          <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                                            <span>•</span>
+                                            {getLabel('size', 'سایز', 'اندازه')}({item.selected_size})
+                                          </span>
+                                        )}
+                                      </div>
                                       <p className="text-xs text-muted-foreground">
-                                        {item.quantity} × {formatCurrency(item.unit_price, item.product_currency || 'AFN', isRTL)}
+                                        {formatCurrency(item.unit_price, item.product_currency || 'AFN', isRTL)}
                                       </p>
                                     </div>
                                   </div>
@@ -1090,7 +1119,8 @@ const BuyerOrders = () => {
                                     </div>
                                   </div>
                                 </div>
-                              ))}
+                                );
+                              })}
                             </div>
                           </div>
                         );
