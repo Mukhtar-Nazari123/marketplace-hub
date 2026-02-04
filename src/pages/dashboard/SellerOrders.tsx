@@ -262,12 +262,45 @@ const SellerOrders = () => {
             console.error('Error fetching order items:', itemsError);
           }
 
-          // Map items to include product_sku
-          const itemsWithSku = (items || []).map((item: any) => ({
-            ...item,
-            product_sku: item.products?.sku || null,
-            product_currency: order.currency,
-          }));
+          // Get product IDs that don't have delivery_label (legacy orders)
+          const legacyProductIds = (items || [])
+            .filter((item: any) => !item.delivery_label && item.product_id)
+            .map((item: any) => item.product_id);
+
+          // Fetch default delivery options for legacy products
+          let deliveryOptionsMap: Record<string, any> = {};
+          if (legacyProductIds.length > 0) {
+            const { data: deliveryOptions } = await supabase
+              .from('delivery_options')
+              .select('product_id, label_en, label_fa, label_ps, price_afn, delivery_hours')
+              .in('product_id', legacyProductIds)
+              .eq('is_default', true)
+              .eq('is_active', true);
+
+            if (deliveryOptions) {
+              deliveryOptionsMap = deliveryOptions.reduce((acc: any, opt: any) => {
+                acc[opt.product_id] = opt;
+                return acc;
+              }, {});
+            }
+          }
+
+          // Map items to include product_sku and fallback delivery info
+          const itemsWithSku = (items || []).map((item: any) => {
+            const legacyDelivery = item.product_id ? deliveryOptionsMap[item.product_id] : null;
+            const deliveryLabel = item.delivery_label || (legacyDelivery ? 
+              (lang === 'ps' ? legacyDelivery.label_ps : lang === 'fa' ? legacyDelivery.label_fa : legacyDelivery.label_en) || legacyDelivery.label_en
+              : null);
+            
+            return {
+              ...item,
+              product_sku: item.products?.sku || null,
+              product_currency: order.currency,
+              delivery_label: deliveryLabel,
+              delivery_price_afn: item.delivery_price_afn || (legacyDelivery?.price_afn ?? null),
+              delivery_hours: item.delivery_hours || (legacyDelivery?.delivery_hours ?? null),
+            };
+          });
 
           return {
             ...order,
