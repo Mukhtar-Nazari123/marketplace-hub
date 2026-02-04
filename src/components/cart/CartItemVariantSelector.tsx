@@ -159,10 +159,25 @@ export const CartItemDeliverySelector = ({
   const selectedOption = variants.deliveryOptions.find(o => o.id === selectedDeliveryOptionId);
   const afnSymbol = isRTL ? '؋' : 'AFN ';
 
-  // Calculate estimated delivery date
-  const getEstimatedDate = (hours: number) => {
-    const estimatedDate = addHours(new Date(), hours);
-    return format(estimatedDate, 'MMM d, yyyy');
+  // Calculate dates
+  const now = new Date();
+  const startDate = format(now, 'MMM d');
+  
+  const getEndDate = (hours: number) => {
+    const endDate = addHours(now, hours);
+    return format(endDate, 'MMM d, yyyy');
+  };
+
+  const formatHours = (hours: number) => {
+    if (hours < 24) {
+      return `${hours}h`;
+    }
+    const days = Math.floor(hours / 24);
+    const remainingHours = hours % 24;
+    if (remainingHours === 0) {
+      return `${days}d`;
+    }
+    return `${days}d ${remainingHours}h`;
   };
 
   return (
@@ -178,13 +193,13 @@ export const CartItemDeliverySelector = ({
         value={selectedDeliveryOptionId || undefined}
         onValueChange={(val) => onDeliveryOptionChange(val)}
       >
-        <SelectTrigger className="h-9 w-full text-xs">
+        <SelectTrigger className="h-auto min-h-9 w-full text-xs py-2">
           <SelectValue placeholder={getLabel('Select delivery option', 'انتخاب روش ارسال', 'د لیږد اختیار غوره کړئ')} />
         </SelectTrigger>
         <SelectContent>
           {variants.deliveryOptions.map((option) => (
-            <SelectItem key={option.id} value={option.id} className="text-xs py-2">
-              <div className="flex flex-col gap-0.5">
+            <SelectItem key={option.id} value={option.id} className="text-xs py-2.5">
+              <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-2">
                   <span className="font-medium">{getDeliveryLabel(option)}</span>
                   <span className="text-primary font-semibold">
@@ -193,10 +208,13 @@ export const CartItemDeliverySelector = ({
                       : `${option.price_afn.toLocaleString()} ${afnSymbol}`
                     }
                   </span>
+                  <span className="text-muted-foreground">({formatHours(option.delivery_hours)})</span>
                 </div>
-                <div className="flex items-center gap-1 text-muted-foreground">
+                <div className="flex items-center gap-1.5 text-muted-foreground">
                   <Calendar className="h-3 w-3" />
-                  <span>{getLabel('Est.', 'تخمینی:', 'اټکل:')} {getEstimatedDate(option.delivery_hours)}</span>
+                  <span>{startDate}</span>
+                  <span>→</span>
+                  <span>{getEndDate(option.delivery_hours)}</span>
                 </div>
               </div>
             </SelectItem>
@@ -206,13 +224,21 @@ export const CartItemDeliverySelector = ({
 
       {/* Show selected delivery info */}
       {selectedOption && (
-        <div className="mt-2 flex items-center gap-2 text-xs bg-muted/50 rounded-md px-2 py-1.5">
-          <Calendar className="h-3.5 w-3.5 text-primary" />
-          <span className="text-muted-foreground">
-            {getLabel('Estimated delivery:', 'تحویل تخمینی:', 'اټکل شوی لیږد:')}
-          </span>
-          <span className="font-medium text-foreground">
-            {getEstimatedDate(selectedOption.delivery_hours)}
+        <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs bg-muted/50 rounded-md px-2.5 py-2">
+          <div className="flex items-center gap-1.5">
+            <Calendar className="h-3.5 w-3.5 text-primary" />
+            <span className="text-muted-foreground">{startDate}</span>
+            <span className="text-muted-foreground">→</span>
+            <span className="font-medium text-foreground">{getEndDate(selectedOption.delivery_hours)}</span>
+          </div>
+          <span className="text-muted-foreground">•</span>
+          <span className="text-muted-foreground">{formatHours(selectedOption.delivery_hours)}</span>
+          <span className="text-muted-foreground">•</span>
+          <span className="font-medium text-primary">
+            {selectedOption.price_afn === 0 
+              ? getLabel('Free', 'رایگان', 'وړیا')
+              : `${selectedOption.price_afn.toLocaleString()} ${afnSymbol}`
+            }
           </span>
         </div>
       )}
