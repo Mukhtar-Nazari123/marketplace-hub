@@ -55,6 +55,10 @@ interface OrderItem {
   seller_id: string;
   selected_color?: string | null;
   selected_size?: string | null;
+  selected_delivery_option_id?: string | null;
+  delivery_label?: string | null;
+  delivery_price_afn?: number | null;
+  delivery_hours?: number | null;
   product?: {
     sku: string | null;
   } | null;
@@ -425,6 +429,29 @@ const AdminOrderDetail = () => {
                           {getLabel(lang, 'Total:', 'جمع:', 'ټول:')} {Number(item.total_price).toLocaleString()} AFN
                         </span>
                       </div>
+                      {/* Delivery option per item */}
+                      {item.delivery_label && (
+                        <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
+                          <Truck className="w-4 h-4" />
+                          <span>{item.delivery_label}</span>
+                          <span>•</span>
+                          <span className="font-medium text-foreground">
+                            {item.delivery_price_afn === 0 
+                              ? getLabel(lang, 'Free', 'رایگان', 'وړیا')
+                              : `${Number(item.delivery_price_afn || 0).toLocaleString()} AFN`}
+                          </span>
+                          {item.delivery_hours && (
+                            <>
+                              <span>•</span>
+                              <span>
+                                {item.delivery_hours < 24 
+                                  ? `${item.delivery_hours}h`
+                                  : `${Math.floor(item.delivery_hours / 24)}d ${item.delivery_hours % 24 > 0 ? `${item.delivery_hours % 24}h` : ''}`}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                   );

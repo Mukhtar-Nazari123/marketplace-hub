@@ -116,6 +116,10 @@ interface OrderItem {
   product_currency?: string | null;
   selected_color?: string | null;
   selected_size?: string | null;
+  selected_delivery_option_id?: string | null;
+  delivery_label?: string | null;
+  delivery_price_afn?: number | null;
+  delivery_hours?: number | null;
 }
 
 interface SellerOrder {
@@ -778,12 +782,26 @@ const SellerOrders = () => {
                                 </p>
                               </div>
                               <div className="text-right space-y-1">
-                                <p className="text-xs text-muted-foreground">
-                                  {t('deliveryFee')}{' '}
-                                  <span className="font-medium text-foreground">
-                                    {formatCurrency(order.delivery_fee, 'AFN', isRTL)}
-                                  </span>
-                                </p>
+                                {/* Show delivery option per item */}
+                                {item.delivery_label && (
+                                  <p className="text-xs text-muted-foreground">
+                                    <Truck className="inline-block w-3 h-3 me-1" />
+                                    {item.delivery_label}{' '}
+                                    <span className="font-medium text-foreground">
+                                      {item.delivery_price_afn === 0 
+                                        ? getLabel(getLabel('Free', 'رایگان', 'وړیا'), getLabel('Free', 'رایگان', 'وړیا'), getLabel('Free', 'رایگان', 'وړیا'))
+                                        : formatCurrency(item.delivery_price_afn || 0, 'AFN', isRTL)}
+                                    </span>
+                                  </p>
+                                )}
+                                {!item.delivery_label && (
+                                  <p className="text-xs text-muted-foreground">
+                                    {t('deliveryFee')}{' '}
+                                    <span className="font-medium text-foreground">
+                                      {formatCurrency(order.delivery_fee, 'AFN', isRTL)}
+                                    </span>
+                                  </p>
+                                )}
                                 <p className="font-semibold">
                                   {formatCurrency(item.total_price, item.product_currency || order.currency, isRTL)}
                                 </p>
