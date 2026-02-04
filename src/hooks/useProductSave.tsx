@@ -348,6 +348,13 @@ async function saveProductAttributes(
   }
 }
 
+// Shipping type to label mapping
+const SHIPPING_TYPE_LABELS: Record<string, { en: string; fa: string; ps: string }> = {
+  standard: { en: 'Standard Shipping', fa: 'ارسال معمولی', ps: 'عادي لیږد' },
+  express: { en: 'Express Shipping', fa: 'ارسال فوری', ps: 'چټک لیږد' },
+  free: { en: 'Free Shipping', fa: 'ارسال رایگان', ps: 'وړیا لیږد' },
+};
+
 /**
  * Save delivery options to delivery_options table
  */
@@ -377,13 +384,16 @@ async function saveDeliveryOptions(
   // Upsert options
   for (let i = 0; i < options.length; i++) {
     const opt = options[i];
+    // Derive labels from shipping_type
+    const labels = SHIPPING_TYPE_LABELS[opt.shipping_type] || SHIPPING_TYPE_LABELS.standard;
+    
     const optionData = {
       product_id: productId,
       seller_id: sellerId,
       shipping_type: opt.shipping_type,
-      label_en: opt.label_en,
-      label_fa: opt.label_fa || null,
-      label_ps: opt.label_ps || null,
+      label_en: labels.en,
+      label_fa: labels.fa,
+      label_ps: labels.ps,
       price_afn: opt.price_afn,
       delivery_hours: opt.delivery_hours,
       confidence_percent: opt.confidence_percent,
