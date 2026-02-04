@@ -38,17 +38,51 @@ interface DeliveryOptionsStepProps {
 }
 
 const SHIPPING_TYPES = [
-  { value: 'standard', icon: Truck, labelEn: 'Standard', labelFa: 'معمولی', labelPs: 'عادي' },
-  { value: 'express', icon: Zap, labelEn: 'Express', labelFa: 'فوری', labelPs: 'چټک' },
-  { value: 'free', icon: Gift, labelEn: 'Free', labelFa: 'رایگان', labelPs: 'وړیا' },
+  { 
+    value: 'standard', 
+    icon: Truck, 
+    labelEn: 'Standard', 
+    labelFa: 'معمولی', 
+    labelPs: 'عادي',
+    fullLabelEn: 'Standard Shipping',
+    fullLabelFa: 'ارسال معمولی',
+    fullLabelPs: 'عادي لیږد'
+  },
+  { 
+    value: 'express', 
+    icon: Zap, 
+    labelEn: 'Express', 
+    labelFa: 'فوری', 
+    labelPs: 'چټک',
+    fullLabelEn: 'Express Shipping',
+    fullLabelFa: 'ارسال فوری',
+    fullLabelPs: 'چټک لیږد'
+  },
+  { 
+    value: 'free', 
+    icon: Gift, 
+    labelEn: 'Free', 
+    labelFa: 'رایگان', 
+    labelPs: 'وړیا',
+    fullLabelEn: 'Free Shipping',
+    fullLabelFa: 'ارسال رایگان',
+    fullLabelPs: 'وړیا لیږد'
+  },
 ];
+
+const getLabelsForType = (type: 'standard' | 'express' | 'free') => {
+  const typeInfo = SHIPPING_TYPES.find(t => t.value === type);
+  return {
+    label_en: typeInfo?.fullLabelEn || 'Standard Shipping',
+    label_fa: typeInfo?.fullLabelFa || 'ارسال معمولی',
+    label_ps: typeInfo?.fullLabelPs || 'عادي لیږد',
+  };
+};
 
 const DEFAULT_OPTIONS: DeliveryOptionInput[] = [
   {
     shipping_type: 'standard',
-    label_en: 'Standard Shipping',
-    label_fa: 'ارسال معمولی',
-    label_ps: 'عادي لیږد',
+    ...getLabelsForType('standard'),
     price_afn: 100,
     delivery_hours: 72,
     confidence_percent: 85,
@@ -57,9 +91,7 @@ const DEFAULT_OPTIONS: DeliveryOptionInput[] = [
   },
   {
     shipping_type: 'express',
-    label_en: 'Express Shipping',
-    label_fa: 'ارسال فوری',
-    label_ps: 'چټک لیږد',
+    ...getLabelsForType('express'),
     price_afn: 200,
     delivery_hours: 24,
     confidence_percent: 95,
@@ -80,9 +112,7 @@ export const DeliveryOptionsStep = ({ options, onChange }: DeliveryOptionsStepPr
   const addOption = () => {
     const newOption: DeliveryOptionInput = {
       shipping_type: 'standard',
-      label_en: 'New Shipping Option',
-      label_fa: 'گزینه ارسال جدید',
-      label_ps: 'نوی لیږد اختیار',
+      ...getLabelsForType('standard'),
       price_afn: 0,
       delivery_hours: 72,
       confidence_percent: null,
@@ -112,9 +142,14 @@ export const DeliveryOptionsStep = ({ options, onChange }: DeliveryOptionsStepPr
       });
     }
 
-    // If changing to 'free' type, set price to 0
-    if (updates.shipping_type === 'free') {
-      newOptions[index].price_afn = 0;
+    // If changing shipping type, auto-update labels and handle free price
+    if (updates.shipping_type) {
+      const labels = getLabelsForType(updates.shipping_type);
+      newOptions[index] = { ...newOptions[index], ...labels };
+      
+      if (updates.shipping_type === 'free') {
+        newOptions[index].price_afn = 0;
+      }
     }
 
     onChange(newOptions);
@@ -243,42 +278,6 @@ export const DeliveryOptionsStep = ({ options, onChange }: DeliveryOptionsStepPr
                   </button>
                 );
               })}
-            </div>
-
-            {/* Labels */}
-            <div className="grid gap-4 md:grid-cols-3">
-              <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">
-                  {getLabel('English Label', 'برچسب انگلیسی', 'انګلیسي لیبل')}
-                </Label>
-                <Input
-                  value={option.label_en}
-                  onChange={(e) => updateOption(index, { label_en: e.target.value })}
-                  placeholder="Standard Shipping"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">
-                  {getLabel('Persian Label', 'برچسب فارسی', 'فارسي لیبل')}
-                </Label>
-                <Input
-                  value={option.label_fa}
-                  onChange={(e) => updateOption(index, { label_fa: e.target.value })}
-                  placeholder="ارسال معمولی"
-                  dir="rtl"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">
-                  {getLabel('Pashto Label', 'برچسب پشتو', 'پښتو لیبل')}
-                </Label>
-                <Input
-                  value={option.label_ps}
-                  onChange={(e) => updateOption(index, { label_ps: e.target.value })}
-                  placeholder="عادي لیږد"
-                  dir="rtl"
-                />
-              </div>
             </div>
 
             {/* Price and Delivery Time */}
