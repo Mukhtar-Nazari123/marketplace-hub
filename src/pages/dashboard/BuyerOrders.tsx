@@ -649,14 +649,12 @@ const BuyerOrders = () => {
                                   )}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-1.5 flex-wrap">
-                                    <span className="font-medium text-xs">{getItemDisplayName(item)}</span>
-                                    <span className="text-[10px] text-muted-foreground">
-                                      × {item.quantity} {getLabel('pcs', 'عدد', 'ټوټه')}
-                                    </span>
+                                  <p className="font-medium text-xs">{getItemDisplayName(item)}</p>
+                                  <div className="flex items-center gap-1.5 flex-wrap text-[10px] text-muted-foreground">
+                                    <span>{item.quantity} × {formatCurrency(item.unit_price, item.product_currency || 'AFN', isRTL)}</span>
                                     {/* Color indicator */}
                                     {colorDef && (
-                                      <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
+                                      <span className="inline-flex items-center gap-1">
                                         <span>•</span>
                                         <span className="lowercase">{colorName}</span>
                                         <span
@@ -670,15 +668,12 @@ const BuyerOrders = () => {
                                     )}
                                     {/* Size indicator */}
                                     {item.selected_size && (
-                                      <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
+                                      <span className="inline-flex items-center gap-1">
                                         <span>•</span>
                                         {getLabel('size', 'سایز', 'اندازه')}({item.selected_size})
                                       </span>
                                     )}
                                   </div>
-                                  <p className="text-[10px] text-muted-foreground">
-                                    {formatCurrency(item.unit_price, item.product_currency || 'AFN', isRTL)}
-                                  </p>
                                 </div>
                                 <div className="text-right shrink-0">
                                   <p className="font-semibold text-xs">
