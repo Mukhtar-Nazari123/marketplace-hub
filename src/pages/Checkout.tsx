@@ -18,6 +18,8 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { getColorByValue } from '@/lib/productColors';
+import { addHours, format } from 'date-fns';
 import {
   Loader2,
   MapPin,
@@ -31,6 +33,7 @@ import {
   ShoppingBag,
   Banknote,
   Clock,
+  Calendar,
 } from 'lucide-react';
 
 interface AddressForm {
@@ -51,6 +54,9 @@ interface CartItemWithDetails {
   id: string;
   product_id: string;
   quantity: number;
+  selected_color: string | null;
+  selected_size: string | null;
+  selected_delivery_option_id: string | null;
   product: {
     id: string;
     name: string;
@@ -60,6 +66,16 @@ interface CartItemWithDetails {
     seller_id: string;
     delivery_fee: number;
   };
+}
+
+interface DeliveryOptionDetails {
+  id: string;
+  label_en: string;
+  label_fa: string | null;
+  label_ps: string | null;
+  price_afn: number;
+  delivery_hours: number;
+  shipping_type: string;
 }
 
 // Helper to get effective price (lower of price_afn and compare_price_afn)
@@ -77,6 +93,8 @@ interface SellerBreakdown {
     name: string;
     quantity: number;
     price: number;
+    selectedColor: string | null;
+    selectedSize: string | null;
   }[];
   productSubtotal: number;
   deliveryFee: number; // Always in AFN
@@ -93,7 +111,12 @@ interface CurrencyBreakdown {
 // Total delivery in AFN (separate from product currency)
 interface DeliveryBreakdown {
   totalDeliveryAFN: number;
-  perSeller: { sellerId: string; sellerName: string; deliveryFee: number }[];
+  perItem: {
+    productId: string;
+    productName: string;
+    sellerName: string;
+    deliveryOption: DeliveryOptionDetails | null;
+  }[];
 }
 
 const STEPS = [
@@ -131,7 +154,7 @@ const Checkout = () => {
 
   const [sellerPolicies, setSellerPolicies] = useState<SellerPolicy[]>([]);
   const [savedAddresses, setSavedAddresses] = useState<{ id: string; title: string; fullAddress: string; city: string; isDefault: boolean }[]>([]);
-
+  const [deliveryOptionsMap, setDeliveryOptionsMap] = useState<Record<string, DeliveryOptionDetails>>({});
   // Redirect checks
   useEffect(() => {
     if (!authLoading) {
@@ -198,6 +221,26 @@ const Checkout = () => {
             );
           }
         }
+
+        // Fetch delivery options for cart items
+        const deliveryOptionIds = cartItems
+          .map((item) => item.selected_delivery_option_id)
+          .filter(Boolean) as string[];
+
+        if (deliveryOptionIds.length > 0) {
+          const { data: deliveryOptions } = await supabase
+            .from('delivery_options')
+            .select('id, label_en, label_fa, label_ps, price_afn, delivery_hours, shipping_type')
+            .in('id', deliveryOptionIds);
+
+          if (deliveryOptions) {
+            const optionsMap: Record<string, DeliveryOptionDetails> = {};
+            deliveryOptions.forEach((opt) => {
+              optionsMap[opt.id] = opt;
+            });
+            setDeliveryOptionsMap(optionsMap);
+          }
+        }
       } catch (error) {
         console.error('Error loading checkout data:', error);
       } finally {
@@ -231,8 +274,8 @@ const Checkout = () => {
       itemsByCurrency['AFN'].push(item);
     });
 
-    // Track delivery fees per seller (always AFN)
-    const sellerDeliveryFees = new Map<string, { sellerId: string; sellerName: string; deliveryFee: number }>();
+    // Track delivery per item (using selected delivery options)
+    const perItem: DeliveryBreakdown['perItem'] = [];
 
     // For each currency, group by seller
     const breakdowns = Object.entries(itemsByCurrency).map(([currency, currencyItems]) => {
@@ -251,12 +294,18 @@ const Checkout = () => {
         }
         sellerGroups[sellerId].items.push(item);
 
-        // Track delivery fee per seller (only once per seller, always AFN)
-        if (!sellerDeliveryFees.has(sellerId)) {
-          const deliveryFee = item.product?.delivery_fee || 0;
-          const sellerName = sellerGroups[sellerId].policy?.sellerName || getLabel('Seller', 'فروشنده', 'پلورونکی');
-          sellerDeliveryFees.set(sellerId, { sellerId, sellerName, deliveryFee });
-        }
+        // Track delivery option per item
+        const deliveryOption = item.selected_delivery_option_id 
+          ? deliveryOptionsMap[item.selected_delivery_option_id] || null
+          : null;
+        const sellerName = sellerGroups[sellerId].policy?.sellerName || getLabel('Seller', 'فروشنده', 'پلورونکی');
+        
+        perItem.push({
+          productId: item.product_id,
+          productName: item.product?.name || 'Product',
+          sellerName,
+          deliveryOption,
+        });
       });
 
       // Calculate breakdown per seller
@@ -267,11 +316,20 @@ const Checkout = () => {
             name: item.product?.name || 'Product',
             quantity: item.quantity,
             price: effectivePrice * item.quantity,
+            selectedColor: item.selected_color || null,
+            selectedSize: item.selected_size || null,
           };
         });
 
         const productSubtotal = products.reduce((sum, p) => sum + p.price, 0);
-        const deliveryFee = group.items[0]?.product?.delivery_fee || 0;
+        
+        // Get delivery fee from selected delivery options for this seller's items
+        let deliveryFee = 0;
+        group.items.forEach((item) => {
+          if (item.selected_delivery_option_id && deliveryOptionsMap[item.selected_delivery_option_id]) {
+            deliveryFee += deliveryOptionsMap[item.selected_delivery_option_id].price_afn;
+          }
+        });
 
         return {
           sellerId,
@@ -293,15 +351,14 @@ const Checkout = () => {
       };
     });
 
-    // Calculate total delivery in AFN
-    const perSeller = Array.from(sellerDeliveryFees.values());
-    const totalDeliveryAFN = perSeller.reduce((sum, s) => sum + s.deliveryFee, 0);
+    // Calculate total delivery in AFN from selected options
+    const totalDeliveryAFN = perItem.reduce((sum, item) => sum + (item.deliveryOption?.price_afn || 0), 0);
 
     return {
       currencyBreakdowns: breakdowns,
-      deliveryBreakdown: { totalDeliveryAFN, perSeller },
+      deliveryBreakdown: { totalDeliveryAFN, perItem },
     };
-  }, [cartItems, sellerPolicies, isRTL]);
+  }, [cartItems, sellerPolicies, isRTL, deliveryOptionsMap]);
 
   const validateAddress = () => {
     return addressForm.name && addressForm.phone && addressForm.city && addressForm.fullAddress;
@@ -649,14 +706,39 @@ const Checkout = () => {
 
                             {/* Seller's Products */}
                             <div className="space-y-3">
-                              {seller.products.map((product, idx) => (
-                                <div key={idx} className="flex items-center justify-between text-sm">
-                                  <span className="text-muted-foreground">
-                                    {product.name} × {product.quantity}
-                                  </span>
-                                  <span>{product.price.toLocaleString()} {currencyData.symbol}</span>
-                                </div>
-                              ))}
+                              {seller.products.map((product, idx) => {
+                                const colorDef = product.selectedColor ? getColorByValue(product.selectedColor) : null;
+                                return (
+                                  <div key={idx} className="flex items-center justify-between text-sm gap-2">
+                                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                                      <span className="text-muted-foreground truncate">
+                                        {product.name} × {product.quantity}
+                                      </span>
+                                      {/* Color and Size indicators */}
+                                      {(colorDef || product.selectedSize) && (
+                                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                                          {colorDef && (
+                                            <span
+                                              className="w-4 h-4 rounded-full border border-border flex-shrink-0"
+                                              style={{
+                                                background: colorDef.hex.startsWith('linear') ? colorDef.hex : colorDef.hex,
+                                                backgroundColor: colorDef.hex.startsWith('linear') ? undefined : colorDef.hex,
+                                              }}
+                                              title={isRTL ? colorDef.nameFa : colorDef.name}
+                                            />
+                                          )}
+                                          {product.selectedSize && (
+                                            <span className="w-6 h-6 rounded-full border border-border bg-muted flex items-center justify-center text-[10px] font-medium flex-shrink-0">
+                                              {product.selectedSize}
+                                            </span>
+                                          )}
+                                        </div>
+                                      )}
+                                    </div>
+                                    <span className="flex-shrink-0">{product.price.toLocaleString()} {currencyData.symbol}</span>
+                                  </div>
+                                );
+                              })}
                             </div>
 
                             <Separator />
@@ -704,18 +786,54 @@ const Checkout = () => {
                     </div>
 
                     <div className="border rounded-lg p-4 space-y-3">
-                      {deliveryBreakdown.perSeller.map((seller) => (
-                        <div key={seller.sellerId} className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">{seller.sellerName}</span>
-                          <span>
-                            {seller.deliveryFee === 0 ? (
-                              <Badge variant="outline" className="text-success">{getLabel('Free', 'رایگان', 'وړیا')}</Badge>
-                            ) : (
-                              `${seller.deliveryFee.toLocaleString()} ${afnSymbol}`
+                      {deliveryBreakdown.perItem.map((item) => {
+                        const option = item.deliveryOption;
+                        const now = new Date();
+                        const startDate = format(now, 'MMM d');
+                        const endDate = option ? format(addHours(now, option.delivery_hours), 'MMM d, yyyy') : '';
+                        
+                        const formatHours = (hours: number) => {
+                          if (hours < 24) return `${hours}h`;
+                          const days = Math.floor(hours / 24);
+                          const remaining = hours % 24;
+                          return remaining === 0 ? `${days}d` : `${days}d ${remaining}h`;
+                        };
+
+                        const getDeliveryLabel = (opt: DeliveryOptionDetails) => {
+                          if (language === 'ps' && opt.label_ps) return opt.label_ps;
+                          if (language === 'fa' && opt.label_fa) return opt.label_fa;
+                          return opt.label_en;
+                        };
+
+                        return (
+                          <div key={item.productId} className="space-y-1.5">
+                            <div className="flex justify-between text-sm">
+                              <span className="text-muted-foreground">{item.sellerName}</span>
+                              <span>
+                                {!option ? (
+                                  <Badge variant="outline" className="text-muted-foreground">{getLabel('Not selected', 'انتخاب نشده', 'نه دی ټاکل شوی')}</Badge>
+                                ) : option.price_afn === 0 ? (
+                                  <Badge variant="outline" className="text-success">{getLabel('Free', 'رایگان', 'وړیا')}</Badge>
+                                ) : (
+                                  `${option.price_afn.toLocaleString()} ${afnSymbol}`
+                                )}
+                              </span>
+                            </div>
+                            {option && (
+                              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground bg-muted/50 rounded px-2 py-1.5">
+                                <span className="font-medium text-foreground">{getDeliveryLabel(option)}</span>
+                                <span className="text-muted-foreground">•</span>
+                                <span className="flex items-center gap-1">
+                                  <Calendar className="h-3 w-3" />
+                                  {startDate} → {endDate}
+                                </span>
+                                <span className="text-muted-foreground">•</span>
+                                <span>{formatHours(option.delivery_hours)}</span>
+                              </div>
                             )}
-                          </span>
-                        </div>
-                      ))}
+                          </div>
+                        );
+                      })}
                       <Separator />
                       <div className="flex justify-between font-bold">
                         <span>{getLabel('Total Delivery', 'جمع هزینه ارسال', 'د لیږد ټوله')}</span>
