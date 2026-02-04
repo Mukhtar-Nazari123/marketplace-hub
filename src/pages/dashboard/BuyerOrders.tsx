@@ -43,6 +43,10 @@ interface OrderItem {
   product_currency?: string | null;
   selected_color?: string | null;
   selected_size?: string | null;
+  selected_delivery_option_id?: string | null;
+  delivery_label?: string | null;
+  delivery_price_afn?: number | null;
+  delivery_hours?: number | null;
   // Localized product fields (fetched from products_with_translations)
   name_en?: string | null;
   name_fa?: string | null;
@@ -674,6 +678,19 @@ const BuyerOrders = () => {
                                       </span>
                                     )}
                                   </div>
+                                  {/* Delivery option per item */}
+                                  {item.delivery_label && (
+                                    <div className="flex items-center gap-1 text-[10px] text-muted-foreground mt-0.5">
+                                      <Truck className="w-3 h-3" />
+                                      <span>{item.delivery_label}</span>
+                                      <span>•</span>
+                                      <span className="font-medium text-foreground">
+                                        {item.delivery_price_afn === 0 
+                                          ? getLabel('Free', 'رایگان', 'وړیا')
+                                          : formatCurrency(item.delivery_price_afn || 0, 'AFN', isRTL)}
+                                      </span>
+                                    </div>
+                                  )}
                                 </div>
                                 <div className="text-right shrink-0">
                                   <p className="font-semibold text-xs">

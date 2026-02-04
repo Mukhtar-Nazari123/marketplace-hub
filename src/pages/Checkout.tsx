@@ -446,9 +446,21 @@ const Checkout = () => {
 
       if (orderError) throw orderError;
 
-      // Create order items with variant selections
+      // Create order items with variant and delivery selections
       const orderItems = cartItems.map((item) => {
         const effectivePrice = getEffectivePrice(item.product?.price_afn || 0, item.product?.compare_price_afn);
+        const deliveryOption = item.selected_delivery_option_id 
+          ? deliveryOptionsMap[item.selected_delivery_option_id] 
+          : null;
+        
+        // Get localized delivery label
+        const getDeliveryLabel = (opt: DeliveryOptionDetails | null) => {
+          if (!opt) return null;
+          if (language === 'ps' && opt.label_ps) return opt.label_ps;
+          if (language === 'fa' && opt.label_fa) return opt.label_fa;
+          return opt.label_en;
+        };
+        
         return {
           order_id: order.id,
           product_id: item.product_id,
@@ -460,6 +472,10 @@ const Checkout = () => {
           seller_id: item.product?.seller_id,
           selected_color: item.selected_color || null,
           selected_size: item.selected_size || null,
+          selected_delivery_option_id: item.selected_delivery_option_id || null,
+          delivery_label: getDeliveryLabel(deliveryOption),
+          delivery_price_afn: deliveryOption?.price_afn || 0,
+          delivery_hours: deliveryOption?.delivery_hours || null,
         };
       });
 

@@ -1033,6 +1033,9 @@ export type Database = {
       order_items: {
         Row: {
           created_at: string
+          delivery_hours: number | null
+          delivery_label: string | null
+          delivery_price_afn: number | null
           id: string
           order_id: string
           product_id: string | null
@@ -1040,6 +1043,7 @@ export type Database = {
           product_name: string
           quantity: number
           selected_color: string | null
+          selected_delivery_option_id: string | null
           selected_size: string | null
           seller_id: string
           total_price: number
@@ -1047,6 +1051,9 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          delivery_hours?: number | null
+          delivery_label?: string | null
+          delivery_price_afn?: number | null
           id?: string
           order_id: string
           product_id?: string | null
@@ -1054,6 +1061,7 @@ export type Database = {
           product_name: string
           quantity: number
           selected_color?: string | null
+          selected_delivery_option_id?: string | null
           selected_size?: string | null
           seller_id: string
           total_price: number
@@ -1061,6 +1069,9 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          delivery_hours?: number | null
+          delivery_label?: string | null
+          delivery_price_afn?: number | null
           id?: string
           order_id?: string
           product_id?: string | null
@@ -1068,6 +1079,7 @@ export type Database = {
           product_name?: string
           quantity?: number
           selected_color?: string | null
+          selected_delivery_option_id?: string | null
           selected_size?: string | null
           seller_id?: string
           total_price?: number
@@ -1093,6 +1105,13 @@ export type Database = {
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products_with_translations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_selected_delivery_option_id_fkey"
+            columns: ["selected_delivery_option_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_options"
             referencedColumns: ["id"]
           },
         ]
