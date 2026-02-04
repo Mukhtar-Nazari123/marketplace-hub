@@ -78,9 +78,7 @@ const TopBar = () => {
 
             {/* Right - Rotating between Free Returns and Secure Payment */}
             <div
-              className={`flex items-center gap-1 sm:gap-1.5 text-[9px] sm:text-[10px] transition-opacity duration-300 min-w-0 overflow-hidden ${
-                isRTL ? "justify-start" : "justify-end"
-              }`}
+              className="flex items-center gap-1 sm:gap-1.5 text-[9px] sm:text-[10px] transition-opacity duration-300 min-w-0 overflow-hidden justify-start"
             >
               <RightIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-black/70 flex-shrink-0" />
               <div className="flex flex-col leading-tight min-w-0 overflow-hidden">
