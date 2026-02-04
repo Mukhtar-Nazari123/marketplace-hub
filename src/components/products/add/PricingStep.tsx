@@ -4,10 +4,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ProductFormData } from '@/pages/dashboard/AddProduct';
 import { cn } from '@/lib/utils';
-import { Tag, Package, Banknote, Truck, AlertCircle, CheckCircle2, Info, Hash } from 'lucide-react';
+import { Tag, Package, Banknote, AlertCircle, CheckCircle2, Info, Hash, Truck } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { generateSKU } from '@/lib/skuGenerator';
+import { Separator } from '@/components/ui/separator';
+import { DeliveryOptionsStep, DeliveryOptionInput } from './DeliveryOptionsStep';
 
 interface PricingStepProps {
   formData: ProductFormData;
@@ -48,10 +50,11 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
     updateFormData({ quantity: numValue });
   };
 
-  const handleDeliveryFeeChange = (value: string) => {
-    const numValue = parseFloat(value) || 0;
-    updateFormData({ deliveryFee: numValue });
-  };
+  // Get default delivery fee from delivery options for backward compatibility
+  const defaultDeliveryFee = useMemo(() => {
+    const defaultOption = formData.deliveryOptions?.find(o => o.is_default);
+    return defaultOption?.price_afn || formData.deliveryFee || 0;
+  }, [formData.deliveryOptions, formData.deliveryFee]);
 
   const handleStockPerSizeChange = (size: string, value: string) => {
     const numValue = parseInt(value) || 0;
@@ -231,40 +234,13 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
         </Card>
       </div>
 
-      {/* Delivery Fee - Always AFN */}
-      <Card className="p-4 space-y-3 border-primary/20 bg-primary/5">
-        <Label htmlFor="deliveryFee" className="text-sm font-medium flex items-center gap-2">
-          <Truck className="w-4 h-4 text-primary" />
-          {isRTL ? 'هزینه ارسال' : 'Delivery Fee'} (AFN)
-          <Badge variant="secondary" className="text-xs font-normal">
-            {isRTL ? 'همیشه افغانی' : 'Always AFN'}
-          </Badge>
-        </Label>
-        <div className="relative">
-          <Input
-            id="deliveryFee"
-            type="number"
-            min="0"
-            step="1"
-            value={formData.deliveryFee || ''}
-            onChange={(e) => handleDeliveryFeeChange(e.target.value)}
-            placeholder="0"
-            className={cn("text-lg font-semibold max-w-xs bg-muted/50", isRTL ? "text-right pr-16" : "pl-16")}
-          />
-          <span className={cn(
-            "absolute top-1/2 -translate-y-1/2 text-muted-foreground font-medium text-lg",
-            isRTL ? "right-3" : "left-3"
-          )}>
-            ؋
-          </span>
-        </div>
-        <p className="text-xs text-muted-foreground flex items-start gap-2">
-          <Info className="w-4 h-4 shrink-0 mt-0.5" />
-          {isRTL 
-            ? 'هزینه ارسال برای این محصول. خریداران این هزینه را در سبد خرید خواهند دید. برای ارسال رایگان، صفر وارد کنید.' 
-            : 'Delivery fee for this product. Buyers will see this fee in their cart. Enter 0 for free delivery.'}
-        </p>
-      </Card>
+      {/* Delivery Options Section */}
+      <Separator className="my-6" />
+      
+      <DeliveryOptionsStep 
+        options={(formData.deliveryOptions || []) as DeliveryOptionInput[]}
+        onChange={(newOptions) => updateFormData({ deliveryOptions: newOptions })}
+      />
 
       {/* Stock Quantity */}
       {!isClothing ? (
@@ -403,9 +379,9 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
                 {isRTL ? 'هزینه ارسال' : 'Delivery Fee'} (AFN)
               </span>
               <span>
-                {formData.deliveryFee === 0 
+                {defaultDeliveryFee === 0 
                   ? <Badge variant="outline" className="text-success">{isRTL ? 'رایگان' : 'Free'}</Badge>
-                  : `؋ ${(formData.deliveryFee || 0).toLocaleString()}`
+                  : `؋ ${(defaultDeliveryFee || 0).toLocaleString()}`
                 }
               </span>
             </div>

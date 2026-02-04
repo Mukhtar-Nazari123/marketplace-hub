@@ -52,6 +52,7 @@ const initialFormData: ProductFormData = {
   quantity: 0,
   stockPerSize: {},
   deliveryFee: 0,
+  deliveryOptions: [],
 };
 
 const EditProduct = () => {
@@ -99,6 +100,13 @@ const EditProduct = () => {
 
       const metadata = (product.metadata as Record<string, unknown>) || {};
       
+      // Fetch delivery options for this product
+      const { data: deliveryOptionsData } = await supabase
+        .from('delivery_options')
+        .select('*')
+        .eq('product_id', id!)
+        .order('sort_order');
+      
       setFormData({
         categoryId: product.category_id || '',
         categoryName: (metadata.categoryName as string) || '',
@@ -124,6 +132,18 @@ const EditProduct = () => {
         quantity: product.quantity,
         stockPerSize: (metadata.stockPerSize as Record<string, number>) || {},
         deliveryFee: product.delivery_fee || 0,
+        deliveryOptions: (deliveryOptionsData || []).map(opt => ({
+          id: opt.id,
+          shipping_type: opt.shipping_type as 'standard' | 'express' | 'free',
+          label_en: opt.label_en,
+          label_fa: opt.label_fa || '',
+          label_ps: opt.label_ps || '',
+          price_afn: Number(opt.price_afn),
+          delivery_hours: opt.delivery_hours,
+          confidence_percent: opt.confidence_percent,
+          is_default: opt.is_default,
+          is_active: opt.is_active,
+        })),
       });
     } catch (error) {
       console.error('Error fetching product:', error);
@@ -147,7 +167,7 @@ const EditProduct = () => {
       case 3:
         return formData.images.length > 0 || formData.imageUrls.length > 0;
       case 4:
-        return formData.price > 0 && formData.deliveryFee >= 0;
+        return formData.price > 0;
       case 5:
         return true;
       default:

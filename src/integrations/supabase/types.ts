@@ -747,6 +747,75 @@ export type Database = {
         }
         Relationships: []
       }
+      delivery_options: {
+        Row: {
+          confidence_percent: number | null
+          created_at: string
+          delivery_hours: number
+          id: string
+          is_active: boolean
+          is_default: boolean
+          label_en: string
+          label_fa: string | null
+          label_ps: string | null
+          price_afn: number
+          product_id: string
+          seller_id: string
+          shipping_type: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          confidence_percent?: number | null
+          created_at?: string
+          delivery_hours?: number
+          id?: string
+          is_active?: boolean
+          is_default?: boolean
+          label_en: string
+          label_fa?: string | null
+          label_ps?: string | null
+          price_afn?: number
+          product_id: string
+          seller_id: string
+          shipping_type?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          confidence_percent?: number | null
+          created_at?: string
+          delivery_hours?: number
+          id?: string
+          is_active?: boolean
+          is_default?: boolean
+          label_en?: string
+          label_fa?: string | null
+          label_ps?: string | null
+          price_afn?: number
+          product_id?: string
+          seller_id?: string
+          shipping_type?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_options_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_options_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products_with_translations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hero_banners: {
         Row: {
           background_color: string | null
