@@ -685,12 +685,14 @@ const BuyerOrders = () => {
                                   )}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <p className="font-medium text-xs">{getItemDisplayName(item)}</p>
-                                  <div className="flex items-center gap-1.5 flex-wrap text-[10px] text-muted-foreground">
-                                    <span>{item.quantity} × {formatCurrency(item.unit_price, item.product_currency || 'AFN', isRTL)}</span>
+                                  <div className="flex items-center gap-1.5 flex-wrap">
+                                    <span className="font-medium text-xs">{getItemDisplayName(item)}</span>
+                                    <span className="text-xs text-muted-foreground">
+                                      {item.quantity} {getLabel('pcs', 'عدد', 'ټوټه')}
+                                    </span>
                                     {/* Color indicator */}
                                     {colorDef && (
-                                      <span className="inline-flex items-center gap-1">
+                                      <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
                                         <span>•</span>
                                         <span className="lowercase">{colorName}</span>
                                         <span
@@ -704,27 +706,29 @@ const BuyerOrders = () => {
                                     )}
                                     {/* Size indicator */}
                                     {item.selected_size && (
-                                      <span className="inline-flex items-center gap-1">
+                                      <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
                                         <span>•</span>
                                         {getLabel('size', 'سایز', 'اندازه')}({item.selected_size})
                                       </span>
                                     )}
                                   </div>
-                                  {/* Delivery option per item */}
+                                  <p className="text-[10px] text-muted-foreground">
+                                    {formatCurrency(item.unit_price, item.product_currency || 'AFN', isRTL)}
+                                  </p>
+                                </div>
+                                <div className="text-right space-y-1">
+                                  {/* Show delivery option per item */}
                                   {item.delivery_label && (
-                                    <div className="flex items-center gap-1 text-[10px] text-muted-foreground mt-0.5">
-                                      <Truck className="w-3 h-3" />
-                                      <span>{item.delivery_label}</span>
-                                      <span>•</span>
+                                    <p className="text-xs text-muted-foreground">
+                                      <Truck className="inline-block w-3 h-3 me-1" />
+                                      {item.delivery_label}{' '}
                                       <span className="font-medium text-foreground">
                                         {item.delivery_price_afn === 0 
                                           ? getLabel('Free', 'رایگان', 'وړیا')
                                           : formatCurrency(item.delivery_price_afn || 0, 'AFN', isRTL)}
                                       </span>
-                                    </div>
+                                    </p>
                                   )}
-                                </div>
-                                <div className="text-right shrink-0">
                                   <p className="font-semibold text-xs">
                                     {formatCurrency(item.total_price, item.product_currency || 'AFN', isRTL)}
                                   </p>
