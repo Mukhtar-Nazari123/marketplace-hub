@@ -1039,6 +1039,8 @@ export type Database = {
           product_image: string | null
           product_name: string
           quantity: number
+          selected_color: string | null
+          selected_size: string | null
           seller_id: string
           total_price: number
           unit_price: number
@@ -1051,6 +1053,8 @@ export type Database = {
           product_image?: string | null
           product_name: string
           quantity: number
+          selected_color?: string | null
+          selected_size?: string | null
           seller_id: string
           total_price: number
           unit_price: number
@@ -1063,6 +1067,8 @@ export type Database = {
           product_image?: string | null
           product_name?: string
           quantity?: number
+          selected_color?: string | null
+          selected_size?: string | null
           seller_id?: string
           total_price?: number
           unit_price?: number

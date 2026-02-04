@@ -35,6 +35,7 @@ import {
 import { toast } from 'sonner';
 import { useLanguage, formatDate, formatCurrency, Language } from '@/lib/i18n';
 import { getLocalizedProductName, LocalizableProduct } from '@/lib/localizedProduct';
+import { getColorByValue } from '@/lib/productColors';
 
 // Trilingual helper
 const getLabel = (lang: Language, en: string, fa: string, ps: string) => {
@@ -52,6 +53,8 @@ interface OrderItem {
   quantity: number;
   total_price: number;
   seller_id: string;
+  selected_color?: string | null;
+  selected_size?: string | null;
   product?: {
     sku: string | null;
   } | null;
@@ -368,7 +371,10 @@ const AdminOrderDetail = () => {
             </CardHeader>
             <CardContent className="p-0">
               <div className="divide-y divide-border">
-                {order.order_items.map((item) => (
+                {order.order_items.map((item) => {
+                  const colorDef = item.selected_color ? getColorByValue(item.selected_color) : null;
+                  const colorName = colorDef ? (isRTL ? colorDef.nameFa : colorDef.name) : '';
+                  return (
                   <div key={item.id} className="p-4 flex gap-4 hover:bg-muted/50 transition-colors">
                     <div className="w-20 h-20 rounded-lg overflow-hidden bg-muted flex-shrink-0 border border-border">
                         <img
@@ -378,7 +384,33 @@ const AdminOrderDetail = () => {
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-foreground truncate">{getItemDisplayName(item)}</h4>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="font-medium text-foreground">{getItemDisplayName(item)}</span>
+                          <span className="text-sm text-muted-foreground">
+                            × {item.quantity} {getLabel(lang, 'pcs', 'عدد', 'ټوټه')}
+                          </span>
+                          {/* Color indicator */}
+                          {colorDef && (
+                            <span className="inline-flex items-center gap-1 text-sm text-muted-foreground">
+                              <span>•</span>
+                              <span className="lowercase">{colorName}</span>
+                              <span
+                                className="w-3.5 h-3.5 rounded-full border border-border flex-shrink-0"
+                                style={{
+                                  background: colorDef.hex.startsWith('linear') ? colorDef.hex : colorDef.hex,
+                                  backgroundColor: colorDef.hex.startsWith('linear') ? undefined : colorDef.hex,
+                                }}
+                              />
+                            </span>
+                          )}
+                          {/* Size indicator */}
+                          {item.selected_size && (
+                            <span className="inline-flex items-center gap-1 text-sm text-muted-foreground">
+                              <span>•</span>
+                              {getLabel(lang, 'size', 'سایز', 'اندازه')}({item.selected_size})
+                            </span>
+                          )}
+                        </div>
                         {item.product?.sku && (
                           <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
                             <Hash className="h-3 w-3" />
@@ -389,16 +421,14 @@ const AdminOrderDetail = () => {
                         <span className="text-muted-foreground">
                           {getLabel(lang, 'Unit:', 'قیمت واحد:', 'واحد:')} {Number(item.unit_price).toLocaleString()} AFN
                         </span>
-                        <span className="text-muted-foreground">
-                          {getLabel(lang, 'Qty:', 'تعداد:', 'شمېر:')} {item.quantity}
-                        </span>
                         <span className="font-semibold text-primary">
                           {getLabel(lang, 'Total:', 'جمع:', 'ټول:')} {Number(item.total_price).toLocaleString()} AFN
                         </span>
                       </div>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
 
               {/* Order Summary */}

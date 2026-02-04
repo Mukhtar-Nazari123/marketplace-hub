@@ -446,7 +446,7 @@ const Checkout = () => {
 
       if (orderError) throw orderError;
 
-      // Create order items
+      // Create order items with variant selections
       const orderItems = cartItems.map((item) => {
         const effectivePrice = getEffectivePrice(item.product?.price_afn || 0, item.product?.compare_price_afn);
         return {
@@ -458,6 +458,8 @@ const Checkout = () => {
           unit_price: effectivePrice,
           total_price: effectivePrice * item.quantity,
           seller_id: item.product?.seller_id,
+          selected_color: item.selected_color || null,
+          selected_size: item.selected_size || null,
         };
       });
 
