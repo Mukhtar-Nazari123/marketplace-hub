@@ -20,6 +20,19 @@ import { saveProduct } from '@/hooks/useProductSave';
 
 export type CurrencyType = 'AFN' | 'USD';
 
+export interface DeliveryOptionData {
+  id?: string;
+  shipping_type: 'standard' | 'express' | 'free';
+  label_en: string;
+  label_fa: string;
+  label_ps: string;
+  price_afn: number;
+  delivery_hours: number;
+  confidence_percent: number | null;
+  is_default: boolean;
+  is_active: boolean;
+}
+
 export interface ProductFormData {
   // Category
   categoryId: string;
@@ -54,7 +67,10 @@ export interface ProductFormData {
   currency: CurrencyType;
   quantity: number;
   stockPerSize?: Record<string, number>;
-  deliveryFee: number;
+  deliveryFee: number; // Legacy - kept for backward compatibility
+  
+  // Delivery Options (saved to delivery_options table)
+  deliveryOptions: DeliveryOptionData[];
 }
 
 const initialFormData: ProductFormData = {
@@ -81,6 +97,7 @@ const initialFormData: ProductFormData = {
   quantity: 0,
   stockPerSize: {},
   deliveryFee: 0,
+  deliveryOptions: [],
 };
 
 const STEPS = [
@@ -121,7 +138,8 @@ const AddProduct = () => {
       case 3:
         return formData.images.length > 0 || formData.imageUrls.length > 0;
       case 4:
-        return formData.price > 0 && formData.deliveryFee >= 0;
+        // Price required, delivery options are optional (will use legacy deliveryFee if empty)
+        return formData.price > 0;
       case 5:
         return true;
       default:

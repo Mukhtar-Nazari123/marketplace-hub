@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { ProductFormData } from '@/pages/dashboard/AddProduct';
+import { ProductFormData, DeliveryOptionData } from '@/pages/dashboard/AddProduct';
 import { generateSKU } from '@/lib/skuGenerator';
 
 interface SaveProductOptions {
@@ -95,6 +95,9 @@ export async function saveProduct(options: SaveProductOptions): Promise<SaveProd
 
     // 4. Save attributes to product_attributes table
     await saveProductAttributes(finalProductId, formData.attributes, formData.brand, currentLanguage);
+
+    // 5. Save delivery options
+    await saveDeliveryOptions(finalProductId, userId, formData.deliveryOptions || []);
 
     return { productId: finalProductId, success: true };
   } catch (error) {
@@ -342,6 +345,65 @@ async function saveProductAttributes(
       .insert(attributesToInsert);
 
     if (error) console.error('Error inserting attributes:', error);
+  }
+}
+
+/**
+ * Save delivery options to delivery_options table
+ */
+async function saveDeliveryOptions(
+  productId: string,
+  sellerId: string,
+  options: DeliveryOptionData[]
+) {
+  // Get existing options
+  const { data: existingOptions } = await supabase
+    .from('delivery_options')
+    .select('id')
+    .eq('product_id', productId);
+
+  const existingIds = new Set(existingOptions?.map(o => o.id) || []);
+  const newIds = new Set(options.filter(o => o.id).map(o => o.id));
+
+  // Delete removed options
+  const toDelete = [...existingIds].filter(id => !newIds.has(id));
+  if (toDelete.length > 0) {
+    await supabase
+      .from('delivery_options')
+      .delete()
+      .in('id', toDelete);
+  }
+
+  // Upsert options
+  for (let i = 0; i < options.length; i++) {
+    const opt = options[i];
+    const optionData = {
+      product_id: productId,
+      seller_id: sellerId,
+      shipping_type: opt.shipping_type,
+      label_en: opt.label_en,
+      label_fa: opt.label_fa || null,
+      label_ps: opt.label_ps || null,
+      price_afn: opt.price_afn,
+      delivery_hours: opt.delivery_hours,
+      confidence_percent: opt.confidence_percent,
+      is_default: opt.is_default,
+      is_active: opt.is_active,
+      sort_order: i,
+    };
+
+    if (opt.id && existingIds.has(opt.id)) {
+      // Update existing
+      await supabase
+        .from('delivery_options')
+        .update(optionData)
+        .eq('id', opt.id);
+    } else {
+      // Insert new
+      await supabase
+        .from('delivery_options')
+        .insert(optionData);
+    }
   }
 }
 
