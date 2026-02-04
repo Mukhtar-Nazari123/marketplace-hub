@@ -291,11 +291,12 @@ export const DeliveryOptionsStep = ({ options, onChange }: DeliveryOptionsStepPr
                 <Input
                     type="number"
                     min="0"
-                    value={option.price_afn}
+                    value={option.price_afn === 0 ? '' : option.price_afn}
                     onChange={(e) => updateOption(index, { price_afn: parseFloat(e.target.value) || 0 })}
                     onFocus={(e) => e.target.select()}
                     disabled={option.shipping_type === 'free'}
                     className={cn(isRTL ? "pr-10" : "pl-10")}
+                    placeholder="0"
                   />
                   <span className={cn(
                     "absolute top-1/2 -translate-y-1/2 text-muted-foreground",
