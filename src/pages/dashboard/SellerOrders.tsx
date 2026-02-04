@@ -888,9 +888,14 @@ const SellerOrders = () => {
                           {t('paymentSummary')}
                         </h4>
                         <div className="p-4 bg-muted/50 rounded-lg text-sm space-y-2">
-                          {(() => {
+                        {(() => {
                             const { usdTotal, afnTotal } = calculateTotalsByCurrency(order.order_items);
-                            const totalAfnWithDelivery = afnTotal + order.delivery_fee;
+                            // Calculate total shipping from order items (fallback to order.delivery_fee for legacy)
+                            const totalShippingFromItems = (order.order_items || []).reduce(
+                              (sum, item) => sum + (item.delivery_price_afn || 0), 0
+                            );
+                            const shippingFee = totalShippingFromItems > 0 ? totalShippingFromItems : order.delivery_fee;
+                            const totalAfnWithDelivery = afnTotal + shippingFee;
                             const hasMixedCurrency = usdTotal > 0 && afnTotal >= 0;
                             
                             return (
@@ -916,7 +921,7 @@ const SellerOrders = () => {
                                     {t('shipping')}
                                   </span>
                                   <span>
-                                    {formatCurrency(order.delivery_fee, 'AFN', isRTL)}
+                                    {formatCurrency(shippingFee, 'AFN', isRTL)}
                                   </span>
                                 </div>
                                 <Separator />
