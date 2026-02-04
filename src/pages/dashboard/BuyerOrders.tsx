@@ -28,6 +28,7 @@ import {
   Store,
 } from "lucide-react";
 import { format } from "date-fns";
+import { getColorByValue } from "@/lib/productColors";
 
 interface OrderItem {
   id: string;
@@ -40,6 +41,8 @@ interface OrderItem {
   product_id: string | null;
   product_sku?: string | null;
   product_currency?: string | null;
+  selected_color?: string | null;
+  selected_size?: string | null;
   // Localized product fields (fetched from products_with_translations)
   name_en?: string | null;
   name_fa?: string | null;
@@ -631,7 +634,10 @@ const BuyerOrders = () => {
                               </div>
                               {sellerOrder && getStatusBadge(sellerOrder.status)}
                             </div>
-                            {group.items.map((item) => (
+                            {group.items.map((item) => {
+                              const colorDef = item.selected_color ? getColorByValue(item.selected_color) : null;
+                              const colorName = colorDef ? (isRTL ? colorDef.nameFa : colorDef.name) : '';
+                              return (
                               <div key={item.id} className="flex items-center gap-3 p-2 bg-muted/50 rounded-lg">
                                 <div className="w-10 h-10 rounded-lg overflow-hidden bg-muted flex-shrink-0">
                                   {item.product_image ? (
@@ -643,9 +649,35 @@ const BuyerOrders = () => {
                                   )}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <p className="font-medium truncate text-xs">{getItemDisplayName(item)}</p>
+                                  <div className="flex items-center gap-1.5 flex-wrap">
+                                    <span className="font-medium text-xs">{getItemDisplayName(item)}</span>
+                                    <span className="text-[10px] text-muted-foreground">
+                                      × {item.quantity} {getLabel('pcs', 'عدد', 'ټوټه')}
+                                    </span>
+                                    {/* Color indicator */}
+                                    {colorDef && (
+                                      <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
+                                        <span>•</span>
+                                        <span className="lowercase">{colorName}</span>
+                                        <span
+                                          className="w-3 h-3 rounded-full border border-border flex-shrink-0"
+                                          style={{
+                                            background: colorDef.hex.startsWith('linear') ? colorDef.hex : colorDef.hex,
+                                            backgroundColor: colorDef.hex.startsWith('linear') ? undefined : colorDef.hex,
+                                          }}
+                                        />
+                                      </span>
+                                    )}
+                                    {/* Size indicator */}
+                                    {item.selected_size && (
+                                      <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
+                                        <span>•</span>
+                                        {getLabel('size', 'سایز', 'اندازه')}({item.selected_size})
+                                      </span>
+                                    )}
+                                  </div>
                                   <p className="text-[10px] text-muted-foreground">
-                                    {item.quantity} × {formatCurrency(item.unit_price, item.product_currency || 'AFN', isRTL)}
+                                    {formatCurrency(item.unit_price, item.product_currency || 'AFN', isRTL)}
                                   </p>
                                 </div>
                                 <div className="text-right shrink-0">
@@ -654,7 +686,8 @@ const BuyerOrders = () => {
                                   </p>
                                 </div>
                               </div>
-                            ))}
+                              );
+                            })}
                           </div>
                         );
                       })}

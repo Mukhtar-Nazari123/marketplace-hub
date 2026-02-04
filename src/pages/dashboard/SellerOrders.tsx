@@ -48,6 +48,7 @@ import {
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import type { Json } from '@/integrations/supabase/types';
+import { getColorByValue } from '@/lib/productColors';
 
 // Trilingual translations
 const translations = {
@@ -113,6 +114,8 @@ interface OrderItem {
   product_id: string | null;
   product_sku?: string | null;
   product_currency?: string | null;
+  selected_color?: string | null;
+  selected_size?: string | null;
 }
 
 interface SellerOrder {
@@ -715,7 +718,16 @@ const SellerOrders = () => {
                           {t('products')}
                         </h4>
                         <div className="space-y-3">
-                          {order.order_items.map((item) => (
+                          {order.order_items.map((item) => {
+                            const colorDef = item.selected_color ? getColorByValue(item.selected_color) : null;
+                            const colorName = colorDef ? (isRTL ? colorDef.nameFa : colorDef.name) : '';
+                            const lang = language as 'en' | 'fa' | 'ps';
+                            const getLabel = (en: string, fa: string, ps: string) => {
+                              if (lang === 'ps') return ps;
+                              if (lang === 'fa') return fa;
+                              return en;
+                            };
+                            return (
                             <div
                               key={item.id}
                               className="flex items-center gap-4 p-3 bg-muted/50 rounded-lg"
@@ -734,9 +746,35 @@ const SellerOrders = () => {
                                 )}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="font-medium truncate">{item.product_name}</p>
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  <span className="font-medium truncate">{item.product_name}</span>
+                                  <span className="text-sm text-muted-foreground">
+                                    × {item.quantity} {getLabel('pcs', 'عدد', 'ټوټه')}
+                                  </span>
+                                  {/* Color indicator */}
+                                  {colorDef && (
+                                    <span className="inline-flex items-center gap-1 text-sm text-muted-foreground">
+                                      <span>•</span>
+                                      <span className="lowercase">{colorName}</span>
+                                      <span
+                                        className="w-3.5 h-3.5 rounded-full border border-border flex-shrink-0"
+                                        style={{
+                                          background: colorDef.hex.startsWith('linear') ? colorDef.hex : colorDef.hex,
+                                          backgroundColor: colorDef.hex.startsWith('linear') ? undefined : colorDef.hex,
+                                        }}
+                                      />
+                                    </span>
+                                  )}
+                                  {/* Size indicator */}
+                                  {item.selected_size && (
+                                    <span className="inline-flex items-center gap-1 text-sm text-muted-foreground">
+                                      <span>•</span>
+                                      {getLabel('size', 'سایز', 'اندازه')}({item.selected_size})
+                                    </span>
+                                  )}
+                                </div>
                                 <p className="text-sm text-muted-foreground">
-                                  {item.quantity} × {formatCurrency(item.unit_price, item.product_currency || order.currency, isRTL)}
+                                  {formatCurrency(item.unit_price, item.product_currency || order.currency, isRTL)}
                                 </p>
                               </div>
                               <div className="text-right space-y-1">
@@ -751,7 +789,8 @@ const SellerOrders = () => {
                                 </p>
                               </div>
                             </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       </div>
                     )}
