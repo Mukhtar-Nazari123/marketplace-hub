@@ -13,7 +13,8 @@ import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Check, X, Edit, Languages, AlertCircle, Copy, Search } from 'lucide-react';
+import { Check, X, Edit, Languages, AlertCircle, Copy, Search, Trash2 } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import { sellerTranslations } from '@/lib/seller-translations';
 
@@ -263,7 +264,7 @@ const TranslationEditDialog = ({
   onOpenChange: (open: boolean) => void;
   language: 'en' | 'fa' | 'ps';
 }) => {
-  const { translations, getTranslation, saveTranslation, isSaving } = useProductTranslations(productId);
+  const { translations, getTranslation, saveTranslation, deleteTranslation, isSaving, isDeleting } = useProductTranslations(productId);
   const [activeTab, setActiveTab] = useState<TranslationLanguage>('ps');
   const [formData, setFormData] = useState({
     name: '',
@@ -272,6 +273,28 @@ const TranslationEditDialog = ({
     meta_title: '',
     meta_description: '',
   });
+
+  const handleDelete = () => {
+    deleteTranslation({
+      productId,
+      language: activeTab,
+    }, {
+      onSuccess: () => {
+        toast.success(language === 'fa' ? 'ترجمه حذف شد' : language === 'ps' ? 'ژباړه ړنګه شوه' : 'Translation deleted');
+        setFormData({
+          name: '',
+          description: '',
+          short_description: '',
+          meta_title: '',
+          meta_description: '',
+        });
+      },
+      onError: (error) => {
+        toast.error(t('common', 'error'));
+        console.error(error);
+      },
+    });
+  };
 
   const t = (section: keyof typeof sellerTranslations, key: string) => {
     const sectionData = sellerTranslations[section] as Record<string, Record<string, string>>;
@@ -420,13 +443,49 @@ const TranslationEditDialog = ({
           ))}
         </Tabs>
 
-        <div className="flex justify-end gap-2 mt-4">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            {t('common', 'cancel')}
-          </Button>
-          <Button onClick={handleSave} disabled={isSaving}>
-            {isSaving ? t('common', 'loading') : t('translations', 'saveTranslation')}
-          </Button>
+        <div className="flex justify-between gap-2 mt-4">
+          {/* Delete button - only show if translation exists */}
+          {getTranslation(activeTab) && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" size="sm" disabled={isDeleting}>
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  {language === 'fa' ? 'حذف ترجمه' : language === 'ps' ? 'ژباړه ړنګول' : 'Delete Translation'}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    {language === 'fa' ? 'آیا مطمئن هستید؟' : language === 'ps' ? 'ایا تاسو ډاډه یاست؟' : 'Are you sure?'}
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {language === 'fa' 
+                      ? `این عمل ترجمه ${activeTab.toUpperCase()} را حذف خواهد کرد. این عمل قابل بازگشت نیست.`
+                      : language === 'ps'
+                      ? `دا عمل به ${activeTab.toUpperCase()} ژباړه ړنګه کړي. دا بیرته نشي راتلای.`
+                      : `This will delete the ${activeTab.toUpperCase()} translation. This action cannot be undone.`}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>
+                    {language === 'fa' ? 'انصراف' : language === 'ps' ? 'لغوه' : 'Cancel'}
+                  </AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete}>
+                    {language === 'fa' ? 'حذف' : language === 'ps' ? 'ړنګول' : 'Delete'}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+          
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
+              {t('common', 'cancel')}
+            </Button>
+            <Button onClick={handleSave} disabled={isSaving}>
+              {isSaving ? t('common', 'loading') : t('translations', 'saveTranslation')}
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
