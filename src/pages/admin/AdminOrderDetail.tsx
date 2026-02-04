@@ -186,14 +186,47 @@ const AdminOrderDetail = () => {
         }
       }
 
-      // Process order items with localized names
-      const processedItems = (orderData.order_items || []).map((item: any) => ({
-        ...item,
-        product: item.products || null,
-        name_en: item.product_id ? productTranslations[item.product_id]?.name_en : null,
-        name_fa: item.product_id ? productTranslations[item.product_id]?.name_fa : null,
-        name_ps: item.product_id ? productTranslations[item.product_id]?.name_ps : null,
-      }));
+      // Get product IDs that don't have delivery_label (legacy orders)
+      const legacyProductIds = (orderData.order_items || [])
+        .filter((item: any) => !item.delivery_label && item.product_id)
+        .map((item: any) => item.product_id);
+
+      // Fetch default delivery options for legacy products
+      let deliveryOptionsMap: Record<string, any> = {};
+      if (legacyProductIds.length > 0) {
+        const { data: deliveryOptions } = await supabase
+          .from('delivery_options')
+          .select('product_id, label_en, label_fa, label_ps, price_afn, delivery_hours')
+          .in('product_id', [...new Set(legacyProductIds)])
+          .eq('is_default', true)
+          .eq('is_active', true);
+
+        if (deliveryOptions) {
+          deliveryOptionsMap = deliveryOptions.reduce((acc: any, opt: any) => {
+            acc[opt.product_id] = opt;
+            return acc;
+          }, {});
+        }
+      }
+
+      // Process order items with localized names and fallback delivery info
+      const processedItems = (orderData.order_items || []).map((item: any) => {
+        const legacyDelivery = item.product_id ? deliveryOptionsMap[item.product_id] : null;
+        const deliveryLabel = item.delivery_label || (legacyDelivery ? 
+          (lang === 'ps' ? legacyDelivery.label_ps : lang === 'fa' ? legacyDelivery.label_fa : legacyDelivery.label_en) || legacyDelivery.label_en
+          : null);
+        
+        return {
+          ...item,
+          product: item.products || null,
+          name_en: item.product_id ? productTranslations[item.product_id]?.name_en : null,
+          name_fa: item.product_id ? productTranslations[item.product_id]?.name_fa : null,
+          name_ps: item.product_id ? productTranslations[item.product_id]?.name_ps : null,
+          delivery_label: deliveryLabel,
+          delivery_price_afn: item.delivery_price_afn || (legacyDelivery?.price_afn ?? null),
+          delivery_hours: item.delivery_hours || (legacyDelivery?.delivery_hours ?? null),
+        };
+      });
 
       setOrder({
         ...orderData,
@@ -472,12 +505,19 @@ const AdminOrderDetail = () => {
                     <span>{Number(order.subtotal_afn).toFixed(0)} AFN</span>
                   </div>
                 )}
-                {Number(order.delivery_fee_afn) > 0 && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">{getLabel(lang, 'Delivery Fee', 'هزینه ارسال', 'د رسولو فیس')}</span>
-                    <span>{Number(order.delivery_fee_afn).toFixed(0)} AFN</span>
-                  </div>
-                )}
+                {(() => {
+                  // Calculate total shipping from order items (fallback to order.delivery_fee_afn for legacy)
+                  const totalShippingFromItems = (order.order_items || []).reduce(
+                    (sum, item) => sum + (item.delivery_price_afn || 0), 0
+                  );
+                  const shippingFee = totalShippingFromItems > 0 ? totalShippingFromItems : Number(order.delivery_fee_afn);
+                  return shippingFee > 0 ? (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">{getLabel(lang, 'Delivery Fee', 'هزینه ارسال', 'د رسولو فیس')}</span>
+                      <span>{shippingFee.toFixed(0)} AFN</span>
+                    </div>
+                  ) : null;
+                })()}
                 {Number(order.discount) > 0 && (
                   <div className="flex justify-between text-sm text-success">
                     <span>{getLabel(lang, 'Discount', 'تخفیف', 'تخفیف')}</span>
