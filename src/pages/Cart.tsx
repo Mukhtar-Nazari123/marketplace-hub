@@ -35,7 +35,7 @@ interface CartItemProduct {
 
 const Cart = () => {
   const { t, isRTL, language } = useLanguage();
-  const { items, loading, removeFromCart, updateQuantity, updateVariants, clearCart } = useCart();
+  const { items, loading, removeFromCart, updateQuantity, updateVariants, updateDeliveryOption, clearCart } = useCart();
   const { user, role, loading: authLoading } = useAuth();
   const { convertToUSD, rate } = useCurrencyRate();
   const navigate = useNavigate();
@@ -283,8 +283,10 @@ const Cart = () => {
                             productId={item.product_id}
                             selectedColor={item.selected_color}
                             selectedSize={item.selected_size}
+                            selectedDeliveryOptionId={item.selected_delivery_option_id}
                             onColorChange={(color) => updateVariants(item.product_id, color, item.selected_size)}
                             onSizeChange={(size) => updateVariants(item.product_id, item.selected_color, size)}
+                            onDeliveryOptionChange={(optionId) => updateDeliveryOption(item.product_id, optionId)}
                           />
 
                           {/* Price */}

@@ -536,6 +536,7 @@ export type Database = {
           product_id: string
           quantity: number
           selected_color: string | null
+          selected_delivery_option_id: string | null
           selected_size: string | null
           updated_at: string
           user_id: string
@@ -546,6 +547,7 @@ export type Database = {
           product_id: string
           quantity?: number
           selected_color?: string | null
+          selected_delivery_option_id?: string | null
           selected_size?: string | null
           updated_at?: string
           user_id: string
@@ -556,6 +558,7 @@ export type Database = {
           product_id?: string
           quantity?: number
           selected_color?: string | null
+          selected_delivery_option_id?: string | null
           selected_size?: string | null
           updated_at?: string
           user_id?: string
@@ -573,6 +576,13 @@ export type Database = {
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products_with_translations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cart_selected_delivery_option_id_fkey"
+            columns: ["selected_delivery_option_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_options"
             referencedColumns: ["id"]
           },
         ]

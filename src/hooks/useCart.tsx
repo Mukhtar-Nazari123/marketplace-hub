@@ -10,6 +10,7 @@ interface CartItem {
   quantity: number;
   selected_color: string | null;
   selected_size: string | null;
+  selected_delivery_option_id: string | null;
   product?: {
     id: string;
     name: string;
@@ -36,6 +37,7 @@ interface CartContextType {
   removeFromCart: (productId: string) => Promise<void>;
   updateQuantity: (productId: string, quantity: number) => Promise<void>;
   updateVariants: (productId: string, color: string | null, size: string | null) => Promise<void>;
+  updateDeliveryOption: (productId: string, deliveryOptionId: string | null) => Promise<void>;
   clearCart: () => Promise<void>;
   isInCart: (productId: string) => boolean;
 }
@@ -66,6 +68,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           quantity,
           selected_color,
           selected_size,
+          selected_delivery_option_id,
           products:products_with_translations (
             id,
             name,
@@ -87,6 +90,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         ...item,
         selected_color: item.selected_color || null,
         selected_size: item.selected_size || null,
+        selected_delivery_option_id: item.selected_delivery_option_id || null,
         product: item.products as CartItem['product']
       })));
     } catch (error) {
@@ -221,6 +225,28 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const updateDeliveryOption = async (productId: string, deliveryOptionId: string | null) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('cart')
+        .update({ selected_delivery_option_id: deliveryOptionId })
+        .eq('user_id', user.id)
+        .eq('product_id', productId);
+
+      if (error) throw error;
+
+      setItems(prev => prev.map(item =>
+        item.product_id === productId 
+          ? { ...item, selected_delivery_option_id: deliveryOptionId } 
+          : item
+      ));
+    } catch (error) {
+      console.error('Error updating delivery option:', error);
+    }
+  };
+
   const clearCart = async () => {
     if (!user) return;
 
@@ -252,6 +278,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       removeFromCart,
       updateQuantity,
       updateVariants,
+      updateDeliveryOption,
       clearCart,
       isInCart,
     }}>
