@@ -288,11 +288,12 @@ export const DeliveryOptionsStep = ({ options, onChange }: DeliveryOptionsStepPr
                   {getLabel('Price (AFN)', 'قیمت (افغانی)', 'قیمت (افغانۍ)')}
                 </Label>
                 <div className="relative">
-                  <Input
+                <Input
                     type="number"
                     min="0"
                     value={option.price_afn}
                     onChange={(e) => updateOption(index, { price_afn: parseFloat(e.target.value) || 0 })}
+                    onFocus={(e) => e.target.select()}
                     disabled={option.shipping_type === 'free'}
                     className={cn(isRTL ? "pr-10" : "pl-10")}
                   />
@@ -314,6 +315,7 @@ export const DeliveryOptionsStep = ({ options, onChange }: DeliveryOptionsStepPr
                   min="1"
                   value={option.delivery_hours}
                   onChange={(e) => updateOption(index, { delivery_hours: parseInt(e.target.value) || 72 })}
+                  onFocus={(e) => e.target.select()}
                 />
               </div>
               <div className="space-y-2">
@@ -329,6 +331,7 @@ export const DeliveryOptionsStep = ({ options, onChange }: DeliveryOptionsStepPr
                   onChange={(e) => updateOption(index, { 
                     confidence_percent: e.target.value ? parseInt(e.target.value) : null 
                   })}
+                  onFocus={(e) => e.target.select()}
                   placeholder={getLabel('Optional', 'اختیاری', 'اختیاري')}
                 />
               </div>
