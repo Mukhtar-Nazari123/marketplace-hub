@@ -225,14 +225,43 @@ const BuyerOrders = () => {
         }
       }
 
+      // Get product IDs that don't have delivery_label (legacy orders)
+      const legacyProductIds = (data || [])
+        .flatMap((order) => order.order_items || [])
+        .filter((item: any) => !item.delivery_label && item.product_id)
+        .map((item: any) => item.product_id);
+
+      // Fetch default delivery options for legacy products
+      let deliveryOptionsMap: Record<string, any> = {};
+      if (legacyProductIds.length > 0) {
+        const { data: deliveryOptions } = await supabase
+          .from("delivery_options")
+          .select("product_id, label_en, label_fa, label_ps, price_afn, delivery_hours")
+          .in("product_id", [...new Set(legacyProductIds)])
+          .eq("is_default", true)
+          .eq("is_active", true);
+
+        if (deliveryOptions) {
+          deliveryOptionsMap = deliveryOptions.reduce((acc: any, opt: any) => {
+            acc[opt.product_id] = opt;
+            return acc;
+          }, {});
+        }
+      }
+
       // Fetch seller sub-orders for each order
       const ordersWithSellerOrders = await Promise.all(
         (data || []).map(async (order) => {
           const { data: sellerOrders } = await supabase.from("seller_orders").select("*").eq("order_id", order.id);
 
-          // Map order items to include product_sku and localized names
+          // Map order items to include product_sku, localized names, and fallback delivery info
           const orderItemsWithSku = (order.order_items || []).map((item: any) => {
             const translations = item.product_id ? productTranslations[item.product_id] : null;
+            const legacyDelivery = item.product_id ? deliveryOptionsMap[item.product_id] : null;
+            const deliveryLabel = item.delivery_label || (legacyDelivery ? 
+              (language === 'ps' ? legacyDelivery.label_ps : language === 'fa' ? legacyDelivery.label_fa : legacyDelivery.label_en) || legacyDelivery.label_en
+              : null);
+            
             return {
               ...item,
               product_sku: item.products?.sku || null,
@@ -240,6 +269,9 @@ const BuyerOrders = () => {
               name_en: translations?.name_en || null,
               name_fa: translations?.name_fa || null,
               name_ps: translations?.name_ps || null,
+              delivery_label: deliveryLabel,
+              delivery_price_afn: item.delivery_price_afn || (legacyDelivery?.price_afn ?? null),
+              delivery_hours: item.delivery_hours || (legacyDelivery?.delivery_hours ?? null),
             };
           });
 
@@ -745,13 +777,22 @@ const BuyerOrders = () => {
                             )}
                           </span>
                         </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground flex items-center gap-1">
-                            <Truck className="w-3 h-3" />
-                            {t.shipping}
-                          </span>
-                          <span>{formatCurrency(order.delivery_fee_afn, "AFN", isRTL)}</span>
-                        </div>
+                        {(() => {
+                          // Calculate total shipping from order items (fallback to order.delivery_fee_afn for legacy)
+                          const totalShippingFromItems = (order.order_items || []).reduce(
+                            (sum, item) => sum + (item.delivery_price_afn || 0), 0
+                          );
+                          const shippingFee = totalShippingFromItems > 0 ? totalShippingFromItems : order.delivery_fee_afn;
+                          return (
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground flex items-center gap-1">
+                                <Truck className="w-3 h-3" />
+                                {t.shipping}
+                              </span>
+                              <span>{formatCurrency(shippingFee, "AFN", isRTL)}</span>
+                            </div>
+                          );
+                        })()}
                         {order.discount > 0 && (
                           <div className="flex justify-between text-green-600">
                             <span>{t.discount}</span>
@@ -1019,13 +1060,26 @@ const BuyerOrders = () => {
                                       />
                                     )}
                                     <div className="text-right">
-                                      <p className="text-xs text-muted-foreground flex items-center gap-1 justify-end mb-0.5">
-                                        <Truck className="w-3 h-3" />
-                                        <span className="hidden sm:inline">{t.delivery}</span>
-                                        <span className="font-medium text-foreground">
-                                          {formatCurrency(sellerOrder?.delivery_fee || 0, 'AFN', isRTL)}
-                                        </span>
-                                      </p>
+                                      {/* Show delivery option per item if available */}
+                                      {item.delivery_label ? (
+                                        <p className="text-xs text-muted-foreground flex items-center gap-1 justify-end mb-0.5">
+                                          <Truck className="w-3 h-3" />
+                                          <span className="hidden sm:inline">{item.delivery_label}</span>
+                                          <span className="font-medium text-foreground">
+                                            {item.delivery_price_afn === 0 
+                                              ? getLabel('Free', 'رایگان', 'وړیا')
+                                              : formatCurrency(item.delivery_price_afn || 0, 'AFN', isRTL)}
+                                          </span>
+                                        </p>
+                                      ) : (
+                                        <p className="text-xs text-muted-foreground flex items-center gap-1 justify-end mb-0.5">
+                                          <Truck className="w-3 h-3" />
+                                          <span className="hidden sm:inline">{t.delivery}</span>
+                                          <span className="font-medium text-foreground">
+                                            {formatCurrency(sellerOrder?.delivery_fee || 0, 'AFN', isRTL)}
+                                          </span>
+                                        </p>
+                                      )}
                                       <p className="font-semibold text-sm">
                                         {formatCurrency(item.total_price, item.product_currency || 'AFN', isRTL)}
                                       </p>
@@ -1082,13 +1136,22 @@ const BuyerOrders = () => {
                               )}
                             </span>
                           </div>
-                          <div className="flex justify-between text-xs md:text-sm">
-                            <span className="text-muted-foreground flex items-center gap-1">
-                              <Truck className="w-3 h-3" />
-                              {t.shipping}
-                            </span>
-                            <span>{formatCurrency(order.delivery_fee_afn, "AFN", isRTL)}</span>
-                          </div>
+                          {(() => {
+                            // Calculate total shipping from order items (fallback to order.delivery_fee_afn for legacy)
+                            const totalShippingFromItems = (order.order_items || []).reduce(
+                              (sum, item) => sum + (item.delivery_price_afn || 0), 0
+                            );
+                            const shippingFee = totalShippingFromItems > 0 ? totalShippingFromItems : order.delivery_fee_afn;
+                            return (
+                              <div className="flex justify-between text-xs md:text-sm">
+                                <span className="text-muted-foreground flex items-center gap-1">
+                                  <Truck className="w-3 h-3" />
+                                  {t.shipping}
+                                </span>
+                                <span>{formatCurrency(shippingFee, "AFN", isRTL)}</span>
+                              </div>
+                            );
+                          })()}
                           {order.discount > 0 && (
                             <div className="flex justify-between text-green-600 text-xs md:text-sm">
                               <span>{t.discount}</span>
