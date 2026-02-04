@@ -383,34 +383,43 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
                   </div>
                   {formData.deliveryOptions && formData.deliveryOptions.length > 0 ? (
                     <div className="space-y-1.5 pl-6">
-                      {formData.deliveryOptions.filter(opt => opt.is_active).map((option, idx) => (
-                        <div key={idx} className="flex items-center gap-2 text-sm">
-                          {option.shipping_type === 'express' && <Zap className="w-3 h-3 text-warning" />}
-                          {option.shipping_type === 'free' && <Gift className="w-3 h-3 text-success" />}
-                          {option.shipping_type === 'standard' && <Truck className="w-3 h-3 text-muted-foreground" />}
-                          <span className="font-medium">
-                            {language === 'ps' ? option.label_ps : language === 'fa' ? option.label_fa : option.label_en}
-                          </span>
-                          <span className="text-muted-foreground">—</span>
-                          {option.price_afn === 0 ? (
-                            <Badge variant="outline" className="text-success text-xs py-0">
-                              {getLabel('Free', 'رایگان', 'وړیا', language)}
-                            </Badge>
-                          ) : (
-                            <span className="text-primary font-medium">
-                              ؋ {option.price_afn.toLocaleString()}
+                      {formData.deliveryOptions.filter(opt => opt.is_active).map((option, idx) => {
+                        // Derive label from shipping type
+                        const shippingTypeLabels: Record<string, { en: string; fa: string; ps: string }> = {
+                          standard: { en: 'Standard Shipping', fa: 'ارسال معمولی', ps: 'عادي لیږد' },
+                          express: { en: 'Express Shipping', fa: 'ارسال فوری', ps: 'چټک لیږد' },
+                          free: { en: 'Free Shipping', fa: 'ارسال رایگان', ps: 'وړیا لیږد' },
+                        };
+                        const typeLabel = shippingTypeLabels[option.shipping_type] || shippingTypeLabels.standard;
+                        const displayLabel = language === 'ps' ? typeLabel.ps : language === 'fa' ? typeLabel.fa : typeLabel.en;
+
+                        return (
+                          <div key={idx} className="flex items-center gap-2 text-sm">
+                            {option.shipping_type === 'express' && <Zap className="w-3 h-3 text-warning" />}
+                            {option.shipping_type === 'free' && <Gift className="w-3 h-3 text-success" />}
+                            {option.shipping_type === 'standard' && <Truck className="w-3 h-3 text-muted-foreground" />}
+                            <span className="font-medium">{displayLabel}</span>
+                            <span className="text-muted-foreground">—</span>
+                            {option.price_afn === 0 ? (
+                              <Badge variant="outline" className="text-success text-xs py-0">
+                                {getLabel('Free', 'رایگان', 'وړیا', language)}
+                              </Badge>
+                            ) : (
+                              <span className="text-primary font-medium">
+                                ؋ {option.price_afn.toLocaleString()}
+                              </span>
+                            )}
+                            <span className="text-xs text-muted-foreground">
+                              ({option.delivery_hours}h)
                             </span>
-                          )}
-                          <span className="text-xs text-muted-foreground">
-                            ({option.delivery_hours}h)
-                          </span>
-                          {option.is_default && (
-                            <Badge variant="secondary" className="text-xs py-0">
-                              {getLabel('Default', 'پیش‌فرض', 'ډیفالټ', language)}
-                            </Badge>
-                          )}
-                        </div>
-                      ))}
+                            {option.is_default && (
+                              <Badge variant="secondary" className="text-xs py-0">
+                                {getLabel('Default', 'پیش‌فرض', 'ډیفالټ', language)}
+                              </Badge>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   ) : (
                     <p className="text-sm text-muted-foreground pl-6">
