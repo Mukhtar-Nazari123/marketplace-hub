@@ -535,6 +535,8 @@ export type Database = {
           id: string
           product_id: string
           quantity: number
+          selected_color: string | null
+          selected_size: string | null
           updated_at: string
           user_id: string
         }
@@ -543,6 +545,8 @@ export type Database = {
           id?: string
           product_id: string
           quantity?: number
+          selected_color?: string | null
+          selected_size?: string | null
           updated_at?: string
           user_id: string
         }
@@ -551,6 +555,8 @@ export type Database = {
           id?: string
           product_id?: string
           quantity?: number
+          selected_color?: string | null
+          selected_size?: string | null
           updated_at?: string
           user_id?: string
         }
