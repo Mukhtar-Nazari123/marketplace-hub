@@ -814,53 +814,11 @@ const Checkout = () => {
                           return opt.label_en;
                         };
 
-                        const colorDef = item.selectedColor ? getColorByValue(item.selectedColor) : null;
-                        const getLocalizedColorName = (def: typeof colorDef) => {
-                          if (!def) return '';
-                          return isRTL ? def.nameFa : def.name;
-                        };
-
                         return (
-                          <div key={item.productId} className="space-y-2">
-                            {/* Product name with variant labels */}
-                            <div className="flex flex-wrap items-center gap-2 text-sm">
-                              <span className="font-medium text-foreground">{item.productName}</span>
-                              
-                              {/* Variant indicators with icons */}
-                              <div className="flex flex-wrap items-center gap-1.5">
-                                {/* Quantity */}
-                                <span className="inline-flex items-center gap-1 text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                                  <Hash className="h-3 w-3" />
-                                  {item.quantity} {getLabel('pcs', 'عدد', 'ټوټه')}
-                                </span>
-                                
-                                {/* Color */}
-                                {colorDef && (
-                                  <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                                    <span
-                                      className="w-3 h-3 rounded-full border border-border flex-shrink-0"
-                                      style={{
-                                        background: colorDef.hex.startsWith('linear') ? colorDef.hex : colorDef.hex,
-                                        backgroundColor: colorDef.hex.startsWith('linear') ? undefined : colorDef.hex,
-                                      }}
-                                    />
-                                    {getLocalizedColorName(colorDef)}
-                                  </span>
-                                )}
-                                
-                                {/* Size */}
-                                {item.selectedSize && (
-                                  <span className="inline-flex items-center gap-1 text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                                    <Ruler className="h-3 w-3" />
-                                    {item.selectedSize}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-
+                          <div key={item.productId} className="space-y-1.5">
                             {/* Delivery option details */}
                             <div className="flex justify-between text-sm">
-                              <span className="text-muted-foreground">{item.sellerName}</span>
+                              <span className="text-muted-foreground">{item.productName}</span>
                               <span>
                                 {!option ? (
                                   <Badge variant="outline" className="text-muted-foreground">{getLabel('Not selected', 'انتخاب نشده', 'نه دی ټاکل شوی')}</Badge>
