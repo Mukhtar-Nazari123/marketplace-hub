@@ -79,7 +79,7 @@ const CategoryGrid = () => {
                   className="group flex flex-col items-center text-center"
                 >
                   {/* Circular Image */}
-                  <div className="relative w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden bg-gradient-to-br from-primary/10 to-primary/5 border-2 border-transparent group-hover:border-primary/50 transition-all duration-300 group-hover:shadow-lg group-hover:scale-105">
+                  <div className="relative w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-3xl overflow-hidden bg-gradient-to-br from-primary/10 to-primary/5 border-2 border-transparent group-hover:border-primary/50 transition-all duration-300 group-hover:shadow-lg group-hover:scale-105">
                     {sub.image_url ? (
                       <img
                         src={sub.image_url}
@@ -113,7 +113,7 @@ const CategoryGrid = () => {
                 to={`/categories?category=${category.slug}`}
                 className="group flex flex-col items-center text-center"
               >
-                <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden bg-gradient-to-br from-primary/10 to-primary/5 border-2 border-transparent group-hover:border-primary/50 transition-all duration-300 group-hover:shadow-lg group-hover:scale-105 flex items-center justify-center">
+                <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-3xl overflow-hidden bg-gradient-to-br from-primary/10 to-primary/5 border-2 border-transparent group-hover:border-primary/50 transition-all duration-300 group-hover:shadow-lg group-hover:scale-105 flex items-center justify-center">
                   <Package className="h-6 w-6 md:h-8 md:w-8 text-muted-foreground group-hover:text-primary transition-colors" />
                 </div>
                 <span className={`mt-2 text-xs md:text-sm text-foreground group-hover:text-primary transition-colors line-clamp-2 ${isRTL ? 'text-center' : ''}`}>
