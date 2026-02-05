@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import { Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import ProductCard from "./ProductCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLanguage } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { useProductRatings } from "@/hooks/useProductRatings";
 import { getLocalizedProductName } from "@/lib/localizedProduct";
+ import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 
 interface Product {
   id: string;
@@ -34,7 +34,7 @@ const DiscoverProducts = () => {
   const productIds = products.map((p) => p.id);
   const { getRating } = useProductRatings(productIds);
 
-  const fetchProducts = useCallback(async (pageNum: number, append: boolean = false) => {
+  const fetchProducts = useCallback(async (pageNum: number, append: boolean = false, signal?: AbortSignal) => {
     if (pageNum === 0) {
       setIsLoading(true);
     } else {
@@ -49,7 +49,7 @@ const DiscoverProducts = () => {
         .order("created_at", { ascending: false })
         .range(pageNum * PRODUCTS_PER_PAGE, (pageNum + 1) * PRODUCTS_PER_PAGE - 1);
 
-      if (error) throw error;
+      if (error || signal?.aborted) throw error;
 
       const newProducts = ((data || []).map(p => ({ ...p, name: p.name || 'Untitled' }))) as Product[];
 
@@ -64,7 +64,9 @@ const DiscoverProducts = () => {
 
       setHasMore(newProducts.length === PRODUCTS_PER_PAGE);
     } catch (error) {
-      console.error("Error fetching products:", error);
+      if (!signal?.aborted) {
+        console.error("Error fetching products:", error);
+      }
     } finally {
       setIsLoading(false);
       setIsLoadingMore(false);
@@ -72,14 +74,26 @@ const DiscoverProducts = () => {
   }, []);
 
   useEffect(() => {
-    fetchProducts(0);
-  }, [fetchProducts, language]);
+    const controller = new AbortController();
+    setPage(0);
+    setProducts([]);
+    fetchProducts(0, false, controller.signal);
+    return () => controller.abort();
+  }, [language]);
 
   const loadMore = () => {
+    if (isLoadingMore || !hasMore) return;
     const nextPage = page + 1;
     setPage(nextPage);
     fetchProducts(nextPage, true);
   };
+
+  // Infinite scroll hook
+  const sentinelRef = useInfiniteScroll({
+    onLoadMore: loadMore,
+    hasMore,
+    isLoading: isLoadingMore,
+  });
 
   const getProductCardData = (product: Product) => {
     const currency = "AFN" as const;
@@ -146,9 +160,9 @@ const DiscoverProducts = () => {
 
   // Localized text
   const texts = {
-    en: { title: "Discover Products", subtitle: "Explore popular and trending items from all categories", loadMore: "Load More", loading: "Loading..." },
-    fa: { title: "کشف محصولات", subtitle: "محصولات محبوب و پرطرفدار از تمام دسته‌بندی‌ها را کاوش کنید", loadMore: "نمایش بیشتر", loading: "در حال بارگذاری..." },
-    ps: { title: "محصولات کشف کړئ", subtitle: "له ټولو کټګوریو څخه مشهور او ترنډي توکي وپلټئ", loadMore: "نور وښایاست", loading: "پورته کیږي..." }
+    en: { title: "Discover Products", subtitle: "Explore popular and trending items from all categories", loading: "Loading..." },
+    fa: { title: "کشف محصولات", subtitle: "محصولات محبوب و پرطرفدار از تمام دسته‌بندی‌ها را کاوش کنید", loading: "در حال بارگذاری..." },
+    ps: { title: "محصولات کشف کړئ", subtitle: "له ټولو کټګوریو څخه مشهور او ترنډي توکي وپلټئ", loading: "پورته کیږي..." }
   };
   const localText = texts[language as keyof typeof texts] || texts.en;
 
@@ -178,19 +192,13 @@ const DiscoverProducts = () => {
           ))}
         </div>
 
-        {/* Load More Button */}
-        {hasMore && (
-          <div className="flex justify-center mt-8">
-            <Button variant="outline" size="lg" onClick={loadMore} disabled={isLoadingMore} className="min-w-[200px]">
-              {isLoadingMore ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  {localText.loading}
-                </>
-              ) : (
-                localText.loadMore
-              )}
-            </Button>
+        {/* Infinite Scroll Sentinel */}
+        <div ref={sentinelRef} className="h-4" />
+        
+        {/* Loading indicator */}
+        {isLoadingMore && (
+          <div className="flex justify-center py-8">
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
           </div>
         )}
       </div>

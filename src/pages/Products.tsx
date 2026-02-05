@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/lib/i18n";
 import { useProducts, formatProductForDisplay } from "@/hooks/useProducts";
@@ -11,7 +11,7 @@ import Navigation from "@/components/layout/Navigation";
 import Footer from "@/components/layout/Footer";
 import StickyNavbar from "@/components/layout/StickyNavbar";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Sparkles, Loader2, Search, Heart, ShoppingCart, Eye } from "lucide-react";
+import { Sparkles, Loader2, Search, Heart, ShoppingCart, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProductRatings } from "@/hooks/useProductRatings";
@@ -21,6 +21,7 @@ import { useWishlist } from "@/hooks/useWishlist";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 import { useCurrencyRate } from "@/hooks/useCurrencyRate";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 
 const Products = () => {
   const { t, language, isRTL } = useLanguage();
@@ -38,7 +39,8 @@ const Products = () => {
   const { getRootCategories, getSubcategoryBySlug } = useCategories();
 
   const [sortBy, setSortBy] = useState("latest");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [displayCount, setDisplayCount] = useState(24);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
     priceRange: [0, 500000],
     rating: 0,
@@ -48,7 +50,7 @@ const Products = () => {
     onSale: false,
   });
 
-  const ITEMS_PER_PAGE = 24;
+  const ITEMS_PER_LOAD = 24;
 
   // Convert DB products to display format
   const products = useMemo(() => {
@@ -126,16 +128,33 @@ const Products = () => {
     return result;
   }, [categorySlug, subcategorySlug, filterType, filters, sortBy, products, getSubcategoryBySlug]);
 
-  // Reset page when filters change
+  // Reset display count when filters change
   useEffect(() => {
-    setCurrentPage(1);
+    setDisplayCount(24);
   }, [categorySlug, subcategorySlug, filterType, filters, sortBy, searchQuery]);
 
-  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
-  const paginatedProducts = filteredProducts.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+  const hasMore = displayCount < filteredProducts.length;
+  const displayedProducts = filteredProducts.slice(0, displayCount);
 
-  const productIds = useMemo(() => paginatedProducts.map((p) => p.id), [paginatedProducts]);
+  const productIds = useMemo(() => displayedProducts.map((p) => p.id), [displayedProducts]);
   const { getRating } = useProductRatings(productIds);
+
+  const loadMore = useCallback(() => {
+    if (isLoadingMore || !hasMore) return;
+    setIsLoadingMore(true);
+    // Simulate slight delay for smoother UX
+    setTimeout(() => {
+      setDisplayCount(prev => prev + ITEMS_PER_LOAD);
+      setIsLoadingMore(false);
+    }, 100);
+  }, [isLoadingMore, hasMore]);
+
+  // Infinite scroll hook
+  const sentinelRef = useInfiniteScroll({
+    onLoadMore: loadMore,
+    hasMore,
+    isLoading: isLoadingMore,
+  });
 
   const getLabel = (en: string, fa: string, ps: string) => {
     if (language === 'ps') return ps;
@@ -259,7 +278,7 @@ const Products = () => {
               </div>
             ))}
           </div>
-        ) : paginatedProducts.length === 0 ? (
+        ) : displayedProducts.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mb-4">
               <Search className="h-12 w-12 text-muted-foreground" />
@@ -290,42 +309,22 @@ const Products = () => {
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
-            {paginatedProducts.map((product) => (
+            {displayedProducts.map((product) => (
               <ProductCard key={product.id} product={product} getRating={getRating} />
             ))}
           </div>
         )}
 
-        {/* Pagination */}
-        {!loading && totalPages > 1 && (
-          <div className="flex justify-center gap-2 mt-8">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((p) => p - 1)}
-            >
-              {isRTL ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-            </Button>
-            {[...Array(Math.min(totalPages, 5))].map((_, i) => (
-              <Button
-                key={i}
-                variant={currentPage === i + 1 ? "cyan" : "outline"}
-                size="sm"
-                onClick={() => setCurrentPage(i + 1)}
-              >
-                {i + 1}
-              </Button>
-            ))}
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage((p) => p + 1)}
-            >
-              {isRTL ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
-            </Button>
-          </div>
+        {/* Infinite Scroll Sentinel */}
+        {!loading && (
+          <>
+            <div ref={sentinelRef} className="h-4" />
+            {isLoadingMore && (
+              <div className="flex justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              </div>
+            )}
+          </>
         )}
       </div>
 
