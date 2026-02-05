@@ -832,6 +832,57 @@ export type Database = {
           },
         ]
       }
+      designed_hero_banners: {
+        Row: {
+          created_at: string
+          cta_link: string | null
+          display_order: number | null
+          id: string
+          image_url: string
+          is_active: boolean | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          cta_link?: string | null
+          display_order?: number | null
+          id?: string
+          image_url: string
+          is_active?: boolean | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          cta_link?: string | null
+          display_order?: number | null
+          id?: string
+          image_url?: string
+          is_active?: boolean | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      hero_banner_settings: {
+        Row: {
+          banner_type: string
+          id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          banner_type?: string
+          id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          banner_type?: string
+          id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       hero_banners: {
         Row: {
           background_color: string | null
