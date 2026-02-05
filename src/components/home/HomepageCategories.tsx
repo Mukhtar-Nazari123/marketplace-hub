@@ -7,11 +7,13 @@ import { useEffect, useState, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { getSubcategoryImage } from '@/lib/subcategoryImages';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const HomepageCategories = () => {
   const { isRTL } = useLanguage();
   const [searchParams] = useSearchParams();
   const selectedCategorySlug = searchParams.get('category');
+  const isMobile = useIsMobile();
   
   const { categories, getSubcategories, getCategoryBySlug, loading } = useCategories();
   const [categoryImages, setCategoryImages] = useState<Map<string, string>>(new Map());
@@ -26,6 +28,22 @@ const HomepageCategories = () => {
   // Determine what to show: subcategories if category selected, otherwise categories
   const showSubcategories = selectedCategory && subcategories.length > 0;
   const items = showSubcategories ? subcategories : categories;
+
+  // Split items into rows - 3 rows on mobile, 2 rows on desktop
+  const rows = useMemo(() => {
+    const rowCount = isMobile ? 3 : 2;
+    const itemsPerRow = Math.ceil(items.length / rowCount);
+    const result: typeof items[] = [];
+    for (let i = 0; i < rowCount; i++) {
+      const start = i * itemsPerRow;
+      const end = start + itemsPerRow;
+      const rowItems = items.slice(start, end);
+      if (rowItems.length > 0) {
+        result.push(rowItems);
+      }
+    }
+    return result;
+  }, [items, isMobile]);
 
   // Fetch product images for categories without images
   useEffect(() => {
@@ -130,10 +148,6 @@ const HomepageCategories = () => {
     return null;
   }
 
-  // Split items evenly - first row fills with first half, second row gets the rest
-  const halfLength = Math.ceil(items.length / 2);
-  const firstRow = items.slice(0, halfLength);
-  const secondRow = items.slice(halfLength);
 
   const CategoryItem = ({ item, isSubcategory }: { item: typeof items[0]; isSubcategory: boolean }) => {
     // Get appropriate image based on item type
@@ -195,21 +209,13 @@ const HomepageCategories = () => {
       <div className="container px-2">
         <ScrollArea className="w-full" dir={isRTL ? 'rtl' : 'ltr'}>
           <div className="flex flex-col gap-3">
-            {/* First Row */}
-            <div className={`flex gap-4 sm:gap-5 md:gap-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
-              {firstRow.map((item) => (
-                <CategoryItem key={item.id} item={item} isSubcategory={showSubcategories} />
-              ))}
-            </div>
-            
-            {/* Second Row */}
-            {secondRow.length > 0 && (
-              <div className={`flex gap-4 sm:gap-5 md:gap-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                {secondRow.map((item) => (
+            {rows.map((row, rowIndex) => (
+              <div key={rowIndex} className={`flex gap-4 sm:gap-5 md:gap-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                {row.map((item) => (
                   <CategoryItem key={item.id} item={item} isSubcategory={showSubcategories} />
                 ))}
               </div>
-            )}
+            ))}
           </div>
           <ScrollBar orientation="horizontal" className="h-2" />
         </ScrollArea>
