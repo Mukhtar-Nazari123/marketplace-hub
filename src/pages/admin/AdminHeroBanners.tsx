@@ -9,10 +9,12 @@ import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit, Trash2, Monitor } from 'lucide-react';
+ import { Plus, Edit, Trash2, Monitor, Image, Wand2 } from 'lucide-react';
 import { useLanguage, type Language } from '@/lib/i18n';
 import { useHeroBanners, HeroBannerInput } from '@/hooks/useHeroBanners';
+ import { useDesignedBanners, DesignedBannerInput } from '@/hooks/useDesignedBanners';
 import ImageUpload from '@/components/admin/ImageUpload';
+ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 // Trilingual helper
 const getLabel = (lang: Language, en: string, fa: string, ps: string) => {
@@ -27,9 +29,27 @@ const AdminHeroBanners = () => {
   const isRTL = direction === 'rtl';
   const iconMarginClass = isRTL ? 'ml-2' : 'mr-2';
   const { heroBanners, loading, createHeroBanner, updateHeroBanner, deleteHeroBanner, toggleHeroBanner } = useHeroBanners(false);
+   const { 
+     designedBanners, 
+     bannerSettings, 
+     loading: designedLoading, 
+     createDesignedBanner, 
+     updateDesignedBanner, 
+     deleteDesignedBanner, 
+     toggleDesignedBanner,
+     updateBannerType 
+   } = useDesignedBanners(false);
   
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingBanner, setEditingBanner] = useState<string | null>(null);
+   const [isDesignedDialogOpen, setIsDesignedDialogOpen] = useState(false);
+   const [editingDesignedBanner, setEditingDesignedBanner] = useState<string | null>(null);
+   const [designedFormData, setDesignedFormData] = useState<DesignedBannerInput>({
+     image_url: '',
+     cta_link: '',
+     display_order: 0,
+     is_active: true,
+   });
   const [formData, setFormData] = useState<HeroBannerInput>({
     title: '',
     title_fa: '',
@@ -51,6 +71,56 @@ const AdminHeroBanners = () => {
     display_order: 0,
   });
 
+   const resetDesignedForm = () => {
+     setDesignedFormData({
+       image_url: '',
+       cta_link: '',
+       display_order: 0,
+       is_active: true,
+     });
+     setEditingDesignedBanner(null);
+   };
+ 
+   const handleOpenDesignedDialog = (banner?: typeof designedBanners[0]) => {
+     if (banner) {
+       setEditingDesignedBanner(banner.id);
+       setDesignedFormData({
+         image_url: banner.image_url,
+         cta_link: banner.cta_link || '',
+         display_order: banner.display_order,
+         is_active: banner.is_active,
+       });
+     } else {
+       resetDesignedForm();
+     }
+     setIsDesignedDialogOpen(true);
+   };
+ 
+   const handleDesignedSubmit = async () => {
+     try {
+       if (editingDesignedBanner) {
+         await updateDesignedBanner(editingDesignedBanner, designedFormData);
+       } else {
+         await createDesignedBanner(designedFormData);
+       }
+       setIsDesignedDialogOpen(false);
+       resetDesignedForm();
+     } catch (error) {
+       // Error handled in hook
+     }
+   };
+ 
+   const handleDeleteDesigned = async (id: string) => {
+     const confirmMessage = getLabel(lang, 
+       'Are you sure you want to delete this banner?', 
+       'آیا مطمئن هستید که می‌خواهید این بنر را حذف کنید؟',
+       'ایا تاسو ډاډه یاست چې دا بینر حذف کړئ؟'
+     );
+     if (confirm(confirmMessage)) {
+       await deleteDesignedBanner(id);
+     }
+   };
+ 
   const resetForm = () => {
     setFormData({
       title: '',
@@ -129,22 +199,77 @@ const AdminHeroBanners = () => {
     }
   };
 
-  return (
-    <AdminLayout 
-      title={getLabel(lang, 'Hero Banners', 'بنرهای اصلی', 'اصلي بینرونه')} 
-      description={getLabel(lang, 'Manage home page hero banners', 'مدیریت بنرهای صفحه اصلی', 'د کور پاڼې اصلي بینرونه اداره کړئ')}
-    >
-      <div className="space-y-6 animate-fade-in">
-        <Card className="hover-lift">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>{getLabel(lang, 'Hero Banners', 'بنرهای اصلی', 'اصلي بینرونه')}</CardTitle>
-                <CardDescription>
-                  {getLabel(lang, 'Create and manage main hero banners for the home page', 'ایجاد و مدیریت بنرهای اصلی صفحه اول', 'د کور پاڼې لپاره اصلي بینرونه جوړ او اداره کړئ')}
-                </CardDescription>
-              </div>
-              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+   const currentBannerType = bannerSettings?.banner_type || 'dynamic';
+ 
+   return (
+     <AdminLayout 
+       title={getLabel(lang, 'Hero Banners', 'بنرهای اصلی', 'اصلي بینرونه')} 
+       description={getLabel(lang, 'Manage home page hero banners', 'مدیریت بنرهای صفحه اصلی', 'د کور پاڼې اصلي بینرونه اداره کړئ')}
+     >
+       <div className="space-y-6 animate-fade-in">
+         {/* Banner Type Toggle */}
+         <Card className="hover-lift">
+           <CardHeader>
+             <CardTitle className="flex items-center gap-2">
+               <Monitor className="h-5 w-5" />
+               {getLabel(lang, 'Active Banner Type', 'نوع بنر فعال', 'د فعال بینر ډول')}
+             </CardTitle>
+             <CardDescription>
+               {getLabel(lang, 'Choose which type of banner to display on the homepage', 'انتخاب کنید کدام نوع بنر در صفحه اصلی نمایش داده شود', 'وټاکئ چې کوم ډول بینر به په کور پاڼه کې ښکاره شي')}
+             </CardDescription>
+           </CardHeader>
+           <CardContent>
+             <div className="flex flex-wrap gap-3">
+               <Button
+                 variant={currentBannerType === 'dynamic' ? 'default' : 'outline'}
+                 onClick={() => updateBannerType('dynamic')}
+                 className="flex items-center gap-2"
+               >
+                 <Wand2 className="h-4 w-4" />
+                 {getLabel(lang, 'Dynamic Banners', 'بنرهای پویا', 'متحرک بینرونه')}
+               </Button>
+               <Button
+                 variant={currentBannerType === 'designed' ? 'default' : 'outline'}
+                 onClick={() => updateBannerType('designed')}
+                 className="flex items-center gap-2"
+               >
+                 <Image className="h-4 w-4" />
+                 {getLabel(lang, 'Designed Banners', 'بنرهای طراحی شده', 'ډیزاین شوي بینرونه')}
+               </Button>
+             </div>
+             <p className="text-sm text-muted-foreground mt-3">
+               {currentBannerType === 'dynamic' 
+                 ? getLabel(lang, 'Currently showing dynamic banners with text, images, and CTA buttons', 'در حال حاضر بنرهای پویا با متن، تصاویر و دکمه‌ها نمایش داده می‌شود', 'اوس مهال متحرک بینرونه د متن، انځورونو او تڼیو سره ښودل کیږي')
+                 : getLabel(lang, 'Currently showing pre-designed image banners uploaded from device', 'در حال حاضر بنرهای طراحی شده که از دستگاه آپلود شده نمایش داده می‌شود', 'اوس مهال د وسیلې څخه پورته شوي ډیزاین شوي انځور بینرونه ښودل کیږي')}
+             </p>
+           </CardContent>
+         </Card>
+ 
+         {/* Tabs for Dynamic vs Designed Banners */}
+         <Tabs defaultValue="dynamic" className="w-full">
+           <TabsList className="grid w-full grid-cols-2 max-w-md">
+             <TabsTrigger value="dynamic" className="flex items-center gap-2">
+               <Wand2 className="h-4 w-4" />
+               {getLabel(lang, 'Dynamic', 'پویا', 'متحرک')}
+             </TabsTrigger>
+             <TabsTrigger value="designed" className="flex items-center gap-2">
+               <Image className="h-4 w-4" />
+               {getLabel(lang, 'Designed', 'طراحی شده', 'ډیزاین شوی')}
+             </TabsTrigger>
+           </TabsList>
+ 
+           {/* Dynamic Banners Tab */}
+           <TabsContent value="dynamic">
+             <Card className="hover-lift">
+               <CardHeader>
+                 <div className="flex items-center justify-between">
+                   <div>
+                     <CardTitle>{getLabel(lang, 'Dynamic Hero Banners', 'بنرهای پویا', 'متحرک بینرونه')}</CardTitle>
+                     <CardDescription>
+                       {getLabel(lang, 'Create banners with text, images and CTA buttons', 'بنرهایی با متن، تصاویر و دکمه‌های فراخوان ایجاد کنید', 'د متن، انځورونو او CTA تڼیو سره بینرونه جوړ کړئ')}
+                     </CardDescription>
+                   </div>
+                   <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
                   <Button className="hover-scale" onClick={() => handleOpenDialog()}>
                     <Plus className={`h-4 w-4 ${iconMarginClass}`} />
@@ -389,12 +514,12 @@ const AdminHeroBanners = () => {
                         : getLabel(lang, 'Create', 'ایجاد', 'جوړول')}
                     </Button>
                   </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
+                   </DialogContent>
+                 </Dialog>
+               </div>
+             </CardHeader>
+             <CardContent>
+               {loading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               </div>
@@ -469,12 +594,160 @@ const AdminHeroBanners = () => {
                   ))}
                 </TableBody>
               </Table>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    </AdminLayout>
-  );
+               )}
+             </CardContent>
+           </Card>
+         </TabsContent>
+ 
+           {/* Designed Banners Tab */}
+           <TabsContent value="designed">
+             <Card className="hover-lift">
+               <CardHeader>
+                 <div className="flex items-center justify-between">
+                   <div>
+                     <CardTitle>{getLabel(lang, 'Designed Banners', 'بنرهای طراحی شده', 'ډیزاین شوي بینرونه')}</CardTitle>
+                     <CardDescription>
+                       {getLabel(lang, 'Upload pre-designed banner images from your device', 'تصاویر بنر طراحی شده را از دستگاه خود آپلود کنید', 'د خپل وسیلې څخه ډیزاین شوي بینر انځورونه پورته کړئ')}
+                     </CardDescription>
+                   </div>
+                   <Dialog open={isDesignedDialogOpen} onOpenChange={setIsDesignedDialogOpen}>
+                     <DialogTrigger asChild>
+                       <Button className="hover-scale" onClick={() => handleOpenDesignedDialog()}>
+                         <Plus className={`h-4 w-4 ${iconMarginClass}`} />
+                         {getLabel(lang, 'Add Designed Banner', 'افزودن بنر طراحی شده', 'ډیزاین شوی بینر اضافه کړئ')}
+                       </Button>
+                     </DialogTrigger>
+                     <DialogContent className="max-w-lg">
+                       <DialogHeader>
+                         <DialogTitle>
+                           {editingDesignedBanner 
+                             ? getLabel(lang, 'Edit Designed Banner', 'ویرایش بنر طراحی شده', 'ډیزاین شوی بینر سمول') 
+                             : getLabel(lang, 'Add Designed Banner', 'افزودن بنر طراحی شده', 'ډیزاین شوی بینر اضافه کړئ')}
+                         </DialogTitle>
+                         <DialogDescription>
+                           {getLabel(lang, 'Upload a pre-designed banner image', 'یک تصویر بنر طراحی شده آپلود کنید', 'یو ډیزاین شوی بینر انځور پورته کړئ')}
+                         </DialogDescription>
+                       </DialogHeader>
+                       
+                       <div className="grid gap-4 py-4">
+                         <ImageUpload
+                           label={getLabel(lang, 'Banner Image *', 'تصویر بنر *', 'د بینر انځور *')}
+                           value={designedFormData.image_url}
+                           onChange={(url) => setDesignedFormData({ ...designedFormData, image_url: url })}
+                           placeholder={getLabel(lang, 'Upload designed banner image', 'آپلود تصویر بنر طراحی شده', 'ډیزاین شوی بینر انځور پورته کړئ')}
+                           folder="hero-banners"
+                         />
+                         
+                         <div className="grid gap-2">
+                           <Label htmlFor="designed_cta_link">{getLabel(lang, 'Link (optional)', 'لینک (اختیاری)', 'لینک (اختیاري)')}</Label>
+                           <Input
+                             id="designed_cta_link"
+                             placeholder={getLabel(lang, 'e.g. /products or /categories/electronics', 'مثلاً: /products', 'لکه /products')}
+                             value={designedFormData.cta_link || ''}
+                             onChange={(e) => setDesignedFormData({ ...designedFormData, cta_link: e.target.value })}
+                           />
+                         </div>
+ 
+                         <div className="grid gap-2">
+                           <Label htmlFor="designed_display_order">{getLabel(lang, 'Display Order', 'ترتیب نمایش', 'د ښودلو ترتیب')}</Label>
+                           <Input
+                             id="designed_display_order"
+                             type="number"
+                             value={designedFormData.display_order}
+                             onChange={(e) => setDesignedFormData({ ...designedFormData, display_order: parseInt(e.target.value) || 0 })}
+                           />
+                         </div>
+ 
+                         <div className="flex items-center gap-2">
+                           <Switch
+                             checked={designedFormData.is_active}
+                             onCheckedChange={(checked) => setDesignedFormData({ ...designedFormData, is_active: checked })}
+                           />
+                           <Label>{getLabel(lang, 'Active', 'فعال', 'فعال')}</Label>
+                         </div>
+                       </div>
+ 
+                       <DialogFooter>
+                         <Button variant="outline" onClick={() => setIsDesignedDialogOpen(false)}>
+                           {getLabel(lang, 'Cancel', 'انصراف', 'لغوه کول')}
+                         </Button>
+                         <Button onClick={handleDesignedSubmit} disabled={!designedFormData.image_url}>
+                           {editingDesignedBanner 
+                             ? getLabel(lang, 'Update', 'به‌روزرسانی', 'تازه کول') 
+                             : getLabel(lang, 'Create', 'ایجاد', 'جوړول')}
+                         </Button>
+                       </DialogFooter>
+                     </DialogContent>
+                   </Dialog>
+                 </div>
+               </CardHeader>
+               <CardContent>
+                 {designedLoading ? (
+                   <div className="flex items-center justify-center py-12">
+                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                   </div>
+                 ) : designedBanners.length === 0 ? (
+                   <div className="flex flex-col items-center justify-center py-12 text-center">
+                     <div className="rounded-full bg-muted p-4 animate-pulse">
+                       <Image className="h-8 w-8 text-muted-foreground" />
+                     </div>
+                     <h3 className="mt-4 text-lg font-semibold">
+                       {getLabel(lang, 'No Designed Banners', 'بنر طراحی شده‌ای وجود ندارد', 'هیڅ ډیزاین شوی بینر نشته')}
+                     </h3>
+                     <p className="mt-2 text-sm text-muted-foreground">
+                       {getLabel(lang, 'Upload your first pre-designed banner image', 'اولین تصویر بنر طراحی شده خود را آپلود کنید', 'خپل لومړی ډیزاین شوی بینر انځور پورته کړئ')}
+                     </p>
+                     <Button className="mt-4 hover-scale" onClick={() => handleOpenDesignedDialog()}>
+                       <Plus className={`h-4 w-4 ${iconMarginClass}`} />
+                       {getLabel(lang, 'Add First Banner', 'افزودن اولین بنر', 'لومړی بینر اضافه کړئ')}
+                     </Button>
+                   </div>
+                 ) : (
+                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                     {designedBanners.map((banner) => (
+                       <div key={banner.id} className="relative group rounded-lg overflow-hidden border bg-card">
+                         <div className="aspect-[16/9] relative">
+                           <img 
+                             src={banner.image_url} 
+                             alt="Designed banner"
+                             className="w-full h-full object-cover"
+                           />
+                           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                             <Button size="sm" variant="secondary" onClick={() => handleOpenDesignedDialog(banner)}>
+                               <Edit className="h-4 w-4" />
+                             </Button>
+                             <Button size="sm" variant="destructive" onClick={() => handleDeleteDesigned(banner.id)}>
+                               <Trash2 className="h-4 w-4" />
+                             </Button>
+                           </div>
+                         </div>
+                         <div className="p-3 flex items-center justify-between">
+                           <div className="flex items-center gap-2">
+                             <Badge variant={banner.is_active ? 'default' : 'secondary'}>
+                               {banner.is_active 
+                                 ? getLabel(lang, 'Active', 'فعال', 'فعال') 
+                                 : getLabel(lang, 'Inactive', 'غیرفعال', 'غیرفعال')}
+                             </Badge>
+                             <span className="text-xs text-muted-foreground">
+                               {getLabel(lang, 'Order:', 'ترتیب:', 'ترتیب:')} {banner.display_order}
+                             </span>
+                           </div>
+                           <Switch
+                             checked={banner.is_active}
+                             onCheckedChange={(checked) => toggleDesignedBanner(banner.id, checked)}
+                           />
+                         </div>
+                       </div>
+                     ))}
+                   </div>
+                 )}
+               </CardContent>
+             </Card>
+           </TabsContent>
+         </Tabs>
+       </div>
+     </AdminLayout>
+   );
 };
 
 export default AdminHeroBanners;
