@@ -119,7 +119,7 @@ const HeroSection = () => {
      }
  
      return (
-       <div className="relative">
+        <div className="relative rounded-xl sm:rounded-2xl overflow-hidden">
          <Carousel
            opts={{
              loop: true,
