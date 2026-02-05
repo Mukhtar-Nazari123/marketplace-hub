@@ -167,7 +167,7 @@ const HomepageCategories = () => {
         className="group flex flex-col items-center text-center flex-shrink-0"
       >
         {/* Category Image */}
-        <div className="relative w-14 h-14 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-2xl overflow-hidden bg-muted border-2 border-transparent group-hover:border-primary/50 transition-all duration-300 group-hover:shadow-lg group-hover:scale-105">
+        <div className="relative w-14 h-14 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 rounded-3xl overflow-hidden bg-muted border-2 border-transparent group-hover:border-primary/50 transition-all duration-300 group-hover:shadow-lg group-hover:scale-105">
           {displayImage ? (
             <img
               src={displayImage}
