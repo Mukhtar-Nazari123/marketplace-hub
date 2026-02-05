@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import { Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/home/ProductCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLanguage } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { useProductRatings } from "@/hooks/useProductRatings";
 import { getLocalizedProductName } from "@/lib/localizedProduct";
+ import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 
 interface Product {
   id: string;
@@ -39,7 +39,7 @@ const CartRecommendations = ({ excludeProductIds = [] }: CartRecommendationsProp
   const { getRating } = useProductRatings(productIds);
 
   const fetchProducts = useCallback(
-    async (pageNum: number, append: boolean = false) => {
+    async (pageNum: number, append: boolean = false, signal?: AbortSignal) => {
       if (pageNum === 0) {
         setIsLoading(true);
       } else {
@@ -60,7 +60,7 @@ const CartRecommendations = ({ excludeProductIds = [] }: CartRecommendationsProp
 
         const { data, error } = await query.range(pageNum * PRODUCTS_PER_PAGE, (pageNum + 1) * PRODUCTS_PER_PAGE - 1);
 
-        if (error) throw error;
+        if (error || signal?.aborted) throw error;
 
         const newProducts = (data || []).map((p) => ({ ...p, name: p.name || "Untitled" })) as Product[];
 
@@ -75,7 +75,9 @@ const CartRecommendations = ({ excludeProductIds = [] }: CartRecommendationsProp
 
         setHasMore(newProducts.length === PRODUCTS_PER_PAGE);
       } catch (error) {
-        console.error("Error fetching products:", error);
+        if (!signal?.aborted) {
+          console.error("Error fetching products:", error);
+        }
       } finally {
         setIsLoading(false);
         setIsLoadingMore(false);
@@ -85,14 +87,26 @@ const CartRecommendations = ({ excludeProductIds = [] }: CartRecommendationsProp
   );
 
   useEffect(() => {
-    fetchProducts(0);
-  }, [fetchProducts, language]);
+    const controller = new AbortController();
+    setPage(0);
+    setProducts([]);
+    fetchProducts(0, false, controller.signal);
+    return () => controller.abort();
+  }, [excludeProductIds.join(','), language]);
 
   const loadMore = () => {
+    if (isLoadingMore || !hasMore) return;
     const nextPage = page + 1;
     setPage(nextPage);
     fetchProducts(nextPage, true);
   };
+
+  // Infinite scroll hook
+  const sentinelRef = useInfiniteScroll({
+    onLoadMore: loadMore,
+    hasMore,
+    isLoading: isLoadingMore,
+  });
 
   const getProductCardData = (product: Product) => {
     const currency = "AFN" as const;
@@ -136,19 +150,16 @@ const CartRecommendations = ({ excludeProductIds = [] }: CartRecommendationsProp
     en: {
       title: "You May Also Like",
       subtitle: "Explore more products you might be interested in",
-      loadMore: "Load More",
       loading: "Loading...",
     },
     fa: {
       title: "شاید بپسندید",
       subtitle: "محصولات بیشتری که ممکن است علاقه‌مند باشید را کاوش کنید",
-      loadMore: "نمایش بیشتر",
       loading: "در حال بارگذاری...",
     },
     ps: {
       title: "تاسو هم خوښ کړئ",
       subtitle: "نور محصولات وپلټئ چې تاسو یې علاقمند یاست",
-      loadMore: "نور وښایاست",
       loading: "پورته کیږي...",
     },
   };
@@ -202,19 +213,13 @@ const CartRecommendations = ({ excludeProductIds = [] }: CartRecommendationsProp
           ))}
         </div>
 
-        {/* Load More Button */}
-        {hasMore && (
-          <div className="flex justify-center mt-8">
-            <Button variant="outline" size="lg" onClick={loadMore} disabled={isLoadingMore} className="min-w-[200px]">
-              {isLoadingMore ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  {localText.loading}
-                </>
-              ) : (
-                localText.loadMore
-              )}
-            </Button>
+        {/* Infinite Scroll Sentinel */}
+        <div ref={sentinelRef} className="h-4" />
+        
+        {/* Loading indicator */}
+        {isLoadingMore && (
+          <div className="flex justify-center py-8">
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
           </div>
         )}
       </div>

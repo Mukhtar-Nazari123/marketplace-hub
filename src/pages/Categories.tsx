@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/lib/i18n";
 import { useCategories } from "@/hooks/useCategories";
@@ -11,7 +11,7 @@ import Footer from "@/components/layout/Footer";
 import HomepageCategories from "@/components/home/HomepageCategories";
 import StickyNavbar from "@/components/layout/StickyNavbar";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Package, Heart, ShoppingCart, Eye } from "lucide-react";
+import { Package, Heart, ShoppingCart, Eye, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProductRatings } from "@/hooks/useProductRatings";
@@ -22,6 +22,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 import { getLocalizedProductName } from "@/lib/localizedProduct";
 import { useCurrencyRate } from "@/hooks/useCurrencyRate";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 
 interface DbProduct {
   id: string;
@@ -55,7 +56,8 @@ const Categories = () => {
   const rootCategories = getRootCategories();
 
   const [sortBy, setSortBy] = useState("latest");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [displayCount, setDisplayCount] = useState(24);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
     priceRange: [0, 150000],
     rating: 0,
@@ -71,7 +73,7 @@ const Categories = () => {
   const currentCategory = selectedCategorySlug ? getCategoryBySlug(selectedCategorySlug) : undefined;
   const currentSubcategory = selectedSubcategorySlug ? getSubcategoryBySlug(selectedSubcategorySlug) : undefined;
 
-  const ITEMS_PER_PAGE = 24;
+  const ITEMS_PER_LOAD = 24;
 
   const getLocalizedName = (item?: { name: string; name_fa?: string | null; name_ps?: string | null } | null) => {
     if (!item) return "";
@@ -176,9 +178,9 @@ const Categories = () => {
     }
   }, [currentCategory?.id, currentSubcategory?.id, subcategories, categoriesLoading, language]);
 
-  // Reset page when filters change
+  // Reset display count when filters change
   useEffect(() => {
-    setCurrentPage(1);
+    setDisplayCount(24);
   }, [selectedCategorySlug, selectedSubcategorySlug, filters, sortBy]);
 
   // Convert DB products to display format
@@ -266,11 +268,27 @@ const Categories = () => {
     return result;
   }, [displayProducts, filters, sortBy]);
 
-  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
-  const paginatedProducts = filteredProducts.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+  const hasMore = displayCount < filteredProducts.length;
+  const displayedProducts = filteredProducts.slice(0, displayCount);
 
-  const productIds = useMemo(() => paginatedProducts.map((p) => p.id), [paginatedProducts]);
+  const productIds = useMemo(() => displayedProducts.map((p) => p.id), [displayedProducts]);
   const { getRating } = useProductRatings(productIds);
+
+  const loadMore = useCallback(() => {
+    if (isLoadingMore || !hasMore) return;
+    setIsLoadingMore(true);
+    setTimeout(() => {
+      setDisplayCount(prev => prev + ITEMS_PER_LOAD);
+      setIsLoadingMore(false);
+    }, 100);
+  }, [isLoadingMore, hasMore]);
+
+  // Infinite scroll hook
+  const sentinelRef = useInfiniteScroll({
+    onLoadMore: loadMore,
+    hasMore,
+    isLoading: isLoadingMore,
+  });
 
   const isLoading = categoriesLoading || productsLoading;
 
@@ -377,7 +395,7 @@ const Categories = () => {
               </div>
             ))}
           </div>
-        ) : paginatedProducts.length === 0 ? (
+        ) : displayedProducts.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mb-4">
               <Package className="h-12 w-12 text-muted-foreground" />
@@ -391,42 +409,22 @@ const Categories = () => {
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
-            {paginatedProducts.map((product) => (
+            {displayedProducts.map((product) => (
               <ProductCard key={product.id} product={product} getRating={getRating} />
             ))}
           </div>
         )}
 
-        {/* Pagination */}
-        {!isLoading && totalPages > 1 && (
-          <div className="flex justify-center gap-2 mt-8">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((p) => p - 1)}
-            >
-              {isRTL ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-            </Button>
-            {[...Array(Math.min(totalPages, 5))].map((_, i) => (
-              <Button
-                key={i}
-                variant={currentPage === i + 1 ? "cyan" : "outline"}
-                size="sm"
-                onClick={() => setCurrentPage(i + 1)}
-              >
-                {i + 1}
-              </Button>
-            ))}
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage((p) => p + 1)}
-            >
-              {isRTL ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
-            </Button>
-          </div>
+        {/* Infinite Scroll Sentinel */}
+        {!isLoading && (
+          <>
+            <div ref={sentinelRef} className="h-4" />
+            {isLoadingMore && (
+              <div className="flex justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              </div>
+            )}
+          </>
         )}
       </div>
 
