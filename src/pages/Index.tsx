@@ -4,6 +4,7 @@ import HomepageCategories from "@/components/home/HomepageCategories";
 import TodayDeals from "@/components/home/TodayDeals";
 import BestSellers from "@/components/home/BestSellers";
 import DiscoverProducts from "@/components/home/DiscoverProducts";
+import TopBar from "@/components/layout/TopBar";
 
 const Index = () => {
   return (
@@ -11,6 +12,10 @@ const Index = () => {
       {/* Hero Section */}
       <HeroSection />
 
+      {/* TopBar for Mobile/Tablet - Below hero section */}
+      <div className="lg:hidden">
+        <TopBar />
+      </div>
       {/* Category Grid */}
       <HomepageCategories />
 
