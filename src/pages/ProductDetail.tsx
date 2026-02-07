@@ -516,6 +516,29 @@ const ProductDetail = () => {
               {localizedName}
             </h1>
 
+            {/* Brand & Model - Prominent Display */}
+            {(product.metadata?.brand || attributes.brand || attributes.model) && (
+              <div className="flex flex-wrap items-center gap-3">
+                {(product.metadata?.brand || attributes.brand) && (
+                  <div className="flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-lg px-4 py-2">
+                    <Tag className="w-4 h-4 text-primary" />
+                    <span className="text-sm text-muted-foreground">{isRTL ? 'برند:' : 'Brand:'}</span>
+                    <span className="font-semibold text-foreground">
+                      {String(product.metadata?.brand || attributes.brand)}
+                    </span>
+                  </div>
+                )}
+                {attributes.model && (
+                  <div className="flex items-center gap-2 bg-muted border border-border rounded-lg px-4 py-2">
+                    <span className="text-sm text-muted-foreground">{isRTL ? 'مدل:' : 'Model:'}</span>
+                    <span className="font-semibold text-foreground">
+                      {String(attributes.model)}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Short Description */}
             {localizedShortDescription && (
               <p className="text-muted-foreground text-lg">
