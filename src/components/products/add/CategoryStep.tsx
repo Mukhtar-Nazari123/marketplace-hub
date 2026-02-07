@@ -151,7 +151,7 @@ export const CategoryStep = ({ formData, updateFormData }: CategoryStepProps) =>
       </div>
 
       {/* Main Categories */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4">
         {categories.map((category) => {
           const Icon = CATEGORY_ICONS[category.slug] || Folder;
           const isSelected = formData.categoryId === category.id;
@@ -165,25 +165,25 @@ export const CategoryStep = ({ formData, updateFormData }: CategoryStepProps) =>
               )}
               onClick={() => handleCategorySelect(category.id)}
             >
-              <CardContent className="p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
+              <CardContent className="p-3 lg:p-4 flex items-center gap-2 lg:gap-3">
                 <div className={cn(
-                  "w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center transition-colors shrink-0",
+                  "w-8 h-8 lg:w-10 lg:h-10 rounded-lg flex items-center justify-center transition-colors shrink-0",
                   isSelected ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
                 )}>
-                  <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <Icon className="w-4 h-4 lg:w-5 lg:h-5" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className={cn(
-                    "font-medium text-xs sm:text-sm line-clamp-2",
+                    "font-medium text-xs lg:text-sm line-clamp-2",
                     isSelected && "text-primary"
                   )}>
                     {isRTL && category.name_fa ? category.name_fa : category.name}
                   </p>
                 </div>
                 {isRTL ? (
-                  <ChevronLeft className={cn("w-4 h-4 text-muted-foreground shrink-0 hidden sm:block", isSelected && "text-primary")} />
+                  <ChevronLeft className={cn("w-4 h-4 text-muted-foreground shrink-0 hidden lg:block", isSelected && "text-primary")} />
                 ) : (
-                  <ChevronRight className={cn("w-4 h-4 text-muted-foreground shrink-0 hidden sm:block", isSelected && "text-primary")} />
+                  <ChevronRight className={cn("w-4 h-4 text-muted-foreground shrink-0 hidden lg:block", isSelected && "text-primary")} />
                 )}
               </CardContent>
             </Card>
