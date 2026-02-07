@@ -100,6 +100,35 @@ const EditProduct = () => {
 
       const metadata = (product.metadata as Record<string, unknown>) || {};
       
+      // Fetch category and subcategory names from the database
+      let categoryName = '';
+      let subCategoryName = '';
+      
+      if (product.category_id) {
+        const { data: categoryData } = await supabase
+          .from('categories')
+          .select('name, name_fa, slug')
+          .eq('id', product.category_id)
+          .maybeSingle();
+        
+        if (categoryData) {
+          // Use the name or slug - CategorySpecificFields uses pattern matching
+          categoryName = categoryData.name || categoryData.slug || '';
+        }
+      }
+      
+      if (product.subcategory_id) {
+        const { data: subCategoryData } = await supabase
+          .from('subcategories')
+          .select('name, name_fa')
+          .eq('id', product.subcategory_id)
+          .maybeSingle();
+        
+        if (subCategoryData) {
+          subCategoryName = isRTL && subCategoryData.name_fa ? subCategoryData.name_fa : subCategoryData.name;
+        }
+      }
+      
       // Fetch delivery options for this product
       const { data: deliveryOptionsData } = await supabase
         .from('delivery_options')
@@ -109,9 +138,9 @@ const EditProduct = () => {
       
       setFormData({
         categoryId: product.category_id || '',
-        categoryName: (metadata.categoryName as string) || '',
+        categoryName,
         subCategoryId: product.subcategory_id || '',
-        subCategoryName: (metadata.subCategoryName as string) || '',
+        subCategoryName,
         // Use translation data if available, fallback to product data
         name: translation?.name || '',
         shortDescription: translation?.short_description || (metadata.shortDescription as string) || '',
