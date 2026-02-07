@@ -1,8 +1,5 @@
 import { useLanguage } from '@/lib/i18n';
-import Header from '@/components/layout/Header';
-import Navigation from '@/components/layout/Navigation';
-import Footer from '@/components/layout/Footer';
-import StickyNavbar from '@/components/layout/StickyNavbar';
+import PublicLayout from '@/components/layout/PublicLayout';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Target, Eye, Heart, Award, Users, CheckCircle, History, Star, Sparkles } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -48,12 +45,7 @@ const About = () => {
   const isLoading = sectionsLoading || valuesLoading || teamLoading || awardsLoading;
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Auto-hide Sticky Navbar */}
-      <StickyNavbar>
-        <Header />
-        <Navigation />
-      </StickyNavbar>
+    <PublicLayout>
 
       {/* Breadcrumb */}
       <div className="bg-muted/50 py-3">
@@ -303,11 +295,9 @@ const About = () => {
               ))}
             </div>
           </div>
-        </section>
+      </section>
       )}
-
-      <Footer />
-    </div>
+    </PublicLayout>
   );
 };
 

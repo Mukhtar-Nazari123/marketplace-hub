@@ -9,10 +9,7 @@ import { useCart } from '@/hooks/useCart';
 import { useWishlist } from '@/hooks/useWishlist';
 import { useProductRating, useProductRatings } from '@/hooks/useProductRatings';
 import { useCurrencyRate } from '@/hooks/useCurrencyRate';
-import Header from '@/components/layout/Header';
-import Navigation from '@/components/layout/Navigation';
-import Footer from '@/components/layout/Footer';
-import StickyNavbar from '@/components/layout/StickyNavbar';
+import PublicLayout from '@/components/layout/PublicLayout';
 import ProductCard from '@/components/home/ProductCard';
 import ProductColorSwatches from '@/components/products/ProductColorSwatches';
 import { Button } from '@/components/ui/button';
@@ -256,12 +253,7 @@ const ProductDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
-        {/* Auto-hide Sticky Navbar */}
-        <StickyNavbar>
-          <Header />
-          <Navigation />
-        </StickyNavbar>
+      <PublicLayout>
         <div className="container mx-auto px-4 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <Skeleton className="aspect-square rounded-xl" />
@@ -274,21 +266,22 @@ const ProductDetail = () => {
             </div>
           </div>
         </div>
-        <Footer />
-      </div>
+      </PublicLayout>
     );
   }
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">{t.common.pageNotFound}</h1>
-          <Link to="/">
-            <Button variant="cyan">{t.common.backToHome}</Button>
-          </Link>
+      <PublicLayout>
+        <div className="flex items-center justify-center py-24">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold mb-4">{t.common.pageNotFound}</h1>
+            <Link to="/">
+              <Button variant="cyan">{t.common.backToHome}</Button>
+            </Link>
+          </div>
         </div>
-      </div>
+      </PublicLayout>
     );
   }
 
@@ -381,12 +374,7 @@ const ProductDetail = () => {
   const stockPerSize = product.metadata?.stockPerSize || {};
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Auto-hide Sticky Navbar */}
-      <StickyNavbar>
-        <Header />
-        <Navigation />
-      </StickyNavbar>
+    <PublicLayout>
 
       {/* Breadcrumb */}
       <div className="bg-muted/50 py-3">
@@ -873,9 +861,7 @@ const ProductDetail = () => {
           </section>
         )}
       </div>
-
-      <Footer />
-    </div>
+    </PublicLayout>
   );
 };
 

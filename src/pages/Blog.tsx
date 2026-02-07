@@ -2,10 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useLanguage } from '@/lib/i18n';
 import { useBlogs, useRecentBlogs } from '@/hooks/useBlogs';
-import Header from '@/components/layout/Header';
-import Navigation from '@/components/layout/Navigation';
-import Footer from '@/components/layout/Footer';
-import StickyNavbar from '@/components/layout/StickyNavbar';
+import PublicLayout from '@/components/layout/PublicLayout';
 import BlogCard from '@/components/blog/BlogCard';
 import BlogCardSkeleton from '@/components/blog/BlogCardSkeleton';
 import BlogSidebar from '@/components/blog/BlogSidebar';
@@ -88,15 +85,9 @@ const Blog = () => {
   }, [searchQuery]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <PublicLayout>
       {/* SEO Meta */}
       <title>{isRTL ? 'وبلاگ - یکتابازار' : 'Blog - YektaBazar'}</title>
-      
-      {/* Auto-hide Sticky Navbar */}
-      <StickyNavbar>
-        <Header />
-        <Navigation />
-      </StickyNavbar>
 
       {/* Breadcrumb */}
       <div className="bg-muted/50 py-3">
@@ -219,9 +210,7 @@ const Blog = () => {
           </div>
         </div>
       </section>
-
-      <Footer />
-    </div>
+    </PublicLayout>
   );
 };
 

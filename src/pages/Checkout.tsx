@@ -6,10 +6,7 @@ import { useLanguage } from '@/lib/i18n';
 import { useCurrencyRate } from '@/hooks/useCurrencyRate';
 import { supabase } from '@/integrations/supabase/client';
 import type { Json } from '@/integrations/supabase/types';
-import Header from '@/components/layout/Header';
-import Navigation from '@/components/layout/Navigation';
-import Footer from '@/components/layout/Footer';
-import StickyNavbar from '@/components/layout/StickyNavbar';
+import PublicLayout from '@/components/layout/PublicLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -577,12 +574,8 @@ const Checkout = () => {
   const ChevronBackIcon = isRTL ? ChevronRight : ChevronLeft;
 
   return (
-    <div className={cn('min-h-screen flex flex-col bg-background', isRTL && 'rtl')}>
-      {/* Auto-hide Sticky Navbar */}
-      <StickyNavbar>
-        <Header />
-        <Navigation />
-      </StickyNavbar>
+    <PublicLayout showFooter={true}>
+      <div className={cn(isRTL && 'rtl')}>
 
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
@@ -1096,9 +1089,8 @@ const Checkout = () => {
           </Card>
         </div>
       </main>
-
-      <Footer />
-    </div>
+      </div>
+    </PublicLayout>
   );
 };
 
