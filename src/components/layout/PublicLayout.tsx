@@ -41,10 +41,6 @@ const PublicLayout = ({
         {showMobileCategoryBar && <MobileCategoryBar />}
       </div>
 
-      {/* TopBar for Mobile/Tablet - Below header */}
-      <div className="lg:hidden">
-        <TopBar />
-      </div>
 
       {/* Main Content */}
       <main className="flex-1">
