@@ -165,25 +165,25 @@ export const CategoryStep = ({ formData, updateFormData }: CategoryStepProps) =>
               )}
               onClick={() => handleCategorySelect(category.id)}
             >
-              <CardContent className="p-4 flex items-center gap-3">
+              <CardContent className="p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
                 <div className={cn(
-                  "w-10 h-10 rounded-lg flex items-center justify-center transition-colors",
+                  "w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center transition-colors shrink-0",
                   isSelected ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
                 )}>
-                  <Icon className="w-5 h-5" />
+                  <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className={cn(
-                    "font-medium text-sm truncate",
+                    "font-medium text-xs sm:text-sm line-clamp-2",
                     isSelected && "text-primary"
                   )}>
                     {isRTL && category.name_fa ? category.name_fa : category.name}
                   </p>
                 </div>
                 {isRTL ? (
-                  <ChevronLeft className={cn("w-4 h-4 text-muted-foreground", isSelected && "text-primary")} />
+                  <ChevronLeft className={cn("w-4 h-4 text-muted-foreground shrink-0 hidden sm:block", isSelected && "text-primary")} />
                 ) : (
-                  <ChevronRight className={cn("w-4 h-4 text-muted-foreground", isSelected && "text-primary")} />
+                  <ChevronRight className={cn("w-4 h-4 text-muted-foreground shrink-0 hidden sm:block", isSelected && "text-primary")} />
                 )}
               </CardContent>
             </Card>
