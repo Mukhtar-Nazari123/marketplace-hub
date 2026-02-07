@@ -2,10 +2,7 @@ import { useState } from 'react';
 import { useLanguage } from '@/lib/i18n';
 import { useAuth } from '@/hooks/useAuth';
 import { useContactSettings } from '@/hooks/useContactSettings';
-import Header from '@/components/layout/Header';
-import Navigation from '@/components/layout/Navigation';
-import Footer from '@/components/layout/Footer';
-import StickyNavbar from '@/components/layout/StickyNavbar';
+import PublicLayout from '@/components/layout/PublicLayout';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -163,12 +160,7 @@ const Contact = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Auto-hide Sticky Navbar */}
-      <StickyNavbar>
-        <Header />
-        <Navigation />
-      </StickyNavbar>
+    <PublicLayout>
 
       {/* Breadcrumb */}
       <div className="bg-muted/50 py-3">
@@ -340,9 +332,7 @@ const Contact = () => {
           </div>
         </div>
       </section>
-
-      <Footer />
-    </div>
+    </PublicLayout>
   );
 };
 

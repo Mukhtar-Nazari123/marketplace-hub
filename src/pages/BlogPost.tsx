@@ -1,10 +1,7 @@
 import { Link, useParams } from 'react-router-dom';
 import { useLanguage } from '@/lib/i18n';
 import { useBlogBySlug, useRecentBlogs } from '@/hooks/useBlogs';
-import Header from '@/components/layout/Header';
-import Navigation from '@/components/layout/Navigation';
-import Footer from '@/components/layout/Footer';
-import StickyNavbar from '@/components/layout/StickyNavbar';
+import PublicLayout from '@/components/layout/PublicLayout';
 import BlogSidebar from '@/components/blog/BlogSidebar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -81,12 +78,7 @@ const BlogPost = () => {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
-        <StickyNavbar>
-          <Header />
-          <Navigation />
-        </StickyNavbar>
-
+      <PublicLayout>
         <div className="bg-muted/50 py-3">
           <div className="container mx-auto px-4">
             <Skeleton className="h-5 w-48" />
@@ -111,21 +103,14 @@ const BlogPost = () => {
             </div>
           </div>
         </div>
-
-        <Footer />
-      </div>
+      </PublicLayout>
     );
   }
 
   // Error state
   if (error || !blog) {
     return (
-      <div className="min-h-screen bg-background">
-        <StickyNavbar>
-          <Header />
-          <Navigation />
-        </StickyNavbar>
-
+      <PublicLayout>
         <div className="container mx-auto px-4 py-24 text-center">
           <div className="text-6xl mb-4">📝</div>
           <h1 className="text-2xl font-bold text-foreground mb-4">
@@ -143,23 +128,15 @@ const BlogPost = () => {
             </Button>
           </Link>
         </div>
-
-        <Footer />
-      </div>
+      </PublicLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <PublicLayout>
       {/* SEO Meta */}
       <title>{metaTitle || title}</title>
       <meta name="description" content={metaDescription || excerpt || ''} />
-      
-      {/* Auto-hide Sticky Navbar */}
-      <StickyNavbar>
-        <Header />
-        <Navigation />
-      </StickyNavbar>
 
       {/* Breadcrumb */}
       <div className="bg-muted/50 py-3">
@@ -315,9 +292,7 @@ const BlogPost = () => {
           </div>
         </div>
       </section>
-
-      <Footer />
-    </div>
+    </PublicLayout>
   );
 };
 

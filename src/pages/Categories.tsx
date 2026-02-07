@@ -5,11 +5,8 @@ import { useCategories } from "@/hooks/useCategories";
 import { supabase } from "@/integrations/supabase/client";
 import { FilterState } from "@/components/ui/ProductFilters";
 import FilterBar from "@/components/products/FilterBar";
-import Header from "@/components/layout/Header";
-import Navigation from "@/components/layout/Navigation";
-import Footer from "@/components/layout/Footer";
+import PublicLayout from "@/components/layout/PublicLayout";
 import HomepageCategories from "@/components/home/HomepageCategories";
-import StickyNavbar from "@/components/layout/StickyNavbar";
 import { Button } from "@/components/ui/button";
 import { Package, Heart, ShoppingCart, Eye, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -293,12 +290,7 @@ const Categories = () => {
   const isLoading = categoriesLoading || productsLoading;
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Auto-hide Sticky Navbar */}
-      <StickyNavbar>
-        <Header />
-        <Navigation />
-      </StickyNavbar>
+    <PublicLayout>
 
       {/* Temu-Style Filter Bar */}
       <FilterBar
@@ -427,9 +419,7 @@ const Categories = () => {
           </>
         )}
       </div>
-
-      <Footer />
-    </div>
+    </PublicLayout>
   );
 };
 

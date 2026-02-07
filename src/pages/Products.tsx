@@ -6,10 +6,7 @@ import { useCategories } from "@/hooks/useCategories";
 import { FilterState } from "@/components/ui/ProductFilters";
 import FilterBar from "@/components/products/FilterBar";
 import HomepageCategories from "@/components/home/HomepageCategories";
-import Header from "@/components/layout/Header";
-import Navigation from "@/components/layout/Navigation";
-import Footer from "@/components/layout/Footer";
-import StickyNavbar from "@/components/layout/StickyNavbar";
+import PublicLayout from "@/components/layout/PublicLayout";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Loader2, Search, Heart, ShoppingCart, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -190,12 +187,7 @@ const Products = () => {
   }, [products]);
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Auto-hide Sticky Navbar */}
-      <StickyNavbar>
-        <Header />
-        <Navigation />
-      </StickyNavbar>
+    <PublicLayout>
 
       {/* Temu-Style Filter Bar */}
       <FilterBar
@@ -327,9 +319,7 @@ const Products = () => {
           </>
         )}
       </div>
-
-      <Footer />
-    </div>
+    </PublicLayout>
   );
 };
 
