@@ -43,16 +43,16 @@ const TopBar = () => {
   return (
     <>
       {/* Desktop Layout */}
-      <div className="bg-[#b6b6b6] py-1.5 hidden lg:block" dir={isRTL ? "rtl" : "ltr"}>
+      <div className="bg-[hsl(var(--brand-neutral))] py-1.5 hidden lg:block" dir={isRTL ? "rtl" : "ltr"}>
         <div className="container">
           <div className="flex items-center justify-center gap-16">
             {allFeatures.map((feature, index) => {
               const Icon = feature.icon;
               return (
                 <div key={index} className="flex items-center gap-2 text-xs">
-                  <Icon className="h-4 w-4 text-black/70 flex-shrink-0" />
-                  <span className="font-semibold text-black">{feature.text}</span>
-                  <span className="text-black/60">{feature.subtext}</span>
+                  <Icon className="h-4 w-4 text-foreground/70 flex-shrink-0" />
+                  <span className="font-semibold text-foreground">{feature.text}</span>
+                  <span className="text-foreground/60">{feature.subtext}</span>
                 </div>
               );
             })}
@@ -60,30 +60,34 @@ const TopBar = () => {
         </div>
       </div>
 
-      {/* Mobile/Tablet Layout - 2 columns with margins to align with other sections */}
-      <div className="lg:hidden overflow-x-hidden" dir={isRTL ? "rtl" : "ltr"}>
-        <div className="bg-[#b6b6b6] mx-1 sm:mx-1.5 px-2 sm:px-3 py-1.5 rounded-sm box-border overflow-hidden">
-          <div className="grid grid-cols-2 items-center gap-2 w-full">
-            {/* Left - Free Shipping */}
-            <div className="flex items-center gap-1 sm:gap-1.5 text-[9px] sm:text-[10px] min-w-0 overflow-hidden">
-              <Truck className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-black/70 flex-shrink-0" />
-              <div className="flex flex-col leading-tight min-w-0 overflow-hidden">
-                <span className="font-semibold text-black truncate">{t.footer.freeShipping}</span>
-                <span className="text-black/60 truncate">{t.footer.ordersOver}</span>
-              </div>
-            </div>
 
-            {/* Right - Rotating between Free Returns and Secure Payment */}
-            <div className="flex items-center gap-1 sm:gap-1.5 text-[9px] sm:text-[10px] transition-opacity duration-300 min-w-0 overflow-hidden justify-start">
-              <RightIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-black/70 flex-shrink-0" />
-              <div className="flex flex-col leading-tight min-w-0 overflow-hidden">
-                <span className="font-semibold text-black truncate">{rightFeature.text}</span>
-                <span className="text-black/60 truncate">{rightFeature.subtext}</span>
+      {/* Mobile/Tablet Layout - aligned to the same container width as other sections */}
+      <div className="lg:hidden overflow-x-hidden" dir={isRTL ? "rtl" : "ltr"}>
+        <div className="container px-1 sm:px-1.5 lg:px-2">
+          <div className="bg-[hsl(var(--brand-neutral))] px-2 sm:px-3 py-1.5 rounded-sm w-full max-w-full box-border overflow-hidden">
+            <div className="grid grid-cols-2 items-center gap-2 w-full">
+              {/* Left - Free Shipping */}
+              <div className="flex items-center gap-1 sm:gap-1.5 text-[9px] sm:text-[10px] min-w-0 overflow-hidden">
+                <Truck className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-foreground/70 flex-shrink-0" />
+                <div className="flex flex-col leading-tight min-w-0 overflow-hidden">
+                  <span className="font-semibold text-foreground truncate">{t.footer.freeShipping}</span>
+                  <span className="text-foreground/60 truncate">{t.footer.ordersOver}</span>
+                </div>
+              </div>
+
+              {/* Right - Rotating between Free Returns and Secure Payment */}
+              <div className="flex items-center gap-1 sm:gap-1.5 text-[9px] sm:text-[10px] transition-opacity duration-300 min-w-0 overflow-hidden justify-start">
+                <RightIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-foreground/70 flex-shrink-0" />
+                <div className="flex flex-col leading-tight min-w-0 overflow-hidden">
+                  <span className="font-semibold text-foreground truncate">{rightFeature.text}</span>
+                  <span className="text-foreground/60 truncate">{rightFeature.subtext}</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
     </>
   );
 };
