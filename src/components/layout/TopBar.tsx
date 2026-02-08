@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { PackageCheck, ShieldCheck, RefreshCcw } from "lucide-react";
+import { Rocket, LockKeyhole, Repeat2 } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 
 const TopBar = () => {
@@ -17,17 +17,17 @@ const TopBar = () => {
   // All features for desktop
   const allFeatures = [
     {
-      icon: PackageCheck,
+      icon: Rocket,
       text: t.footer.freeShipping,
       subtext: t.footer.ordersOver,
     },
     {
-      icon: ShieldCheck,
+      icon: LockKeyhole,
       text: t.footer.securePayment,
       subtext: t.footer.protected,
     },
     {
-      icon: RefreshCcw,
+      icon: Repeat2,
       text: t.footer.easyReturns,
       subtext: t.footer.daysReturn,
     },
@@ -35,8 +35,8 @@ const TopBar = () => {
 
   // Dynamic right feature for mobile
   const rightFeature = showSecurePayment
-    ? { icon: ShieldCheck, text: t.footer.securePayment, subtext: t.footer.protected }
-    : { icon: RefreshCcw, text: t.footer.easyReturns, subtext: t.footer.daysReturn };
+    ? { icon: LockKeyhole, text: t.footer.securePayment, subtext: t.footer.protected }
+    : { icon: Repeat2, text: t.footer.easyReturns, subtext: t.footer.daysReturn };
 
   const RightIcon = rightFeature.icon;
 
@@ -67,7 +67,7 @@ const TopBar = () => {
             <div className="grid grid-cols-2 items-center gap-2 w-full">
               {/* Left - Free Shipping */}
               <div className="flex items-center gap-1 sm:gap-1.5 text-[9px] sm:text-[10px] min-w-0 overflow-hidden">
-                <PackageCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-foreground/70 flex-shrink-0" />
+                <Rocket className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-foreground/70 flex-shrink-0" />
                 <div className="flex flex-col leading-tight min-w-0 overflow-hidden">
                   <span className="font-semibold text-foreground truncate">{t.footer.freeShipping}</span>
                   <span className="text-foreground/60 truncate">{t.footer.ordersOver}</span>
