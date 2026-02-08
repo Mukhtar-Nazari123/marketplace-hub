@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Rocket, LockKeyhole, Repeat2 } from "lucide-react";
+import { Rocket, LockKeyhole, ArrowLeftRight } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 
 const TopBar = () => {
@@ -27,7 +27,7 @@ const TopBar = () => {
       subtext: t.footer.protected,
     },
     {
-      icon: Repeat2,
+      icon: ArrowLeftRight,
       text: t.footer.easyReturns,
       subtext: t.footer.daysReturn,
     },
@@ -36,7 +36,7 @@ const TopBar = () => {
   // Dynamic right feature for mobile
   const rightFeature = showSecurePayment
     ? { icon: LockKeyhole, text: t.footer.securePayment, subtext: t.footer.protected }
-    : { icon: Repeat2, text: t.footer.easyReturns, subtext: t.footer.daysReturn };
+    : { icon: ArrowLeftRight, text: t.footer.easyReturns, subtext: t.footer.daysReturn };
 
   const RightIcon = rightFeature.icon;
 
