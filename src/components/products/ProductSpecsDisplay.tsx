@@ -3,6 +3,45 @@ import { cn } from '@/lib/utils';
 import { useLanguage, Language } from '@/lib/i18n';
 import { Tag, Settings, ShieldCheck } from 'lucide-react';
 
+// Localized attribute labels for Food & Groceries and other categories
+const attributeLabels: Record<string, { en: string; fa: string; ps: string }> = {
+  // Food & Groceries
+  netWeight: { en: 'Net Weight', fa: 'وزن خالص', ps: 'خالص وزن' },
+  weightUnit: { en: 'Weight Unit', fa: 'واحد وزن', ps: 'د وزن واحد' },
+  shelfLife: { en: 'Shelf Life', fa: 'مدت ماندگاری', ps: 'د ساتلو موده' },
+  shelfLifeUnit: { en: 'Shelf Life Unit', fa: 'واحد ماندگاری', ps: 'د ساتلو واحد' },
+  storageCondition: { en: 'Storage Condition', fa: 'شرایط نگهداری', ps: 'د ساتلو شرایط' },
+  countryOfOrigin: { en: 'Country of Origin', fa: 'کشور سازنده', ps: 'د جوړولو هېواد' },
+  ingredients: { en: 'Ingredients', fa: 'مواد تشکیل دهنده', ps: 'اجزا' },
+  allergenWarnings: { en: 'Allergen Warnings', fa: 'هشدارهای آلرژی', ps: 'د الرژۍ خبرداری' },
+  isHalal: { en: 'Halal', fa: 'حلال', ps: 'حلال' },
+  isOrganic: { en: 'Organic', fa: 'ارگانیک', ps: 'طبیعي' },
+  isGlutenFree: { en: 'Gluten Free', fa: 'بدون گلوتن', ps: 'پرته له ګلوټین' },
+  isVegan: { en: 'Vegan', fa: 'وگان', ps: 'وېګان' },
+  isSugarFree: { en: 'Sugar Free', fa: 'بدون قند', ps: 'پرته له بورې' },
+  isNatural: { en: 'Natural', fa: 'طبیعی', ps: 'طبیعي' },
+  // Electronics
+  screenSize: { en: 'Screen Size', fa: 'اندازه صفحه', ps: 'د سکرین اندازه' },
+  processor: { en: 'Processor', fa: 'پردازنده', ps: 'پروسیسر' },
+  ram: { en: 'RAM', fa: 'رم', ps: 'رم' },
+  storage: { en: 'Storage', fa: 'حافظه', ps: 'ذخیره' },
+  batteryCapacity: { en: 'Battery Capacity', fa: 'ظرفیت باتری', ps: 'د بېټرۍ ظرفیت' },
+  operatingSystem: { en: 'Operating System', fa: 'سیستم عامل', ps: 'عامل سیستم' },
+  connectivity: { en: 'Connectivity', fa: 'اتصالات', ps: 'اړیکه' },
+  // Clothing
+  material: { en: 'Material', fa: 'جنس', ps: 'ډول' },
+  gender: { en: 'Gender', fa: 'جنسیت', ps: 'جنسیت' },
+  careInstructions: { en: 'Care Instructions', fa: 'دستورالعمل شستشو', ps: 'د پاملرنې لارښوونې' },
+  // Beauty
+  skinType: { en: 'Skin Type', fa: 'نوع پوست', ps: 'د پوستکي ډول' },
+  volume: { en: 'Volume', fa: 'حجم', ps: 'حجم' },
+  // Home & Living
+  dimensions: { en: 'Dimensions', fa: 'ابعاد', ps: 'ابعاد' },
+  weight: { en: 'Weight', fa: 'وزن', ps: 'وزن' },
+  // Sports
+  sportType: { en: 'Sport Type', fa: 'نوع ورزش', ps: 'د ورزش ډول' },
+  ageGroup: { en: 'Age Group', fa: 'رده سنی', ps: 'عمري ډله' },
+};
 interface ProductAttribute {
   attribute_key: string;
   attribute_value: string;
@@ -134,8 +173,19 @@ export const ProductSpecsDisplay = ({ metadata, attributes = [], className }: Pr
                   <div className="space-y-3 text-sm">
                     {otherSpecs.map(([key, value]) => {
                       if (!value) return null;
-                      const formattedKey = key.replace(/([A-Z])/g, ' $1').trim();
+                      // Use localized label if available, otherwise format the key
+                      const localizedLabel = attributeLabels[key]?.[language] || 
+                        key.replace(/([A-Z])/g, ' $1').trim();
                       const isLongValue = String(value).length > 50;
+                      
+                      // Format boolean values
+                      let displayValue = value;
+                      if (value === 'true') {
+                        displayValue = language === 'fa' ? 'بله' : language === 'ps' ? 'هو' : 'Yes';
+                      } else if (value === 'false') {
+                        displayValue = language === 'fa' ? 'خیر' : language === 'ps' ? 'نه' : 'No';
+                      }
+                      
                       return (
                         <div key={key} className={cn(
                           isLongValue ? "flex flex-col gap-1" : "flex gap-2 items-start"
@@ -144,14 +194,14 @@ export const ProductSpecsDisplay = ({ metadata, attributes = [], className }: Pr
                             "font-medium capitalize text-muted-foreground shrink-0",
                             !isLongValue && "min-w-[120px]"
                           )}>
-                            {formattedKey}:
+                            {localizedLabel}:
                           </span>
                           <span className={cn(
                             "font-semibold break-words",
                             isRTL ? "text-start" : "text-start",
                             isLongValue ? "whitespace-pre-wrap" : ""
                           )}>
-                            {value}
+                            {displayValue}
                           </span>
                         </div>
                       );
