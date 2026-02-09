@@ -203,12 +203,12 @@ const HomepageCategories = () => {
   };
 
   return (
-    <section className="py-3 bg-background" dir={isRTL ? 'rtl' : 'ltr'}>
-      <div className="container px-2">
-        <ScrollArea className="w-full" dir={isRTL ? 'rtl' : 'ltr'}>
+    <section className="py-3 bg-background">
+      <div className="container px-2" dir={isRTL ? 'rtl' : 'ltr'}>
+        <ScrollArea className="w-full">
           <div className="flex flex-col gap-3">
             {rows.map((row, rowIndex) => (
-              <div key={rowIndex} className={`flex gap-4 sm:gap-5 md:gap-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <div key={rowIndex} className="flex gap-4 sm:gap-5 md:gap-6">
                 {row.map((item) => (
                   <CategoryItem key={item.id} item={item} isSubcategory={showSubcategories} />
                 ))}
