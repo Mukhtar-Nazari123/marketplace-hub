@@ -20,6 +20,11 @@ import {
   Calendar,
   Palette,
   Layers,
+  UtensilsCrossed,
+  Thermometer,
+  Leaf,
+  FileText,
+  Package,
 } from "lucide-react";
 
 interface CategorySpecificFieldsProps {
@@ -692,6 +697,234 @@ export const CategorySpecificFields = ({
     </div>
   );
 
+  const renderFoodGroceriesFields = () => (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2 mb-4 text-primary">
+        <UtensilsCrossed className="w-5 h-5" />
+        <span className="font-medium">{isRTL ? "مشخصات مواد غذایی" : "Food & Groceries Specifications"}</span>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="space-y-2">
+          <Label className="flex items-center gap-2">
+            <Package className="w-4 h-4" />
+            {isRTL ? "وزن خالص" : "Net Weight"}
+          </Label>
+          <div className="flex gap-2">
+            <Input
+              type="number"
+              step="0.01"
+              value={(attributes.netWeight as string) || ""}
+              onChange={(e) => updateAttribute("netWeight", e.target.value)}
+              placeholder="0"
+              className="flex-1"
+            />
+            <Select
+              value={(attributes.weightUnit as string) || "g"}
+              onValueChange={(value) => updateAttribute("weightUnit", value)}
+            >
+              <SelectTrigger className="w-24">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="g">{isRTL ? "گرم" : "g"}</SelectItem>
+                <SelectItem value="kg">{isRTL ? "کیلوگرم" : "kg"}</SelectItem>
+                <SelectItem value="ml">{isRTL ? "میلی‌لیتر" : "ml"}</SelectItem>
+                <SelectItem value="l">{isRTL ? "لیتر" : "L"}</SelectItem>
+                <SelectItem value="pcs">{isRTL ? "عدد" : "pcs"}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label className="flex items-center gap-2">
+            <Calendar className="w-4 h-4" />
+            {isRTL ? "مدت ماندگاری" : "Shelf Life"}
+          </Label>
+          <div className="flex gap-2">
+            <Input
+              type="number"
+              value={(attributes.shelfLife as string) || ""}
+              onChange={(e) => updateAttribute("shelfLife", e.target.value)}
+              placeholder="0"
+              className="flex-1"
+            />
+            <Select
+              value={(attributes.shelfLifeUnit as string) || "days"}
+              onValueChange={(value) => updateAttribute("shelfLifeUnit", value)}
+            >
+              <SelectTrigger className="w-28">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="days">{isRTL ? "روز" : "Days"}</SelectItem>
+                <SelectItem value="weeks">{isRTL ? "هفته" : "Weeks"}</SelectItem>
+                <SelectItem value="months">{isRTL ? "ماه" : "Months"}</SelectItem>
+                <SelectItem value="years">{isRTL ? "سال" : "Years"}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label className="flex items-center gap-2">
+            <Thermometer className="w-4 h-4" />
+            {isRTL ? "شرایط نگهداری" : "Storage Conditions"}
+          </Label>
+          <Select
+            value={(attributes.storageCondition as string) || ""}
+            onValueChange={(value) => updateAttribute("storageCondition", value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder={isRTL ? "انتخاب کنید" : "Select"} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="room">{isRTL ? "دمای اتاق" : "Room Temperature"}</SelectItem>
+              <SelectItem value="cool">{isRTL ? "جای خنک و خشک" : "Cool & Dry Place"}</SelectItem>
+              <SelectItem value="refrigerated">{isRTL ? "یخچال (۲-۸ درجه)" : "Refrigerated (2-8°C)"}</SelectItem>
+              <SelectItem value="frozen">{isRTL ? "فریزر (زیر -۱۸ درجه)" : "Frozen (below -18°C)"}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label>{isRTL ? "کشور مبدأ" : "Country of Origin"}</Label>
+          <Input
+            value={(attributes.countryOfOrigin as string) || ""}
+            onChange={(e) => updateAttribute("countryOfOrigin", e.target.value)}
+            placeholder={isRTL ? "مثال: افغانستان، ایران" : "e.g., Afghanistan, Iran"}
+            className={cn(isRTL && "text-right")}
+          />
+        </div>
+
+        <div className="md:col-span-2 space-y-2">
+          <Label className="flex items-center gap-2">
+            <FileText className="w-4 h-4" />
+            {isRTL ? "مواد تشکیل‌دهنده" : "Ingredients"}
+          </Label>
+          <Textarea
+            value={(attributes.ingredients as string) || ""}
+            onChange={(e) => updateAttribute("ingredients", e.target.value)}
+            placeholder={isRTL ? "لیست مواد تشکیل‌دهنده را وارد کنید..." : "List all ingredients..."}
+            rows={3}
+            className={cn(isRTL && "text-right")}
+          />
+        </div>
+
+        <div className="md:col-span-2 space-y-2">
+          <Label>{isRTL ? "اطلاعات تغذیه‌ای (در هر ۱۰۰ گرم)" : "Nutritional Info (per 100g)"}</Label>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">{isRTL ? "کالری" : "Calories"}</Label>
+              <Input
+                type="number"
+                value={(attributes.calories as string) || ""}
+                onChange={(e) => updateAttribute("calories", e.target.value)}
+                placeholder="kcal"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">{isRTL ? "پروتئین" : "Protein"}</Label>
+              <Input
+                type="number"
+                step="0.1"
+                value={(attributes.protein as string) || ""}
+                onChange={(e) => updateAttribute("protein", e.target.value)}
+                placeholder="g"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">{isRTL ? "چربی" : "Fat"}</Label>
+              <Input
+                type="number"
+                step="0.1"
+                value={(attributes.fat as string) || ""}
+                onChange={(e) => updateAttribute("fat", e.target.value)}
+                placeholder="g"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs text-muted-foreground">{isRTL ? "کربوهیدرات" : "Carbs"}</Label>
+              <Input
+                type="number"
+                step="0.1"
+                value={(attributes.carbs as string) || ""}
+                onChange={(e) => updateAttribute("carbs", e.target.value)}
+                placeholder="g"
+              />
+            </div>
+          </div>
+        </div>
+
+        <Card className="md:col-span-2 p-4 space-y-4 bg-muted/30">
+          <Label className="flex items-center gap-2">
+            <Leaf className="w-4 h-4 text-primary" />
+            {isRTL ? "گواهینامه‌ها و ویژگی‌ها" : "Certifications & Features"}
+          </Label>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            <div className="flex items-center gap-3">
+              <Switch
+                checked={(attributes.isHalal as boolean) || false}
+                onCheckedChange={(checked) => updateAttribute("isHalal", checked)}
+              />
+              <span className="text-sm">{isRTL ? "حلال" : "Halal"}</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <Switch
+                checked={(attributes.isOrganic as boolean) || false}
+                onCheckedChange={(checked) => updateAttribute("isOrganic", checked)}
+              />
+              <span className="text-sm">{isRTL ? "ارگانیک" : "Organic"}</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <Switch
+                checked={(attributes.isGlutenFree as boolean) || false}
+                onCheckedChange={(checked) => updateAttribute("isGlutenFree", checked)}
+              />
+              <span className="text-sm">{isRTL ? "بدون گلوتن" : "Gluten-Free"}</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <Switch
+                checked={(attributes.isVegan as boolean) || false}
+                onCheckedChange={(checked) => updateAttribute("isVegan", checked)}
+              />
+              <span className="text-sm">{isRTL ? "گیاهی" : "Vegan"}</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <Switch
+                checked={(attributes.isSugarFree as boolean) || false}
+                onCheckedChange={(checked) => updateAttribute("isSugarFree", checked)}
+              />
+              <span className="text-sm">{isRTL ? "بدون قند" : "Sugar-Free"}</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <Switch
+                checked={(attributes.isNatural as boolean) || false}
+                onCheckedChange={(checked) => updateAttribute("isNatural", checked)}
+              />
+              <span className="text-sm">{isRTL ? "طبیعی" : "Natural"}</span>
+            </div>
+          </div>
+        </Card>
+
+        <div className="md:col-span-2 space-y-2">
+          <Label className="flex items-center gap-2">
+            <Shield className="w-4 h-4" />
+            {isRTL ? "هشدارهای آلرژی‌زا" : "Allergen Warnings"}
+          </Label>
+          <Textarea
+            value={(attributes.allergenWarnings as string) || ""}
+            onChange={(e) => updateAttribute("allergenWarnings", e.target.value)}
+            placeholder={isRTL ? "مثال: حاوی گلوتن، لبنیات، آجیل..." : "e.g., Contains gluten, dairy, nuts..."}
+            rows={2}
+            className={cn(isRTL && "text-right")}
+          />
+        </div>
+      </div>
+    </div>
+  );
+
   // Match category by name - works with both English names and Persian names
   const getCategoryType = (name: string): string => {
     const categoryMap: Record<string, string[]> = {
@@ -709,6 +942,7 @@ export const CategorySpecificFields = ({
       ],
       sports: ["sports", "sports-outdoor", "ورزش", "sports & outdoor", "outdoor", "ورزشی"],
       baby: ["baby", "baby-kids", "کودک", "baby & kids", "kids", "نوزاد", "بچه"],
+      food: ["food", "food-groceries", "groceries", "غذا", "خواربار", "مواد غذایی", "food & groceries"],
     };
 
     const normalizedName = name.toLowerCase();
@@ -737,6 +971,8 @@ export const CategorySpecificFields = ({
       return renderSportsFields();
     case "baby":
       return renderBabyFields();
+    case "food":
+      return renderFoodGroceriesFields();
     default:
       return (
         <Card className="p-4 bg-muted/30">
