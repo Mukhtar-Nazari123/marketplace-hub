@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { ProductSpecsDisplay } from '@/components/products/ProductSpecsDisplay';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/lib/i18n';
 import { getCategoryName } from '@/lib/localizedContent';
@@ -102,6 +103,7 @@ const ProductDetail = () => {
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [colorMedia, setColorMedia] = useState<{ color_value: string; url: string }[]>([]);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [productAttributes, setProductAttributes] = useState<{ attribute_key: string; attribute_value: string; language_code: string | null }[]>([]);
 
   // Fetch product rating
   const { averageRating, reviewCount, refetch: refetchRating } = useProductRating(product?.id || '');
@@ -172,6 +174,14 @@ const ProductDetail = () => {
           setColorMedia([]);
         }
         setSelectedColor(null);
+
+        // Fetch product attributes from normalized table
+        const { data: attrsData } = await supabase
+          .from('product_attributes')
+          .select('attribute_key, attribute_value, language_code')
+          .eq('product_id', data.id)
+          .order('sort_order');
+        setProductAttributes(attrsData || []);
 
         // Fetch related products
         if (data.category_id) {
@@ -338,38 +348,8 @@ const ProductDetail = () => {
   const localizedDescription = getLocalizedProductDescription(product, language);
   const localizedShortDescription = getLocalizedShortDescription(product, language) || product.metadata?.shortDescription || '';
   
-  // Get specifications from metadata - can be either an object or within attributes
-  const rawSpecifications = product.metadata?.specifications || {};
-  const attributes = (product.metadata?.attributes as Record<string, unknown>) || {};
-  
-  // Parse attributes.specifications if it's a string (Technical Specifications from text area)
-  const technicalSpecsString = typeof attributes.specifications === 'string' ? attributes.specifications : null;
-  
-  // Build specifications object from both sources
-  const specifications: Record<string, string> = {};
-  
-  // Add object-based specifications if available
-  if (typeof rawSpecifications === 'object' && rawSpecifications !== null) {
-    Object.entries(rawSpecifications).forEach(([key, value]) => {
-      if (value) specifications[key] = String(value);
-    });
-  }
-  
-  // Add key attributes as specifications
-  if (attributes.model) specifications[isRTL ? 'مدل' : 'Model'] = String(attributes.model);
-  if (attributes.productionYear) specifications[isRTL ? 'سال تولید' : 'Year'] = String(attributes.productionYear);
-  if (attributes.hasWarranty) specifications[isRTL ? 'گارانتی' : 'Warranty'] = attributes.warrantyDuration ? String(attributes.warrantyDuration) : (isRTL ? 'دارد' : 'Yes');
-  if (attributes.color) specifications[isRTL ? 'رنگ' : 'Color'] = String(attributes.color);
-  if (attributes.material) specifications[isRTL ? 'جنس' : 'Material'] = String(attributes.material);
-  if (attributes.fabric) specifications[isRTL ? 'پارچه' : 'Fabric'] = String(attributes.fabric);
-  if (attributes.gender) specifications[isRTL ? 'جنسیت' : 'Gender'] = String(attributes.gender);
-  if (attributes.dimensions) specifications[isRTL ? 'ابعاد' : 'Dimensions'] = String(attributes.dimensions);
-  if (attributes.weight) specifications[isRTL ? 'وزن' : 'Weight'] = String(attributes.weight);
-  if (attributes.volume) specifications[isRTL ? 'حجم' : 'Volume'] = String(attributes.volume);
-  if (attributes.skinType) specifications[isRTL ? 'نوع پوست' : 'Skin Type'] = String(attributes.skinType);
-  if (attributes.sportType) specifications[isRTL ? 'نوع ورزش' : 'Sport Type'] = String(attributes.sportType);
-  if (attributes.ageRange) specifications[isRTL ? 'رده سنی' : 'Age Range'] = String(attributes.ageRange);
-  if (attributes.countryOfOrigin) specifications[isRTL ? 'کشور سازنده' : 'Country of Origin'] = String(attributes.countryOfOrigin);
+  // Check if product has attributes from the normalized table
+  const hasProductAttributes = productAttributes.length > 0;
   
   const stockPerSize = product.metadata?.stockPerSize || {};
 
@@ -504,28 +484,31 @@ const ProductDetail = () => {
               {localizedName}
             </h1>
 
-            {/* Brand & Model - Prominent Display */}
-            {(product.metadata?.brand || attributes.brand || attributes.model) && (
-              <div className="flex flex-wrap items-center gap-3">
-                {(product.metadata?.brand || attributes.brand) && (
-                  <div className="flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-lg px-4 py-2">
-                    <Tag className="w-4 h-4 text-primary" />
-                    <span className="text-sm text-muted-foreground">{isRTL ? 'برند:' : 'Brand:'}</span>
-                    <span className="font-semibold text-foreground">
-                      {String(product.metadata?.brand || attributes.brand)}
-                    </span>
-                  </div>
-                )}
-                {attributes.model && (
-                  <div className="flex items-center gap-2 bg-muted border border-border rounded-lg px-4 py-2">
-                    <span className="text-sm text-muted-foreground">{isRTL ? 'مدل:' : 'Model:'}</span>
-                    <span className="font-semibold text-foreground">
-                      {String(attributes.model)}
-                    </span>
-                  </div>
-                )}
-              </div>
-            )}
+            {/* Brand & Model - from product_attributes */}
+            {(() => {
+              const brandAttr = productAttributes.find(a => a.attribute_key === 'brand');
+              const modelAttr = productAttributes.find(a => a.attribute_key === 'model');
+              const brand = brandAttr?.attribute_value || product.metadata?.brand;
+              const model = modelAttr?.attribute_value;
+              if (!brand && !model) return null;
+              return (
+                <div className="flex flex-wrap items-center gap-3">
+                  {brand && (
+                    <div className="flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-lg px-4 py-2">
+                      <Tag className="w-4 h-4 text-primary" />
+                      <span className="text-sm text-muted-foreground">{isRTL ? 'برند:' : 'Brand:'}</span>
+                      <span className="font-semibold text-foreground">{String(brand)}</span>
+                    </div>
+                  )}
+                  {model && (
+                    <div className="flex items-center gap-2 bg-muted border border-border rounded-lg px-4 py-2">
+                      <span className="text-sm text-muted-foreground">{isRTL ? 'مدل:' : 'Model:'}</span>
+                      <span className="font-semibold text-foreground">{String(model)}</span>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
 
             {/* Short Description */}
             {localizedShortDescription && (
@@ -736,7 +719,7 @@ const ProductDetail = () => {
         {/* Tabs - default to specifications if no description but specs exist */}
         <Tabs 
           defaultValue={
-            !localizedDescription && (Object.keys(specifications).length > 0 || technicalSpecsString)
+            !localizedDescription && hasProductAttributes
               ? "specifications"
               : "description"
           } 
@@ -750,7 +733,7 @@ const ProductDetail = () => {
             >
               {isRTL ? 'توضیحات' : 'Description'}
             </TabsTrigger>
-            {(Object.keys(specifications).length > 0 || technicalSpecsString) && (
+            {hasProductAttributes && (
               <TabsTrigger
                 value="specifications"
                 className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent"
@@ -776,29 +759,9 @@ const ProductDetail = () => {
             </div>
           </TabsContent>
 
-          {(Object.keys(specifications).length > 0 || technicalSpecsString) && (
-            <TabsContent value="specifications" className={`pt-6 ${isRTL ? 'text-right' : 'text-left'}`}>
-              {/* Technical Specifications from textarea */}
-              {technicalSpecsString && (
-                <div className="mb-6 p-4 bg-muted/50 rounded-lg border border-border">
-                  <h4 className="font-medium mb-3">{isRTL ? 'مشخصات فنی' : 'Technical Specifications'}</h4>
-                  <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
-                    {technicalSpecsString}
-                  </p>
-                </div>
-              )}
-              
-              {/* Key-value specifications */}
-              {Object.keys(specifications).length > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {Object.entries(specifications).map(([key, value]) => (
-                    <div key={key} className={`flex ${isRTL ? 'flex-row-reverse' : ''} justify-between p-3 bg-muted/50 rounded-lg border border-border`}>
-                      <span className="text-muted-foreground">{key}</span>
-                      <span className="font-medium">{String(value)}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
+          {hasProductAttributes && (
+            <TabsContent value="specifications" className="pt-6">
+              <ProductSpecsDisplay metadata={product.metadata} attributes={productAttributes} />
             </TabsContent>
           )}
 
