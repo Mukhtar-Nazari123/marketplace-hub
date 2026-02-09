@@ -453,12 +453,18 @@ export async function loadProductWithTranslations(
     .or(`language_code.eq.${language},language_code.is.null`)
     .order('sort_order');
 
-  // Convert attributes array to object
-  const attributesObj: Record<string, string> = {};
+  // Convert attributes array to object, restoring booleans and arrays
+  const attributesObj: Record<string, string | boolean | string[]> = {};
   let brand = '';
   attributes?.forEach(attr => {
     if (attr.attribute_key === 'brand') {
       brand = attr.attribute_value;
+    } else if (attr.attribute_value === 'true') {
+      attributesObj[attr.attribute_key] = true;
+    } else if (attr.attribute_value === 'false') {
+      attributesObj[attr.attribute_key] = false;
+    } else if (['sizes', 'colors'].includes(attr.attribute_key) && attr.attribute_value.includes(', ')) {
+      attributesObj[attr.attribute_key] = attr.attribute_value.split(', ');
     } else {
       attributesObj[attr.attribute_key] = attr.attribute_value;
     }
