@@ -205,10 +205,10 @@ const HomepageCategories = () => {
   return (
     <section className="py-3 bg-background">
       <div className="container px-2" dir={isRTL ? 'rtl' : 'ltr'}>
-        <ScrollArea className="w-full">
+        <ScrollArea className="w-full" dir={isRTL ? 'rtl' : 'ltr'}>
           <div className="flex flex-col gap-3">
             {rows.map((row, rowIndex) => (
-              <div key={rowIndex} className="flex gap-4 sm:gap-5 md:gap-6">
+              <div key={rowIndex} className={`flex gap-4 sm:gap-5 md:gap-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
                 {row.map((item) => (
                   <CategoryItem key={item.id} item={item} isSubcategory={showSubcategories} />
                 ))}
