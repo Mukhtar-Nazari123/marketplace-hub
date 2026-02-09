@@ -27,6 +27,14 @@ import sportswear from '@/assets/subcategories/sportswear.jpg';
 import toys from '@/assets/subcategories/toys.jpg';
 import womensClothing from '@/assets/subcategories/womens-clothing.jpg';
 
+// Food & Groceries subcategories
+import foodGroceries from '@/assets/subcategories/food-groceries.jpg';
+import riceGrains from '@/assets/subcategories/rice-grains.jpg';
+import oilsCooking from '@/assets/subcategories/oils-cooking.jpg';
+import dairy from '@/assets/subcategories/dairy.jpg';
+import legumes from '@/assets/subcategories/legumes.jpg';
+import proteins from '@/assets/subcategories/proteins.jpg';
+
 // Map slug to local image
 export const subcategoryImageMap: Record<string, string> = {
   'audio': audio,
@@ -56,6 +64,13 @@ export const subcategoryImageMap: Record<string, string> = {
   'sportswear': sportswear,
   'toys': toys,
   'women': womensClothing,
+  // Food & Groceries
+  'food-groceries': foodGroceries,
+  'rice-grains': riceGrains,
+  'oils-cooking': oilsCooking,
+  'dairy': dairy,
+  'legumes': legumes,
+  'proteins': proteins,
 };
 
 export const getSubcategoryImage = (slug: string): string | undefined => {
