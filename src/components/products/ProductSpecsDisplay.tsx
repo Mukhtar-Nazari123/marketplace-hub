@@ -11,9 +11,11 @@ const attributeLabels: Record<string, { en: string; fa: string; ps: string }> = 
   shelfLife: { en: 'Shelf Life', fa: 'مدت ماندگاری', ps: 'د ساتلو موده' },
   shelfLifeUnit: { en: 'Shelf Life Unit', fa: 'واحد ماندگاری', ps: 'د ساتلو واحد' },
   storageCondition: { en: 'Storage Condition', fa: 'شرایط نگهداری', ps: 'د ساتلو شرایط' },
+  storageConditions: { en: 'Storage Conditions', fa: 'شرایط نگهداری', ps: 'د ساتلو شرایط' },
   countryOfOrigin: { en: 'Country of Origin', fa: 'کشور سازنده', ps: 'د جوړولو هېواد' },
   ingredients: { en: 'Ingredients', fa: 'مواد تشکیل دهنده', ps: 'اجزا' },
   allergenWarnings: { en: 'Allergen Warnings', fa: 'هشدارهای آلرژی', ps: 'د الرژۍ خبرداری' },
+  safetyWarnings: { en: 'Safety Warnings', fa: 'هشدارهای ایمنی', ps: 'د خوندیتوب خبرداری' },
   isHalal: { en: 'Halal', fa: 'حلال', ps: 'حلال' },
   isOrganic: { en: 'Organic', fa: 'ارگانیک', ps: 'طبیعي' },
   isGlutenFree: { en: 'Gluten Free', fa: 'بدون گلوتن', ps: 'پرته له ګلوټین' },
@@ -28,19 +30,35 @@ const attributeLabels: Record<string, { en: string; fa: string; ps: string }> = 
   batteryCapacity: { en: 'Battery Capacity', fa: 'ظرفیت باتری', ps: 'د بېټرۍ ظرفیت' },
   operatingSystem: { en: 'Operating System', fa: 'سیستم عامل', ps: 'عامل سیستم' },
   connectivity: { en: 'Connectivity', fa: 'اتصالات', ps: 'اړیکه' },
+  cameraResolution: { en: 'Camera Resolution', fa: 'رزولوشن دوربین', ps: 'د کمرې ریزولوشن' },
   // Clothing
   material: { en: 'Material', fa: 'جنس', ps: 'ډول' },
   gender: { en: 'Gender', fa: 'جنسیت', ps: 'جنسیت' },
   careInstructions: { en: 'Care Instructions', fa: 'دستورالعمل شستشو', ps: 'د پاملرنې لارښوونې' },
-  // Beauty
+  size: { en: 'Size', fa: 'سایز', ps: 'اندازه' },
+  color: { en: 'Color', fa: 'رنگ', ps: 'رنګ' },
+  colors: { en: 'Colors', fa: 'رنگ‌ها', ps: 'رنګونه' },
+  sizes: { en: 'Sizes', fa: 'سایزها', ps: 'اندازې' },
+  // Beauty & Personal Care
   skinType: { en: 'Skin Type', fa: 'نوع پوست', ps: 'د پوستکي ډول' },
+  hairType: { en: 'Hair Type', fa: 'نوع مو', ps: 'د ویښتانو ډول' },
   volume: { en: 'Volume', fa: 'حجم', ps: 'حجم' },
+  fragranceType: { en: 'Fragrance Type', fa: 'نوع عطر', ps: 'د عطر ډول' },
   // Home & Living
   dimensions: { en: 'Dimensions', fa: 'ابعاد', ps: 'ابعاد' },
   weight: { en: 'Weight', fa: 'وزن', ps: 'وزن' },
-  // Sports
+  roomType: { en: 'Room Type', fa: 'نوع اتاق', ps: 'د خونې ډول' },
+  // Sports & Outdoor
   sportType: { en: 'Sport Type', fa: 'نوع ورزش', ps: 'د ورزش ډول' },
   ageGroup: { en: 'Age Group', fa: 'رده سنی', ps: 'عمري ډله' },
+  fitnessLevel: { en: 'Fitness Level', fa: 'سطح تناسب اندام', ps: 'د فټنس کچه' },
+  // Baby & Kids
+  ageRange: { en: 'Age Range', fa: 'محدوده سنی', ps: 'عمري حد' },
+  safetyStandards: { en: 'Safety Standards', fa: 'استانداردهای ایمنی', ps: 'د خوندیتوب معیارونه' },
+  // General
+  model: { en: 'Model', fa: 'مدل', ps: 'ماډل' },
+  warranty: { en: 'Warranty', fa: 'گارانتی', ps: 'ګارنټي' },
+  condition: { en: 'Condition', fa: 'وضعیت', ps: 'حالت' },
 };
 interface ProductAttribute {
   attribute_key: string;
