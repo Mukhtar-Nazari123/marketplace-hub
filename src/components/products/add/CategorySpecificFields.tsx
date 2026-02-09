@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useLanguage } from "@/lib/i18n";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -914,6 +915,17 @@ export const CategorySpecificFields = ({
 
   const categoryType = getCategoryType(categoryName);
 
+  // Initialize default values for category-specific fields
+  useEffect(() => {
+    if (categoryType === 'food') {
+      const defaults: Record<string, string> = {};
+      if (!attributes.weightUnit) defaults.weightUnit = 'g';
+      if (!attributes.shelfLifeUnit) defaults.shelfLifeUnit = 'days';
+      if (Object.keys(defaults).length > 0) {
+        updateAttributes({ ...attributes, ...defaults });
+      }
+    }
+  }, [categoryType]); // Only run when category changes
   switch (categoryType) {
     case "electronics":
       return renderElectronicsFields();
