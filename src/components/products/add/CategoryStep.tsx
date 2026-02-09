@@ -16,7 +16,8 @@ import {
   Baby,
   ChevronRight,
   ChevronLeft,
-  Folder
+  Folder,
+  ShoppingBasket
 } from 'lucide-react';
 
 interface CategoryStepProps {
@@ -47,6 +48,7 @@ const CATEGORY_ICONS: Record<string, React.ComponentType<{ className?: string }>
   'beauty-personal-care': Sparkles,
   'sports-outdoor': Dumbbell,
   'baby-kids': Baby,
+  'food-groceries': ShoppingBasket,
 };
 
 export const CategoryStep = ({ formData, updateFormData }: CategoryStepProps) => {
