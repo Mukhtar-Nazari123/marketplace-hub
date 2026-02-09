@@ -812,50 +812,6 @@ export const CategorySpecificFields = ({
           />
         </div>
 
-        <div className="md:col-span-2 space-y-2">
-          <Label>{isRTL ? "اطلاعات تغذیه‌ای (در هر ۱۰۰ گرم)" : "Nutritional Info (per 100g)"}</Label>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="space-y-1">
-              <Label className="text-xs text-muted-foreground">{isRTL ? "کالری" : "Calories"}</Label>
-              <Input
-                type="number"
-                value={(attributes.calories as string) || ""}
-                onChange={(e) => updateAttribute("calories", e.target.value)}
-                placeholder="kcal"
-              />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-xs text-muted-foreground">{isRTL ? "پروتئین" : "Protein"}</Label>
-              <Input
-                type="number"
-                step="0.1"
-                value={(attributes.protein as string) || ""}
-                onChange={(e) => updateAttribute("protein", e.target.value)}
-                placeholder="g"
-              />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-xs text-muted-foreground">{isRTL ? "چربی" : "Fat"}</Label>
-              <Input
-                type="number"
-                step="0.1"
-                value={(attributes.fat as string) || ""}
-                onChange={(e) => updateAttribute("fat", e.target.value)}
-                placeholder="g"
-              />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-xs text-muted-foreground">{isRTL ? "کربوهیدرات" : "Carbs"}</Label>
-              <Input
-                type="number"
-                step="0.1"
-                value={(attributes.carbs as string) || ""}
-                onChange={(e) => updateAttribute("carbs", e.target.value)}
-                placeholder="g"
-              />
-            </div>
-          </div>
-        </div>
 
         <Card className="md:col-span-2 p-4 space-y-4 bg-muted/30">
           <Label className="flex items-center gap-2">
