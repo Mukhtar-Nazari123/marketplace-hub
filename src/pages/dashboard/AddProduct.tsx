@@ -167,6 +167,61 @@ const AddProduct = () => {
     }
   };
 
+  // Helper function to upload a single file with retry logic
+  const uploadFileWithRetry = async (
+    file: File,
+    fileName: string,
+    maxRetries = 3
+  ): Promise<string> => {
+    let lastError: Error | null = null;
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const { data, error } = await supabase.storage
+          .from('seller-assets')
+          .upload(fileName, file, {
+            cacheControl: '3600',
+            upsert: false
+          });
+
+        if (error) {
+          // If it's a duplicate error, try with a different filename
+          if (error.message?.includes('already exists') || error.message?.includes('duplicate')) {
+            const newFileName = fileName.replace(/(\.[^.]+)$/, `-${Date.now()}$1`);
+            const retryResult = await supabase.storage
+              .from('seller-assets')
+              .upload(newFileName, file, { cacheControl: '3600', upsert: false });
+            
+            if (retryResult.error) throw retryResult.error;
+            
+            const { data: urlData } = supabase.storage
+              .from('seller-assets')
+              .getPublicUrl(newFileName);
+            
+            return urlData.publicUrl;
+          }
+          throw error;
+        }
+
+        const { data: urlData } = supabase.storage
+          .from('seller-assets')
+          .getPublicUrl(fileName);
+
+        return urlData.publicUrl;
+      } catch (err: any) {
+        lastError = err;
+        console.warn(`Upload attempt ${attempt}/${maxRetries} failed:`, err.message);
+        
+        // Wait before retry (exponential backoff)
+        if (attempt < maxRetries) {
+          await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+        }
+      }
+    }
+    
+    throw lastError || new Error('Upload failed after retries');
+  };
+
   const uploadMedia = async (): Promise<{ 
     imageUrls: string[]; 
     videoUrl: string;
@@ -179,52 +234,33 @@ const AddProduct = () => {
 
     try {
       // Upload general images - path must start with user ID for RLS policy
-      for (const image of formData.images) {
-        const fileName = `${user?.id}/products/${Date.now()}-${image.name}`;
-        const { data, error } = await supabase.storage
-          .from('seller-assets')
-          .upload(fileName, image);
-
-        if (error) throw error;
-
-        const { data: urlData } = supabase.storage
-          .from('seller-assets')
-          .getPublicUrl(fileName);
-
-        uploadedImageUrls.push(urlData.publicUrl);
+      for (let i = 0; i < formData.images.length; i++) {
+        const image = formData.images[i];
+        // Sanitize filename to remove special characters
+        const sanitizedName = image.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+        const fileName = `${user?.id}/products/${Date.now()}-${i}-${sanitizedName}`;
+        
+        const publicUrl = await uploadFileWithRetry(image, fileName);
+        uploadedImageUrls.push(publicUrl);
       }
 
       // Upload video if exists - path must start with user ID for RLS policy
       if (formData.video) {
-        const fileName = `${user?.id}/videos/${Date.now()}-${formData.video.name}`;
-        const { data, error } = await supabase.storage
-          .from('seller-assets')
-          .upload(fileName, formData.video);
-
-        if (error) throw error;
-
-        const { data: urlData } = supabase.storage
-          .from('seller-assets')
-          .getPublicUrl(fileName);
-
-        uploadedVideoUrl = urlData.publicUrl;
+        const sanitizedName = formData.video.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+        const fileName = `${user?.id}/videos/${Date.now()}-${sanitizedName}`;
+        
+        uploadedVideoUrl = await uploadFileWithRetry(formData.video, fileName);
       }
 
       // Upload color-specific images
       for (const [colorValue, file] of Object.entries(formData.colorImages)) {
         if (file) {
-          const fileName = `${user?.id}/products/colors/${Date.now()}-${colorValue}-${file.name}`;
-          const { data, error } = await supabase.storage
-            .from('seller-assets')
-            .upload(fileName, file);
-
-          if (error) throw error;
-
-          const { data: urlData } = supabase.storage
-            .from('seller-assets')
-            .getPublicUrl(fileName);
-
-          uploadedColorImageUrls[colorValue] = urlData.publicUrl;
+          const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+          const sanitizedColor = colorValue.replace(/[^a-zA-Z0-9]/g, '_');
+          const fileName = `${user?.id}/products/colors/${Date.now()}-${sanitizedColor}-${sanitizedName}`;
+          
+          const publicUrl = await uploadFileWithRetry(file, fileName);
+          uploadedColorImageUrls[colorValue] = publicUrl;
         }
       }
 
