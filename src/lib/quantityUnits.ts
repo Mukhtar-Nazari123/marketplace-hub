@@ -13,8 +13,23 @@ export const QUANTITY_UNITS = [
   { value: 'dozen', en: 'dozen', fa: 'دوجین', ps: 'درجن', label_en: 'Dozen', label_fa: 'دوجین', label_ps: 'درجن' },
 ];
 
+// Aliases for common unit value variants stored in the database
+const UNIT_ALIASES: Record<string, string> = {
+  'l': 'lt',
+  'liter': 'lt',
+  'litre': 'lt',
+  'kilogram': 'kg',
+  'gram': 'g',
+  'meter': 'm',
+  'centimeter': 'cm',
+  'milliliter': 'ml',
+  'piece': 'pcs',
+  'pieces': 'pcs',
+};
+
 export function getUnitLabel(unitValue: string, language: 'en' | 'fa' | 'ps'): string {
-  const unit = QUANTITY_UNITS.find(u => u.value === unitValue);
+  const normalized = UNIT_ALIASES[unitValue] || unitValue;
+  const unit = QUANTITY_UNITS.find(u => u.value === normalized);
   if (!unit) return unitValue || 'pcs';
   return unit[language] || unit.en;
 }
