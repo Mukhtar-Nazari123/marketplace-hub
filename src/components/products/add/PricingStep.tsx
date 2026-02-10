@@ -11,21 +11,7 @@ import { generateSKU } from '@/lib/skuGenerator';
 import { Separator } from '@/components/ui/separator';
 import { DeliveryOptionsStep, DeliveryOptionInput } from './DeliveryOptionsStep';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-
-const QUANTITY_UNITS = [
-  { value: 'pcs', en: 'Pieces', fa: 'عدد', ps: 'ټوټه' },
-  { value: 'kg', en: 'Kilogram (kg)', fa: 'کیلوگرم (kg)', ps: 'کیلوګرام (kg)' },
-  { value: 'g', en: 'Gram (g)', fa: 'گرم (g)', ps: 'ګرام (g)' },
-  { value: 'lt', en: 'Liter (lt)', fa: 'لیتر (lt)', ps: 'لیتر (lt)' },
-  { value: 'ml', en: 'Milliliter (ml)', fa: 'میلی‌لیتر (ml)', ps: 'میلي لیتر (ml)' },
-  { value: 'm', en: 'Meter (m)', fa: 'متر (m)', ps: 'متر (m)' },
-  { value: 'cm', en: 'Centimeter (cm)', fa: 'سانتی‌متر (cm)', ps: 'سانتي متر (cm)' },
-  { value: 'box', en: 'Box', fa: 'جعبه', ps: 'بکس' },
-  { value: 'pack', en: 'Pack', fa: 'بسته', ps: 'بسته' },
-  { value: 'set', en: 'Set', fa: 'ست', ps: 'سیټ' },
-  { value: 'pair', en: 'Pair', fa: 'جفت', ps: 'جوړه' },
-  { value: 'dozen', en: 'Dozen', fa: 'دوجین', ps: 'درجن' },
-];
+import { QUANTITY_UNITS } from '@/lib/quantityUnits';
 
 interface PricingStepProps {
   formData: ProductFormData;
@@ -289,7 +275,7 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
               <SelectContent>
                 {QUANTITY_UNITS.map((unit) => (
                   <SelectItem key={unit.value} value={unit.value}>
-                    {language === 'fa' ? unit.fa : language === 'ps' ? unit.ps : unit.en}
+                    {language === 'fa' ? unit.label_fa : language === 'ps' ? unit.label_ps : unit.label_en}
                   </SelectItem>
                 ))}
               </SelectContent>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { getQuantityUnitFromAttributes, getUnitLabel } from '@/lib/quantityUnits';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -503,7 +504,7 @@ const AdminProductView = () => {
                         {getLabel(lang, 'Stock', 'موجودی', 'ذخیره')}
                       </span>
                     </div>
-                    <p className="text-2xl font-bold">{product.quantity}</p>
+                    <p className="text-2xl font-bold">{product.quantity} <span className="text-base font-normal text-muted-foreground">{getUnitLabel(getQuantityUnitFromAttributes(attributes), lang as 'en' | 'fa' | 'ps')}</span></p>
                   </div>
                   
                   <div className="p-4 bg-muted/30 rounded-xl border border-border/50">

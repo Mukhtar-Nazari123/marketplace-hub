@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { ProductSpecsDisplay } from '@/components/products/ProductSpecsDisplay';
+import { getQuantityUnitFromAttributes, getUnitLabel } from '@/lib/quantityUnits';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/lib/i18n';
 import { getCategoryName } from '@/lib/localizedContent';
@@ -573,11 +574,12 @@ const ProductDetail = () => {
                 const totalStock = product.quantity + sizeStockTotal;
                 
                 if (totalStock > 0) {
+                  const qUnit = getUnitLabel(getQuantityUnitFromAttributes(productAttributes), language as 'en' | 'fa' | 'ps');
                   return (
                     <div className="flex items-center gap-2 text-green-600">
                       <Check size={20} />
                       <span className="font-medium">
-                        {isRTL ? `موجود (${totalStock} عدد)` : `In Stock (${totalStock} items)`}
+                        {isRTL ? `موجود (${totalStock} ${qUnit})` : `In Stock (${totalStock} ${qUnit})`}
                       </span>
                     </div>
                   );
