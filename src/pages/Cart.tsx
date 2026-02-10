@@ -346,30 +346,9 @@ const Cart = () => {
                             onDeliveryOptionChange={(optionId) => updateDeliveryOption(item.product_id, optionId)}
                           />
 
-                          {/* Price */}
-                          <div className="flex flex-col gap-0.5 mt-1">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <p className="text-primary font-bold text-sm sm:text-base">
-                                {item.effectivePrice?.toLocaleString() || 0} {item.currencySymbol}
-                              </p>
-                              {item.hasDiscount && item.originalPrice && (
-                                <p className="text-muted-foreground text-xs line-through">
-                                  {item.originalPrice.toLocaleString()} {item.currencySymbol}
-                                </p>
-                              )}
-                              <Badge variant="outline" className="text-[10px] px-1.5 py-0">
-                                {item.currency}
-                              </Badge>
-                            </div>
-                            {rate && (
-                              <p className="text-[10px] sm:text-xs text-muted-foreground">
-                                ≈ ${convertToUSD(item.effectivePrice || 0).toFixed(2)} USD
-                              </p>
-                            )}
-                          </div>
-
-                          {/* Quantity & Total - Same row on mobile */}
-                          <div className="flex items-center justify-between mt-2 gap-2">
+                          {/* Price, Quantity & Total - right-aligned block */}
+                          <div className="flex items-end sm:items-center justify-between mt-2 gap-2">
+                            {/* Quantity controls */}
                             <div className="flex items-center gap-1.5">
                               <Button
                                 variant="outline"
@@ -400,10 +379,31 @@ const Cart = () => {
                                 <Plus size={12} />
                               </Button>
                             </div>
-                            
-                            <p className="font-bold text-sm sm:text-base text-foreground whitespace-nowrap">
-                              {item.itemTotal.toLocaleString()} {item.currencySymbol}
-                            </p>
+
+                            {/* Price & Total - stacked on right */}
+                            <div className="flex flex-col items-end gap-0.5">
+                              <div className="flex items-center gap-1.5 flex-wrap justify-end">
+                                <p className="text-primary font-bold text-sm sm:text-base">
+                                  {item.effectivePrice?.toLocaleString() || 0} {item.currencySymbol}
+                                </p>
+                                {item.hasDiscount && item.originalPrice && (
+                                  <p className="text-muted-foreground text-xs line-through">
+                                    {item.originalPrice.toLocaleString()} {item.currencySymbol}
+                                  </p>
+                                )}
+                                <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                                  {item.currency}
+                                </Badge>
+                              </div>
+                              {rate && (
+                                <p className="text-[10px] sm:text-xs text-muted-foreground">
+                                  ≈ ${convertToUSD(item.effectivePrice || 0).toFixed(2)} USD
+                                </p>
+                              )}
+                              <p className="font-bold text-sm sm:text-base text-foreground whitespace-nowrap">
+                                {item.itemTotal.toLocaleString()} {item.currencySymbol}
+                              </p>
+                            </div>
                           </div>
 
                           {product?.quantity !== undefined && item.quantity >= product.quantity && (
