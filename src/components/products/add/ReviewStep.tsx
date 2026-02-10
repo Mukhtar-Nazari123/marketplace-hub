@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useLanguage } from '@/lib/i18n';
 import { ProductFormData, DeliveryOptionData } from '@/pages/dashboard/AddProduct';
+import { getUnitLabel } from '@/lib/quantityUnits';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -40,7 +41,7 @@ const getLabel = (en: string, fa: string, ps: string, language: string) => {
 export const ReviewStep = ({ formData }: ReviewStepProps) => {
   const { isRTL, language } = useLanguage();
 
-  const pcsLabel = getLabel('pcs', 'عدد', 'عدد', language);
+  const pcsLabel = getUnitLabel(formData.quantityUnit || 'pcs', language as 'en' | 'fa' | 'ps');
   const allImages = [...formData.imageUrls];
   const hasImages = allImages.length > 0 || formData.images.length > 0;
   const hasVideo = formData.video || formData.videoUrl;
@@ -365,7 +366,7 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
                   <span className="text-sm">
                     {totalStock > 0 ? (
                       <Badge variant={totalStock > 10 ? "default" : "secondary"}>
-                        {totalStock} {isRTL ? 'عدد موجود' : 'in stock'}
+                        {totalStock} {pcsLabel} {isRTL ? 'موجود' : 'in stock'}
                       </Badge>
                     ) : (
                       <Badge variant="destructive">
