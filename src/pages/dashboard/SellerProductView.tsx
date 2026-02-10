@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
+import { getQuantityUnitFromAttributes, getUnitLabel } from '@/lib/quantityUnits';
 import { DashboardLayout } from '@/components/dashboard/DashboardLayout';
 import { useLanguage } from '@/lib/i18n';
 import { useAuth } from '@/hooks/useAuth';
@@ -408,7 +409,7 @@ const SellerProductView = () => {
                   "text-2xl font-bold",
                   product.quantity <= 0 && "text-destructive"
                 )}>
-                  {product.quantity}
+                  {product.quantity} <span className="text-base font-normal text-muted-foreground">{getUnitLabel(getQuantityUnitFromAttributes(attributes), language as 'en' | 'fa' | 'ps')}</span>
                 </p>
               </Card>
 
