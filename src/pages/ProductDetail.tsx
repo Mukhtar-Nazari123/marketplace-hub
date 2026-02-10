@@ -518,9 +518,23 @@ const ProductDetail = () => {
               </p>
             )}
 
-            {/* Rating */}
-            <div className="flex items-center gap-3">
+            {/* Rating & Net Weight */}
+            <div className="flex items-center gap-3 flex-wrap">
               <CompactRating rating={averageRating} reviewCount={reviewCount} size="md" />
+              {(() => {
+                const netWeightAttr = productAttributes.find(a => a.attribute_key === 'netWeight' && (a.language_code === language || a.language_code === null || a.language_code === 'en'));
+                const weightUnitAttr = productAttributes.find(a => a.attribute_key === 'weightUnit' && (a.language_code === language || a.language_code === null || a.language_code === 'en'));
+                const netWeight = netWeightAttr?.attribute_value;
+                const weightUnit = weightUnitAttr?.attribute_value;
+                if (!netWeight) return null;
+                const unitLabel = weightUnit ? getUnitLabel(weightUnit, language as 'en' | 'fa' | 'ps') : '';
+                return (
+                  <span className="text-sm text-muted-foreground border border-border rounded-md px-2 py-0.5 flex items-center gap-1">
+                    <Package className="w-3.5 h-3.5" />
+                    {netWeight} {unitLabel}
+                  </span>
+                );
+              })()}
             </div>
 
             {/* Price */}
