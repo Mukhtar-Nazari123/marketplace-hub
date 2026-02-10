@@ -22,6 +22,7 @@ const attributeLabels: Record<string, { en: string; fa: string; ps: string }> = 
   isVegan: { en: 'Vegan', fa: 'وگان', ps: 'وېګان' },
   isSugarFree: { en: 'Sugar Free', fa: 'بدون قند', ps: 'پرته له بورې' },
   isNatural: { en: 'Natural', fa: 'طبیعی', ps: 'طبیعي' },
+  quantityUnit: { en: 'Unit of Measure', fa: 'واحد اندازه‌گیری', ps: 'د اندازې واحد' },
   // Electronics
   screenSize: { en: 'Screen Size', fa: 'اندازه صفحه', ps: 'د سکرین اندازه' },
   processor: { en: 'Processor', fa: 'پردازنده', ps: 'پروسیسر' },

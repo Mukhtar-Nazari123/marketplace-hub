@@ -10,6 +10,22 @@ import { Badge } from '@/components/ui/badge';
 import { generateSKU } from '@/lib/skuGenerator';
 import { Separator } from '@/components/ui/separator';
 import { DeliveryOptionsStep, DeliveryOptionInput } from './DeliveryOptionsStep';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+const QUANTITY_UNITS = [
+  { value: 'pcs', en: 'Pieces', fa: 'عدد', ps: 'ټوټه' },
+  { value: 'kg', en: 'Kilogram (kg)', fa: 'کیلوگرم (kg)', ps: 'کیلوګرام (kg)' },
+  { value: 'g', en: 'Gram (g)', fa: 'گرم (g)', ps: 'ګرام (g)' },
+  { value: 'lt', en: 'Liter (lt)', fa: 'لیتر (lt)', ps: 'لیتر (lt)' },
+  { value: 'ml', en: 'Milliliter (ml)', fa: 'میلی‌لیتر (ml)', ps: 'میلي لیتر (ml)' },
+  { value: 'm', en: 'Meter (m)', fa: 'متر (m)', ps: 'متر (m)' },
+  { value: 'cm', en: 'Centimeter (cm)', fa: 'سانتی‌متر (cm)', ps: 'سانتي متر (cm)' },
+  { value: 'box', en: 'Box', fa: 'جعبه', ps: 'بکس' },
+  { value: 'pack', en: 'Pack', fa: 'بسته', ps: 'بسته' },
+  { value: 'set', en: 'Set', fa: 'ست', ps: 'سیټ' },
+  { value: 'pair', en: 'Pair', fa: 'جفت', ps: 'جوړه' },
+  { value: 'dozen', en: 'Dozen', fa: 'دوجین', ps: 'درجن' },
+];
 
 interface PricingStepProps {
   formData: ProductFormData;
@@ -20,7 +36,7 @@ const ALL_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
 const OTHER_SIZE_KEY = 'other';
 
 export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
-  const { isRTL } = useLanguage();
+  const { isRTL, language } = useLanguage();
   
   // Check if clothing category
   const isClothing = useMemo(() => {
@@ -253,15 +269,32 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
             {isRTL ? 'تعداد موجودی' : 'Stock Quantity'}
             {stockValid && <CheckCircle2 className="w-4 h-4 text-success" />}
           </Label>
-          <Input
-            id="quantity"
-            type="number"
-            min="0"
-            value={formData.quantity || ''}
-            onChange={(e) => handleQuantityChange(e.target.value)}
-            placeholder="0"
-            className={cn("text-lg max-w-xs", isRTL && "text-right")}
-          />
+          <div className="flex items-center gap-3">
+            <Input
+              id="quantity"
+              type="number"
+              min="0"
+              value={formData.quantity || ''}
+              onChange={(e) => handleQuantityChange(e.target.value)}
+              placeholder="0"
+              className={cn("text-lg max-w-[160px]", isRTL && "text-right")}
+            />
+            <Select
+              value={formData.quantityUnit || 'pcs'}
+              onValueChange={(value) => updateFormData({ quantityUnit: value })}
+            >
+              <SelectTrigger className="w-[160px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {QUANTITY_UNITS.map((unit) => (
+                  <SelectItem key={unit.value} value={unit.value}>
+                    {language === 'fa' ? unit.fa : language === 'ps' ? unit.ps : unit.en}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           {!stockValid && (
             <p className="text-xs text-warning flex items-center gap-1">
               <AlertCircle className="w-3 h-3" />
@@ -391,7 +424,7 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
                 {isRTL ? 'موجودی' : 'Stock'}
               </span>
               <Badge variant={stockValid ? "default" : "secondary"}>
-                {isClothing ? totalClothingStock : formData.quantity} {isRTL ? 'عدد' : 'items'}
+                {isClothing ? totalClothingStock : formData.quantity} {QUANTITY_UNITS.find(u => u.value === (formData.quantityUnit || 'pcs'))?.[language] || (isRTL ? 'عدد' : 'items')}
               </Badge>
             </div>
           </div>
