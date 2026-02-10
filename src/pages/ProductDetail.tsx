@@ -429,7 +429,7 @@ const ProductDetail = () => {
                   <button
                     key={idx}
                     onClick={() => setSelectedImage(idx)}
-                    className={`w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-colors relative ${
+                    className={`w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-colors relative ${
                       selectedImage === idx ? 'border-primary' : 'border-border'
                     }`}
                   >
