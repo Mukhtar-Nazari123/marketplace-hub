@@ -640,7 +640,7 @@ const ProductDetail = () => {
 
             {/* Quantity & Add to Cart */}
             {(product.quantity > 0 || Object.values(stockPerSize).some(v => Number(v) > 0)) && (
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-col items-center sm:flex-row sm:items-stretch gap-3">
                 <div className="flex items-center border border-border rounded-lg">
                   <button
                     className="p-2.5 sm:p-3 hover:bg-muted transition-colors"
@@ -659,7 +659,7 @@ const ProductDetail = () => {
                 <Button 
                   variant="cyan" 
                   size="lg" 
-                  className="flex-1 min-w-[140px] gap-2"
+                  className="w-full sm:w-auto sm:flex-1 min-w-[140px] gap-2"
                   onClick={handleAddToCart}
                   disabled={isInCart(product.id)}
                 >
