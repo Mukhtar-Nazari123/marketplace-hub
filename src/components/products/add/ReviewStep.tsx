@@ -489,7 +489,7 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
                   {isRTL ? 'توضیحات کامل' : 'Full Description'}
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent dir={isRTL ? 'rtl' : 'ltr'} className={isRTL ? 'text-right' : 'text-left'}>
                 <p className="text-sm text-muted-foreground whitespace-pre-wrap line-clamp-6">
                   {formData.description}
                 </p>
