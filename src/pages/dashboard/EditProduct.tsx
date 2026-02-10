@@ -50,6 +50,7 @@ const initialFormData: ProductFormData = {
   discountPriceUSD: null,
   currency: 'AFN',
   quantity: 0,
+  quantityUnit: 'pcs',
   stockPerSize: {},
   deliveryFee: 0,
   deliveryOptions: [],
@@ -159,6 +160,7 @@ const EditProduct = () => {
         discountPriceUSD: null,
         currency: 'AFN',
         quantity: product.quantity,
+        quantityUnit: (attributes?.quantityUnit as string) || (metadata.quantityUnit as string) || 'pcs',
         stockPerSize: (metadata.stockPerSize as Record<string, number>) || {},
         deliveryFee: product.delivery_fee || 0,
         deliveryOptions: (deliveryOptionsData || []).map(opt => ({

@@ -66,6 +66,7 @@ export interface ProductFormData {
   discountPriceUSD: number | null;
   currency: CurrencyType;
   quantity: number;
+  quantityUnit: string;
   stockPerSize?: Record<string, number>;
   deliveryFee: number; // Legacy - kept for backward compatibility
   
@@ -95,6 +96,7 @@ const initialFormData: ProductFormData = {
   discountPriceUSD: null,
   currency: 'AFN',
   quantity: 0,
+  quantityUnit: 'pcs',
   stockPerSize: {},
   deliveryFee: 0,
   deliveryOptions: [],

@@ -93,8 +93,9 @@ export async function saveProduct(options: SaveProductOptions): Promise<SaveProd
     // 3. Save media to product_media table (including color-specific images)
     await saveProductMedia(finalProductId, imageUrls, videoUrl, colorImageUrls);
 
-    // 4. Save attributes to product_attributes table
-    await saveProductAttributes(finalProductId, formData.attributes, formData.brand, currentLanguage);
+    // 4. Save attributes to product_attributes table (include quantityUnit)
+    const attributesToSave = { ...formData.attributes, quantityUnit: formData.quantityUnit || 'pcs' };
+    await saveProductAttributes(finalProductId, attributesToSave, formData.brand, currentLanguage);
 
     // 5. Save delivery options
     await saveDeliveryOptions(finalProductId, userId, formData.deliveryOptions || []);
@@ -327,7 +328,7 @@ async function saveProductAttributes(
     // Determine if this attribute is language-specific or universal
     // Size, color codes, technical specs are usually universal
     // Labels/descriptions might be language-specific
-    const isUniversal = ['size', 'color', 'weight', 'dimensions', 'material_code'].includes(key.toLowerCase());
+    const isUniversal = ['size', 'color', 'weight', 'dimensions', 'material_code', 'quantityunit'].includes(key.toLowerCase());
 
     attributesToInsert.push({
       product_id: productId,
