@@ -127,7 +127,7 @@ const BottomNavigation = () => {
                     active && "scale-110"
                   )}
                 />
-                {item.badge && item.badge > 0 && (
+                {item.badge != null && item.badge > 0 && (
                   <span className="absolute -top-1.5 -right-2 h-4 min-w-4 px-1 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center font-bold">
                     {formatCount(item.badge > 99 ? 99 : item.badge)}
                   </span>
