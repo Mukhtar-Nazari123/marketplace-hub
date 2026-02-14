@@ -1242,6 +1242,140 @@ export type Database = {
         }
         Relationships: []
       }
+      privacy_policies: {
+        Row: {
+          content_en: string | null
+          content_fa: string | null
+          content_ps: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          is_draft: boolean
+          meta_description_en: string | null
+          meta_description_fa: string | null
+          meta_description_ps: string | null
+          meta_title_en: string | null
+          meta_title_fa: string | null
+          meta_title_ps: string | null
+          platform_type: string
+          policy_type: string
+          published_at: string | null
+          slug: string
+          title_en: string
+          title_fa: string | null
+          title_ps: string | null
+          updated_at: string
+          updated_by: string | null
+          version: number
+        }
+        Insert: {
+          content_en?: string | null
+          content_fa?: string | null
+          content_ps?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          is_draft?: boolean
+          meta_description_en?: string | null
+          meta_description_fa?: string | null
+          meta_description_ps?: string | null
+          meta_title_en?: string | null
+          meta_title_fa?: string | null
+          meta_title_ps?: string | null
+          platform_type?: string
+          policy_type?: string
+          published_at?: string | null
+          slug: string
+          title_en?: string
+          title_fa?: string | null
+          title_ps?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          version?: number
+        }
+        Update: {
+          content_en?: string | null
+          content_fa?: string | null
+          content_ps?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          is_draft?: boolean
+          meta_description_en?: string | null
+          meta_description_fa?: string | null
+          meta_description_ps?: string | null
+          meta_title_en?: string | null
+          meta_title_fa?: string | null
+          meta_title_ps?: string | null
+          platform_type?: string
+          policy_type?: string
+          published_at?: string | null
+          slug?: string
+          title_en?: string
+          title_fa?: string | null
+          title_ps?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          version?: number
+        }
+        Relationships: []
+      }
+      privacy_policy_versions: {
+        Row: {
+          change_summary: string | null
+          content_en: string | null
+          content_fa: string | null
+          content_ps: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          policy_id: string
+          title_en: string | null
+          title_fa: string | null
+          title_ps: string | null
+          version: number
+        }
+        Insert: {
+          change_summary?: string | null
+          content_en?: string | null
+          content_fa?: string | null
+          content_ps?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          policy_id: string
+          title_en?: string | null
+          title_fa?: string | null
+          title_ps?: string | null
+          version: number
+        }
+        Update: {
+          change_summary?: string | null
+          content_en?: string | null
+          content_fa?: string | null
+          content_ps?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          policy_id?: string
+          title_en?: string | null
+          title_fa?: string | null
+          title_ps?: string | null
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "privacy_policy_versions_policy_id_fkey"
+            columns: ["policy_id"]
+            isOneToOne: false
+            referencedRelation: "privacy_policies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_attributes: {
         Row: {
           attribute_key: string
