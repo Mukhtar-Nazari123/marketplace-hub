@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { useLanguage } from '@/lib/i18n';
-import { usePrivacyPolicies, PrivacyPolicy } from '@/hooks/usePrivacyPolicies';
+import { usePrivacyPolicies, usePrivacyPolicyVersions, PrivacyPolicy } from '@/hooks/usePrivacyPolicies';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -36,7 +36,7 @@ const AdminPrivacyPolicy = () => {
   const lang = language as Language;
   const { user } = useAuth();
   const {
-    policies, isLoading, createPolicy, updatePolicy, publishPolicy, rollbackPolicy, deletePolicy, versionsQuery,
+    policies, isLoading, createPolicy, updatePolicy, publishPolicy, rollbackPolicy, deletePolicy,
   } = usePrivacyPolicies();
 
   const [editingPolicy, setEditingPolicy] = useState<PrivacyPolicy | null>(null);
@@ -109,7 +109,7 @@ const AdminPrivacyPolicy = () => {
     setDeleteId(null);
   };
 
-  const { data: versions = [] } = selectedPolicyId ? versionsQuery(selectedPolicyId) : { data: [] };
+  const { data: versions = [] } = usePrivacyPolicyVersions(selectedPolicyId);
 
   const policyTypeLabel = (type: string) => getLabel(lang,
     type === 'general' ? 'General' : type === 'vendor' ? 'Vendor' : 'Mobile App',
