@@ -66,6 +66,8 @@ import AdminCategories from "./pages/admin/AdminCategories";
 import AdminCurrencySettings from "./pages/admin/AdminCurrencySettings";
 import Notifications from "./pages/dashboard/Notifications";
 import DashboardShell from "@/components/dashboard/DashboardShell";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import AdminPrivacyPolicy from "./pages/admin/AdminPrivacyPolicy";
 
 const queryClient = new QueryClient();
 
@@ -100,6 +102,7 @@ const App = () => (
                       <Route path="/forgot-password" element={<ForgotPassword />} />
                       <Route path="/cart" element={<Cart />} />
                       <Route path="/checkout" element={<Checkout />} />
+                      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
                       {/* Dashboard Routes */}
                       <Route path="/dashboard/seller/pending" element={<SellerPending />} />
@@ -155,6 +158,7 @@ const App = () => (
                       <Route path="/dashboard/categories" element={<AdminCategories />} />
                       <Route path="/dashboard/currency" element={<AdminCurrencySettings />} />
                       <Route path="/dashboard/admin/notifications" element={<AdminNotifications />} />
+                      <Route path="/dashboard/privacy-policy" element={<AdminPrivacyPolicy />} />
                       <Route path="/dashboard/admin/products/:id" element={<AdminProductView />} />
                       <Route path="/dashboard/admin/orders/:id" element={<AdminOrderDetail />} />
 

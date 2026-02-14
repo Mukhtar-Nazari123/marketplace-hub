@@ -38,6 +38,7 @@ import {
   Check,
   Languages,
   Coins,
+  Shield,
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -99,6 +100,7 @@ export const AdminSidebar = () => {
     { title: getLabel(lang, 'Hero Banners', 'بنرهای هیرو', 'هیرو بینرونه'), icon: Monitor, url: '/dashboard/hero-banners' },
     { title: getLabel(lang, 'CMS', 'مدیریت محتوا', 'د منځپانګې مدیریت'), icon: FileText, url: '/dashboard/cms' },
     { title: getLabel(lang, 'Newsletter', 'خبرنامه', 'خبرپاڼه'), icon: Mail, url: '/dashboard/newsletter' },
+    { title: getLabel(lang, 'Privacy Policy', 'سیاست حریم خصوصی', 'د محرمیت تګلاره'), icon: Shield, url: '/dashboard/privacy-policy' },
   ];
 
   const settingsNavItems = [
