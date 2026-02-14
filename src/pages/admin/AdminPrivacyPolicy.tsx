@@ -128,7 +128,7 @@ const AdminPrivacyPolicy = () => {
       title={getLabel(lang, 'Privacy Policies', 'سیاست حریم خصوصی', 'د محرمیت تګلاره')}
       description={getLabel(lang, 'Manage privacy policy content', 'مدیریت محتوای سیاست حریم خصوصی', 'د محرمیت تګلاره منځپانګه مدیریت کړئ')}
     >
-      <div className="space-y-6 animate-fade-in">
+      <div className="space-y-6 animate-fade-in overflow-auto">
         {/* Header */}
         <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
           <div>
