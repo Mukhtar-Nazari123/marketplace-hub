@@ -61,19 +61,7 @@ export const usePrivacyPolicies = () => {
     },
   });
 
-  const versionsQuery = (policyId: string) => useQuery({
-    queryKey: ['privacy-policy-versions', policyId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('privacy_policy_versions')
-        .select('*')
-        .eq('policy_id', policyId)
-        .order('version', { ascending: false });
-      if (error) throw error;
-      return data as PolicyVersion[];
-    },
-    enabled: !!policyId,
-  });
+  // versions query removed - use usePrivacyPolicyVersions instead
 
   const createPolicy = useMutation({
     mutationFn: async (policy: Partial<PrivacyPolicy>) => {
@@ -208,7 +196,6 @@ export const usePrivacyPolicies = () => {
     policies: policiesQuery.data || [],
     isLoading: policiesQuery.isLoading,
     error: policiesQuery.error,
-    versionsQuery,
     createPolicy,
     updatePolicy,
     publishPolicy,
@@ -235,5 +222,22 @@ export const useActivePrivacyPolicy = (policyType = 'general', platform = 'web')
       if (error) throw error;
       return data as PrivacyPolicy | null;
     },
+  });
+};
+
+// Hook for fetching policy versions (must be called at top level)
+export const usePrivacyPolicyVersions = (policyId: string | null) => {
+  return useQuery({
+    queryKey: ['privacy-policy-versions', policyId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('privacy_policy_versions')
+        .select('*')
+        .eq('policy_id', policyId!)
+        .order('version', { ascending: false });
+      if (error) throw error;
+      return data as PolicyVersion[];
+    },
+    enabled: !!policyId,
   });
 };
