@@ -44,7 +44,7 @@ const Footer = () => {
   const quickLinks = [
     { label: t.footer.aboutUs, href: "/about" },
     { label: t.footer.contactUs, href: "/contact" },
-    { label: t.footer.privacyPolicy, href: "/privacy" },
+    { label: t.footer.privacyPolicy, href: "/privacy-policy" },
     { label: t.footer.termsConditions, href: "/terms" },
     { label: t.footer.faq, href: "/faq" },
     { label: t.footer.sitemap, href: "/sitemap" },
