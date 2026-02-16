@@ -20,7 +20,7 @@ const ProductColorSwatches = ({
   selectedColor, 
   onColorSelect 
 }: ProductColorSwatchesProps) => {
-  const { isRTL } = useLanguage();
+  const { language, isRTL } = useLanguage();
 
   if (colorMedia.length === 0) return null;
 
@@ -35,7 +35,7 @@ const ProductColorSwatches = ({
             const colorDef = getColorByValue(media.color_value);
             const isMulticolor = media.color_value === 'multicolor';
             const isSelected = selectedColor === media.color_value;
-            const colorName = getLocalizedColorName(media.color_value, isRTL);
+            const colorName = getLocalizedColorName(media.color_value, language);
             const needsBorder = ['white', 'cream', 'ivory', 'beige'].includes(media.color_value);
             
             return (
