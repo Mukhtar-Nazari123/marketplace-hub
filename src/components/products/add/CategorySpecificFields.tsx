@@ -220,6 +220,39 @@ export const CategorySpecificFields = ({
             </button>
           </div>
 
+          <div className="space-y-2 pt-3">
+            <Label className="flex items-center gap-2 text-sm">
+              <Ruler className="w-4 h-4" />
+              {getLabel("Numeric Sizes", "سایزهای عددی", "شمېري اندازې")}
+            </Label>
+            <div className="flex flex-wrap gap-1.5">
+              {Array.from({ length: 14 }, (_, i) => (20 + i * 2).toString()).map((size) => {
+                const selectedNumSizes = (attributes.numericSizes as string[]) || [];
+                const isSelected = selectedNumSizes.includes(size);
+                return (
+                  <button
+                    key={size}
+                    type="button"
+                    onClick={() => {
+                      const newSizes = isSelected
+                        ? selectedNumSizes.filter((s) => s !== size)
+                        : [...selectedNumSizes, size];
+                      updateAttribute("numericSizes", newSizes);
+                    }}
+                    className={cn(
+                      "w-10 h-9 text-sm font-medium rounded-md border transition-all duration-200",
+                      isSelected
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-background text-foreground border-border hover:border-primary/50",
+                    )}
+                  >
+                    {size}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           <div className="space-y-2 pt-2">
             <Label className="text-sm text-muted-foreground">
               {getLabel("Custom Size (optional)", "سایز دیگر (اختیاری)", "بله اندازه (اختیاري)")}
