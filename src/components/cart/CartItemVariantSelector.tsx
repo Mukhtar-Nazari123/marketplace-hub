@@ -92,7 +92,7 @@ export const CartItemVariantInline = ({
                           }}
                         />
                       )}
-                      <span>{getLocalizedColorName(colorValue, isRTL)}</span>
+                      <span>{getLocalizedColorName(colorValue, language)}</span>
                     </div>
                   </SelectItem>
                 );

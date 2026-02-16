@@ -31,6 +31,7 @@ import {
 interface CategorySpecificFieldsProps {
   categoryId: string;
   categoryName: string;
+  subCategoryName?: string;
   attributes: Record<string, string | boolean | string[]>;
   updateAttributes: (attributes: Record<string, string | boolean | string[]>) => void;
 }
@@ -38,10 +39,17 @@ interface CategorySpecificFieldsProps {
 export const CategorySpecificFields = ({
   categoryId,
   categoryName,
+  subCategoryName,
   attributes,
   updateAttributes,
 }: CategorySpecificFieldsProps) => {
-  const { isRTL } = useLanguage();
+  const { language, isRTL } = useLanguage();
+
+  const getLabel = (en: string, fa: string, ps: string) => {
+    if (language === 'ps') return ps;
+    if (language === 'fa') return fa;
+    return en;
+  };
 
   const updateAttribute = (key: string, value: string | boolean | string[]) => {
     updateAttributes({ ...attributes, [key]: value });
@@ -141,24 +149,24 @@ export const CategorySpecificFields = ({
     <div className="space-y-4">
       <div className="flex items-center gap-2 mb-4 text-primary">
         <Shirt className="w-5 h-5" />
-        <span className="font-medium">{isRTL ? "مشخصات پوشاک" : "Clothing Specifications"}</span>
+        <span className="font-medium">{getLabel("Clothing Specifications", "مشخصات پوشاک", "د جامو مشخصات")}</span>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
-          <Label className="flex items-center gap-2">{isRTL ? "جنسیت" : "Gender"}</Label>
+          <Label className="flex items-center gap-2">{getLabel("Gender", "جنسیت", "جنسیت")}</Label>
           <Select
             value={(attributes.gender as string) || ""}
             onValueChange={(value) => updateAttribute("gender", value)}
           >
             <SelectTrigger>
-              <SelectValue placeholder={isRTL ? "انتخاب کنید" : "Select"} />
+              <SelectValue placeholder={getLabel("Select", "انتخاب کنید", "غوره کړئ")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="men">{isRTL ? "مردانه" : "Men"}</SelectItem>
-              <SelectItem value="women">{isRTL ? "زنانه" : "Women"}</SelectItem>
-              <SelectItem value="unisex">{isRTL ? "یونیسکس" : "Unisex"}</SelectItem>
-              <SelectItem value="kids">{isRTL ? "بچگانه" : "Kids"}</SelectItem>
+              <SelectItem value="men">{getLabel("Men", "مردانه", "نارینه")}</SelectItem>
+              <SelectItem value="women">{getLabel("Women", "زنانه", "ښځینه")}</SelectItem>
+              <SelectItem value="unisex">{getLabel("Unisex", "یونیسکس", "دواړه")}</SelectItem>
+              <SelectItem value="kids">{getLabel("Kids", "بچگانه", "ماشومانو")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -166,7 +174,7 @@ export const CategorySpecificFields = ({
         <div className="space-y-3">
           <Label className="flex items-center gap-2">
             <Ruler className="w-4 h-4" />
-            {isRTL ? "سایزهای موجود" : "Available Sizes"}
+            {getLabel("Available Sizes", "سایزهای موجود", "موجود اندازې")}
           </Label>
           <div className="flex flex-wrap gap-2">
             {["XS", "S", "M", "L", "XL", "XXL"].map((size) => {
@@ -208,18 +216,18 @@ export const CategorySpecificFields = ({
                   : "bg-background text-foreground border-border hover:border-primary/50",
               )}
             >
-              {isRTL ? "فری سایز" : "Free"}
+              {getLabel("Free Size", "فری سایز", "آزاد اندازه")}
             </button>
           </div>
 
           <div className="space-y-2 pt-2">
             <Label className="text-sm text-muted-foreground">
-              {isRTL ? "سایز دیگر (اختیاری)" : "Custom Size (optional)"}
+              {getLabel("Custom Size (optional)", "سایز دیگر (اختیاری)", "بله اندازه (اختیاري)")}
             </Label>
             <Input
               value={(attributes.customSize as string) || ""}
               onChange={(e) => updateAttribute("customSize", e.target.value)}
-              placeholder={isRTL ? "مثال: 38، 40، 42 یا XXS" : "e.g., 38, 40, 42 or XXS"}
+              placeholder={getLabel("e.g., 38, 40, 42 or XXS", "مثال: 38، 40، 42 یا XXS", "مثال: 38، 40، 42 یا XXS")}
               className={cn(isRTL && "text-right")}
             />
           </div>
@@ -228,13 +236,14 @@ export const CategorySpecificFields = ({
         <div className="md:col-span-2 space-y-2">
           <Label className="flex items-center gap-2">
             <Palette className="w-4 h-4" />
-            {isRTL ? "رنگ" : "Color"}
+            {getLabel("Color", "رنگ", "رنګ")}
           </Label>
           <div className="overflow-x-auto pb-2 -mx-1 px-1">
             <div className="flex gap-2 min-w-max">
               {PRODUCT_COLORS.map((colorOption) => {
                 const selectedColors = (attributes.colors as string[]) || [];
                 const isSelected = selectedColors.includes(colorOption.value);
+                const colorLabel = language === 'ps' ? (colorOption.namePs || colorOption.nameFa) : language === 'fa' ? colorOption.nameFa : colorOption.name;
                 return (
                   <button
                     key={colorOption.value}
@@ -257,7 +266,7 @@ export const CategorySpecificFields = ({
                       className="w-3.5 h-3.5 rounded-full border border-border/50 flex-shrink-0"
                       style={{ backgroundColor: colorOption.hex }}
                     />
-                    <span>{isRTL ? colorOption.nameFa : colorOption.name}</span>
+                    <span>{colorLabel}</span>
                   </button>
                 );
               })}
@@ -265,12 +274,12 @@ export const CategorySpecificFields = ({
           </div>
           <div className="space-y-2 pt-1">
             <Label className="text-sm text-muted-foreground">
-              {isRTL ? "رنگ دیگر (اختیاری)" : "Custom Color (optional)"}
+              {getLabel("Custom Color (optional)", "رنگ دیگر (اختیاری)", "بل رنګ (اختیاري)")}
             </Label>
             <Input
               value={(attributes.customColor as string) || ""}
               onChange={(e) => updateAttribute("customColor", e.target.value)}
-              placeholder={isRTL ? "مثال: طلایی، نقره‌ای" : "e.g., Gold, Silver"}
+              placeholder={getLabel("e.g., Gold, Silver", "مثال: طلایی، نقره‌ای", "مثال: سرو، سپینزر")}
               className={cn(isRTL && "text-right")}
             />
           </div>
@@ -279,22 +288,22 @@ export const CategorySpecificFields = ({
         <div className="space-y-2">
           <Label className="flex items-center gap-2">
             <Layers className="w-4 h-4" />
-            {isRTL ? "جنس پارچه" : "Fabric / Material"}
+            {getLabel("Fabric / Material", "جنس پارچه", "د تکي ډول")}
           </Label>
           <Input
             value={(attributes.fabric as string) || ""}
             onChange={(e) => updateAttribute("fabric", e.target.value)}
-            placeholder={isRTL ? "مثال: پنبه، پلی‌استر" : "e.g., Cotton, Polyester"}
+            placeholder={getLabel("e.g., Cotton, Polyester", "مثال: پنبه، پلی‌استر", "مثال: مالبافت، پالیستر")}
             className={cn(isRTL && "text-right")}
           />
         </div>
 
         <div className="md:col-span-2 space-y-2">
-          <Label>{isRTL ? "راهنمای شستشو" : "Washing Instructions"}</Label>
+          <Label>{getLabel("Washing Instructions", "راهنمای شستشو", "د مینځلو لارښود")}</Label>
           <Textarea
             value={(attributes.washingInstructions as string) || ""}
             onChange={(e) => updateAttribute("washingInstructions", e.target.value)}
-            placeholder={isRTL ? "دستورالعمل‌های شستشو و نگهداری..." : "Washing and care instructions..."}
+            placeholder={getLabel("Washing and care instructions...", "دستورالعمل‌های شستشو و نگهداری...", "د مینځلو او ساتنې لارښوونې...")}
             rows={2}
             className={cn(isRTL && "text-right")}
           />
@@ -882,38 +891,39 @@ export const CategorySpecificFields = ({
     </div>
   );
 
-  // Match category by name - works with both English names and Persian names
-  const getCategoryType = (name: string): string => {
+  // Match category by name - works with both English names and Persian/Pashto names
+  const getCategoryType = (name: string, subName?: string): string => {
     const categoryMap: Record<string, string[]> = {
-      electronics: ["electronics", "الکترونیک", "electronic"],
-      clothing: ["clothing", "پوشاک", "fashion", "clothes"],
-      home: ["home", "home-living", "خانه", "home & living", "living", "خانگی"],
+      electronics: ["electronics", "الکترونیک", "electronic", "برقیات"],
+      clothing: ["clothing", "پوشاک", "fashion", "clothes", "men's clothing", "women's clothing", 
+        "mens-clothing", "womens-clothing", "لباس مردانه", "لباس زنانه", "د نارینو جامې", "د ښځو جامې",
+        "لباس", "جامې", "مد و لباس"],
+      home: ["home", "home-living", "خانه", "home & living", "living", "خانگی", "کور"],
       beauty: [
-        "beauty",
-        "beauty-personal-care",
-        "زیبایی",
-        "beauty & personal care",
-        "personal care",
-        "آرایشی",
-        "بهداشتی",
+        "beauty", "beauty-personal-care", "زیبایی", "beauty & personal care",
+        "personal care", "آرایشی", "بهداشتی", "ښکلا",
       ],
-      sports: ["sports", "sports-outdoor", "ورزش", "sports & outdoor", "outdoor", "ورزشی"],
-      baby: ["baby", "baby-kids", "کودک", "baby & kids", "kids", "نوزاد", "بچه"],
-      food: ["food", "food-groceries", "groceries", "غذا", "خواربار", "مواد غذایی", "food & groceries"],
+      sports: ["sports", "sports-outdoor", "ورزش", "sports & outdoor", "outdoor", "ورزشی", "لوبې"],
+      baby: ["baby", "baby-kids", "کودک", "baby & kids", "kids", "نوزاد", "بچه", "ماشومان"],
+      food: ["food", "food-groceries", "groceries", "غذا", "خواربار", "مواد غذایی", "food & groceries", "خواړه"],
     };
 
-    const normalizedName = name.toLowerCase();
+    // Check both category and subcategory names
+    const namesToCheck = [name.toLowerCase()];
+    if (subName) namesToCheck.push(subName.toLowerCase());
 
     for (const [type, matches] of Object.entries(categoryMap)) {
-      if (matches.some((m) => normalizedName.includes(m) || m.includes(normalizedName))) {
-        return type;
+      for (const normalizedName of namesToCheck) {
+        if (matches.some((m) => normalizedName.includes(m) || m.includes(normalizedName))) {
+          return type;
+        }
       }
     }
 
     return "";
   };
 
-  const categoryType = getCategoryType(categoryName);
+  const categoryType = getCategoryType(categoryName, subCategoryName);
 
   // Initialize default values for category-specific fields
   useEffect(() => {
