@@ -104,6 +104,7 @@ const ProductDetail = () => {
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [colorMedia, setColorMedia] = useState<{ color_value: string; url: string }[]>([]);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [productAttributes, setProductAttributes] = useState<{ attribute_key: string; attribute_value: string; language_code: string | null }[]>([]);
 
   // Fetch product rating
@@ -459,23 +460,90 @@ const ProductDetail = () => {
               onColorSelect={handleColorSelect}
             />
             
-            {/* Size Stock (if available) - placed under colors */}
-            {Object.keys(stockPerSize).length > 0 && (
-              <div className="space-y-2">
-                <h4 className="font-medium">{isRTL ? 'موجودی سایزها' : 'Size Availability'}</h4>
-                <div className="flex flex-wrap gap-2">
-                  {Object.entries(stockPerSize).map(([size, stock]) => (
-                    <Badge
-                      key={size}
-                      variant={Number(stock) > 0 ? 'outline' : 'secondary'}
-                      className={Number(stock) > 0 ? 'border-primary' : 'opacity-50'}
-                    >
-                      {size}: {stock}
-                    </Badge>
-                  ))}
+            {/* Available Sizes from attributes */}
+            {(() => {
+              // Extract sizes from product attributes
+              const sizesAttr = productAttributes.find(a => a.attribute_key === 'sizes');
+              const numericSizesAttr = productAttributes.find(a => a.attribute_key === 'numericSizes');
+              
+              let letterSizes: string[] = [];
+              let numericSizes: string[] = [];
+              
+              try {
+                if (sizesAttr?.attribute_value) {
+                  const parsed = JSON.parse(sizesAttr.attribute_value);
+                  if (Array.isArray(parsed)) letterSizes = parsed;
+                }
+              } catch { /* ignore */ }
+              
+              try {
+                if (numericSizesAttr?.attribute_value) {
+                  const parsed = JSON.parse(numericSizesAttr.attribute_value);
+                  if (Array.isArray(parsed)) numericSizes = parsed.sort((a: string, b: string) => Number(a) - Number(b));
+                }
+              } catch { /* ignore */ }
+
+              const allSizes = [...letterSizes, ...numericSizes];
+              if (allSizes.length === 0 && Object.keys(stockPerSize).length === 0) return null;
+
+              return (
+                <div className="space-y-2">
+                  <h4 className="font-medium text-sm">
+                    {language === 'ps' ? 'موجودې اندازې' : language === 'fa' ? 'سایزهای موجود' : 'Available Sizes'}
+                  </h4>
+                  <div className="flex flex-wrap gap-1.5">
+                    {/* Letter sizes */}
+                    {letterSizes.map((size) => (
+                      <button
+                        key={`l-${size}`}
+                        type="button"
+                        onClick={() => setSelectedSize(selectedSize === size ? null : size)}
+                        className={`min-w-[40px] h-9 px-2.5 rounded-lg border text-sm font-medium transition-colors ${
+                          selectedSize === size
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-background text-foreground border-border hover:border-primary/50'
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                    {/* Numeric sizes */}
+                    {numericSizes.map((size) => (
+                      <button
+                        key={`n-${size}`}
+                        type="button"
+                        onClick={() => setSelectedSize(selectedSize === size ? null : size)}
+                        className={`min-w-[40px] h-9 px-2.5 rounded-lg border text-sm font-medium transition-colors ${
+                          selectedSize === size
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-background text-foreground border-border hover:border-primary/50'
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                    {/* Fallback: stockPerSize keys */}
+                    {allSizes.length === 0 && Object.entries(stockPerSize).map(([size, stock]) => (
+                      <button
+                        key={`s-${size}`}
+                        type="button"
+                        disabled={Number(stock) <= 0}
+                        onClick={() => setSelectedSize(selectedSize === size ? null : size)}
+                        className={`min-w-[40px] h-9 px-2.5 rounded-lg border text-sm font-medium transition-colors ${
+                          Number(stock) <= 0
+                            ? 'opacity-40 cursor-not-allowed bg-muted text-muted-foreground line-through'
+                            : selectedSize === size
+                              ? 'bg-primary text-primary-foreground border-primary'
+                              : 'bg-background text-foreground border-border hover:border-primary/50'
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
           </div>
 
           {/* Product Info */}
