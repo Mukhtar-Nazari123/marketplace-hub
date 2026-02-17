@@ -226,7 +226,7 @@ export const CategorySpecificFields = ({
               {getLabel("Numeric Sizes", "سایزهای عددی", "شمېري اندازې")}
             </Label>
             <div className="flex flex-wrap gap-1.5">
-              {Array.from({ length: 14 }, (_, i) => (20 + i * 2).toString()).map((size) => {
+              {Array.from({ length: 27 }, (_, i) => (20 + i).toString()).map((size) => {
                 const selectedNumSizes = (attributes.numericSizes as string[]) || [];
                 const isSelected = selectedNumSizes.includes(size);
                 return (
