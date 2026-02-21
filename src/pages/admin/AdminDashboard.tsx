@@ -103,10 +103,10 @@ const AdminDashboard = () => {
         // Fetch total revenue (sum of AFN totals)
         const { data: revenueData } = await supabase
           .from('orders')
-          .select('total_afn, total_usd')
+          .select('total_afn')
           .eq('payment_status', 'paid');
 
-        const totalRevenue = revenueData?.reduce((sum, order) => sum + Number(order.total_afn) + Number(order.total_usd), 0) || 0;
+        const totalRevenue = revenueData?.reduce((sum, order) => sum + Number(order.total_afn), 0) || 0;
 
         // Fetch pending seller verifications
         const { count: pendingSellers } = await supabase

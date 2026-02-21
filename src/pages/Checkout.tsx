@@ -425,10 +425,8 @@ const Checkout = () => {
           payment_status: 'pending',
           payment_method: 'cash_on_delivery',
           currency: 'AFN', // Always AFN
-          subtotal_usd: subtotalUSD,
           subtotal_afn: subtotalAFN,
           delivery_fee_afn: deliveryFeeAFN,
-          total_usd: totalUSD,
           total_afn: totalAFN,
           shipping_cost: deliveryFeeAFN, // Also store in shipping_cost for backward compatibility
           discount: 0,

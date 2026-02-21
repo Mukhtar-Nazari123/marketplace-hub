@@ -102,13 +102,11 @@ interface Order {
   status: string;
   payment_status: string;
   payment_method: string | null;
-  subtotal_usd: number;
   subtotal_afn: number;
   shipping_cost: number;
   delivery_fee_afn: number;
   discount: number;
   tax: number;
-  total_usd: number;
   total_afn: number;
   currency: string;
   shipping_address: ShippingAddress | null;
@@ -560,15 +558,7 @@ const BuyerOrders = () => {
                         )}
                       </span>
                       <span className="font-bold text-primary">
-                        {order.total_usd > 0 && order.total_afn > 0 ? (
-                          <>
-                            {formatCurrency(order.total_usd, 'USD', isRTL)} + {formatCurrency(order.total_afn, 'AFN', isRTL)}
-                          </>
-                        ) : order.total_usd > 0 ? (
-                          formatCurrency(order.total_usd, 'USD', isRTL)
-                        ) : (
-                          formatCurrency(order.total_afn, 'AFN', isRTL)
-                        )}
+                        {formatCurrency(order.total_afn, 'AFN', isRTL)}
                       </span>
                     </div>
                   </div>
@@ -770,15 +760,7 @@ const BuyerOrders = () => {
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">{t.subtotal}</span>
                           <span>
-                            {order.subtotal_usd > 0 && order.subtotal_afn > 0 ? (
-                              <>
-                                {formatCurrency(order.subtotal_usd, "USD", isRTL)} + {formatCurrency(order.subtotal_afn, "AFN", isRTL)}
-                              </>
-                            ) : order.subtotal_usd > 0 ? (
-                              formatCurrency(order.subtotal_usd, "USD", isRTL)
-                            ) : (
-                              formatCurrency(order.subtotal_afn, "AFN", isRTL)
-                            )}
+                            {formatCurrency(order.subtotal_afn, "AFN", isRTL)}
                           </span>
                         </div>
                         {(() => {
@@ -808,15 +790,7 @@ const BuyerOrders = () => {
                           <div className="flex justify-between font-bold text-sm">
                             <span>{t.total}</span>
                             <span className="text-primary">
-                              {order.total_usd > 0 && order.total_afn > 0 ? (
-                                <>
-                                  {formatCurrency(order.total_usd, "USD", isRTL)} + {formatCurrency(order.total_afn, "AFN", isRTL)}
-                                </>
-                              ) : order.total_usd > 0 ? (
-                                formatCurrency(order.total_usd, "USD", isRTL)
-                              ) : (
-                                formatCurrency(order.total_afn, "AFN", isRTL)
-                              )}
+                              {formatCurrency(order.total_afn, "AFN", isRTL)}
                             </span>
                           </div>
                           {rate && order.total_afn > 0 && (
@@ -876,15 +850,7 @@ const BuyerOrders = () => {
                     </div>
                     <div className="text-right">
                       <p className="text-base md:text-lg font-bold text-primary">
-                        {order.total_usd > 0 && order.total_afn > 0 ? (
-                          <>
-                            {formatCurrency(order.total_usd, 'USD', isRTL)} + {formatCurrency(order.total_afn, 'AFN', isRTL)}
-                          </>
-                        ) : order.total_usd > 0 ? (
-                          formatCurrency(order.total_usd, 'USD', isRTL)
-                        ) : (
-                          formatCurrency(order.total_afn, 'AFN', isRTL)
-                        )}
+                        {formatCurrency(order.total_afn, 'AFN', isRTL)}
                       </p>
                       <p className="text-xs md:text-sm text-muted-foreground">
                         {order.order_items.length} {t.items}
@@ -1158,16 +1124,7 @@ const BuyerOrders = () => {
                           <div className="flex justify-between text-xs md:text-sm">
                             <span className="text-muted-foreground">{t.subtotal}</span>
                             <span>
-                              {order.subtotal_usd > 0 && order.subtotal_afn > 0 ? (
-                                <>
-                                  {formatCurrency(order.subtotal_usd, "USD", isRTL)} +{" "}
-                                  {formatCurrency(order.subtotal_afn, "AFN", isRTL)}
-                                </>
-                              ) : order.subtotal_usd > 0 ? (
-                                formatCurrency(order.subtotal_usd, "USD", isRTL)
-                              ) : (
-                                formatCurrency(order.subtotal_afn, "AFN", isRTL)
-                              )}
+                              {formatCurrency(order.subtotal_afn, "AFN", isRTL)}
                             </span>
                           </div>
                           {(() => {
@@ -1197,16 +1154,7 @@ const BuyerOrders = () => {
                             <div className="flex justify-between font-bold text-sm md:text-base">
                               <span>{t.total}</span>
                               <span className="text-primary">
-                                {order.total_usd > 0 && order.total_afn > 0 ? (
-                                  <>
-                                    {formatCurrency(order.total_usd, "USD", isRTL)} +{" "}
-                                    {formatCurrency(order.total_afn, "AFN", isRTL)}
-                                  </>
-                                ) : order.total_usd > 0 ? (
-                                  formatCurrency(order.total_usd, "USD", isRTL)
-                                ) : (
-                                  formatCurrency(order.total_afn, "AFN", isRTL)
-                                )}
+                                {formatCurrency(order.total_afn, "AFN", isRTL)}
                               </span>
                             </div>
                             {rate && order.total_afn > 0 && (
