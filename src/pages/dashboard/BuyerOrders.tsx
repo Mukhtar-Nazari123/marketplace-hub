@@ -61,10 +61,12 @@ interface SellerPolicy {
 }
 
 interface ShippingAddress {
-  name: string;
+  name?: string;
+  full_name?: string;
   phone: string;
   city: string;
-  fullAddress: string;
+  fullAddress?: string;
+  full_address?: string;
 }
 
 interface SellerSubOrder {
@@ -740,10 +742,10 @@ const BuyerOrders = () => {
                           {t.shippingAddress}
                         </h4>
                         <div className="p-3 bg-muted/50 rounded-lg text-xs space-y-1">
-                          <p className="font-medium">{order.shipping_address.name}</p>
+                          <p className="font-medium">{order.shipping_address.name || order.shipping_address.full_name}</p>
                           <p className="text-muted-foreground">{order.shipping_address.phone}</p>
                           <p className="text-muted-foreground">
-                            {order.shipping_address.city}, {order.shipping_address.fullAddress}
+                            {order.shipping_address.city}, {order.shipping_address.fullAddress || order.shipping_address.full_address}
                           </p>
                         </div>
                       </div>
@@ -1104,10 +1106,10 @@ const BuyerOrders = () => {
                             {t.shippingAddress}
                           </h4>
                           <div className="p-3 md:p-4 bg-muted/50 rounded-lg text-sm space-y-1">
-                            <p className="font-medium">{order.shipping_address.name}</p>
+                            <p className="font-medium">{order.shipping_address.name || order.shipping_address.full_name}</p>
                             <p className="text-muted-foreground text-xs md:text-sm">{order.shipping_address.phone}</p>
                             <p className="text-muted-foreground text-xs md:text-sm">
-                              {order.shipping_address.city}, {order.shipping_address.fullAddress}
+                              {order.shipping_address.city}, {order.shipping_address.fullAddress || order.shipping_address.full_address}
                             </p>
                           </div>
                         </div>
