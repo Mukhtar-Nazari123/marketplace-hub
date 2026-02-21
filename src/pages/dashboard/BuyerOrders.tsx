@@ -103,7 +103,6 @@ interface Order {
   payment_status: string;
   payment_method: string | null;
   subtotal_afn: number;
-  shipping_cost: number;
   delivery_fee_afn: number;
   discount: number;
   tax: number;

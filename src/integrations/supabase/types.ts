@@ -1183,7 +1183,6 @@ export type Database = {
           seller_policies: Json | null
           settlement_currency: string
           shipping_address: Json | null
-          shipping_cost: number
           status: string
           subtotal_afn: number
           tax: number
@@ -1205,7 +1204,6 @@ export type Database = {
           seller_policies?: Json | null
           settlement_currency?: string
           shipping_address?: Json | null
-          shipping_cost?: number
           status?: string
           subtotal_afn?: number
           tax?: number
@@ -1227,7 +1225,6 @@ export type Database = {
           seller_policies?: Json | null
           settlement_currency?: string
           shipping_address?: Json | null
-          shipping_cost?: number
           status?: string
           subtotal_afn?: number
           tax?: number
