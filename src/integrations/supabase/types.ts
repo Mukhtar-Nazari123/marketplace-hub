@@ -1186,10 +1186,8 @@ export type Database = {
           shipping_cost: number
           status: string
           subtotal_afn: number
-          subtotal_usd: number
           tax: number
           total_afn: number
-          total_usd: number
           updated_at: string
         }
         Insert: {
@@ -1210,10 +1208,8 @@ export type Database = {
           shipping_cost?: number
           status?: string
           subtotal_afn?: number
-          subtotal_usd?: number
           tax?: number
           total_afn?: number
-          total_usd?: number
           updated_at?: string
         }
         Update: {
@@ -1234,10 +1230,8 @@ export type Database = {
           shipping_cost?: number
           status?: string
           subtotal_afn?: number
-          subtotal_usd?: number
           tax?: number
           total_afn?: number
-          total_usd?: number
           updated_at?: string
         }
         Relationships: []

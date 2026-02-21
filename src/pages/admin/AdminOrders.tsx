@@ -45,9 +45,7 @@ interface Order {
   status: string;
   payment_status: string;
   total_afn: number;
-  total_usd: number;
   subtotal_afn: number;
-  subtotal_usd: number;
   delivery_fee_afn: number;
   currency: string;
   created_at: string;
@@ -307,15 +305,10 @@ const AdminOrders = () => {
                         <TableCell>
                           {order.delivery_fee_afn > 0 ? (
                             <>
-                              {order.currency === 'USD' 
-                                ? formatCurrency(order.subtotal_usd, 'USD', isRTL)
-                                : formatCurrency(order.subtotal_afn, 'AFN', isRTL)
-                              } + {formatCurrency(order.delivery_fee_afn, 'AFN', isRTL)}
+                          {formatCurrency(order.subtotal_afn, 'AFN', isRTL)} + {formatCurrency(order.delivery_fee_afn, 'AFN', isRTL)}
                             </>
                           ) : (
-                            order.currency === 'USD'
-                              ? formatCurrency(order.total_usd, 'USD', isRTL)
-                              : formatCurrency(order.total_afn, 'AFN', isRTL)
+                            formatCurrency(order.total_afn, 'AFN', isRTL)
                           )}
                         </TableCell>
                         <TableCell>

@@ -86,10 +86,8 @@ interface Order {
   status: string;
   payment_status: string;
   payment_method: string | null;
-  subtotal_usd: number;
   subtotal_afn: number;
   delivery_fee_afn: number;
-  total_usd: number;
   total_afn: number;
   tax: number;
   shipping_cost: number;
@@ -493,12 +491,6 @@ const AdminOrderDetail = () => {
 
               {/* Order Summary */}
               <div className="p-4 bg-muted/30 border-t border-border space-y-2">
-                {order.subtotal_usd > 0 && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">{getLabel(lang, 'Subtotal (USD)', 'جمع فرعی (USD)', 'فرعي مجموعه (USD)')}</span>
-                    <span>${Number(order.subtotal_usd).toFixed(2)}</span>
-                  </div>
-                )}
                 {order.subtotal_afn > 0 && (
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">{getLabel(lang, 'Subtotal (AFN)', 'جمع فرعی (AFN)', 'فرعي مجموعه (AFN)')}</span>
@@ -525,12 +517,6 @@ const AdminOrderDetail = () => {
                   </div>
                 )}
                 <Separator />
-                {order.total_usd > 0 && (
-                  <div className="flex justify-between font-bold text-lg">
-                    <span>{getLabel(lang, 'Total (USD)', 'مجموع (USD)', 'ټول (USD)')}</span>
-                    <span className="text-primary">${Number(order.total_usd).toFixed(2)}</span>
-                  </div>
-                )}
                 {order.total_afn > 0 && (
                   <div className="flex justify-between font-bold text-lg">
                     <span>{getLabel(lang, 'Total (AFN)', 'مجموع (AFN)', 'ټول (AFN)')}</span>
