@@ -90,7 +90,6 @@ interface Order {
   delivery_fee_afn: number;
   total_afn: number;
   tax: number;
-  shipping_cost: number;
   discount: number;
   currency: string;
   settlement_currency: string;

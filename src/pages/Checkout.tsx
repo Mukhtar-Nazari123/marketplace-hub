@@ -428,7 +428,6 @@ const Checkout = () => {
           subtotal_afn: subtotalAFN,
           delivery_fee_afn: deliveryFeeAFN,
           total_afn: totalAFN,
-          shipping_cost: deliveryFeeAFN, // Also store in shipping_cost for backward compatibility
           discount: 0,
           tax: 0,
           settlement_currency: subtotalUSD > 0 && subtotalAFN > 0 ? 'AFN' : (subtotalUSD > 0 ? 'USD' : 'AFN'),
