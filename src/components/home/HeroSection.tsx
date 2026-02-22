@@ -36,11 +36,11 @@ const HeroSection = () => {
    const renderDesignedBanners = () => {
      if (designedBanners.length === 0) {
        return (
-         <div className="relative rounded-xl sm:rounded-2xl overflow-hidden bg-muted min-h-[200px] sm:min-h-[280px] lg:min-h-[350px] flex items-center justify-center">
-           <p className="text-muted-foreground text-sm sm:text-base">
-             {isRTL ? "بنر تبلیغاتی موجود نیست" : "No hero banner available"}
-           </p>
-         </div>
+          <div className="relative overflow-hidden bg-muted min-h-[200px] sm:min-h-[280px] lg:min-h-[350px] flex items-center justify-center">
+            <p className="text-muted-foreground text-sm sm:text-base">
+              {isRTL ? "بنر تبلیغاتی موجود نیست" : "No hero banner available"}
+            </p>
+          </div>
        );
      }
  
@@ -64,7 +64,7 @@ const HeroSection = () => {
                <CarouselItem key={banner.id} className="pl-0">
                  {banner.cta_link ? (
                    <Link to={banner.cta_link}>
-                     <div className="relative rounded-xl sm:rounded-2xl overflow-hidden min-h-[200px] sm:min-h-[280px] lg:min-h-[350px]">
+                      <div className="relative overflow-hidden min-h-[200px] sm:min-h-[280px] lg:min-h-[350px]">
                        <img
                          src={banner.image_url}
                          alt="Hero banner"
@@ -73,7 +73,7 @@ const HeroSection = () => {
                      </div>
                    </Link>
                  ) : (
-                   <div className="relative rounded-xl sm:rounded-2xl overflow-hidden min-h-[200px] sm:min-h-[280px] lg:min-h-[350px]">
+                   <div className="relative overflow-hidden min-h-[200px] sm:min-h-[280px] lg:min-h-[350px]">
                      <img
                        src={banner.image_url}
                        alt="Hero banner"
@@ -110,16 +110,16 @@ const HeroSection = () => {
    const renderDynamicBanners = () => {
      if (heroBanners.length === 0) {
        return (
-         <div className="relative rounded-xl sm:rounded-2xl overflow-hidden bg-muted min-h-[200px] sm:min-h-[280px] lg:min-h-[350px] flex items-center justify-center">
-           <p className="text-muted-foreground text-sm sm:text-base">
-             {isRTL ? "بنر تبلیغاتی موجود نیست" : "No hero banner available"}
-           </p>
-         </div>
+          <div className="relative overflow-hidden bg-muted min-h-[200px] sm:min-h-[280px] lg:min-h-[350px] flex items-center justify-center">
+            <p className="text-muted-foreground text-sm sm:text-base">
+              {isRTL ? "بنر تبلیغاتی موجود نیست" : "No hero banner available"}
+            </p>
+          </div>
        );
      }
  
      return (
-        <div className="relative rounded-xl sm:rounded-2xl overflow-hidden">
+        <div className="relative overflow-hidden">
          <Carousel
            opts={{
              loop: true,
@@ -163,9 +163,9 @@ const HeroSection = () => {
    };
  
   return (
-    <section className="relative w-full overflow-hidden">
-      <div className="container px-1 sm:px-1.5 lg:px-2 pt-2 lg:pb-2">
-        <div className="flex flex-col gap-4 sm:gap-6">
+     <section className="relative w-full overflow-hidden">
+       <div className="w-full">
+         <div className="flex flex-col">
           {/* Main Hero - Full Width */}
            {isLoading ? (
             <HeroBannerSkeleton />
