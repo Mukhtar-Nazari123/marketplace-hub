@@ -109,7 +109,7 @@ export const NotificationBell = () => {
         <TooltipTrigger asChild>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-5 w-5" />
+              <Bell className="h-5 w-5 text-black dark:text-white" />
               {unreadCount > 0 && (
                 <Badge 
                   className={`absolute -top-1 h-5 min-w-[20px] rounded-full bg-orange-500 hover:bg-orange-500 text-white text-xs font-bold flex items-center justify-center px-1.5 ${isRTL ? '-right-1' : '-left-1'}`}

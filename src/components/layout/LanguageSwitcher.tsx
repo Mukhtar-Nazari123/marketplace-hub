@@ -31,7 +31,7 @@ const LanguageSwitcher = () => {
               className="transition-all duration-300 hover:bg-muted"
               aria-label={t.header.language}
             >
-              <Globe className="h-5 w-5 text-muted-foreground" />
+              <Globe className="h-5 w-5 text-black dark:text-white" />
             </Button>
           </DropdownMenuTrigger>
         </TooltipTrigger>
