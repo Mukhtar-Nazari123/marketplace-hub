@@ -8,10 +8,7 @@ import TopBar from "@/components/layout/TopBar";
 
 const Index = () => {
   return (
-    <PublicLayout showMobileCategoryBar>
-      {/* Hero Section */}
-      <HeroSection />
-
+    <PublicLayout showMobileCategoryBar heroContent={<HeroSection />}>
       {/* TopBar for Mobile/Tablet - Below hero section */}
       <div className="lg:hidden">
         <TopBar />
