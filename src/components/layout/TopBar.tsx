@@ -62,7 +62,7 @@ const TopBar = () => {
 
       {/* Mobile/Tablet Layout - aligned to the same container width as other sections */}
       <div className="lg:hidden overflow-x-hidden bg-background/15 backdrop-blur-sm" dir={isRTL ? "rtl" : "ltr"}>
-        <div className="container px-1 sm:px-1.5 lg:px-2 pt-1">
+        <div className="container px-3 sm:px-4 lg:px-6 pt-1">
           <div className="bg-white/10 px-2 sm:px-3 py-1.5 rounded-sm w-full max-w-full box-border overflow-hidden">
             <div className="grid grid-cols-2 items-center gap-2 w-full">
               {/* Left - Free Shipping */}
