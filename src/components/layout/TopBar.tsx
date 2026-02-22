@@ -43,7 +43,7 @@ const TopBar = () => {
   return (
     <>
       {/* Desktop Layout */}
-      <div className="bg-[hsl(var(--brand-neutral))] py-1.5 hidden lg:block" dir={isRTL ? "rtl" : "ltr"}>
+      <div className="bg-background/15 backdrop-blur-sm py-1.5 hidden lg:block" dir={isRTL ? "rtl" : "ltr"}>
         <div className="container">
           <div className="flex items-center justify-center gap-16">
             {allFeatures.map((feature, index) => {
