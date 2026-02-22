@@ -32,7 +32,7 @@ const MobileCategoryBar = () => {
             {/* All Categories Link */}
           <Link
             to="/categories"
-            className="flex-shrink-0 px-3 py-1.5 text-sm font-semibold text-foreground border-b-2 border-primary"
+            className="flex-shrink-0 px-3 py-1.5 text-sm font-semibold text-black dark:text-white border-b-2 border-primary"
           >
             {isRTL ? 'همه' : 'All'}
           </Link>
@@ -42,7 +42,7 @@ const MobileCategoryBar = () => {
             <Link
               key={category.id}
               to={`/categories?category=${category.slug}`}
-              className="flex-shrink-0 px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors border-b-2 border-transparent hover:border-primary/50"
+              className="flex-shrink-0 px-3 py-1.5 text-sm font-medium text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white transition-colors border-b-2 border-transparent hover:border-primary/50"
             >
               {category.name}
             </Link>
