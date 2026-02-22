@@ -90,7 +90,7 @@ const Header = () => {
             {/* Mobile Icons - Left side (Menu + Search) */}
             <div className="flex items-center gap-1 lg:hidden flex-shrink-0 z-10">
               <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(true)} aria-label={t.header.menu}>
-                <Menu className="h-5 w-5" />
+                <Menu className="h-5 w-5 text-black dark:text-white" />
               </Button>
               <Button
                 variant="ghost"
@@ -98,7 +98,7 @@ const Header = () => {
                 onClick={() => setIsSearchOpen(true)}
                 aria-label={t.header.searchPlaceholder}
               >
-                <Search className="h-5 w-5" />
+                <Search className="h-5 w-5 text-black dark:text-white" />
               </Button>
             </div>
 
@@ -157,7 +157,7 @@ const Header = () => {
                     {theme === "dark" ? (
                       <Sun className="h-5 w-5 text-warning" />
                     ) : (
-                      <Moon className="h-5 w-5 text-muted-foreground" />
+                      <Moon className="h-5 w-5 text-black dark:text-white" />
                     )}
                   </Button>
                 </TooltipTrigger>
@@ -170,7 +170,7 @@ const Header = () => {
                   <TooltipTrigger asChild>
                     <Link to="/dashboard/buyer/wishlist" className="hidden lg:block">
                       <Button variant="ghost" size="icon" className="relative">
-                        <Heart className="h-5 w-5 text-muted-foreground" />
+                        <Heart className="h-5 w-5 text-black dark:text-white" />
                         {wishlistCount > 0 && (
                           <span
                             className={`absolute -top-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-bold ${isRTL ? "-right-1" : "-left-1"}`}
@@ -191,7 +191,7 @@ const Header = () => {
                   <TooltipTrigger asChild>
                     <Link to="/cart" className="hidden lg:block">
                       <Button variant="ghost" size="icon" className="relative">
-                        <ShoppingCart className="h-5 w-5 text-muted-foreground" />
+                        <ShoppingCart className="h-5 w-5 text-black dark:text-white" />
                         {itemCount > 0 && (
                           <span
                             className={`absolute -top-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-bold ${isRTL ? "-right-1" : "-left-1"}`}
@@ -240,7 +240,7 @@ const Header = () => {
                             className="transition-all duration-300 hover:bg-primary/10"
                             aria-label={t.header.logout}
                           >
-                            <LogOut className="h-5 w-5 text-muted-foreground hover:text-primary" />
+                            <LogOut className="h-5 w-5 text-black dark:text-white hover:text-primary" />
                           </Button>
                         </AlertDialogTrigger>
                       </TooltipTrigger>
