@@ -16,7 +16,11 @@ import kitchen from '@/assets/subcategories/kitchen.jpg';
 import ledLighting from '@/assets/subcategories/led-lighting.jpg';
 import makeup from '@/assets/subcategories/makeup.jpg';
 import mensClothing from '@/assets/subcategories/mens-clothing.jpg';
-import mensShoes from '@/assets/subcategories/mens-shoes.jpg';
+import mensShoes from '@/assets/subcategories/mens-shoes.webp';
+import womensShoes from '@/assets/subcategories/womens-shoes.webp';
+import kidsShoes from '@/assets/subcategories/kids-shoes.webp';
+import sportsShoes from '@/assets/subcategories/sports-shoes.webp';
+import sandalsSlippers from '@/assets/subcategories/sandals-slippers.webp';
 import nursery from '@/assets/subcategories/nursery.jpg';
 import outdoor from '@/assets/subcategories/outdoor.jpg';
 import personalCare from '@/assets/subcategories/personal-care.jpg';
@@ -55,6 +59,10 @@ export const subcategoryImageMap: Record<string, string> = {
   'makeup': makeup,
   'men': mensClothing,
   'mens-shoes': mensShoes,
+  'womens-shoes': womensShoes,
+  'kids-shoes': kidsShoes,
+  'sports-shoes': sportsShoes,
+  'sandals-slippers': sandalsSlippers,
   'nursery': nursery,
   'outdoor': outdoor,
   'personal': personalCare,
