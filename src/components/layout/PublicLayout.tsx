@@ -28,12 +28,10 @@ const PublicLayout = ({
             {/* Hero background layer */}
             <div className="w-full">{heroContent}</div>
 
-            {/* Header/Nav overlay on top of hero */}
+          {/* Header/Nav overlay on top of hero */}
             <div className="absolute top-0 left-0 right-0 z-50">
-              {/* TopBar - Desktop only */}
-              <div className="hidden lg:block">
-                <TopBar />
-              </div>
+              {/* TopBar */}
+              <TopBar />
 
               {/* Desktop navbar */}
               <div className="hidden lg:block">
@@ -53,9 +51,7 @@ const PublicLayout = ({
       ) : (
         <>
           {/* Normal layout without hero behind header */}
-          <div className="hidden lg:block">
-            <TopBar />
-          </div>
+          <TopBar />
 
           <StickyNavbar className="hidden lg:block">
             <Header />
