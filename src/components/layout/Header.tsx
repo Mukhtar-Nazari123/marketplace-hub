@@ -126,7 +126,7 @@ const Header = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className={`w-full h-11 rounded-full bg-background/15 backdrop-blur-sm border border-white/10 focus:border-primary transition-colors text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/50 ${isRTL ? "pr-4 pl-24 text-right" : "pl-4 pr-24 text-left"}`}
+                  className={`w-full h-11 rounded-full bg-background/15 backdrop-blur-sm border border-border/30 focus:border-primary transition-colors text-black dark:text-white placeholder:text-black/50 dark:placeholder:text-white/50 ${isRTL ? "pr-4 pl-24 text-right" : "pl-4 pr-24 text-left"}`}
                   dir={isRTL ? "rtl" : "ltr"}
                 />
                 <Button
