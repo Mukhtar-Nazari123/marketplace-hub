@@ -222,7 +222,7 @@ const Header = () => {
                           className="relative transition-all duration-300 hover:bg-primary/10"
                           aria-label={getDashboardLabel()}
                         >
-                          <LayoutDashboard className="h-5 w-5 text-primary" />
+                          <LayoutDashboard className="h-5 w-5 text-black dark:text-white" />
                         </Button>
                       </Link>
                     </TooltipTrigger>
