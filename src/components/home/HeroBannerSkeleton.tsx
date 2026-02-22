@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const HeroBannerSkeleton = () => {
   return (
-    <div className="lg:col-span-2 relative rounded-xl sm:rounded-2xl overflow-hidden bg-muted min-h-[280px] sm:min-h-[350px] lg:min-h-[500px] w-full">
+    <div className="lg:col-span-2 relative overflow-hidden bg-muted min-h-[400px] sm:min-h-[480px] lg:min-h-[550px] w-full">
       <div className="absolute inset-0 bg-gradient-to-r from-muted via-muted/95 to-muted/70" />
       <div className="relative z-10 h-full flex flex-col sm:flex-row items-center justify-center sm:justify-between px-4 sm:px-8 lg:px-16 py-6 sm:py-0 gap-4 sm:gap-6">
         {/* Icon skeleton */}

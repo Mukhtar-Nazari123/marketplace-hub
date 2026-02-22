@@ -36,7 +36,7 @@ const HeroSection = () => {
    const renderDesignedBanners = () => {
      if (designedBanners.length === 0) {
        return (
-          <div className="relative overflow-hidden bg-muted min-h-[200px] sm:min-h-[280px] lg:min-h-[350px] flex items-center justify-center">
+          <div className="relative overflow-hidden bg-muted min-h-[400px] sm:min-h-[480px] lg:min-h-[550px] flex items-center justify-center">
             <p className="text-muted-foreground text-sm sm:text-base">
               {isRTL ? "بنر تبلیغاتی موجود نیست" : "No hero banner available"}
             </p>
@@ -64,7 +64,7 @@ const HeroSection = () => {
                <CarouselItem key={banner.id} className="pl-0">
                  {banner.cta_link ? (
                    <Link to={banner.cta_link}>
-                      <div className="relative overflow-hidden min-h-[200px] sm:min-h-[280px] lg:min-h-[350px]">
+                      <div className="relative overflow-hidden min-h-[400px] sm:min-h-[480px] lg:min-h-[550px]">
                        <img
                          src={banner.image_url}
                          alt="Hero banner"
@@ -73,7 +73,7 @@ const HeroSection = () => {
                      </div>
                    </Link>
                  ) : (
-                   <div className="relative overflow-hidden min-h-[200px] sm:min-h-[280px] lg:min-h-[350px]">
+                   <div className="relative overflow-hidden min-h-[400px] sm:min-h-[480px] lg:min-h-[550px]">
                      <img
                        src={banner.image_url}
                        alt="Hero banner"
@@ -110,7 +110,7 @@ const HeroSection = () => {
    const renderDynamicBanners = () => {
      if (heroBanners.length === 0) {
        return (
-          <div className="relative overflow-hidden bg-muted min-h-[200px] sm:min-h-[280px] lg:min-h-[350px] flex items-center justify-center">
+          <div className="relative overflow-hidden bg-muted min-h-[400px] sm:min-h-[480px] lg:min-h-[550px] flex items-center justify-center">
             <p className="text-muted-foreground text-sm sm:text-base">
               {isRTL ? "بنر تبلیغاتی موجود نیست" : "No hero banner available"}
             </p>
