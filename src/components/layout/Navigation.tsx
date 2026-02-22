@@ -17,7 +17,7 @@ const Navigation = () => {
   ];
 
   return (
-    <nav className="hidden lg:block bg-background/15 backdrop-blur-sm border-b border-white/10">
+    <nav className="hidden lg:block bg-background/15 backdrop-blur-sm border-b border-border/30">
       <div className="container px-3 sm:px-4 lg:px-6">
         <div className="flex items-center">
           {/* Category Mega Menu */}
