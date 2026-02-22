@@ -328,7 +328,7 @@ async function saveProductAttributes(
     // Determine if this attribute is language-specific or universal
     // Size, color codes, technical specs are usually universal
     // Labels/descriptions might be language-specific
-    const isUniversal = ['size', 'color', 'weight', 'dimensions', 'material_code', 'quantityunit'].includes(key.toLowerCase());
+    const isUniversal = ['size', 'sizes', 'numericsizes', 'color', 'colors', 'weight', 'dimensions', 'material_code', 'quantityunit', 'gender', 'material', 'solematerial'].includes(key.toLowerCase());
 
     attributesToInsert.push({
       product_id: productId,
@@ -464,7 +464,7 @@ export async function loadProductWithTranslations(
       attributesObj[attr.attribute_key] = true;
     } else if (attr.attribute_value === 'false') {
       attributesObj[attr.attribute_key] = false;
-    } else if (['sizes', 'colors'].includes(attr.attribute_key) && attr.attribute_value.includes(', ')) {
+    } else if (['sizes', 'colors', 'numericSizes'].includes(attr.attribute_key) && attr.attribute_value.includes(', ')) {
       attributesObj[attr.attribute_key] = attr.attribute_value.split(', ');
     } else {
       attributesObj[attr.attribute_key] = attr.attribute_value;
