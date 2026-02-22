@@ -10,37 +10,65 @@ interface PublicLayoutProps {
   children: ReactNode;
   showMobileCategoryBar?: boolean;
   showFooter?: boolean;
+  heroContent?: ReactNode;
 }
 
-/**
- * PublicLayout - Shared layout for all public-facing pages
- * Includes: TopBar, Header, Navigation, and Footer
- */
 const PublicLayout = ({ 
   children, 
   showMobileCategoryBar = false,
-  showFooter = true 
+  showFooter = true,
+  heroContent
 }: PublicLayoutProps) => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      {/* TopBar with features - Desktop only (at top) */}
-      <div className="hidden lg:block">
-        <TopBar />
-      </div>
+      {heroContent ? (
+        <>
+          {/* Hero behind header: hero is positioned, header overlays it */}
+          <div className="relative w-full">
+            {/* Hero background layer */}
+            <div className="w-full">{heroContent}</div>
 
-      {/* Auto-hide Sticky Navbar - Desktop */}
-      <StickyNavbar className="hidden lg:block">
-        <Header />
-        {showMobileCategoryBar && <MobileCategoryBar />}
-        <Navigation />
-      </StickyNavbar>
+            {/* Header/Nav overlay on top of hero */}
+            <div className="absolute top-0 left-0 right-0 z-50">
+              {/* TopBar - Desktop only */}
+              <div className="hidden lg:block">
+                <TopBar />
+              </div>
 
-      {/* Mobile/Tablet Header - Sticky */}
-      <div className="lg:hidden sticky top-0 z-50 bg-background border-b border-muted-foreground/20 shadow-sm">
-        <Header />
-        {showMobileCategoryBar && <MobileCategoryBar />}
-      </div>
+              {/* Desktop navbar */}
+              <div className="hidden lg:block">
+                <Header />
+                {showMobileCategoryBar && <MobileCategoryBar />}
+                <Navigation />
+              </div>
 
+              {/* Mobile/Tablet Header */}
+              <div className="lg:hidden">
+                <Header />
+                {showMobileCategoryBar && <MobileCategoryBar />}
+              </div>
+            </div>
+          </div>
+        </>
+      ) : (
+        <>
+          {/* Normal layout without hero behind header */}
+          <div className="hidden lg:block">
+            <TopBar />
+          </div>
+
+          <StickyNavbar className="hidden lg:block">
+            <Header />
+            {showMobileCategoryBar && <MobileCategoryBar />}
+            <Navigation />
+          </StickyNavbar>
+
+          <div className="lg:hidden sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-muted-foreground/20 shadow-sm">
+            <Header />
+            {showMobileCategoryBar && <MobileCategoryBar />}
+          </div>
+        </>
+      )}
 
       {/* Main Content */}
       <main className="flex-1">

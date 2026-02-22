@@ -84,7 +84,7 @@ const Header = () => {
   };
   return (
     <>
-      <header className="bg-background border-b border-muted-foreground/20 shadow-sm sticky top-0 z-50">
+      <header className="bg-background/80 backdrop-blur-md border-b border-muted-foreground/20 shadow-sm sticky top-0 z-50">
         <div className="container px-1 sm:px-1.5 lg:px-2 py-1.5 lg:py-1">
           <div className="flex items-center justify-between gap-2 sm:gap-3 relative">
             {/* Mobile Icons - Left side (Menu + Search) */}
