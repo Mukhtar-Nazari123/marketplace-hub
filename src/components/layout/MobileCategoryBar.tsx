@@ -10,7 +10,7 @@ const MobileCategoryBar = () => {
 
   if (loading) {
     return (
-      <div className="lg:hidden bg-muted/80 backdrop-blur-sm border-b border-border">
+      <div className="lg:hidden bg-background/15 backdrop-blur-sm border-b border-white/10">
         <div className="flex gap-6 px-4 py-2">
           {[...Array(6)].map((_, i) => (
             <Skeleton key={i} className="h-6 w-16 flex-shrink-0" />
@@ -25,7 +25,7 @@ const MobileCategoryBar = () => {
   }
 
   return (
-    <div className="lg:hidden bg-muted/80 backdrop-blur-sm border-b border-border" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="lg:hidden bg-background/15 backdrop-blur-sm border-b border-white/10" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="container px-1 sm:px-1.5 lg:px-2">
         <ScrollArea className="w-full whitespace-nowrap">
           <div className={`flex gap-1 py-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
