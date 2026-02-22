@@ -924,6 +924,185 @@ export const CategorySpecificFields = ({
     </div>
   );
 
+  const renderShoesFields = () => (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2 mb-4 text-primary">
+        <Package className="w-5 h-5" />
+        <span className="font-medium">{getLabel("Shoes Specifications", "مشخصات کفش", "د بوټانو مشخصات")}</span>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="space-y-2">
+          <Label className="flex items-center gap-2">{getLabel("Gender", "جنسیت", "جنسیت")}</Label>
+          <Select
+            value={(attributes.gender as string) || ""}
+            onValueChange={(value) => updateAttribute("gender", value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder={getLabel("Select", "انتخاب کنید", "غوره کړئ")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="men">{getLabel("Men", "مردانه", "نارینه")}</SelectItem>
+              <SelectItem value="women">{getLabel("Women", "زنانه", "ښځینه")}</SelectItem>
+              <SelectItem value="unisex">{getLabel("Unisex", "یونیسکس", "دواړه")}</SelectItem>
+              <SelectItem value="kids">{getLabel("Kids", "بچگانه", "ماشومانو")}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-3">
+          <Label className="flex items-center gap-2">
+            <Ruler className="w-4 h-4" />
+            {getLabel("Available Sizes", "سایزهای موجود", "موجود اندازې")}
+          </Label>
+          <div className="flex flex-wrap gap-2">
+            {["XS", "S", "M", "L", "XL", "XXL"].map((size) => {
+              const selectedSizes = (attributes.sizes as string[]) || [];
+              const isSelected = selectedSizes.includes(size);
+              return (
+                <button
+                  key={size}
+                  type="button"
+                  onClick={() => {
+                    const newSizes = isSelected ? selectedSizes.filter((s) => s !== size) : [...selectedSizes, size];
+                    updateAttribute("sizes", newSizes);
+                  }}
+                  className={cn(
+                    "px-3 py-2 text-sm font-medium rounded-md border transition-all duration-200",
+                    isSelected
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-background text-foreground border-border hover:border-primary/50",
+                  )}
+                >
+                  {size}
+                </button>
+              );
+            })}
+            <button
+              type="button"
+              onClick={() => {
+                const selectedSizes = (attributes.sizes as string[]) || [];
+                const isSelected = selectedSizes.includes("freesize");
+                const newSizes = isSelected
+                  ? selectedSizes.filter((s) => s !== "freesize")
+                  : [...selectedSizes, "freesize"];
+                updateAttribute("sizes", newSizes);
+              }}
+              className={cn(
+                "px-3 py-2 text-sm font-medium rounded-md border transition-all duration-200",
+                ((attributes.sizes as string[]) || []).includes("freesize")
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-background text-foreground border-border hover:border-primary/50",
+              )}
+            >
+              {getLabel("Free Size", "فری سایز", "آزاد اندازه")}
+            </button>
+          </div>
+
+          <div className="space-y-2 pt-3">
+            <Label className="flex items-center gap-2 text-sm">
+              <Ruler className="w-4 h-4" />
+              {getLabel("Numeric Sizes", "سایزهای عددی", "شمېري اندازې")}
+            </Label>
+            <div className="flex flex-wrap gap-1.5">
+              {Array.from({ length: 27 }, (_, i) => (20 + i).toString()).map((size) => {
+                const selectedNumSizes = (attributes.numericSizes as string[]) || [];
+                const isSelected = selectedNumSizes.includes(size);
+                return (
+                  <button
+                    key={size}
+                    type="button"
+                    onClick={() => {
+                      const newSizes = isSelected
+                        ? selectedNumSizes.filter((s) => s !== size)
+                        : [...selectedNumSizes, size];
+                      updateAttribute("numericSizes", newSizes);
+                    }}
+                    className={cn(
+                      "w-10 h-9 text-sm font-medium rounded-md border transition-all duration-200",
+                      isSelected
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-background text-foreground border-border hover:border-primary/50",
+                    )}
+                  >
+                    {size}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        <div className="md:col-span-2 space-y-2">
+          <Label className="flex items-center gap-2">
+            <Palette className="w-4 h-4" />
+            {getLabel("Color", "رنگ", "رنګ")}
+          </Label>
+          <div className="overflow-x-auto pb-2 -mx-1 px-1">
+            <div className="flex gap-2 min-w-max">
+              {PRODUCT_COLORS.map((colorOption) => {
+                const selectedColors = (attributes.colors as string[]) || [];
+                const isSelected = selectedColors.includes(colorOption.value);
+                const colorLabel = language === 'ps' ? (colorOption.namePs || colorOption.nameFa) : language === 'fa' ? colorOption.nameFa : colorOption.name;
+                return (
+                  <button
+                    key={colorOption.value}
+                    type="button"
+                    onClick={() => {
+                      const newColors = isSelected 
+                        ? selectedColors.filter((c) => c !== colorOption.value) 
+                        : [...selectedColors, colorOption.value];
+                      updateAttribute("colors", newColors);
+                    }}
+                    className={cn(
+                      "flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-full border transition-all duration-200 whitespace-nowrap",
+                      isSelected
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-background text-foreground border-border hover:border-primary/50"
+                    )}
+                    title={colorOption.name}
+                  >
+                    <span
+                      className="w-3.5 h-3.5 rounded-full border border-border/50 flex-shrink-0"
+                      style={{ backgroundColor: colorOption.hex }}
+                    />
+                    <span>{colorLabel}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label className="flex items-center gap-2">
+            <Layers className="w-4 h-4" />
+            {getLabel("Material", "جنس", "ماده")}
+          </Label>
+          <Input
+            value={(attributes.material as string) || ""}
+            onChange={(e) => updateAttribute("material", e.target.value)}
+            placeholder={getLabel("e.g., Leather, Canvas, Suede", "مثال: چرم، کتان، جیر", "مثال: څرمن، کتان، جیر")}
+            className={cn(isRTL && "text-right")}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label className="flex items-center gap-2">
+            <Layers className="w-4 h-4" />
+            {getLabel("Sole Material", "جنس زیره", "د تلي ماده")}
+          </Label>
+          <Input
+            value={(attributes.soleMaterial as string) || ""}
+            onChange={(e) => updateAttribute("soleMaterial", e.target.value)}
+            placeholder={getLabel("e.g., Rubber, EVA, PU", "مثال: لاستیک، EVA، PU", "مثال: ربړ، EVA، PU")}
+            className={cn(isRTL && "text-right")}
+          />
+        </div>
+      </div>
+    </div>
+  );
+
   // Match category by name - works with both English names and Persian/Pashto names
   const getCategoryType = (name: string, subName?: string): string => {
     const categoryMap: Record<string, string[]> = {
@@ -931,6 +1110,10 @@ export const CategorySpecificFields = ({
       clothing: ["clothing", "پوشاک", "fashion", "clothes", "men's clothing", "women's clothing", 
         "mens-clothing", "womens-clothing", "لباس مردانه", "لباس زنانه", "د نارینو جامې", "د ښځو جامې",
         "لباس", "جامې", "مد و لباس"],
+      shoes: ["shoes", "کفش", "بوټان", "men's shoes", "women's shoes", "kids' shoes", "sports shoes",
+        "sandals", "slippers", "sandals & slippers", "کفش مردانه", "کفش زنانه", "کفش بچه‌گانه",
+        "کفش ورزشی", "صندل", "دمپایی", "د نارینو بوټان", "د ښځو بوټان", "د ماشومانو بوټان",
+        "سپورت بوټان", "سنډل", "چپلکې"],
       home: ["home", "home-living", "خانه", "home & living", "living", "خانگی", "کور"],
       beauty: [
         "beauty", "beauty-personal-care", "زیبایی", "beauty & personal care",
@@ -974,6 +1157,8 @@ export const CategorySpecificFields = ({
       return renderElectronicsFields();
     case "clothing":
       return renderClothingFields();
+    case "shoes":
+      return renderShoesFields();
     case "home":
       return renderHomeFields();
     case "beauty":
