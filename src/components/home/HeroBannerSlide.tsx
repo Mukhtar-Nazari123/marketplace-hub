@@ -40,7 +40,7 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
       {/* Layer 2: Background Image in Circle with White Fade */}
       {banner.background_image && (
         <div
-          className={`absolute z-[2] top-1/2 -translate-y-1/2 pointer-events-none
+          className={`absolute z-[2] top-[60%] -translate-y-1/2 pointer-events-none
             ${isRTL ? "left-[5%] sm:left-[8%]" : "right-[5%] sm:right-[8%]"}
           `}
         >
@@ -91,7 +91,7 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
 
       {/* Layer 3: Content (Text + CTA) */}
       <div
-        className={`hero-content absolute z-[3] top-1/2 -translate-y-1/2 py-4 sm:py-5 lg:py-6 max-w-[480px]
+        className={`hero-content absolute z-[3] top-[60%] -translate-y-1/2 py-4 sm:py-5 lg:py-6 max-w-[480px]
           ${isRTL ? "right-[8%] sm:right-[10%] text-right" : "left-[8%] sm:left-[10%] text-left"}
         `}
         dir={isRTL ? "rtl" : "ltr"}
