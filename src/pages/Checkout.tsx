@@ -529,13 +529,19 @@ const Checkout = () => {
       }));
 
 
-      const { error: sellerOrdersError } = await supabase
-        .from('seller_orders')
-        .insert(sellerOrdersToInsert);
+      if (sellerOrdersToInsert.length > 0) {
+        console.log('Inserting seller orders:', JSON.stringify(sellerOrdersToInsert));
+        const { error: sellerOrdersError } = await supabase
+          .from('seller_orders')
+          .insert(sellerOrdersToInsert);
 
-      if (sellerOrdersError) {
-        console.error('Error creating seller orders:', sellerOrdersError);
-        // Don't throw - main order is created, just log the error
+        if (sellerOrdersError) {
+          console.error('Error creating seller orders:', sellerOrdersError);
+          // Throw the error so we can debug - seller orders are critical
+          throw new Error(`Failed to create seller orders: ${sellerOrdersError.message}`);
+        }
+      } else {
+        console.warn('No seller orders to insert - cartItems may have empty product data');
       }
 
       // Clear cart
