@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import ImageUpload from '@/components/admin/ImageUpload';
+import MigrateSubcategoryImages from '@/components/admin/MigrateSubcategoryImages';
 import {
   Table,
   TableBody,
@@ -431,6 +432,26 @@ const AdminCategories = () => {
             {getLabel(lang, 'New Category', 'دسته‌بندی جدید', 'نوې کټګوري')}
           </Button>
         </div>
+
+        {/* Image Migration Utility */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Image className="h-5 w-5" />
+              {getLabel(lang, 'Migrate Subcategory Images to Storage', 'انتقال تصاویر زیردسته به فضای ذخیره‌سازی', 'د فرعي کټګوریو عکسونه ذخیره‌ته انتقال کړئ')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-3">
+              {getLabel(lang, 
+                'Upload all bundled subcategory images to the site-assets/subcategories/ storage folder and link them in the database.',
+                'آپلود تمام تصاویر زیردسته‌بندی‌ها به پوشه site-assets/subcategories/ و اتصال آنها در پایگاه داده.',
+                'ټول فرعي کټګوریو عکسونه site-assets/subcategories/ فولډر ته اپلوډ کړئ او ډیټابیس کې یې وصل کړئ.'
+              )}
+            </p>
+            <MigrateSubcategoryImages onComplete={fetchData} />
+          </CardContent>
+        </Card>
 
         {/* Categories Table */}
         <Card>
