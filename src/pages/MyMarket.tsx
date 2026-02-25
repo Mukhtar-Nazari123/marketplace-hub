@@ -2,6 +2,7 @@ import {
   Package, Zap, BookOpen, Bookmark, Clock, Scale, Info,
   Headphones, Newspaper, LayoutDashboard, Globe, Sun, Moon, Heart,
   ChevronLeft, ChevronRight, User, LogOut, Check,
+  Facebook, Twitter, Instagram, Youtube, Linkedin, Github,
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -14,13 +15,21 @@ import {
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useSocialLinks } from "@/hooks/useSocialLinks";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
+const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+  Facebook, Twitter, Instagram, Youtube, YouTube: Youtube,
+  LinkedIn: Linkedin, Linkedin, GitHub: Github, Github, Other: Globe, Globe,
+};
 const MyMarket = () => {
   const { language, setLanguage, isRTL } = useLanguage();
   const { user, role, signOut } = useAuth();
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const [langOpen, setLangOpen] = useState(false);
+  const { data: socialLinks } = useSocialLinks();
+  const { siteName } = useSiteSettings();
 
   const l = (en: string, fa: string, ps: string) => {
     if (language === "fa") return fa;
@@ -201,6 +210,31 @@ const MyMarket = () => {
               <Row icon={User} label={l("Login / Register", "ورود / ثبت‌نام", "ننوتل / نوم لیکنه")} />
             </Link>
           )}
+        </div>
+
+        {/* Social Links & Copyright */}
+        <div className="mx-4 mt-6 flex flex-col items-center gap-4">
+          {socialLinks && socialLinks.length > 0 && (
+            <div className="flex gap-3">
+              {socialLinks.map((link) => {
+                const IconComponent = ICON_MAP[link.icon] || Globe;
+                return (
+                  <a
+                    key={link.id}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-colors"
+                  >
+                    <IconComponent className="h-5 w-5" />
+                  </a>
+                );
+              })}
+            </div>
+          )}
+          <p className="text-xs text-muted-foreground text-center">
+            © {isRTL ? "۱۴۰۴" : "2025"} {siteName}. {l("All rights reserved.", "تمام حقوق محفوظ است.", "ټول حقونه خوندي دي.")}
+          </p>
         </div>
       </div>
     </PublicLayout>
