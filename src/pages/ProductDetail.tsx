@@ -162,6 +162,14 @@ const ProductDetail = () => {
 
         setProduct({ ...(data as any), seller: seller ?? null } as Product);
 
+        // Track recently viewed
+        try {
+          const stored = JSON.parse(localStorage.getItem('recently_viewed_products') || '[]');
+          const filtered = stored.filter((i: any) => i.productId !== data.id);
+          const updated = [{ productId: data.id, viewedAt: Date.now() }, ...filtered].slice(0, 20);
+          localStorage.setItem('recently_viewed_products', JSON.stringify(updated));
+        } catch { /* ignore */ }
+
         // Fetch color-specific media
         const { data: colorMediaData } = await supabase
           .from('product_media')
