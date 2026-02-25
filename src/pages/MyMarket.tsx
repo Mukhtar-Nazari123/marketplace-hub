@@ -38,10 +38,7 @@ const MyMarket = () => {
 
   return (
     <PublicLayout>
-      <div className="min-h-[60vh] px-4 pt-8 pb-24" dir={isRTL ? "rtl" : "ltr"}>
-        <h1 className="text-xl font-bold text-center text-foreground mb-6">
-          {getLabel("My Market", "بازار من", "بازار من")}
-        </h1>
+      <div className="min-h-[60vh] px-4 pt-4 pb-24" dir={isRTL ? "rtl" : "ltr"}>
 
         <div className="grid grid-cols-3 gap-3 max-w-md mx-auto">
           {navBoxes.map((box) => {
