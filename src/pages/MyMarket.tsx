@@ -26,7 +26,7 @@ const MyMarket = () => {
     return en;
   };
 
-  const Chevron = isRTL ? ChevronLeft : ChevronRight;
+  const Chevron = isRTL ? ChevronRight : ChevronLeft;
 
   const getDashboardLink = () => {
     if (role === "admin") return "/dashboard/admin";
@@ -59,44 +59,48 @@ const MyMarket = () => {
 
   const langLabel = language === "fa" ? "فارسی" : language === "ps" ? "پښتو" : "English";
 
-  const Row = ({ icon: Icon, label, href, right }: { icon: any; label: string; href?: string; right?: React.ReactNode }) => {
-    const content = (
-      <div className="flex items-center justify-between px-4 py-3.5 hover:bg-muted/50 transition-colors">
-        <div className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse" : ""}`}>
-          <Icon className="h-5 w-5 text-primary" />
-          <span className="text-sm font-medium text-foreground">{label}</span>
+  const Row = ({ icon: Icon, label, href, right, destructive }: {
+    icon: any; label: string; href?: string; right?: React.ReactNode; destructive?: boolean;
+  }) => {
+    const inner = (
+      <div className="flex items-center justify-between px-4 py-4 group-hover:bg-muted/40 transition-colors">
+        <div className="flex items-center gap-3">
+          <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${destructive ? "bg-destructive/10" : "bg-primary/10"}`}>
+            <Icon className={`h-[18px] w-[18px] ${destructive ? "text-destructive" : "text-primary"}`} />
+          </div>
+          <span className={`text-sm font-medium ${destructive ? "text-destructive" : "text-foreground"}`}>{label}</span>
         </div>
-        {right || <Chevron className="h-4 w-4 text-muted-foreground" />}
+        {right || <Chevron className="h-4 w-4 text-muted-foreground/60" />}
       </div>
     );
-    if (href) return <Link to={href}>{content}</Link>;
-    return content;
+    if (href) return <Link to={href} className="group">{inner}</Link>;
+    return <div className="group">{inner}</div>;
   };
 
   const SectionTitle = ({ title }: { title: string }) => (
-    <div className={`px-4 pt-5 pb-2 ${isRTL ? "text-right" : "text-left"}`}>
-      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{title}</span>
+    <div className="px-4 pt-6 pb-2">
+      <span className="text-[11px] font-bold text-muted-foreground/70 uppercase tracking-widest">{title}</span>
     </div>
   );
 
   return (
     <PublicLayout>
-      <div className="min-h-[60vh] pb-24" dir={isRTL ? "rtl" : "ltr"}>
+      <div className="min-h-[60vh] pb-24 max-w-lg mx-auto" dir={isRTL ? "rtl" : "ltr"}>
         {/* Top nav boxes */}
-        <div className="px-4 pt-4">
-          <div className="grid grid-cols-3 gap-3 max-w-md mx-auto">
+        <div className="px-4 pt-5">
+          <div className="grid grid-cols-3 gap-3">
             {topBoxes.map((box) => {
               const Icon = box.icon;
               return (
                 <Link
                   key={box.label}
                   to={box.href}
-                  className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border border-border bg-card shadow-sm hover:shadow-md hover:border-primary/40 transition-all"
+                  className="flex flex-col items-center justify-center gap-2.5 p-5 rounded-2xl border border-border bg-card shadow-sm hover:shadow-lg hover:border-primary/30 hover:-translate-y-0.5 transition-all duration-200"
                 >
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center">
                     <Icon className="h-5 w-5 text-primary" />
                   </div>
-                  <span className="text-xs font-medium text-foreground text-center leading-tight">{box.label}</span>
+                  <span className="text-xs font-semibold text-foreground text-center leading-tight">{box.label}</span>
                 </Link>
               );
             })}
@@ -105,7 +109,7 @@ const MyMarket = () => {
 
         {/* Quick Access */}
         <SectionTitle title={l("Quick Access", "دسترسی سریع", "ګړندی لاسرسی")} />
-        <div className="divide-y divide-border border-y border-border">
+        <div className="mx-4 rounded-2xl border border-border bg-card overflow-hidden divide-y divide-border">
           {quickAccess.map((item) => (
             <Row key={item.label} icon={item.icon} label={item.label} href={item.href} />
           ))}
@@ -113,7 +117,7 @@ const MyMarket = () => {
 
         {/* Support & Info */}
         <SectionTitle title={l("Support & Information", "پشتیبانی و اطلاعات", "ملاتړ او معلومات")} />
-        <div className="divide-y divide-border border-y border-border">
+        <div className="mx-4 rounded-2xl border border-border bg-card overflow-hidden divide-y divide-border">
           {supportInfo.map((item) => (
             <Row key={item.label} icon={item.icon} label={item.label} href={item.href} />
           ))}
@@ -121,47 +125,37 @@ const MyMarket = () => {
 
         {/* Settings */}
         <SectionTitle title={l("Settings", "تنظیمات", "تنظیمات")} />
-        <div className="divide-y divide-border border-y border-border">
+        <div className="mx-4 rounded-2xl border border-border bg-card overflow-hidden divide-y divide-border">
           {user && (
             <Row icon={LayoutDashboard} label={l("Dashboard", "داشبورد", "ډشبورډ")} href={getDashboardLink()} />
           )}
 
-          <Link to="/my-market">
-            <div className="flex items-center justify-between px-4 py-3.5 hover:bg-muted/50 transition-colors">
-              <div className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse" : ""}`}>
-                <Globe className="h-5 w-5 text-primary" />
-                <span className="text-sm font-medium text-foreground">{l("Language", "زبان", "ژبه")}</span>
-              </div>
-              <span className="text-sm text-muted-foreground">{langLabel}</span>
-            </div>
-          </Link>
+          <Row
+            icon={Globe}
+            label={l("Language", "زبان", "ژبه")}
+            right={<span className="text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full">{langLabel}</span>}
+          />
 
-          <button
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="w-full"
-          >
-            <div className="flex items-center justify-between px-4 py-3.5 hover:bg-muted/50 transition-colors">
-              <div className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse" : ""}`}>
-                {theme === "dark" ? <Sun className="h-5 w-5 text-primary" /> : <Moon className="h-5 w-5 text-primary" />}
-                <span className="text-sm font-medium text-foreground">{l("Theme", "تم", "تم")}</span>
-              </div>
-              <span className="text-sm text-muted-foreground">
-                {theme === "dark" ? l("Dark", "تاریک", "تیاره") : l("Light", "روشن", "رڼا")}
-              </span>
-            </div>
+          <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} className="w-full">
+            <Row
+              icon={theme === "dark" ? Sun : Moon}
+              label={l("Theme", "تم", "تم")}
+              right={
+                <span className="text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full">
+                  {theme === "dark" ? l("Dark", "تاریک", "تیاره") : l("Light", "روشن", "رڼا")}
+                </span>
+              }
+            />
           </button>
         </div>
 
         {/* Login / Logout */}
-        <div className="mt-4 border-y border-border">
+        <div className="mx-4 mt-4 rounded-2xl border border-border bg-card overflow-hidden">
           {user ? (
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <button className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-destructive/10 transition-colors">
-                  <div className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse" : ""}`}>
-                    <LogOut className="h-5 w-5 text-destructive" />
-                    <span className="text-sm font-medium text-destructive">{l("Logout", "خروج", "وتل")}</span>
-                  </div>
+                <button className="w-full">
+                  <Row icon={LogOut} label={l("Logout", "خروج", "وتل")} destructive right={<span />} />
                 </button>
               </AlertDialogTrigger>
               <AlertDialogContent dir={isRTL ? "rtl" : "ltr"}>
@@ -181,13 +175,7 @@ const MyMarket = () => {
             </AlertDialog>
           ) : (
             <Link to="/login">
-              <div className="flex items-center justify-between px-4 py-3.5 hover:bg-muted/50 transition-colors">
-                <div className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse" : ""}`}>
-                  <User className="h-5 w-5 text-primary" />
-                  <span className="text-sm font-medium text-primary">{l("Login / Register", "ورود / ثبت‌نام", "ننوتل / نوم لیکنه")}</span>
-                </div>
-                <Chevron className="h-4 w-4 text-muted-foreground" />
-              </div>
+              <Row icon={User} label={l("Login / Register", "ورود / ثبت‌نام", "ننوتل / نوم لیکنه")} />
             </Link>
           )}
         </div>
