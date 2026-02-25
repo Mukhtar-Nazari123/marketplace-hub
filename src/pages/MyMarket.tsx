@@ -213,7 +213,7 @@ const MyMarket = () => {
         </div>
 
         {/* Social Links & Copyright */}
-        <div className="mx-4 mt-6 flex flex-col items-center gap-4">
+        <div className="mx-4 mt-4 mb-2 flex flex-col items-center gap-3">
           {socialLinks && socialLinks.length > 0 && (
             <div className="flex gap-3">
               {socialLinks.map((link) => {
