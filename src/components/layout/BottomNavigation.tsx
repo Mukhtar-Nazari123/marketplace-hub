@@ -1,4 +1,4 @@
-import { Home, ShoppingCart, TrendingUp, Heart, User } from "lucide-react";
+import { Home, ShoppingCart, TrendingUp, LayoutGrid, User } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useLanguage } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
@@ -61,12 +61,11 @@ const BottomNavigation = () => {
       href: "/products",
     },
     {
-      icon: Heart,
-      labelEn: "Wishlist",
-      labelFa: "علاقه‌مندی",
-      labelPs: "خوښې",
-      href: user ? "/dashboard/buyer/wishlist" : "/login",
-      badge: user ? wishlistCount : undefined,
+      icon: LayoutGrid,
+      labelEn: "Categories",
+      labelFa: "دسته‌بندی",
+      labelPs: "کټګورۍ",
+      href: "/categories",
     },
     {
       icon: User,
