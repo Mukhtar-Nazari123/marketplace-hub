@@ -1,6 +1,6 @@
 import {
   Package, Zap, BookOpen, Bookmark, Clock, Scale, Info,
-  Headphones, Newspaper, LayoutDashboard, Globe, Sun, Moon,
+  Headphones, Newspaper, LayoutDashboard, Globe, Sun, Moon, Heart,
   ChevronLeft, ChevronRight, User, LogOut, Check,
 } from "lucide-react";
 import { useState } from "react";
@@ -44,7 +44,7 @@ const MyMarket = () => {
   const topBoxes = [
     { icon: Package, label: l("Products", "محصولات", "محصولات"), href: "/products" },
     { icon: Zap, label: l("New Arrival", "جدیدترین‌ها", "نوي راغلي"), href: "/products?filter=new" },
-    { icon: BookOpen, label: l("Weblogs", "وبلاگ", "بلاګ"), href: "/blog" },
+    { icon: Heart, label: l("Wishlist", "علاقه‌مندی", "خوښې"), href: user ? "/dashboard/buyer/wishlist" : "/login" },
   ];
 
   const quickAccess = [
