@@ -141,8 +141,10 @@ const Header = () => {
 
             {/* Actions */}
             <div className="flex items-center gap-1 sm:gap-2 md:gap-4">
-              {/* Language Switcher */}
-              <LanguageSwitcher />
+              {/* Language Switcher - Desktop only */}
+              <div className="hidden lg:block">
+                <LanguageSwitcher />
+              </div>
 
               {/* Theme Toggle - Hidden on mobile, shown in hamburger menu */}
               <Tooltip>
@@ -206,8 +208,12 @@ const Header = () => {
                 </Tooltip>
               )}
 
-              {/* Notifications - Only visible when logged in */}
-              {user && (role === "buyer" || role === "seller") && <NotificationBell />}
+              {/* Notifications - Only visible on desktop when logged in */}
+              {user && (role === "buyer" || role === "seller") && (
+                <div className="hidden lg:block">
+                  <NotificationBell />
+                </div>
+              )}
 
               {/* Account / Dashboard / Logout - Hidden on mobile, shown on lg+ */}
               {user ? (
