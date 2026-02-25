@@ -69,6 +69,7 @@ import DashboardShell from "@/components/dashboard/DashboardShell";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import AdminPrivacyPolicy from "./pages/admin/AdminPrivacyPolicy";
 import MyMarket from "./pages/MyMarket";
+import RecentlyViewed from "./pages/RecentlyViewed";
 
 const queryClient = new QueryClient();
 
@@ -105,6 +106,7 @@ const App = () => (
                       <Route path="/checkout" element={<Checkout />} />
                       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                       <Route path="/my-market" element={<MyMarket />} />
+                      <Route path="/recently-viewed" element={<RecentlyViewed />} />
 
                       {/* Dashboard Routes */}
                       <Route path="/dashboard/seller/pending" element={<SellerPending />} />
