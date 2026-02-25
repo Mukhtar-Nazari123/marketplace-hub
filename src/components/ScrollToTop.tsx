@@ -43,9 +43,19 @@ export default function ScrollToTop() {
     });
   }, []);
 
+  // Scroll on route change
   useEffect(() => {
     scrollToTop();
   }, [pathname, scrollToTop]);
+
+  // Scroll on initial page load/reload
+  useEffect(() => {
+    scrollToTop();
+    // Also handle when browser restores scroll position after load
+    const handleLoad = () => scrollToTop();
+    window.addEventListener('load', handleLoad);
+    return () => window.removeEventListener('load', handleLoad);
+  }, [scrollToTop]);
 
   return null;
 }
