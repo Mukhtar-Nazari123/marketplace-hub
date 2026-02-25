@@ -101,7 +101,7 @@ const MyMarket = () => {
 
   return (
     <PublicLayout>
-      <div className="min-h-[60vh] pb-24 max-w-lg mx-auto" dir={isRTL ? "rtl" : "ltr"}>
+      <div className="min-h-[60vh] pb-4 max-w-lg mx-auto" dir={isRTL ? "rtl" : "ltr"}>
         {/* Top nav boxes */}
         <div className="px-4 pt-5">
           <div className="grid grid-cols-3 gap-3">
