@@ -1,8 +1,9 @@
 import {
   Package, Zap, BookOpen, Bookmark, Clock, Scale, Info,
   Headphones, Newspaper, LayoutDashboard, Globe, Sun, Moon,
-  ChevronLeft, ChevronRight, User, LogOut,
+  ChevronLeft, ChevronRight, User, LogOut, Check,
 } from "lucide-react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/lib/i18n";
 import { useAuth } from "@/hooks/useAuth";
@@ -15,10 +16,11 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const MyMarket = () => {
-  const { language, isRTL } = useLanguage();
+  const { language, setLanguage, isRTL } = useLanguage();
   const { user, role, signOut } = useAuth();
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
+  const [langOpen, setLangOpen] = useState(false);
 
   const l = (en: string, fa: string, ps: string) => {
     if (language === "fa") return fa;
@@ -57,7 +59,12 @@ const MyMarket = () => {
     { icon: Newspaper, label: l("News", "اتاق خبر", "خبرتیاوې"), href: "/blog" },
   ];
 
-  const langLabel = language === "fa" ? "فارسی" : language === "ps" ? "پښتو" : "English";
+  const languages = [
+    { code: "en" as const, label: "English" },
+    { code: "fa" as const, label: "فارسی" },
+    { code: "ps" as const, label: "پښتو" },
+  ];
+  const langLabel = languages.find((l) => l.code === language)?.label || "English";
 
   const Row = ({ icon: Icon, label, href, right, destructive }: {
     icon: any; label: string; href?: string; right?: React.ReactNode; destructive?: boolean;
@@ -130,11 +137,27 @@ const MyMarket = () => {
             <Row icon={LayoutDashboard} label={l("Dashboard", "داشبورد", "ډشبورډ")} href={getDashboardLink()} />
           )}
 
-          <Row
-            icon={Globe}
-            label={l("Language", "زبان", "ژبه")}
-            right={<span className="text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full">{langLabel}</span>}
-          />
+          <button onClick={() => setLangOpen(!langOpen)} className="w-full">
+            <Row
+              icon={Globe}
+              label={l("Language", "زبان", "ژبه")}
+              right={<span className="text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full">{langLabel}</span>}
+            />
+          </button>
+          {langOpen && (
+            <div className="bg-muted/30 divide-y divide-border">
+              {languages.map((lang) => (
+                <button
+                  key={lang.code}
+                  onClick={() => { setLanguage(lang.code); setLangOpen(false); }}
+                  className="w-full flex items-center justify-between px-6 py-3.5 hover:bg-muted/60 transition-colors"
+                >
+                  <span className={`text-sm font-medium ${language === lang.code ? "text-primary" : "text-foreground"}`}>{lang.label}</span>
+                  {language === lang.code && <Check className="h-4 w-4 text-primary" />}
+                </button>
+              ))}
+            </div>
+          )}
 
           <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")} className="w-full">
             <Row
