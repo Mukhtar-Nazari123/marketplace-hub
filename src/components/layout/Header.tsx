@@ -89,9 +89,6 @@ const Header = () => {
           <div className="flex items-center justify-between gap-2 sm:gap-3 relative">
             {/* Mobile Icons - Left side (Menu + Search) */}
             <div className="flex items-center gap-1 lg:hidden flex-shrink-0 z-10">
-              <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(true)} aria-label={t.header.menu}>
-                <Menu className="h-5 w-5 text-black dark:text-white" />
-              </Button>
               <Button
                 variant="ghost"
                 size="icon"
@@ -142,7 +139,9 @@ const Header = () => {
             {/* Actions */}
             <div className="flex items-center gap-1 sm:gap-2 md:gap-4">
               {/* Language Switcher */}
-              <LanguageSwitcher />
+              <div className="hidden lg:block">
+                <LanguageSwitcher />
+              </div>
 
               {/* Theme Toggle - Hidden on mobile, shown in hamburger menu */}
               <Tooltip>
