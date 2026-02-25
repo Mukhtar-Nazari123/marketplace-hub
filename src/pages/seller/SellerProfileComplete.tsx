@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/lib/i18n';
@@ -59,6 +59,7 @@ const SellerProfileComplete = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const hasLoadedRef = useRef(false);
 
   const [personalInfo, setPersonalInfo] = useState<PersonalInfo>({
     fullName: '',
@@ -86,7 +87,8 @@ const SellerProfileComplete = () => {
 
   // Load existing data
   const loadData = useCallback(async () => {
-    if (!user) return;
+    if (!user || hasLoadedRef.current) return;
+    hasLoadedRef.current = true;
 
     try {
       // Load profile data
