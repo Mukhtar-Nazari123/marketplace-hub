@@ -71,8 +71,8 @@ const BottomNavigation = () => {
     {
       icon: User,
       labelEn: "Profile",
-      labelFa: "حساب",
-      labelPs: "حساب",
+      labelFa: "بازار من",
+      labelPs: "بازار من",
       href: getProfileHref(),
     },
   ];
