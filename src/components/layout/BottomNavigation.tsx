@@ -73,7 +73,7 @@ const BottomNavigation = () => {
       labelEn: "Profile",
       labelFa: "بازار من",
       labelPs: "بازار من",
-      href: getProfileHref(),
+      href: "/my-market",
     },
   ];
 

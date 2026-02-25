@@ -68,6 +68,7 @@ import Notifications from "./pages/dashboard/Notifications";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import AdminPrivacyPolicy from "./pages/admin/AdminPrivacyPolicy";
+import MyMarket from "./pages/MyMarket";
 
 const queryClient = new QueryClient();
 
@@ -103,6 +104,7 @@ const App = () => (
                       <Route path="/cart" element={<Cart />} />
                       <Route path="/checkout" element={<Checkout />} />
                       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                      <Route path="/my-market" element={<MyMarket />} />
 
                       {/* Dashboard Routes */}
                       <Route path="/dashboard/seller/pending" element={<SellerPending />} />
