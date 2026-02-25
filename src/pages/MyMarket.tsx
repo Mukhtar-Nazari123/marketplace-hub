@@ -57,7 +57,6 @@ const MyMarket = () => {
   ];
 
   const quickAccess = [
-    { icon: Bookmark, label: l("Wishlist", "نشان‌ها", "خوښې"), href: user ? "/dashboard/buyer/wishlist" : "/login" },
     { icon: Clock, label: l("Recent Views", "بازدیدهای اخیر", "وروستي لیدنې"), href: "/recently-viewed" },
   ];
 
