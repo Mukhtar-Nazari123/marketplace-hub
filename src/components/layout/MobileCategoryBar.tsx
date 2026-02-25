@@ -1,3 +1,4 @@
+import { useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/lib/i18n';
 import { useCategories } from '@/hooks/useCategories';
@@ -7,6 +8,17 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 const MobileCategoryBar = () => {
   const { isRTL } = useLanguage();
   const { categories, loading } = useCategories();
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to the end (right side) for RTL after categories load
+  useEffect(() => {
+    if (isRTL && !loading && categories.length > 0 && scrollRef.current) {
+      const viewport = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      if (viewport) {
+        viewport.scrollLeft = viewport.scrollWidth;
+      }
+    }
+  }, [isRTL, loading, categories]);
 
   if (loading) {
     return (
@@ -27,7 +39,7 @@ const MobileCategoryBar = () => {
   return (
     <div className="lg:hidden bg-background/15 backdrop-blur-sm border-b border-white/10" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="container px-1 sm:px-1.5 lg:px-2">
-        <ScrollArea className="w-full whitespace-nowrap">
+        <ScrollArea className="w-full whitespace-nowrap" ref={scrollRef}>
           <div className={`flex gap-1 py-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
             {/* All Categories Link */}
           <Link
