@@ -1053,10 +1053,10 @@ const Checkout = () => {
                             'د Stripe له لارې د کریډیټ/ډیبیټ کارت سره خوندي تادیه'
                           )}
                         </p>
-                        <div className="flex items-center gap-2 mt-2">
-                          <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">Visa</span>
-                          <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">Mastercard</span>
-                          <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">Amex</span>
+                        <div className="flex items-center gap-2 mt-3">
+                          <span className="inline-flex items-center text-[11px] font-semibold px-2.5 py-1 rounded-md bg-[hsl(var(--primary)/0.08)] text-primary border border-[hsl(var(--primary)/0.15)] tracking-wide">Visa</span>
+                          <span className="inline-flex items-center text-[11px] font-semibold px-2.5 py-1 rounded-md bg-[hsl(var(--primary)/0.08)] text-primary border border-[hsl(var(--primary)/0.15)] tracking-wide">Mastercard</span>
+                          <span className="inline-flex items-center text-[11px] font-semibold px-2.5 py-1 rounded-md bg-[hsl(var(--primary)/0.08)] text-primary border border-[hsl(var(--primary)/0.15)] tracking-wide">Amex</span>
                         </div>
                       </div>
                       <div className={cn('flex-shrink-0', isRTL ? 'mr-auto' : 'ml-auto')}>
