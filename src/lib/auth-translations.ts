@@ -66,6 +66,7 @@ export const authTranslations = {
   validation: {
     fullNameMin: { en: 'Full name must be at least 2 characters', fa: 'نام کامل باید حداقل ۲ کاراکتر باشد', ps: 'بشپړ نوم باید لږ تر لږه ۲ توري ولري' },
     invalidEmail: { en: 'Invalid email address', fa: 'آدرس ایمیل نامعتبر است', ps: 'ناسم بریښنالیک' },
+    invalidEmailDomain: { en: 'This email domain does not exist. Please use a valid email.', fa: 'این دامنه ایمیل وجود ندارد. لطفاً از ایمیل معتبر استفاده کنید.', ps: 'د بریښنالیک ډومین شتون نلري. مهرباني وکړئ معتبر بریښنالیک وکاروئ.' },
     passwordMin: { en: 'Password must be at least 8 characters', fa: 'رمز عبور باید حداقل ۸ کاراکتر باشد', ps: 'پټنوم باید لږ تر لږه ۸ توري ولري' },
     passwordsNoMatch: { en: 'Passwords do not match', fa: 'رمزهای عبور مطابقت ندارند', ps: 'پټنومونه سره سمون نه لري' },
     agreeTermsRequired: { en: 'You must agree to the terms', fa: 'باید با شرایط موافقت کنید', ps: 'تاسو باید شرایطو ته ومنئ' },
