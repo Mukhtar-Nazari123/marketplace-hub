@@ -1977,6 +1977,7 @@ export type Database = {
         Row: {
           created_at: string
           favicon_url: string | null
+          footer_logo_url: string | null
           id: string
           logo_url: string | null
           site_name_en: string
@@ -1987,6 +1988,7 @@ export type Database = {
         Insert: {
           created_at?: string
           favicon_url?: string | null
+          footer_logo_url?: string | null
           id?: string
           logo_url?: string | null
           site_name_en?: string
@@ -1997,6 +1999,7 @@ export type Database = {
         Update: {
           created_at?: string
           favicon_url?: string | null
+          footer_logo_url?: string | null
           id?: string
           logo_url?: string | null
           site_name_en?: string

@@ -29,12 +29,15 @@ const AdminSettings = () => {
   const [siteNameFa, setSiteNameFa] = useState('');
   const [siteNamePs, setSiteNamePs] = useState('');
   const [logoUrl, setLogoUrl] = useState('');
+  const [footerLogoUrl, setFooterLogoUrl] = useState('');
   const [faviconUrl, setFaviconUrl] = useState('');
   const [logoUploading, setLogoUploading] = useState(false);
+  const [footerLogoUploading, setFooterLogoUploading] = useState(false);
   const [faviconUploading, setFaviconUploading] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const logoInputRef = useRef<HTMLInputElement>(null);
+  const footerLogoInputRef = useRef<HTMLInputElement>(null);
   const faviconInputRef = useRef<HTMLInputElement>(null);
 
   // Initialize form with settings
@@ -44,6 +47,7 @@ const AdminSettings = () => {
       setSiteNameFa(settings.site_name_fa);
       setSiteNamePs(settings.site_name_ps || '');
       setLogoUrl(settings.logo_url || '');
+      setFooterLogoUrl(settings.footer_logo_url || '');
       setFaviconUrl(settings.favicon_url || '');
     }
   }, [settings]);
@@ -73,6 +77,34 @@ const AdminSettings = () => {
     } finally {
       setLogoUploading(false);
       if (logoInputRef.current) logoInputRef.current.value = '';
+    }
+  };
+
+  const handleFooterLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error(getLabel(lang, 'Please select an image file', 'لطفاً یک فایل تصویری انتخاب کنید', 'مهرباني وکړئ د عکس فایل وټاکئ'));
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error(getLabel(lang, 'Image must be less than 5MB', 'حجم تصویر باید کمتر از ۵ مگابایت باشد', 'عکس باید له ۵ میګابایټ څخه کم وي'));
+      return;
+    }
+
+    setFooterLogoUploading(true);
+    try {
+      const url = await uploadSiteAsset(file, 'logo');
+      setFooterLogoUrl(url);
+      toast.success(getLabel(lang, 'Footer logo uploaded successfully', 'لوگوی فوتر با موفقیت آپلود شد', 'د فوټر لوګو په بریالیتوب سره اپلوډ شو'));
+    } catch (error) {
+      console.error('Footer logo upload error:', error);
+      toast.error(getLabel(lang, 'Failed to upload footer logo', 'خطا در آپلود لوگوی فوتر', 'د فوټر لوګو اپلوډ ناکام شو'));
+    } finally {
+      setFooterLogoUploading(false);
+      if (footerLogoInputRef.current) footerLogoInputRef.current.value = '';
     }
   };
 
@@ -117,6 +149,7 @@ const AdminSettings = () => {
         site_name_fa: siteNameFa.trim(),
         site_name_ps: siteNamePs.trim() || null,
         logo_url: logoUrl || null,
+        footer_logo_url: footerLogoUrl || null,
         favicon_url: faviconUrl || null,
       });
       toast.success(getLabel(lang, 'Branding settings saved successfully', 'تنظیمات برند با موفقیت ذخیره شد', 'د برانډ تنظیمات په بریالیتوب سره خوندي شول'));
@@ -283,6 +316,74 @@ const AdminSettings = () => {
 
                     <Separator />
 
+                    {/* Footer Logo Upload */}
+                    <div className="space-y-2">
+                      <Label>{getLabel(lang, 'Footer Logo', 'لوگوی فوتر', 'د فوټر لوګو')}</Label>
+                      <p className="text-sm text-muted-foreground">
+                        {getLabel(
+                          lang, 
+                          'Separate logo for footer. If not set, the main logo will be used.', 
+                          'لوگوی جداگانه برای فوتر. اگر تنظیم نشود، لوگوی اصلی استفاده می‌شود.',
+                          'د فوټر لپاره جلا لوګو. که تنظیم نشي، اصلي لوګو کارول کیږي.'
+                        )}
+                      </p>
+                      
+                      {footerLogoUrl ? (
+                        <div className="relative group w-48 h-24 rounded-lg overflow-hidden border bg-muted">
+                          <img 
+                            src={footerLogoUrl} 
+                            alt="Footer Logo" 
+                            className="w-full h-full object-contain p-2"
+                          />
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="secondary"
+                              onClick={() => footerLogoInputRef.current?.click()}
+                              disabled={footerLogoUploading}
+                            >
+                              <Upload className="h-4 w-4 me-1" />
+                              {getLabel(lang, 'Replace', 'جایگزین', 'بدلول')}
+                            </Button>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => setFooterLogoUrl('')}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div
+                          onClick={() => footerLogoInputRef.current?.click()}
+                          className="w-48 h-24 border-2 border-dashed rounded-lg flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-primary hover:bg-accent/50 transition-colors"
+                        >
+                          {footerLogoUploading ? (
+                            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                          ) : (
+                            <>
+                              <ImageIcon className="h-8 w-8 text-muted-foreground" />
+                              <span className="text-sm text-muted-foreground">
+                                {getLabel(lang, 'Upload Footer Logo', 'آپلود لوگوی فوتر', 'د فوټر لوګو اپلوډ کړئ')}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      )}
+                      <input
+                        ref={footerLogoInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFooterLogoUpload}
+                        className="hidden"
+                      />
+                    </div>
+
+                    <Separator />
+
                     {/* Favicon Upload */}
                     <div className="space-y-2">
                       <Label>{getLabel(lang, 'Favicon (Browser Tab Icon)', 'فاویکون (آیکون تب مرورگر)', 'فاویکون (د براوزر ټب آیکون)')}</Label>
@@ -355,7 +456,7 @@ const AdminSettings = () => {
                     <Button 
                       className="hover-scale" 
                       onClick={handleSaveBranding}
-                      disabled={saving || logoUploading || faviconUploading}
+                      disabled={saving || logoUploading || footerLogoUploading || faviconUploading}
                     >
                       {saving ? (
                         <>

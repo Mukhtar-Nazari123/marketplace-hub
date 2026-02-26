@@ -9,6 +9,7 @@ export interface SiteSettings {
   site_name_fa: string;
   site_name_ps: string | null;
   logo_url: string | null;
+  footer_logo_url: string | null;
   favicon_url: string | null;
   created_at: string;
   updated_at: string;
@@ -65,6 +66,7 @@ export const useSiteSettings = () => {
     settings,
     siteName,
     logoUrl: settings?.logo_url || null,
+    footerLogoUrl: settings?.footer_logo_url || null,
     faviconUrl: settings?.favicon_url || null,
     isLoading,
     error,
