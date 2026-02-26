@@ -147,6 +147,8 @@ const AdminSellers = () => {
         };
       });
 
+      // Sort by newest first
+      combinedData.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
       setSellers(combinedData);
       setFilteredSellers(combinedData);
     } catch (error) {
