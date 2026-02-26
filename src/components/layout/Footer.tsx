@@ -42,7 +42,7 @@ const Footer = () => {
   const { t, isRTL } = useLanguage();
   const { address, phone: contactPhone, email: contactEmail } = useContactSettings();
   const { data: socialLinks } = useSocialLinks();
-  const { siteName, logoUrl } = useSiteSettings();
+  const { siteName, logoUrl, footerLogoUrl } = useSiteSettings();
 
   const quickLinks = [
     { label: t.footer.aboutUs, href: "/about" },
@@ -113,8 +113,8 @@ const Footer = () => {
           {/* About */}
           <div>
             <Link to="/" className="flex-shrink-0 mb-4 inline-block pb-2">
-              {logoUrl ? (
-                <img src={logoUrl} alt={siteName} className="h-10 sm:h-12 w-auto object-contain" />
+              {(footerLogoUrl || logoUrl) ? (
+                <img src={footerLogoUrl || logoUrl!} alt={siteName} className="h-10 sm:h-12 w-auto object-contain" />
               ) : (
                 <span className="text-primary font-bold text-2xl">{siteName}</span>
               )}

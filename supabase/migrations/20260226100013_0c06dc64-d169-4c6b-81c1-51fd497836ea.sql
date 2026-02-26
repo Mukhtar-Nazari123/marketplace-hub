@@ -1,0 +1,1 @@
+ALTER TABLE public.site_settings ADD COLUMN footer_logo_url text DEFAULT NULL;
