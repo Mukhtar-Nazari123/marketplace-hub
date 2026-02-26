@@ -12,6 +12,7 @@ import PasswordStrengthIndicator from "@/components/auth/PasswordStrengthIndicat
 import { Eye, EyeOff, Loader2, CheckCircle, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
+import { supabase } from "@/integrations/supabase/client";
 
 const Register = () => {
   const { isRTL, language } = useLanguage();
@@ -82,6 +83,21 @@ const Register = () => {
     if (!validateForm()) return;
 
     setLoading(true);
+
+    // Validate email domain via edge function
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke('validate-email-domain', {
+        body: { email }
+      });
+      if (fnError || !data?.valid) {
+        setErrors(prev => ({ ...prev, email: t('validation', 'invalidEmailDomain') }));
+        setLoading(false);
+        return;
+      }
+    } catch {
+      // If validation service is unavailable, proceed (don't block registration)
+    }
+
     const { error } = await signUp(email, password, fullName, selectedRole);
     setLoading(false);
 
