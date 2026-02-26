@@ -70,6 +70,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import AdminPrivacyPolicy from "./pages/admin/AdminPrivacyPolicy";
 import MyMarket from "./pages/MyMarket";
 import RecentlyViewed from "./pages/RecentlyViewed";
+import PaymentSuccess from "./pages/PaymentSuccess";
 
 const queryClient = new QueryClient();
 
@@ -107,6 +108,7 @@ const App = () => (
                       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                       <Route path="/my-market" element={<MyMarket />} />
                       <Route path="/recently-viewed" element={<RecentlyViewed />} />
+                      <Route path="/payment-success" element={<PaymentSuccess />} />
 
                       {/* Dashboard Routes */}
                       <Route path="/dashboard/seller/pending" element={<SellerPending />} />
