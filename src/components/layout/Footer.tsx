@@ -20,6 +20,9 @@ import { useContactSettings } from "@/hooks/useContactSettings";
 import { useSocialLinks } from "@/hooks/useSocialLinks";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import NewsletterForm from "@/components/newsletter/NewsletterForm";
+import visaLogo from "@/assets/payment/visa.svg";
+import mastercardLogo from "@/assets/payment/mastercard.svg";
+import paypalLogo from "@/assets/payment/paypal.svg";
 
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   Facebook,
@@ -193,22 +196,10 @@ const Footer = () => {
             <p className="text-sm text-[#b6b6b6]">
               © {isRTL ? "۱۴۰۴" : "2025"} {siteName}. {t.footer.allRightsReserved}
             </p>
-            <div className="flex items-center gap-4">
-              <img
-                src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg"
-                alt="PayPal"
-                className="h-6 opacity-70 hover:opacity-100 transition-opacity"
-              />
-              <img
-                src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Mastercard_2019_logo.svg"
-                alt="Mastercard"
-                className="h-6 opacity-70 hover:opacity-100 transition-opacity"
-              />
-              <img
-                src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg"
-                alt="Visa"
-                className="h-6 opacity-70 hover:opacity-100 transition-opacity"
-              />
+            <div className="flex items-center gap-3">
+              <img src={visaLogo} alt="Visa" className="h-8 rounded" />
+              <img src={mastercardLogo} alt="Mastercard" className="h-8" />
+              <img src={paypalLogo} alt="PayPal" className="h-8" />
             </div>
           </div>
         </div>
