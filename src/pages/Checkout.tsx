@@ -147,6 +147,8 @@ const Checkout = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(true);
   const [placingOrder, setPlacingOrder] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'cash_on_delivery' | 'stripe'>('cash_on_delivery');
+  const [stripeLoading, setStripeLoading] = useState(false);
 
   const [addressForm, setAddressForm] = useState<AddressForm>({
     name: '',
@@ -386,6 +388,59 @@ const Checkout = () => {
     setCurrentStep((prev) => Math.max(prev - 1, 1));
   };
 
+  const handleStripePayment = async () => {
+    if (!user) return;
+    setStripeLoading(true);
+    try {
+      const afnBreakdown = currencyBreakdowns.find(cb => cb.currency === 'AFN');
+      const subtotalAFN = afnBreakdown?.productSubtotal || 0;
+      const deliveryFeeAFN = deliveryBreakdown.totalDeliveryAFN;
+      const totalAFN = subtotalAFN + deliveryFeeAFN;
+
+      const items = cartItems.map((item) => {
+        const effectivePrice = getEffectivePrice(item.product?.price_afn || 0, item.product?.compare_price_afn);
+        return {
+          name: item.product?.name || 'Product',
+          quantity: item.quantity,
+          priceAFN: effectivePrice,
+          image: item.product?.images?.[0] || undefined,
+          color: item.selected_color || undefined,
+          size: item.selected_size || undefined,
+        };
+      });
+
+      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+        body: {
+          items,
+          addressForm,
+          totalAFN,
+          subtotalAFN,
+          deliveryFeeAFN,
+        },
+      });
+
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error('No checkout URL returned');
+      }
+    } catch (error) {
+      console.error('Error creating Stripe session:', error);
+      toast({
+        title: getLabel('Error', 'خطا', 'تېروتنه'),
+        description: getLabel(
+          'Failed to initialize online payment. Please try again.',
+          'خطا در شروع پرداخت آنلاین. لطفاً دوباره تلاش کنید.',
+          'د آنلاین تادیه پیل کولو کې تېروتنه. مهرباني وکړئ بیا هڅه وکړئ.'
+        ),
+        variant: 'destructive',
+      });
+    } finally {
+      setStripeLoading(false);
+    }
+  };
+
   const handlePlaceOrder = async () => {
     if (!user) return;
 
@@ -423,7 +478,7 @@ const Checkout = () => {
           order_number: orderNumber,
           status: 'pending',
           payment_status: 'pending',
-          payment_method: 'cash_on_delivery',
+          payment_method: paymentMethod === 'stripe' ? 'stripe' : 'cash_on_delivery',
           currency: 'AFN', // Always AFN
           subtotal_afn: subtotalAFN,
           delivery_fee_afn: deliveryFeeAFN,
@@ -943,36 +998,74 @@ const Checkout = () => {
                   </CardHeader>
 
                   {/* Cash on Delivery */}
-                  <div className="p-4 border-2 border-primary rounded-lg bg-primary/5">
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod('cash_on_delivery')}
+                    className={cn(
+                      'w-full p-4 border-2 rounded-lg text-left transition-all',
+                      paymentMethod === 'cash_on_delivery'
+                        ? 'border-primary bg-primary/5'
+                        : 'border-border hover:border-primary/50'
+                    )}
+                  >
                     <div className="flex items-start gap-4">
                       <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                         <Banknote className="w-6 h-6 text-primary" />
                       </div>
-                      <div>
+                      <div className="flex-1">
                         <h4 className="font-medium">{t.checkout.payment.cashOnDelivery}</h4>
                         <p className="text-sm text-muted-foreground mt-1">
                           {t.checkout.payment.cashOnDeliveryDesc}
                         </p>
                       </div>
                       <div className={cn('flex-shrink-0', isRTL ? 'mr-auto' : 'ml-auto')}>
-                        <CheckCircle className="w-6 h-6 text-primary" />
+                        {paymentMethod === 'cash_on_delivery' && (
+                          <CheckCircle className="w-6 h-6 text-primary" />
+                        )}
                       </div>
                     </div>
-                  </div>
+                  </button>
 
-                  {/* Online Payment Coming Soon */}
-                  <div className="p-4 border rounded-lg bg-muted/30 opacity-60">
+                  {/* Stripe Online Payment */}
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod('stripe')}
+                    className={cn(
+                      'w-full p-4 border-2 rounded-lg text-left transition-all',
+                      paymentMethod === 'stripe'
+                        ? 'border-primary bg-primary/5'
+                        : 'border-border hover:border-primary/50'
+                    )}
+                  >
                     <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
-                        <Clock className="w-6 h-6 text-muted-foreground" />
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0">
+                        <CreditCard className="w-6 h-6 text-white" />
                       </div>
-                      <div>
-                        <h4 className="font-medium text-muted-foreground">
-                          {t.checkout.payment.onlinePaymentSoon}
+                      <div className="flex-1">
+                        <h4 className="font-medium flex items-center gap-2">
+                          {getLabel('Pay Online', 'پرداخت آنلاین', 'آنلاین تادیه')}
+                          <Badge variant="secondary" className="text-[10px]">Stripe</Badge>
                         </h4>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {getLabel(
+                            'Pay securely with credit/debit card via Stripe',
+                            'پرداخت امن با کارت اعتباری/نقدی از طریق Stripe',
+                            'د Stripe له لارې د کریډیټ/ډیبیټ کارت سره خوندي تادیه'
+                          )}
+                        </p>
+                        <div className="flex items-center gap-2 mt-2">
+                          <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">Visa</span>
+                          <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">Mastercard</span>
+                          <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">Amex</span>
+                        </div>
+                      </div>
+                      <div className={cn('flex-shrink-0', isRTL ? 'mr-auto' : 'ml-auto')}>
+                        {paymentMethod === 'stripe' && (
+                          <CheckCircle className="w-6 h-6 text-primary" />
+                        )}
                       </div>
                     </div>
-                  </div>
+                  </button>
                 </div>
               )}
 
@@ -1009,7 +1102,12 @@ const Checkout = () => {
                       <Separator />
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">{t.checkout.payment.title}:</span>
-                        <span className="font-medium">{t.checkout.payment.cashOnDelivery}</span>
+                        <span className="font-medium">
+                          {paymentMethod === 'stripe' 
+                            ? getLabel('Online Payment (Stripe)', 'پرداخت آنلاین (Stripe)', 'آنلاین تادیه (Stripe)')
+                            : t.checkout.payment.cashOnDelivery
+                          }
+                        </span>
                       </div>
                       {/* Show totals per currency */}
                       {currencyBreakdowns.map((cb) => (
@@ -1050,21 +1148,42 @@ const Checkout = () => {
                     </div>
                   </div>
 
-                  <Button
-                    onClick={handlePlaceOrder}
-                    disabled={placingOrder}
-                    className="w-full h-12 text-lg"
-                    size="lg"
-                  >
-                    {placingOrder ? (
-                      <>
-                        <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                        {t.checkout.confirm.processing}
-                      </>
-                    ) : (
-                      t.checkout.confirm.placeOrder
-                    )}
-                  </Button>
+                  {paymentMethod === 'stripe' ? (
+                    <Button
+                      onClick={handleStripePayment}
+                      disabled={stripeLoading}
+                      className="w-full h-12 text-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white"
+                      size="lg"
+                    >
+                      {stripeLoading ? (
+                        <>
+                          <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                          {getLabel('Redirecting to Stripe...', 'در حال انتقال به Stripe...', 'Stripe ته لیږدول...')}
+                        </>
+                      ) : (
+                        <>
+                          <CreditCard className="w-5 h-5 mr-2" />
+                          {getLabel('Pay with Stripe', 'پرداخت با Stripe', 'د Stripe سره تادیه')}
+                        </>
+                      )}
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={handlePlaceOrder}
+                      disabled={placingOrder}
+                      className="w-full h-12 text-lg"
+                      size="lg"
+                    >
+                      {placingOrder ? (
+                        <>
+                          <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                          {t.checkout.confirm.processing}
+                        </>
+                      ) : (
+                        t.checkout.confirm.placeOrder
+                      )}
+                    </Button>
+                  )}
                 </div>
               )}
 
