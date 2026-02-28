@@ -122,6 +122,37 @@ const MyMarket = () => {
           </div>
         </div>
 
+        {/* Login / Logout - moved up */}
+        <div className="mx-4 mt-4 rounded-2xl border border-border bg-card overflow-hidden">
+          {user ? (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <button className="w-full">
+                  <Row icon={LogOut} label={l("Logout", "خروج", "وتل")} destructive right={<span />} />
+                </button>
+              </AlertDialogTrigger>
+              <AlertDialogContent dir={isRTL ? "rtl" : "ltr"}>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>{l("Logout", "خروج از حساب", "له حساب وتل")}</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {l("Are you sure you want to logout?", "آیا مطمئن هستید که می‌خواهید خارج شوید؟", "ایا تاسو ډاډه یاست چې غواړئ ووځئ؟")}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter className={isRTL ? "flex-row-reverse gap-2" : ""}>
+                  <AlertDialogCancel>{l("Cancel", "انصراف", "لغوه")}</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleLogout} className="bg-primary text-primary-foreground">
+                    {l("Logout", "خروج", "وتل")}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          ) : (
+            <Link to="/login">
+              <Row icon={User} label={l("Login / Register", "ورود / ثبت‌نام", "ننوتل / نوم لیکنه")} />
+            </Link>
+          )}
+        </div>
+
         {/* Quick Access */}
         <SectionTitle title={l("Quick Access", "دسترسی سریع", "ګړندی لاسرسی")} />
         <div className="mx-4 rounded-2xl border border-border bg-card overflow-hidden divide-y divide-border">
@@ -180,36 +211,6 @@ const MyMarket = () => {
           </button>
         </div>
 
-        {/* Login / Logout */}
-        <div className="mx-4 mt-4 rounded-2xl border border-border bg-card overflow-hidden">
-          {user ? (
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <button className="w-full">
-                  <Row icon={LogOut} label={l("Logout", "خروج", "وتل")} destructive right={<span />} />
-                </button>
-              </AlertDialogTrigger>
-              <AlertDialogContent dir={isRTL ? "rtl" : "ltr"}>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>{l("Logout", "خروج از حساب", "له حساب وتل")}</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    {l("Are you sure you want to logout?", "آیا مطمئن هستید که می‌خواهید خارج شوید؟", "ایا تاسو ډاډه یاست چې غواړئ ووځئ؟")}
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter className={isRTL ? "flex-row-reverse gap-2" : ""}>
-                  <AlertDialogCancel>{l("Cancel", "انصراف", "لغوه")}</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleLogout} className="bg-primary text-primary-foreground">
-                    {l("Logout", "خروج", "وتل")}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          ) : (
-            <Link to="/login">
-              <Row icon={User} label={l("Login / Register", "ورود / ثبت‌نام", "ننوتل / نوم لیکنه")} />
-            </Link>
-          )}
-        </div>
 
         {/* Social Links & Copyright */}
         <div className="mx-4 mt-4 mb-2 flex flex-col items-center gap-3">
