@@ -149,7 +149,7 @@ const MyMarket = () => {
 
         {/* Settings */}
         <SectionTitle title={l("Settings", "تنظیمات", "تنظیمات")} />
-        <div className="mx-4 rounded-2xl border border-border bg-card overflow-hidden divide-y divide-border">
+        <div className="mx-4 rounded-2xl border border-border bg-card overflow-hidden">
           {user && (
             <Row icon={LayoutDashboard} label={l("Dashboard", "داشبورد", "ډشبورډ")} href={getDashboardLink()} />
           )}
