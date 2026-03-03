@@ -108,8 +108,10 @@ export const CategoryStep = ({ formData, updateFormData }: CategoryStepProps) =>
     updateFormData({
       categoryId,
       categoryName: category ? (isRTL && category.name_fa ? category.name_fa : category.name) : '',
+      categoryNameEn: category?.name || '',
       subCategoryId: '',
       subCategoryName: '',
+      subCategoryNameEn: '',
       attributes: {},
     });
     setShowSubCategories(true);
@@ -120,6 +122,7 @@ export const CategoryStep = ({ formData, updateFormData }: CategoryStepProps) =>
     updateFormData({
       subCategoryId,
       subCategoryName: subCategory ? (isRTL && subCategory.name_fa ? subCategory.name_fa : subCategory.name) : '',
+      subCategoryNameEn: subCategory?.name || '',
     });
   };
 

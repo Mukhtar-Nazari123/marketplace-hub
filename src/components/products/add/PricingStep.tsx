@@ -34,8 +34,8 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
   // Auto-generate SKU
   const generatedSKU = useMemo(() => {
     if (!formData.name || !formData.categoryId) return '';
-    return generateSKU(formData.categoryId, formData.categoryName, formData.name, formData.subCategoryName);
-  }, [formData.categoryId, formData.categoryName, formData.name, formData.subCategoryName]);
+    return generateSKU(formData.categoryId, formData.categoryNameEn || formData.categoryName, formData.name, formData.subCategoryNameEn || formData.subCategoryName);
+  }, [formData.categoryId, formData.categoryName, formData.categoryNameEn, formData.name, formData.subCategoryName, formData.subCategoryNameEn]);
 
   const handlePriceChange = (value: string) => {
     const numValue = parseFloat(value) || 0;

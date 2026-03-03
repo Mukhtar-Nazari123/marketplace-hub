@@ -31,8 +31,10 @@ const STEPS = [
 const initialFormData: ProductFormData = {
   categoryId: '',
   categoryName: '',
+  categoryNameEn: '',
   subCategoryId: '',
   subCategoryName: '',
+  subCategoryNameEn: '',
   name: '',
   shortDescription: '',
   description: '',
@@ -103,7 +105,9 @@ const EditProduct = () => {
       
       // Fetch category and subcategory names from the database
       let categoryName = '';
+      let categoryNameEn = '';
       let subCategoryName = '';
+      let subCategoryNameEn = '';
       
       if (product.category_id) {
         const { data: categoryData } = await supabase
@@ -113,8 +117,8 @@ const EditProduct = () => {
           .maybeSingle();
         
         if (categoryData) {
-          // Use the name or slug - CategorySpecificFields uses pattern matching
           categoryName = categoryData.name || categoryData.slug || '';
+          categoryNameEn = categoryData.name || '';
         }
       }
       
@@ -127,6 +131,7 @@ const EditProduct = () => {
         
         if (subCategoryData) {
           subCategoryName = isRTL && subCategoryData.name_fa ? subCategoryData.name_fa : subCategoryData.name;
+          subCategoryNameEn = subCategoryData.name || '';
         }
       }
       
@@ -140,8 +145,10 @@ const EditProduct = () => {
       setFormData({
         categoryId: product.category_id || '',
         categoryName,
+        categoryNameEn,
         subCategoryId: product.subcategory_id || '',
         subCategoryName,
+        subCategoryNameEn,
         // Use translation data if available, fallback to product data
         name: translation?.name || '',
         shortDescription: translation?.short_description || (metadata.shortDescription as string) || '',
