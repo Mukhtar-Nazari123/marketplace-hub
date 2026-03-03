@@ -43,9 +43,11 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
 
   const pcsLabel = getUnitLabel(formData.quantityUnit || 'pcs', language as 'en' | 'fa' | 'ps');
   const allImages = [...formData.imageUrls];
-  const hasImages = allImages.length > 0 || formData.images.length > 0;
+  const colorImageCount = Object.keys(formData.colorImageUrls || {}).length + Object.keys(formData.colorImages || {}).length;
+  const generalImageCount = formData.imageUrls.length + formData.images.length;
+  const totalImages = generalImageCount + colorImageCount;
+  const hasImages = totalImages > 0;
   const hasVideo = formData.video || formData.videoUrl;
-  const totalImages = formData.imageUrls.length + formData.images.length;
 
   // Generate SKU
   const generatedSKU = useMemo(() => {
