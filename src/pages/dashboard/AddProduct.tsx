@@ -37,8 +37,10 @@ export interface ProductFormData {
   // Category
   categoryId: string;
   categoryName: string;
+  categoryNameEn: string;
   subCategoryId: string;
   subCategoryName: string;
+  subCategoryNameEn: string;
   
   // Basic Info (these will be saved to product_translations)
   name: string;
@@ -77,8 +79,10 @@ export interface ProductFormData {
 const initialFormData: ProductFormData = {
   categoryId: '',
   categoryName: '',
+  categoryNameEn: '',
   subCategoryId: '',
   subCategoryName: '',
+  subCategoryNameEn: '',
   name: '',
   shortDescription: '',
   description: '',
