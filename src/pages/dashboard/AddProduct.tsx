@@ -138,7 +138,7 @@ const AddProduct = () => {
       case 2:
         return !!formData.name && formData.name.length >= 3;
       case 3:
-        return formData.images.length > 0 || formData.imageUrls.length > 0;
+        return formData.images.length > 0 || formData.imageUrls.length > 0 || Object.keys(formData.colorImages).length > 0 || Object.keys(formData.colorImageUrls).length > 0;
       case 4:
         // Price required, delivery options are optional (will use legacy deliveryFee if empty)
         return formData.price > 0;
@@ -324,7 +324,7 @@ const AddProduct = () => {
         ? await uploadMedia()
         : { imageUrls: formData.imageUrls, videoUrl: formData.videoUrl, colorImageUrls: formData.colorImageUrls };
 
-      if (imageUrls.length === 0) {
+      if (imageUrls.length === 0 && Object.keys(colorImageUrls).length === 0) {
         toast.error(isRTL ? 'حداقل یک تصویر لازم است' : 'At least one image is required');
         setIsSubmitting(false);
         return;
