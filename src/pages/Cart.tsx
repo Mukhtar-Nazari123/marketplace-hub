@@ -10,7 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ShoppingCart, Trash2, Plus, Minus, ChevronLeft, ChevronRight, ShoppingBag, Eye, Truck, Calendar } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { addHours, format } from 'date-fns';
 import CartRecommendations from '@/components/cart/CartRecommendations';
@@ -49,6 +49,11 @@ const Cart = () => {
   const { convertToUSD, rate } = useCurrencyRate();
   const navigate = useNavigate();
   const [deliveryOptionsMap, setDeliveryOptionsMap] = useState<Record<string, DeliveryOptionData>>({});
+  const [colorImagesMap, setColorImagesMap] = useState<Record<string, string | null>>({});
+
+  const handleColorImageChange = useCallback((productId: string, imageUrl: string | null) => {
+    setColorImagesMap(prev => ({ ...prev, [productId]: imageUrl }));
+  }, []);
 
   // Trilingual label helper
   const getLabel = (en: string, fa: string, ps: string) => {
@@ -290,10 +295,10 @@ const Cart = () => {
                           to={`/products/${productSlug}`}
                           className="w-20 h-20 sm:w-24 sm:h-24 bg-muted rounded-lg overflow-hidden flex-shrink-0 hover:opacity-80 transition-opacity"
                         >
-                          {product?.images?.[0] ? (
+                          {(colorImagesMap[item.product_id] || product?.images?.[0]) ? (
                             <img
-                              src={product.images[0]}
-                              alt={product.name}
+                              src={colorImagesMap[item.product_id] || product?.images?.[0]}
+                              alt={product?.name || ''}
                               className="w-full h-full object-cover"
                             />
                           ) : (
@@ -344,6 +349,7 @@ const Cart = () => {
                             onColorChange={(color) => updateVariants(item.product_id, color, item.selected_size)}
                             onSizeChange={(size) => updateVariants(item.product_id, item.selected_color, size)}
                             onDeliveryOptionChange={(optionId) => updateDeliveryOption(item.product_id, optionId)}
+                            onColorImageChange={(imageUrl) => handleColorImageChange(item.product_id, imageUrl)}
                           />
 
                           {/* Price, Quantity & Total - right-aligned block */}

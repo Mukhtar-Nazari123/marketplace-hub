@@ -25,12 +25,14 @@ interface CartItemVariantSelectorProps {
   onColorChange: (color: string | null) => void;
   onSizeChange: (size: string | null) => void;
   onDeliveryOptionChange: (optionId: string | null) => void;
+  onColorImageChange?: (imageUrl: string | null) => void;
 }
 
 interface ProductVariants {
   colors: string[];
   sizes: string[];
   deliveryOptions: DeliveryOption[];
+  colorImageMap: Record<string, string>;
 }
 
 // Inline color/size selectors
@@ -255,22 +257,36 @@ const CartItemVariantSelector = ({
   onColorChange,
   onSizeChange,
   onDeliveryOptionChange,
+  onColorImageChange,
 }: CartItemVariantSelectorProps) => {
-  const [variants, setVariants] = useState<ProductVariants>({ colors: [], sizes: [], deliveryOptions: [] });
+  const [variants, setVariants] = useState<ProductVariants>({ colors: [], sizes: [], deliveryOptions: [], colorImageMap: {} });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchVariants = async () => {
       setLoading(true);
       try {
-        // Fetch available colors from product_media
+        // Fetch available colors from product_media (include url for image switching)
         const { data: colorMedia } = await supabase
           .from('product_media')
-          .select('color_value')
+          .select('color_value, url')
           .eq('product_id', productId)
-          .not('color_value', 'is', null);
+          .not('color_value', 'is', null)
+          .order('sort_order', { ascending: true });
 
-        const colors = [...new Set(colorMedia?.map(m => m.color_value).filter(Boolean) || [])] as string[];
+        const colors: string[] = [];
+        const colorImageMap: Record<string, string> = {};
+        colorMedia?.forEach(m => {
+          if (m.color_value) {
+            if (!colors.includes(m.color_value)) {
+              colors.push(m.color_value);
+            }
+            // Keep first image per color
+            if (!colorImageMap[m.color_value]) {
+              colorImageMap[m.color_value] = m.url;
+            }
+          }
+        });
 
         // Fetch product metadata for sizes
         const { data: product } = await supabase
@@ -293,12 +309,14 @@ const CartItemVariantSelector = ({
         setVariants({ 
           colors, 
           sizes, 
-          deliveryOptions: deliveryOptions || [] 
+          deliveryOptions: deliveryOptions || [],
+          colorImageMap,
         });
 
         // Auto-select first available variant if not already selected
         if (colors.length > 0 && !selectedColor) {
           onColorChange(colors[0]);
+          onColorImageChange?.(colorImageMap[colors[0]] || null);
         }
         if (sizes.length > 0 && !selectedSize) {
           onSizeChange(sizes[0]);
@@ -316,6 +334,15 @@ const CartItemVariantSelector = ({
 
     fetchVariants();
   }, [productId]);
+
+  // Notify parent when selected color changes
+  useEffect(() => {
+    if (selectedColor && variants.colorImageMap[selectedColor]) {
+      onColorImageChange?.(variants.colorImageMap[selectedColor]);
+    } else if (!selectedColor) {
+      onColorImageChange?.(null);
+    }
+  }, [selectedColor, variants.colorImageMap]);
 
   if (loading) {
     return null;
