@@ -31,6 +31,14 @@ import sportswear from '@/assets/subcategories/sportswear.jpg';
 import toys from '@/assets/subcategories/toys.jpg';
 import womensClothing from '@/assets/subcategories/womens-clothing.jpg';
 
+// Women's Clothing subcategories
+import womensClothingMain from '@/assets/subcategories/womens-clothing-main.jpg';
+import jewelleryAccessories from '@/assets/subcategories/jewellery-accessories.jpg';
+import curvePlus from '@/assets/subcategories/curve-plus.jpg';
+import beautySubcat from '@/assets/subcategories/beauty.jpg';
+import bagsSubcat from '@/assets/subcategories/bags.jpg';
+import womensShoesMain from '@/assets/subcategories/womens-shoes-main.jpg';
+
 // Food & Groceries subcategories
 import foodGroceries from '@/assets/subcategories/food-groceries.jpg';
 import riceGrains from '@/assets/subcategories/rice-grains.jpg';
@@ -79,6 +87,13 @@ export const subcategoryImageMap: Record<string, string> = {
   'dairy': dairy,
   'legumes': legumes,
   'proteins': proteins,
+  // Women's Clothing subcategories
+  'clothing': womensClothingMain,
+  'jewellery-accessories': jewelleryAccessories,
+  'curve-plus': curvePlus,
+  'beauty': beautySubcat,
+  'bags': bagsSubcat,
+  'womens-shoes-main': womensShoesMain,
 };
 
 export const getSubcategoryImage = (slug: string): string | undefined => {
