@@ -436,79 +436,110 @@ export const MediaStep = ({ formData, updateFormData, isUploading }: MediaStepPr
         </div>
       </div>
 
-      {/* Color Images Section - Only show if colors are selected */}
+      {/* Color Images Section - AliExpress-style */}
       {selectedColors.length > 0 && (
-        <div className="space-y-4 pt-6 border-t">
+        <div className="space-y-5 pt-6 border-t">
           <div className="flex items-center justify-between">
             <Label className="text-base font-medium flex items-center gap-2">
               <Palette className="w-4 h-4 text-primary" />
-              {isRTL ? 'تصاویر رنگ‌ها' : 'Color Images'}
+              {isRTL ? 'تصاویر رنگ‌ها' : 'Color Variant Images'}
             </Label>
-            <Badge variant="outline" className="text-xs font-normal">
-              {isRTL ? 'یک تصویر برای هر رنگ' : 'One image per color'}
+            <Badge variant="outline" className="text-xs font-normal gap-1">
+              <Info className="w-3 h-3" />
+              {isRTL ? 'اختیاری' : 'Optional'}
             </Badge>
           </div>
 
           <p className="text-sm text-muted-foreground">
             {isRTL 
-              ? 'برای هر رنگ انتخاب شده، یک تصویر اختصاصی آپلود کنید. این تصاویر هنگام انتخاب رنگ توسط مشتری نمایش داده می‌شوند.'
-              : 'Upload a specific image for each selected color. These images will be shown when customers select a color.'}
+              ? 'مانند فروشگاه‌های آنلاین، برای هر رنگ یک تصویر اختصاصی آپلود کنید تا مشتریان بتوانند محصول را در رنگ دلخواه ببینند.'
+              : 'Like major online stores, upload a dedicated image for each color so customers can preview the product in their preferred color.'}
           </p>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          <div className="space-y-3">
             {selectedColors.map((color) => {
               const imageSrc = getColorImageSrc(color.value);
               const hasImage = !!imageSrc;
+              const isMulticolor = color.value === 'multicolor';
+              const needsBorder = ['white', 'cream', 'ivory', 'beige'].includes(color.value);
 
               return (
-                <div key={color.value} className="space-y-2">
-                  <div className="flex items-center gap-2">
+                <div
+                  key={color.value}
+                  className={cn(
+                    "flex items-center gap-4 p-3 rounded-xl border transition-all",
+                    hasImage 
+                      ? "border-primary/30 bg-primary/5" 
+                      : "border-border hover:border-primary/40 hover:bg-muted/30"
+                  )}
+                >
+                  {/* Color swatch + name */}
+                  <div className="flex items-center gap-3 min-w-[120px]">
                     <span
-                      className="w-4 h-4 rounded-full border border-border/50 flex-shrink-0"
-                      style={{ backgroundColor: color.hex }}
+                      className={cn(
+                        "w-8 h-8 rounded-full flex-shrink-0 shadow-sm",
+                        needsBorder && "border border-border"
+                      )}
+                      style={{
+                        background: isMulticolor
+                          ? color.hex
+                          : color.hex,
+                      }}
                     />
-                    <span className="text-sm font-medium">
+                    <span className="text-sm font-medium truncate">
                       {isRTL ? color.nameFa : color.name}
                     </span>
                   </div>
 
-                  {hasImage ? (
-                    <Card className="relative aspect-square overflow-hidden group">
-                      <img
-                        src={imageSrc}
-                        alt={`${color.name} variant`}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-foreground/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  {/* Image preview or upload */}
+                  <div className="flex-1 flex items-center gap-3">
+                    {hasImage ? (
+                      <div className="flex items-center gap-3 w-full">
+                        <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-border/50 shadow-sm group flex-shrink-0">
+                          <img
+                            src={imageSrc}
+                            alt={`${color.name} variant`}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-foreground/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <Button
+                              variant="destructive"
+                              size="icon"
+                              className="h-6 w-6"
+                              onClick={() => removeColorImage(color.value)}
+                              disabled={isUploading}
+                            >
+                              <X className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-xs text-primary">
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span>{isRTL ? 'آپلود شده' : 'Uploaded'}</span>
+                        </div>
                         <Button
-                          variant="destructive"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => removeColorImage(color.value)}
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs h-7 ms-auto"
+                          onClick={() => colorImageInputRefs.current[color.value]?.click()}
                           disabled={isUploading}
                         >
-                          <X className="w-4 h-4" />
+                          {isRTL ? 'تغییر' : 'Change'}
                         </Button>
                       </div>
-                      <div className="absolute bottom-1 left-1">
-                        <CheckCircle2 className="w-4 h-4 text-success" />
-                      </div>
-                    </Card>
-                  ) : (
-                    <Card
-                      className={cn(
-                        "aspect-square flex flex-col items-center justify-center cursor-pointer border-dashed",
-                        "hover:border-primary hover:bg-primary/5 transition-colors",
-                        isUploading && "pointer-events-none opacity-50"
-                      )}
-                      onClick={() => colorImageInputRefs.current[color.value]?.click()}
-                    >
-                      <Upload className="w-6 h-6 text-muted-foreground mb-1" />
-                      <span className="text-xs text-muted-foreground text-center px-2">
-                        {isRTL ? 'آپلود' : 'Upload'}
-                      </span>
-                    </Card>
-                  )}
+                    ) : (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-9 gap-2 text-xs border-dashed hover:border-primary hover:bg-primary/5"
+                        onClick={() => colorImageInputRefs.current[color.value]?.click()}
+                        disabled={isUploading}
+                      >
+                        <Upload className="w-3.5 h-3.5" />
+                        {isRTL ? 'آپلود تصویر' : 'Upload Image'}
+                      </Button>
+                    )}
+                  </div>
 
                   <input
                     ref={(el) => { colorImageInputRefs.current[color.value] = el; }}
@@ -523,12 +554,12 @@ export const MediaStep = ({ formData, updateFormData, isUploading }: MediaStepPr
             })}
           </div>
 
-          <div className="flex items-start gap-2 text-xs text-muted-foreground">
-            <Info className="w-4 h-4 shrink-0 mt-0.5" />
+          <div className="flex items-start gap-2 text-xs text-muted-foreground bg-muted/40 rounded-lg p-3">
+            <Info className="w-4 h-4 shrink-0 mt-0.5 text-primary" />
             <p>
               {isRTL 
-                ? 'تصاویر رنگ‌ها اختیاری هستند اما به مشتریان کمک می‌کنند تا محصول در هر رنگ را ببینند.'
-                : 'Color images are optional but help customers see the product in each color.'}
+                ? 'این تصاویر هنگام انتخاب رنگ توسط مشتری در گالری محصول نمایش داده می‌شوند.'
+                : 'These images appear in the product gallery when a customer selects a color variant.'}
             </p>
           </div>
         </div>
