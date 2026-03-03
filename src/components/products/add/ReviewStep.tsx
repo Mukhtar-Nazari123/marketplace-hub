@@ -50,8 +50,8 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
   // Generate SKU
   const generatedSKU = useMemo(() => {
     if (!formData.name || !formData.categoryId) return '';
-    return generateSKU(formData.categoryId, formData.categoryName, formData.name);
-  }, [formData.categoryId, formData.categoryName, formData.name]);
+    return generateSKU(formData.categoryId, formData.categoryName, formData.name, formData.subCategoryName);
+  }, [formData.categoryId, formData.categoryName, formData.name, formData.subCategoryName]);
 
   // Check if clothing category
   const isClothing = useMemo(() => {

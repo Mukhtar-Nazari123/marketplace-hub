@@ -31,7 +31,7 @@ export async function saveProduct(options: SaveProductOptions): Promise<SaveProd
 
   try {
     // Generate SKU
-    const generatedSKU = generateSKU(formData.categoryId, formData.categoryName, formData.name || 'DRAFT');
+    const generatedSKU = generateSKU(formData.categoryId, formData.categoryName, formData.name || 'DRAFT', formData.subCategoryName);
     const slug = formData.name 
       ? formData.name.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now() 
       : `draft-${Date.now()}`;
