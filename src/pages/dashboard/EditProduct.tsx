@@ -196,7 +196,7 @@ const EditProduct = () => {
       case 2:
         return !!formData.name && formData.name.length >= 3;
       case 3:
-        return formData.images.length > 0 || formData.imageUrls.length > 0;
+        return formData.images.length > 0 || formData.imageUrls.length > 0 || Object.keys(formData.colorImages).length > 0 || Object.keys(formData.colorImageUrls).length > 0;
       case 4:
         return formData.price > 0;
       case 5:
@@ -279,9 +279,13 @@ const EditProduct = () => {
         : { imageUrls: formData.imageUrls, videoUrl: formData.videoUrl };
 
       if (imageUrls.length === 0) {
-        toast.error(isRTL ? 'حداقل یک تصویر لازم است' : 'At least one image is required');
-        setIsSubmitting(false);
-        return;
+        // Check if color images exist as fallback
+        const hasColorImages = Object.keys(formData.colorImageUrls).length > 0 || Object.keys(formData.colorImages).length > 0;
+        if (!hasColorImages) {
+          toast.error(isRTL ? 'حداقل یک تصویر لازم است' : 'At least one image is required');
+          setIsSubmitting(false);
+          return;
+        }
       }
 
       const status: 'draft' | 'pending' | 'active' = asDraft ? 'draft' : (isVerifiedSeller ? 'pending' : 'draft');

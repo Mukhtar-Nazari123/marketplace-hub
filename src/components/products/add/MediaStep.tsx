@@ -281,6 +281,8 @@ export const MediaStep = ({ formData, updateFormData, isUploading }: MediaStepPr
   ];
 
   const hasImages = allImages.length > 0;
+  const hasColorImages = Object.keys(colorImagePreviews).length > 0 || Object.keys(formData.colorImageUrls).length > 0;
+  const hasAnyImages = hasImages || hasColorImages;
   const canAddMore = allImages.length < MAX_IMAGES;
   const hasVideo = formData.video || formData.videoUrl;
 
@@ -319,7 +321,7 @@ export const MediaStep = ({ formData, updateFormData, isUploading }: MediaStepPr
           <Label className="text-base font-medium flex items-center gap-2">
             <ImageIcon className="w-4 h-4 text-primary" />
             {isRTL ? 'تصاویر محصول' : 'Product Images'} 
-            <span className="text-destructive">*</span>
+            {!hasColorImages && <span className="text-destructive">*</span>}
           </Label>
           <Badge variant={hasImages ? "default" : "secondary"} className="gap-1">
             {hasImages ? <CheckCircle2 className="w-3 h-3" /> : <AlertCircle className="w-3 h-3" />}
@@ -332,7 +334,7 @@ export const MediaStep = ({ formData, updateFormData, isUploading }: MediaStepPr
           className={cn(
             "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4 border-2 border-dashed rounded-lg transition-colors",
             isDraggingOver && "border-primary bg-primary/5",
-            !hasImages && "border-destructive/50"
+            !hasAnyImages && "border-destructive/50"
           )}
           onDragOver={handleDropZoneDragOver}
           onDragLeave={handleDropZoneDragLeave}
@@ -415,10 +417,10 @@ export const MediaStep = ({ formData, updateFormData, isUploading }: MediaStepPr
           disabled={isUploading}
         />
 
-        {!hasImages && (
+        {!hasAnyImages && (
           <div className="flex items-center gap-2 text-sm text-destructive">
             <AlertCircle className="w-4 h-4" />
-            {isRTL ? 'حداقل یک تصویر الزامی است' : 'At least one image is required'}
+            {isRTL ? 'حداقل یک تصویر (عمومی یا رنگی) الزامی است' : 'At least one image (general or color-specific) is required'}
           </div>
         )}
 
@@ -444,9 +446,11 @@ export const MediaStep = ({ formData, updateFormData, isUploading }: MediaStepPr
               <Palette className="w-4 h-4 text-primary" />
               {isRTL ? 'تصاویر رنگ‌ها' : 'Color Variant Images'}
             </Label>
-            <Badge variant="outline" className="text-xs font-normal gap-1">
+            <Badge variant={hasImages ? "outline" : "secondary"} className="text-xs font-normal gap-1">
               <Info className="w-3 h-3" />
-              {isRTL ? 'اختیاری' : 'Optional'}
+              {hasImages 
+                ? (isRTL ? 'اختیاری' : 'Optional')
+                : (isRTL ? 'حداقل یک تصویر لازم است' : 'At least one required')}
             </Badge>
           </div>
 
