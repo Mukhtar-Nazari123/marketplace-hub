@@ -345,10 +345,15 @@ const AddProduct = () => {
       if (!silent) {
         toast.success(isRTL ? 'پیش‌نویس ذخیره شد' : 'Draft saved');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving draft:', error);
       if (!silent) {
-        toast.error(isRTL ? 'خطا در ذخیره پیش‌نویس' : 'Error saving draft');
+        const msg = error?.message || '';
+        toast.error(
+          isRTL
+            ? `خطا در ذخیره پیش‌نویس: ${msg}`
+            : `Error saving draft: ${msg}`
+        );
       }
     }
   };
