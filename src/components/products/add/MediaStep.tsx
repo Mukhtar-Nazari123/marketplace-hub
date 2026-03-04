@@ -460,7 +460,7 @@ export const MediaStep = ({ formData, updateFormData, isUploading }: MediaStepPr
               : 'Like major online stores, upload a dedicated image for each color so customers can preview the product in their preferred color.'}
           </p>
 
-          <div className="space-y-3">
+          <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 snap-x snap-mandatory">
             {selectedColors.map((color) => {
               const imageSrc = getColorImageSrc(color.value);
               const hasImage = !!imageSrc;
