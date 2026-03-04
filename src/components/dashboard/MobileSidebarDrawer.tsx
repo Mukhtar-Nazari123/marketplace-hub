@@ -190,7 +190,7 @@ export const MobileSidebarDrawer = ({ open, onOpenChange }: MobileSidebarDrawerP
 
           {/* Navigation */}
           <ScrollArea className="flex-1 py-2">
-            <nav className="space-y-1 px-2">
+            <nav className="space-y-1 px-2" dir="ltr">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const active = isActive(item.url);
