@@ -322,12 +322,31 @@ const Categories = () => {
         onSortChange={setSortBy}
         selectedCategory={selectedCategorySlug}
         onCategoryChange={(cat) => {
+          const newParams = new URLSearchParams(searchParams);
           if (cat) {
-            window.location.href = `/categories?category=${cat}`;
+            newParams.set("category", cat);
+            newParams.delete("subcategory");
           } else {
-            window.location.href = "/categories";
+            newParams.delete("category");
+            newParams.delete("subcategory");
           }
+          setSearchParams(newParams);
         }}
+        selectedSubcategory={selectedSubcategorySlug}
+        onSubcategoryChange={(sub) => {
+          const newParams = new URLSearchParams(searchParams);
+          if (sub) {
+            newParams.set("subcategory", sub);
+          } else {
+            newParams.delete("subcategory");
+          }
+          setSearchParams(newParams);
+        }}
+        availableBrands={availableBrands}
+        selectedBrand={selectedBrand}
+        onBrandChange={setSelectedBrand}
+        selectedColor={selectedColor}
+        onColorChange={setSelectedColor}
       />
 
       {/* Subcategories Scroll - shows when category is selected */}
