@@ -113,7 +113,7 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
     : 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3 sm:space-y-6">
       <div>
         <h3 className="text-lg font-semibold mb-2">
           {isRTL ? 'بررسی و ارسال' : 'Review & Submit'}

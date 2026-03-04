@@ -427,7 +427,7 @@ const AddProduct = () => {
 
         {/* Navigation Buttons */}
         <div className={cn(
-          "flex flex-wrap gap-2 sm:gap-4",
+          "flex flex-wrap gap-2 sm:gap-4 mt-2 sm:mt-0",
           isRTL ? "flex-row-reverse" : "flex-row",
           "justify-between"
         )}>
