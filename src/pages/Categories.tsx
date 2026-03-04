@@ -177,7 +177,7 @@ const Categories = () => {
     if (!categoriesLoading) {
       fetchProducts();
     }
-  }, [currentCategory?.id, currentSubcategory?.id, subcategories, categoriesLoading, language]);
+  }, [currentCategory?.id, currentSubcategory?.id, categoriesLoading, language]);
 
   // Reset display count when filters change
   useEffect(() => {
