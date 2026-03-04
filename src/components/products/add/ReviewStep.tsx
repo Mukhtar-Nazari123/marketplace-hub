@@ -153,7 +153,7 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
             )}
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-3 sm:px-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {validationChecks.map((check, index) => (
               <div key={index} className="flex items-center gap-2 text-sm">
