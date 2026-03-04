@@ -132,7 +132,7 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
           ? (allValid ? "border-success/50 bg-success/5" : "border-primary/50 bg-primary/5")
           : "border-destructive/50 bg-destructive/5"
       )}>
-        <CardHeader className="pb-3">
+        <CardHeader className="px-3 sm:px-6 pb-3">
           <CardTitle className="text-base flex items-center gap-2">
             {criticalValid ? (
               <>
