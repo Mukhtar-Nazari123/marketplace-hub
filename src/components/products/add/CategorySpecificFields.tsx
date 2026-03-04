@@ -284,7 +284,8 @@ export const CategorySpecificFields = ({
               <Ruler className="w-4 h-4" />
               {getLabel("Numeric Sizes", "سایزهای عددی", "شمېري اندازې")}
             </Label>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="max-h-32 overflow-y-auto sm:max-h-none sm:overflow-y-visible pb-2">
+            <div className={cn("flex flex-wrap gap-1.5", isRTL ? "flex-row-reverse justify-start" : "justify-start")}>
               {Array.from({ length: 27 }, (_, i) => (20 + i).toString()).map((size) => {
                 const selectedNumSizes = (attributes.numericSizes as string[]) || [];
                 const isSelected = selectedNumSizes.includes(size);
