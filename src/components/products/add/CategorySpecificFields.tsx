@@ -277,6 +277,7 @@ export const CategorySpecificFields = ({
               {getLabel("Free Size", "فری سایز", "آزاد اندازه")}
             </button>
           </div>
+          </div>
 
           <div className="space-y-2 pt-3">
             <Label className="flex items-center gap-2 text-sm">
