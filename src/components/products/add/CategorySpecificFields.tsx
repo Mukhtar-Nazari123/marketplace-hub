@@ -113,7 +113,7 @@ export const CategorySpecificFields = ({
             <Palette className="w-4 h-4" />
             {isRTL ? "رنگ" : "Color"}
           </Label>
-          <div className="pb-2">
+          <div className="max-h-52 overflow-y-auto sm:max-h-none sm:overflow-y-visible pb-2">
             <div className="flex gap-2 flex-wrap justify-end">
               {PRODUCT_COLORS.map((colorOption) => {
                 const selectedColors = (attributes.colors as string[]) || [];
