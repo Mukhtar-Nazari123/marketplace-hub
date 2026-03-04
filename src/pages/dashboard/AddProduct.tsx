@@ -404,9 +404,14 @@ const AddProduct = () => {
       }
 
       navigate('/dashboard/seller/products');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting product:', error);
-      toast.error(isRTL ? 'خطا در ارسال محصول' : 'Error submitting product');
+      const msg = error?.message || '';
+      toast.error(
+        isRTL
+          ? `خطا در ارسال محصول: ${msg}`
+          : `Error submitting product: ${msg}`
+      );
     } finally {
       setIsSubmitting(false);
     }
