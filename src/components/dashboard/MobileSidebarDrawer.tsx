@@ -214,7 +214,7 @@ export const MobileSidebarDrawer = ({ open, onOpenChange }: MobileSidebarDrawerP
             <Separator className="my-4" />
 
             {/* Utility Navigation */}
-            <nav className="space-y-1 px-2">
+            <nav className="space-y-1 px-2" dir={isRTL ? 'rtl' : 'ltr'}>
               <button
                 onClick={() => handleNavigation('/')}
                 className="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium hover:bg-muted transition-colors min-h-[48px]"
