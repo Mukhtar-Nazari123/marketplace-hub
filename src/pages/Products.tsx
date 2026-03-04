@@ -416,8 +416,8 @@ const ProductCard = ({ product, getRating }: ProductCardProps) => {
 
         {/* Quick Actions */}
         <div
-          className={`absolute top-2 ${isRTL ? "left-2" : "right-2"} flex flex-col gap-2 transition-all duration-300 ${
-            isHovered ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4"
+          className={`absolute top-2 ${isRTL ? "left-2" : "right-2"} flex flex-col gap-2 transition-all duration-300 md:opacity-0 md:translate-x-4 ${
+            isHovered ? "opacity-100 translate-x-0" : "opacity-100"
           }`}
         >
           {(!user || isBuyer) && (
