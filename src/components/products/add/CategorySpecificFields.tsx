@@ -107,6 +107,58 @@ export const CategorySpecificFields = ({
           />
         </div>
 
+        <div className="md:col-span-2 space-y-2">
+          <Label className="flex items-center gap-2">
+            <Palette className="w-4 h-4" />
+            {getLabel("Color", "رنگ", "رنګ")}
+          </Label>
+          <div className="overflow-x-auto pb-2 -mx-1 px-1">
+            <div className="flex gap-2 min-w-max">
+              {PRODUCT_COLORS.map((colorOption) => {
+                const selectedColors = (attributes.colors as string[]) || [];
+                const isSelected = selectedColors.includes(colorOption.value);
+                const colorLabel = language === 'ps' ? (colorOption.namePs || colorOption.nameFa) : language === 'fa' ? colorOption.nameFa : colorOption.name;
+                return (
+                  <button
+                    key={colorOption.value}
+                    type="button"
+                    onClick={() => {
+                      const newColors = isSelected 
+                        ? selectedColors.filter((c) => c !== colorOption.value) 
+                        : [...selectedColors, colorOption.value];
+                      updateAttribute("colors", newColors);
+                    }}
+                    className={cn(
+                      "flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-full border transition-all duration-200 whitespace-nowrap",
+                      isSelected
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-background text-foreground border-border hover:border-primary/50"
+                    )}
+                    title={colorOption.name}
+                  >
+                    <span
+                      className="w-3.5 h-3.5 rounded-full border border-border/50 flex-shrink-0"
+                      style={{ backgroundColor: colorOption.hex }}
+                    />
+                    <span>{colorLabel}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <div className="space-y-2 pt-1">
+            <Label className="text-sm text-muted-foreground">
+              {getLabel("Custom Color (optional)", "رنگ دیگر (اختیاری)", "بل رنګ (اختیاري)")}
+            </Label>
+            <Input
+              value={(attributes.customColor as string) || ""}
+              onChange={(e) => updateAttribute("customColor", e.target.value)}
+              placeholder={getLabel("e.g., Gold, Silver", "مثال: طلایی، نقره‌ای", "مثال: سرو، سپینزر")}
+              className={cn(isRTL && "text-right")}
+            />
+          </div>
+        </div>
+
         <Card className="md:col-span-2 p-4 space-y-3 bg-muted/30">
           <Label className="flex items-center gap-2">
             <Shield className="w-4 h-4 text-primary" />
