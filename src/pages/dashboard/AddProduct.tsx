@@ -216,16 +216,18 @@ const AddProduct = () => {
         return urlData.publicUrl;
       } catch (err: any) {
         lastError = err;
-        console.warn(`Upload attempt ${attempt}/${maxRetries} failed:`, err.message);
+        console.warn(`Upload attempt ${attempt}/${maxRetries} failed for "${file.name}":`, err.message);
         
         // Wait before retry (exponential backoff)
         if (attempt < maxRetries) {
-          await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+          await new Promise(resolve => setTimeout(resolve, 1500 * attempt));
         }
       }
     }
     
-    throw lastError || new Error('Upload failed after retries');
+    throw new Error(
+      `Failed to upload "${file.name}" after ${maxRetries} attempts: ${lastError?.message || 'Unknown error'}`
+    );
   };
 
   // Max file size: 10MB for images, 50MB for video
