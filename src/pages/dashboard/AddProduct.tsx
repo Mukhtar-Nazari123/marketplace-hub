@@ -394,7 +394,7 @@ const AddProduct = () => {
       description={isRTL ? 'محصول جدید به فروشگاه اضافه کنید' : 'Add a new product to your store'}
       allowedRoles={['seller']}
     >
-      <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6 min-w-0 overflow-hidden">
+      <div className="max-w-4xl mx-auto space-y-6">
         {/* Seller verification warning */}
         {!isVerifiedSeller && (
           <Card className="p-4 border-warning/50 bg-warning/10">
@@ -416,12 +416,12 @@ const AddProduct = () => {
         </Card>
 
         {/* Stepper */}
-        <Card className="p-3 sm:p-6">
+        <Card className="p-6">
           <ProductStepper steps={STEPS} currentStep={currentStep} onStepClick={goToStep} />
         </Card>
 
         {/* Step Content */}
-        <Card className="p-3 sm:p-6 animate-fade-in min-w-0 overflow-hidden">
+        <Card className="p-6 animate-fade-in">
           {renderStep()}
         </Card>
 
