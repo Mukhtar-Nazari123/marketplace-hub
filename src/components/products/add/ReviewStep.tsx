@@ -310,7 +310,7 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
                   {isRTL ? 'دسته‌بندی' : 'Category'}
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-3 sm:px-6">
                 <div className="flex flex-wrap gap-2">
                   {formData.categoryName ? (
                     <Badge variant="secondary">
