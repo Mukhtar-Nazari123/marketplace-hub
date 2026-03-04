@@ -437,7 +437,7 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
           {/* Category-Specific Attributes */}
           {Object.keys(formData.attributes).length > 0 && (
             <Card>
-              <CardHeader className="pb-3">
+              <CardHeader className="px-3 sm:px-6 pb-3">
                 <CardTitle className="text-sm flex items-center gap-2">
                   <Hash className="w-4 h-4 text-primary" />
                   {isRTL ? 'مشخصات اختصاصی' : 'Specific Attributes'}
