@@ -34,7 +34,7 @@ export const BasicInfoStep = ({ formData, updateFormData }: BasicInfoStepProps) 
         </p>
       </div>
 
-      <div className="grid gap-6">
+      <div className="grid gap-4 sm:gap-6">
         {/* Product Name */}
         <div className="space-y-2">
           <Label htmlFor="name" className="text-sm font-medium flex items-center gap-2">
