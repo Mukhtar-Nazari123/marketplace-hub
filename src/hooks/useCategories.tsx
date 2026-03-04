@@ -173,7 +173,10 @@ export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
     return categories.find(cat => cat.slug === slug);
   };
 
-  const getSubcategoryBySlug = (slug: string) => {
+  const getSubcategoryBySlug = (slug: string, categoryId?: string) => {
+    if (categoryId) {
+      return subcategories.find(sub => sub.slug === slug && sub.category_id === categoryId);
+    }
     return subcategories.find(sub => sub.slug === slug);
   };
 
