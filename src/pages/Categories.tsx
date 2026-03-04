@@ -185,6 +185,19 @@ const Categories = () => {
   useEffect(() => {
     setDisplayCount(24);
   }, [selectedCategorySlug, selectedSubcategorySlug, filters, sortBy]);
+  // Reset brand/color when category changes
+  useEffect(() => {
+    setSelectedBrand(null);
+    setSelectedColor(null);
+  }, [selectedCategorySlug]);
+
+  // Extract available brands from products
+  const availableBrands = useMemo(() => {
+    const brands = dbProducts
+      .map((p) => (p.metadata as { brand?: string } | null)?.brand)
+      .filter((b): b is string => !!b && b.trim() !== "");
+    return [...new Set(brands)];
+  }, [dbProducts]);
 
   // Convert DB products to display format
   const displayProducts = useMemo(() => {
