@@ -169,24 +169,24 @@ export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
     return { categories: localizedCategories, subcategories: localizedSubcategories };
   }, [rawCategories, rawSubcategories, language]);
 
-  const getCategoryBySlug = (slug: string) => {
+  const getCategoryBySlug = useCallback((slug: string) => {
     return categories.find(cat => cat.slug === slug);
-  };
+  }, [categories]);
 
-  const getSubcategoryBySlug = (slug: string, categoryId?: string) => {
+  const getSubcategoryBySlug = useCallback((slug: string, categoryId?: string) => {
     if (categoryId) {
       return subcategories.find(sub => sub.slug === slug && sub.category_id === categoryId);
     }
     return subcategories.find(sub => sub.slug === slug);
-  };
+  }, [subcategories]);
 
-  const getSubcategories = (categoryId: string) => {
+  const getSubcategories = useCallback((categoryId: string) => {
     return subcategories.filter(sub => sub.category_id === categoryId);
-  };
+  }, [subcategories]);
 
-  const getRootCategories = () => {
+  const getRootCategories = useCallback(() => {
     return categories;
-  };
+  }, [categories]);
 
   return (
     <CategoriesContext.Provider value={{
