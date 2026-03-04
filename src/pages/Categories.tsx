@@ -264,6 +264,11 @@ const Categories = () => {
       result = result.filter((p) => p.discount && p.discount > 0);
     }
 
+    // Filter by brand
+    if (selectedBrand) {
+      result = result.filter((p) => p.brand.toLowerCase() === selectedBrand.toLowerCase());
+    }
+
     // Sort
     switch (sortBy) {
       case "price-low":
@@ -282,7 +287,7 @@ const Categories = () => {
     }
 
     return result;
-  }, [displayProducts, filters, sortBy]);
+  }, [displayProducts, filters, sortBy, selectedBrand]);
 
   const hasMore = displayCount < filteredProducts.length;
   const displayedProducts = filteredProducts.slice(0, displayCount);
