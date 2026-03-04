@@ -108,7 +108,7 @@ export const BasicInfoStep = ({ formData, updateFormData }: BasicInfoStepProps) 
             placeholder={isRTL 
               ? 'توضیحات کامل محصول را بنویسید. ویژگی‌ها، مزایا و اطلاعات مهم را ذکر کنید...'
               : 'Write a detailed description of your product. Include features, benefits, and important information...'}
-            minRows={6}
+            minRows={4}
             maxLength={5000}
           />
           <p className="text-xs text-muted-foreground">

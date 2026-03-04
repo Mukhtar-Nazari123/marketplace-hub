@@ -121,7 +121,7 @@ export const RichTextEditor = ({
   return (
     <div className={cn("border rounded-lg overflow-hidden", className)}>
       {/* Toolbar */}
-      <div className="flex items-center gap-1 p-2 border-b bg-muted/50 flex-wrap">
+      <div className="flex items-center gap-0.5 sm:gap-1 p-1.5 sm:p-2 border-b bg-muted/50 flex-wrap">
         <TooltipProvider delayDuration={300}>
           {TOOLBAR_BUTTONS.map((button) => (
             <Tooltip key={button.label}>
@@ -130,10 +130,10 @@ export const RichTextEditor = ({
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8"
+                  className="h-7 w-7 sm:h-8 sm:w-8"
                   onClick={() => insertFormatting(button.prefix, button.suffix)}
                 >
-                  <button.icon className="h-4 w-4" />
+                  <button.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -142,7 +142,7 @@ export const RichTextEditor = ({
             </Tooltip>
           ))}
           
-          <div className="w-px h-6 bg-border mx-1" />
+          <div className="w-px h-5 sm:h-6 bg-border mx-0.5 sm:mx-1" />
           
           <Tooltip>
             <TooltipTrigger asChild>
@@ -150,11 +150,11 @@ export const RichTextEditor = ({
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8"
+                className="h-7 w-7 sm:h-8 sm:w-8"
                 onClick={handleUndo}
                 disabled={historyIndex === 0}
               >
-                <Undo className="h-4 w-4" />
+                <Undo className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>
@@ -168,11 +168,11 @@ export const RichTextEditor = ({
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8"
+                className="h-7 w-7 sm:h-8 sm:w-8"
                 onClick={handleRedo}
                 disabled={historyIndex >= history.length - 1}
               >
-                <Redo className="h-4 w-4" />
+                <Redo className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>
