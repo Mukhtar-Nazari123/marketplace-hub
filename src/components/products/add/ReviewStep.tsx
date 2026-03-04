@@ -209,7 +209,7 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
                   </Badge>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-3 sm:px-6">
                 {hasImages ? (
                   <div className="grid grid-cols-3 gap-2">
                     {allPreviewImages.slice(0, 6).map((src, index) => (
