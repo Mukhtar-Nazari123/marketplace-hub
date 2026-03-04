@@ -486,7 +486,7 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
           {/* Description Preview */}
           {formData.description && (
             <Card>
-              <CardHeader className="pb-3">
+              <CardHeader className="px-3 sm:px-6 pb-3">
                 <CardTitle className="text-sm">
                   {isRTL ? 'توضیحات کامل' : 'Full Description'}
                 </CardTitle>
