@@ -216,16 +216,34 @@ const AddProduct = () => {
         return urlData.publicUrl;
       } catch (err: any) {
         lastError = err;
-        console.warn(`Upload attempt ${attempt}/${maxRetries} failed:`, err.message);
+        console.warn(`Upload attempt ${attempt}/${maxRetries} failed for "${file.name}":`, err.message);
         
         // Wait before retry (exponential backoff)
         if (attempt < maxRetries) {
-          await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+          await new Promise(resolve => setTimeout(resolve, 1500 * attempt));
         }
       }
     }
     
-    throw lastError || new Error('Upload failed after retries');
+    throw new Error(
+      `Failed to upload "${file.name}" after ${maxRetries} attempts: ${lastError?.message || 'Unknown error'}`
+    );
+  };
+
+  // Max file size: 10MB for images, 50MB for video
+  const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
+  const MAX_VIDEO_SIZE = 50 * 1024 * 1024;
+
+  const validateFileSize = (file: File, maxSize: number, label: string): void => {
+    if (file.size > maxSize) {
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+      const maxMB = (maxSize / (1024 * 1024)).toFixed(0);
+      throw new Error(
+        isRTL
+          ? `فایل "${file.name}" (${sizeMB}MB) بزرگتر از حد مجاز ${maxMB}MB است`
+          : `File "${file.name}" (${sizeMB}MB) exceeds the ${maxMB}MB ${label} limit`
+      );
+    }
   };
 
   const uploadMedia = async (): Promise<{ 
@@ -239,10 +257,20 @@ const AddProduct = () => {
     const uploadedColorImageUrls: Record<string, string> = { ...formData.colorImageUrls };
 
     try {
+      // Validate all file sizes before uploading
+      for (const image of formData.images) {
+        validateFileSize(image, MAX_IMAGE_SIZE, 'image');
+      }
+      if (formData.video) {
+        validateFileSize(formData.video, MAX_VIDEO_SIZE, 'video');
+      }
+      for (const file of Object.values(formData.colorImages)) {
+        if (file) validateFileSize(file, MAX_IMAGE_SIZE, 'image');
+      }
+
       // Upload general images - path must start with user ID for RLS policy
       for (let i = 0; i < formData.images.length; i++) {
         const image = formData.images[i];
-        // Sanitize filename to remove special characters
         const sanitizedName = image.name.replace(/[^a-zA-Z0-9.-]/g, '_');
         const fileName = `${user?.id}/products/${Date.now()}-${i}-${sanitizedName}`;
         
@@ -250,7 +278,7 @@ const AddProduct = () => {
         uploadedImageUrls.push(publicUrl);
       }
 
-      // Upload video if exists - path must start with user ID for RLS policy
+      // Upload video if exists
       if (formData.video) {
         const sanitizedName = formData.video.name.replace(/[^a-zA-Z0-9.-]/g, '_');
         const fileName = `${user?.id}/videos/${Date.now()}-${sanitizedName}`;
@@ -269,6 +297,16 @@ const AddProduct = () => {
           uploadedColorImageUrls[colorValue] = publicUrl;
         }
       }
+
+      // Clear File objects after successful upload to prevent re-uploads
+      updateFormData({
+        images: [],
+        imageUrls: uploadedImageUrls,
+        video: null,
+        videoUrl: uploadedVideoUrl,
+        colorImages: {},
+        colorImageUrls: uploadedColorImageUrls,
+      });
 
       return { 
         imageUrls: uploadedImageUrls, 
@@ -309,10 +347,15 @@ const AddProduct = () => {
       if (!silent) {
         toast.success(isRTL ? 'پیش‌نویس ذخیره شد' : 'Draft saved');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving draft:', error);
       if (!silent) {
-        toast.error(isRTL ? 'خطا در ذخیره پیش‌نویس' : 'Error saving draft');
+        const msg = error?.message || '';
+        toast.error(
+          isRTL
+            ? `خطا در ذخیره پیش‌نویس: ${msg}`
+            : `Error saving draft: ${msg}`
+        );
       }
     }
   };
@@ -363,9 +406,14 @@ const AddProduct = () => {
       }
 
       navigate('/dashboard/seller/products');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting product:', error);
-      toast.error(isRTL ? 'خطا در ارسال محصول' : 'Error submitting product');
+      const msg = error?.message || '';
+      toast.error(
+        isRTL
+          ? `خطا در ارسال محصول: ${msg}`
+          : `Error submitting product: ${msg}`
+      );
     } finally {
       setIsSubmitting(false);
     }
