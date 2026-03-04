@@ -195,7 +195,7 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
         </TabsList>
 
         {/* Details Tab */}
-        <TabsContent value="details" className="mt-4 space-y-6">
+        <TabsContent value="details" className="mt-4 space-y-3 sm:space-y-6">
           {/* Product Preview Grid */}
           <div className="grid md:grid-cols-2 gap-6">
             {/* Images Preview */}
