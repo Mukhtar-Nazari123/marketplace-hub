@@ -338,7 +338,7 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
                   {isRTL ? 'قیمت و موجودی' : 'Price & Stock'}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="px-3 sm:px-6 space-y-3">
                 <div className="flex items-baseline gap-2">
                   {hasDiscount ? (
                     <>
