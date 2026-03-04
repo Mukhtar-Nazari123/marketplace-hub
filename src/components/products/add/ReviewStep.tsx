@@ -257,7 +257,7 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
 
             {/* Basic Info Preview */}
             <Card>
-              <CardHeader className="pb-3">
+              <CardHeader className="px-3 sm:px-6 pb-3">
                 <CardTitle className="text-sm flex items-center gap-2">
                   <FileText className="w-4 h-4 text-primary" />
                   {isRTL ? 'اطلاعات پایه' : 'Basic Info'}
