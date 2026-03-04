@@ -233,7 +233,8 @@ export const CategorySpecificFields = ({
             <Ruler className="w-4 h-4" />
             {getLabel("Available Sizes", "سایزهای موجود", "موجود اندازې")}
           </Label>
-          <div className="flex flex-wrap gap-2">
+          <div className="max-h-32 overflow-y-auto sm:max-h-none sm:overflow-y-visible pb-2">
+          <div className={cn("flex flex-wrap gap-2", isRTL ? "flex-row-reverse justify-start" : "justify-start")}>
             {["XS", "S", "M", "L", "XL", "XXL"].map((size) => {
               const selectedSizes = (attributes.sizes as string[]) || [];
               const isSelected = selectedSizes.includes(size);
@@ -276,13 +277,15 @@ export const CategorySpecificFields = ({
               {getLabel("Free Size", "فری سایز", "آزاد اندازه")}
             </button>
           </div>
+          </div>
 
           <div className="space-y-2 pt-3">
             <Label className="flex items-center gap-2 text-sm">
               <Ruler className="w-4 h-4" />
               {getLabel("Numeric Sizes", "سایزهای عددی", "شمېري اندازې")}
             </Label>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="max-h-32 overflow-y-auto sm:max-h-none sm:overflow-y-visible pb-2">
+            <div className={cn("flex flex-wrap gap-1.5", isRTL ? "flex-row-reverse justify-start" : "justify-start")}>
               {Array.from({ length: 27 }, (_, i) => (20 + i).toString()).map((size) => {
                 const selectedNumSizes = (attributes.numericSizes as string[]) || [];
                 const isSelected = selectedNumSizes.includes(size);
@@ -308,6 +311,7 @@ export const CategorySpecificFields = ({
                 );
               })}
             </div>
+            </div>
           </div>
 
           <div className="space-y-2 pt-2">
@@ -328,8 +332,8 @@ export const CategorySpecificFields = ({
             <Palette className="w-4 h-4" />
             {getLabel("Color", "رنگ", "رنګ")}
           </Label>
-          <div className="overflow-x-auto pb-2 -mx-1 px-1">
-            <div className="flex gap-2 min-w-max">
+          <div className="max-h-32 overflow-y-auto sm:max-h-none sm:overflow-y-visible pb-2">
+            <div className={cn("flex gap-2 flex-wrap", isRTL ? "flex-row-reverse justify-start" : "justify-start")}>
               {PRODUCT_COLORS.map((colorOption) => {
                 const selectedColors = (attributes.colors as string[]) || [];
                 const isSelected = selectedColors.includes(colorOption.value);
