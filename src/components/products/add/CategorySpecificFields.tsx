@@ -233,7 +233,8 @@ export const CategorySpecificFields = ({
             <Ruler className="w-4 h-4" />
             {getLabel("Available Sizes", "سایزهای موجود", "موجود اندازې")}
           </Label>
-          <div className="flex flex-wrap gap-2">
+          <div className="max-h-32 overflow-y-auto sm:max-h-none sm:overflow-y-visible pb-2">
+          <div className={cn("flex flex-wrap gap-2", isRTL ? "flex-row-reverse justify-start" : "justify-start")}>
             {["XS", "S", "M", "L", "XL", "XXL"].map((size) => {
               const selectedSizes = (attributes.sizes as string[]) || [];
               const isSelected = selectedSizes.includes(size);
