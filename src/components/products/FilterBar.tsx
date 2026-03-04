@@ -111,10 +111,12 @@ const FilterBar = ({
     const maxScroll = scrollWidth - clientWidth;
     const buffer = 10;
     
-    // RTL-aware scroll detection
+    // scrollBy always works the same: negative = left, positive = right
+    // In RTL, scrollLeft starts at 0 (or negative depending on browser)
     if (isRTL) {
-      setCanScrollRight(Math.abs(scrollLeft) > buffer);
-      setCanScrollLeft(Math.abs(scrollLeft) < maxScroll - buffer);
+      const absScroll = Math.abs(scrollLeft);
+      setCanScrollRight(absScroll > buffer);
+      setCanScrollLeft(absScroll < maxScroll - buffer);
     } else {
       setCanScrollLeft(scrollLeft > buffer);
       setCanScrollRight(scrollLeft < maxScroll - buffer);
