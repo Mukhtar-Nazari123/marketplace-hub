@@ -22,12 +22,12 @@ export const BasicInfoStep = ({ formData, updateFormData }: BasicInfoStepProps) 
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div>
-        <h3 className="text-lg font-semibold mb-2">
+        <h3 className="text-base sm:text-lg font-semibold mb-1 sm:mb-2">
           {isRTL ? 'اطلاعات پایه محصول' : 'Basic Product Information'}
         </h3>
-        <p className="text-sm text-muted-foreground mb-6">
+        <p className="text-xs sm:text-sm text-muted-foreground mb-4 sm:mb-6">
           {isRTL 
             ? 'اطلاعات اصلی محصول را وارد کنید'
             : 'Enter the main details of your product'}
