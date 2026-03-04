@@ -193,12 +193,12 @@ export const DeliveryOptionsStep = ({ options, onChange }: DeliveryOptionsStepPr
               'د لیږد اختیارونه اضافه کړئ یا زموږ وړاندیز شوي ډیفالټونه وکاروئ'
             )}
           </p>
-          <div className="flex gap-3 justify-center">
-            <Button variant="outline" onClick={addOption}>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Button variant="outline" onClick={addOption} className="w-full sm:w-auto">
               <Plus className="h-4 w-4 mr-2" />
               {getLabel('Add Custom', 'افزودن سفارشی', 'دودیز اضافه کړئ')}
             </Button>
-            <Button onClick={initializeDefaults}>
+            <Button onClick={initializeDefaults} className="w-full sm:w-auto">
               <CheckCircle2 className="h-4 w-4 mr-2" />
               {getLabel('Use Defaults', 'استفاده از پیش‌فرض', 'ډیفالټ وکاروئ')}
             </Button>
