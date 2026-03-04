@@ -416,7 +416,7 @@ const AddProduct = () => {
         </Card>
 
         {/* Stepper */}
-        <Card className="p-6">
+        <Card className="p-3 sm:p-6">
           <ProductStepper steps={STEPS} currentStep={currentStep} onStepClick={goToStep} />
         </Card>
 
