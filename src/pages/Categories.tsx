@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
-import { Link, useSearchParams, useNavigate } from "react-router-dom";
+import { Link, useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import { useLanguage } from "@/lib/i18n";
 import { useCategories } from "@/hooks/useCategories";
 import { supabase } from "@/integrations/supabase/client";
@@ -39,7 +39,7 @@ interface DbProduct {
 
 const Categories = () => {
   const { t, language, isRTL } = useLanguage();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const selectedCategorySlug = searchParams.get("category");
   const selectedSubcategorySlug = searchParams.get("subcategory");
 
@@ -55,6 +55,8 @@ const Categories = () => {
   const [sortBy, setSortBy] = useState("latest");
   const [displayCount, setDisplayCount] = useState(24);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [filters, setFilters] = useState<FilterState>({
     priceRange: [0, 150000],
     rating: 0,
@@ -183,6 +185,19 @@ const Categories = () => {
   useEffect(() => {
     setDisplayCount(24);
   }, [selectedCategorySlug, selectedSubcategorySlug, filters, sortBy]);
+  // Reset brand/color when category changes
+  useEffect(() => {
+    setSelectedBrand(null);
+    setSelectedColor(null);
+  }, [selectedCategorySlug]);
+
+  // Extract available brands from products
+  const availableBrands = useMemo(() => {
+    const brands = dbProducts
+      .map((p) => (p.metadata as { brand?: string } | null)?.brand)
+      .filter((b): b is string => !!b && b.trim() !== "");
+    return [...new Set(brands)];
+  }, [dbProducts]);
 
   // Convert DB products to display format
   const displayProducts = useMemo(() => {
@@ -249,6 +264,11 @@ const Categories = () => {
       result = result.filter((p) => p.discount && p.discount > 0);
     }
 
+    // Filter by brand
+    if (selectedBrand) {
+      result = result.filter((p) => p.brand.toLowerCase() === selectedBrand.toLowerCase());
+    }
+
     // Sort
     switch (sortBy) {
       case "price-low":
@@ -267,7 +287,7 @@ const Categories = () => {
     }
 
     return result;
-  }, [displayProducts, filters, sortBy]);
+  }, [displayProducts, filters, sortBy, selectedBrand]);
 
   const hasMore = displayCount < filteredProducts.length;
   const displayedProducts = filteredProducts.slice(0, displayCount);
@@ -302,12 +322,31 @@ const Categories = () => {
         onSortChange={setSortBy}
         selectedCategory={selectedCategorySlug}
         onCategoryChange={(cat) => {
+          const newParams = new URLSearchParams(searchParams);
           if (cat) {
-            window.location.href = `/categories?category=${cat}`;
+            newParams.set("category", cat);
+            newParams.delete("subcategory");
           } else {
-            window.location.href = "/categories";
+            newParams.delete("category");
+            newParams.delete("subcategory");
           }
+          setSearchParams(newParams);
         }}
+        selectedSubcategory={selectedSubcategorySlug}
+        onSubcategoryChange={(sub) => {
+          const newParams = new URLSearchParams(searchParams);
+          if (sub) {
+            newParams.set("subcategory", sub);
+          } else {
+            newParams.delete("subcategory");
+          }
+          setSearchParams(newParams);
+        }}
+        availableBrands={availableBrands}
+        selectedBrand={selectedBrand}
+        onBrandChange={setSelectedBrand}
+        selectedColor={selectedColor}
+        onColorChange={setSelectedColor}
       />
 
       {/* Subcategories Scroll - shows when category is selected */}
