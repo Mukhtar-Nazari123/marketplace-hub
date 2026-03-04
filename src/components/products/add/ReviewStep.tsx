@@ -132,7 +132,7 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
           ? (allValid ? "border-success/50 bg-success/5" : "border-primary/50 bg-primary/5")
           : "border-destructive/50 bg-destructive/5"
       )}>
-        <CardHeader className="pb-3">
+        <CardHeader className="px-3 sm:px-6 pb-3">
           <CardTitle className="text-base flex items-center gap-2">
             {criticalValid ? (
               <>
@@ -153,7 +153,7 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
             )}
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-3 sm:px-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {validationChecks.map((check, index) => (
               <div key={index} className="flex items-center gap-2 text-sm">
@@ -200,7 +200,7 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
           <div className="grid md:grid-cols-2 gap-6">
             {/* Images Preview */}
             <Card>
-              <CardHeader className="pb-3">
+              <CardHeader className="px-3 sm:px-6 pb-3">
                 <CardTitle className="text-sm flex items-center gap-2">
                   <ImageIcon className="w-4 h-4 text-primary" />
                   {isRTL ? 'تصاویر' : 'Images'} 
@@ -209,7 +209,7 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
                   </Badge>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-3 sm:px-6">
                 {hasImages ? (
                   <div className="grid grid-cols-3 gap-2">
                     {allPreviewImages.slice(0, 6).map((src, index) => (
@@ -257,13 +257,13 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
 
             {/* Basic Info Preview */}
             <Card>
-              <CardHeader className="pb-3">
+              <CardHeader className="px-3 sm:px-6 pb-3">
                 <CardTitle className="text-sm flex items-center gap-2">
                   <FileText className="w-4 h-4 text-primary" />
                   {isRTL ? 'اطلاعات پایه' : 'Basic Info'}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="px-3 sm:px-6 space-y-3">
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">
                     {isRTL ? 'نام محصول' : 'Product Name'}
@@ -304,13 +304,13 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
 
             {/* Category Preview */}
             <Card>
-              <CardHeader className="pb-3">
+              <CardHeader className="px-3 sm:px-6 pb-3">
                 <CardTitle className="text-sm flex items-center gap-2">
                   <Folder className="w-4 h-4 text-primary" />
                   {isRTL ? 'دسته‌بندی' : 'Category'}
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-3 sm:px-6">
                 <div className="flex flex-wrap gap-2">
                   {formData.categoryName ? (
                     <Badge variant="secondary">
@@ -332,13 +332,13 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
 
             {/* Pricing Preview */}
             <Card>
-              <CardHeader className="pb-3">
+              <CardHeader className="px-3 sm:px-6 pb-3">
                 <CardTitle className="text-sm flex items-center gap-2">
                   <Tag className="w-4 h-4 text-primary" />
                   {isRTL ? 'قیمت و موجودی' : 'Price & Stock'}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="px-3 sm:px-6 space-y-3">
                 <div className="flex items-baseline gap-2">
                   {hasDiscount ? (
                     <>
@@ -437,13 +437,13 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
           {/* Category-Specific Attributes */}
           {Object.keys(formData.attributes).length > 0 && (
             <Card>
-              <CardHeader className="pb-3">
+              <CardHeader className="px-3 sm:px-6 pb-3">
                 <CardTitle className="text-sm flex items-center gap-2">
                   <Hash className="w-4 h-4 text-primary" />
                   {isRTL ? 'مشخصات اختصاصی' : 'Specific Attributes'}
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-3 sm:px-6">
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {Object.entries(formData.attributes).map(([key, value]) => {
                     if (!value) return null;
@@ -486,12 +486,12 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
           {/* Description Preview */}
           {formData.description && (
             <Card>
-              <CardHeader className="pb-3">
+              <CardHeader className="px-3 sm:px-6 pb-3">
                 <CardTitle className="text-sm">
                   {isRTL ? 'توضیحات کامل' : 'Full Description'}
                 </CardTitle>
               </CardHeader>
-              <CardContent dir={isRTL ? 'rtl' : 'ltr'} className={isRTL ? 'text-right' : 'text-left'}>
+              <CardContent dir={isRTL ? 'rtl' : 'ltr'} className={cn("px-3 sm:px-6", isRTL ? 'text-right' : 'text-left')}>
                 <p className="text-sm text-muted-foreground whitespace-pre-wrap line-clamp-6">
                   {formData.description}
                 </p>
