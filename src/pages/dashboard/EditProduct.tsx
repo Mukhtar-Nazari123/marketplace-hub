@@ -390,33 +390,33 @@ const EditProduct = () => {
           </p>
         </Card>
 
-        <Card className="p-6">
+        <Card className="p-3 sm:p-6">
           <ProductStepper steps={STEPS} currentStep={currentStep} onStepClick={goToStep} />
         </Card>
 
-        <Card className="p-6 animate-fade-in">
+        <Card className="p-3 sm:p-6 animate-fade-in">
           {renderStep()}
         </Card>
 
         <div className={cn(
-          "flex gap-4",
+          "flex flex-wrap gap-2 sm:gap-4 mt-2 sm:mt-0",
           isRTL ? "flex-row-reverse" : "flex-row",
           "justify-between"
         )}>
           <div className={cn("flex gap-2", isRTL && "flex-row-reverse")}>
             {currentStep > 1 && (
-              <Button variant="outline" onClick={prevStep} className="gap-2">
-                {isRTL ? <ArrowRight className="h-4 w-4" /> : <ArrowLeft className="h-4 w-4" />}
+              <Button variant="outline" onClick={prevStep} className="gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4">
+                {isRTL ? <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4" /> : <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />}
                 {isRTL ? 'قبلی' : 'Previous'}
               </Button>
             )}
           </div>
 
-          <div className={cn("flex gap-2", isRTL && "flex-row-reverse")}>
+          <div className={cn("flex flex-wrap gap-2", isRTL && "flex-row-reverse")}>
             {currentStep < 5 ? (
-              <Button onClick={nextStep} disabled={!canProceed} className="gap-2">
+              <Button onClick={nextStep} disabled={!canProceed} className="gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4">
                 {isRTL ? 'بعدی' : 'Next'}
-                {isRTL ? <ArrowLeft className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
+                {isRTL ? <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" /> : <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4" />}
               </Button>
             ) : (
               <>
@@ -424,22 +424,30 @@ const EditProduct = () => {
                   variant="secondary"
                   onClick={() => updateProduct(true)}
                   disabled={isSubmitting || isUploading}
-                  className="gap-2"
+                  className="gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4"
                 >
-                  <FileText className="h-4 w-4" />
-                  {isRTL ? 'ذخیره پیش‌نویس' : 'Save as Draft'}
+                  <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden xs:inline">{isRTL ? 'ذخیره پیش‌نویس' : 'Save as Draft'}</span>
+                  <span className="xs:hidden">{isRTL ? 'پیش‌نویس' : 'Draft'}</span>
                 </Button>
                 <Button
                   onClick={() => updateProduct(false)}
                   disabled={isSubmitting || isUploading || !canProceed}
-                  className="gap-2"
+                  className="gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4"
                 >
-                  <Send className="h-4 w-4" />
-                  {isSubmitting
-                    ? (isRTL ? 'در حال ارسال...' : 'Submitting...')
-                    : isVerifiedSeller
-                      ? (isRTL ? 'ارسال برای بررسی' : 'Submit for Review')
-                      : (isRTL ? 'ذخیره' : 'Save')}
+                  <Send className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">
+                    {isSubmitting
+                      ? (isRTL ? 'در حال ارسال...' : 'Submitting...')
+                      : isVerifiedSeller
+                        ? (isRTL ? 'ارسال برای بررسی' : 'Submit for Review')
+                        : (isRTL ? 'ذخیره' : 'Save')}
+                  </span>
+                  <span className="sm:hidden">
+                    {isSubmitting
+                      ? '...'
+                      : (isRTL ? 'ارسال' : 'Submit')}
+                  </span>
                 </Button>
               </>
             )}
