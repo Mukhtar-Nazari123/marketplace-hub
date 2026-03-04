@@ -421,13 +421,13 @@ const AddProduct = () => {
         </Card>
 
         {/* Step Content */}
-        <Card className="p-6 animate-fade-in">
+        <Card className="p-3 sm:p-6 animate-fade-in">
           {renderStep()}
         </Card>
 
         {/* Navigation Buttons */}
         <div className={cn(
-          "flex flex-wrap gap-2 sm:gap-4",
+          "flex flex-wrap gap-2 sm:gap-4 mt-2 sm:mt-0",
           isRTL ? "flex-row-reverse" : "flex-row",
           "justify-between"
         )}>
