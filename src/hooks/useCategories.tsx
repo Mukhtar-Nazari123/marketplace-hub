@@ -64,7 +64,7 @@ interface CategoriesContextType {
   error: string | null;
   refetch: () => Promise<void>;
   getCategoryBySlug: (slug: string) => Category | undefined;
-  getSubcategoryBySlug: (slug: string) => Subcategory | undefined;
+  getSubcategoryBySlug: (slug: string, categoryId?: string) => Subcategory | undefined;
   getSubcategories: (categoryId: string) => Subcategory[];
   getRootCategories: () => Category[];
 }
@@ -173,7 +173,10 @@ export const CategoriesProvider = ({ children }: { children: ReactNode }) => {
     return categories.find(cat => cat.slug === slug);
   };
 
-  const getSubcategoryBySlug = (slug: string) => {
+  const getSubcategoryBySlug = (slug: string, categoryId?: string) => {
+    if (categoryId) {
+      return subcategories.find(sub => sub.slug === slug && sub.category_id === categoryId);
+    }
     return subcategories.find(sub => sub.slug === slug);
   };
 

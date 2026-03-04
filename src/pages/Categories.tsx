@@ -68,7 +68,11 @@ const Categories = () => {
   const [categoryImages, setCategoryImages] = useState<Map<string, string>>(new Map());
 
   const currentCategory = selectedCategorySlug ? getCategoryBySlug(selectedCategorySlug) : undefined;
-  const currentSubcategory = selectedSubcategorySlug ? getSubcategoryBySlug(selectedSubcategorySlug) : undefined;
+  const currentSubcategory = selectedSubcategorySlug && currentCategory
+    ? getSubcategoryBySlug(selectedSubcategorySlug, currentCategory.id)
+    : selectedSubcategorySlug
+      ? getSubcategoryBySlug(selectedSubcategorySlug)
+      : undefined;
 
   const ITEMS_PER_LOAD = 24;
 
