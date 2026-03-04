@@ -471,79 +471,71 @@ export const MediaStep = ({ formData, updateFormData, isUploading }: MediaStepPr
                 <div
                   key={color.value}
                   className={cn(
-                    "flex items-center gap-4 p-3 rounded-xl border transition-all",
+                    "flex-shrink-0 w-28 sm:w-32 snap-start flex flex-col items-center gap-2 p-3 rounded-xl border transition-all",
                     hasImage 
                       ? "border-primary/30 bg-primary/5" 
                       : "border-border hover:border-primary/40 hover:bg-muted/30"
                   )}
                 >
                   {/* Color swatch + name */}
-                  <div className="flex items-center gap-3 min-w-[120px]">
-                    <span
-                      className={cn(
-                        "w-8 h-8 rounded-full flex-shrink-0 shadow-sm",
-                        needsBorder && "border border-border"
-                      )}
-                      style={{
-                        background: isMulticolor
-                          ? color.hex
-                          : color.hex,
-                      }}
-                    />
-                    <span className="text-sm font-medium truncate">
-                      {isRTL ? color.nameFa : color.name}
-                    </span>
-                  </div>
+                  <span
+                    className={cn(
+                      "w-8 h-8 rounded-full flex-shrink-0 shadow-sm",
+                      needsBorder && "border border-border"
+                    )}
+                    style={{ background: color.hex }}
+                  />
+                  <span className="text-xs font-medium truncate max-w-full text-center">
+                    {isRTL ? color.nameFa : color.name}
+                  </span>
 
                   {/* Image preview or upload */}
-                  <div className="flex-1 flex items-center gap-3">
-                    {hasImage ? (
-                      <div className="flex items-center gap-3 w-full">
-                        <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-border/50 shadow-sm group flex-shrink-0">
-                          <img
-                            src={imageSrc}
-                            alt={`${color.name} variant`}
-                            className="w-full h-full object-cover"
-                          />
-                          <div className="absolute inset-0 bg-foreground/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <Button
-                              variant="destructive"
-                              size="icon"
-                              className="h-6 w-6"
-                              onClick={() => removeColorImage(color.value)}
-                              disabled={isUploading}
-                            >
-                              <X className="w-3 h-3" />
-                            </Button>
-                          </div>
+                  {hasImage ? (
+                    <div className="flex flex-col items-center gap-1.5 w-full">
+                      <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-border/50 shadow-sm group flex-shrink-0">
+                        <img
+                          src={imageSrc}
+                          alt={`${color.name} variant`}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-foreground/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <Button
+                            variant="destructive"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={() => removeColorImage(color.value)}
+                            disabled={isUploading}
+                          >
+                            <X className="w-3 h-3" />
+                          </Button>
                         </div>
-                        <div className="flex items-center gap-1.5 text-xs text-primary">
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          <span>{isRTL ? 'آپلود شده' : 'Uploaded'}</span>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-xs h-7 ms-auto"
-                          onClick={() => colorImageInputRefs.current[color.value]?.click()}
-                          disabled={isUploading}
-                        >
-                          {isRTL ? 'تغییر' : 'Change'}
-                        </Button>
                       </div>
-                    ) : (
+                      <div className="flex items-center gap-1 text-[10px] text-primary">
+                        <CheckCircle2 className="w-3 h-3" />
+                        <span>{isRTL ? 'آپلود شده' : 'Uploaded'}</span>
+                      </div>
                       <Button
-                        variant="outline"
+                        variant="ghost"
                         size="sm"
-                        className="h-9 gap-2 text-xs border-dashed hover:border-primary hover:bg-primary/5"
+                        className="text-[10px] h-6 px-2"
                         onClick={() => colorImageInputRefs.current[color.value]?.click()}
                         disabled={isUploading}
                       >
-                        <Upload className="w-3.5 h-3.5" />
-                        {isRTL ? 'آپلود تصویر' : 'Upload Image'}
+                        {isRTL ? 'تغییر' : 'Change'}
                       </Button>
-                    )}
-                  </div>
+                    </div>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8 gap-1.5 text-[10px] border-dashed hover:border-primary hover:bg-primary/5 w-full"
+                      onClick={() => colorImageInputRefs.current[color.value]?.click()}
+                      disabled={isUploading}
+                    >
+                      <Upload className="w-3 h-3" />
+                      {isRTL ? 'آپلود' : 'Upload'}
+                    </Button>
+                  )}
 
                   <input
                     ref={(el) => { colorImageInputRefs.current[color.value] = el; }}
