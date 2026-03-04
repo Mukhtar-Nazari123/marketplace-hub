@@ -180,9 +180,9 @@ const ProductCard = ({ product, getRating }: ProductCardInternalProps) => {
           {product.discount && product.discount > 0 && <Badge variant="sale">-{product.discount}%</Badge>}
         </div>
 
-        {/* Quick Actions */}
+        {/* Quick Actions - Hidden on desktop, visible on mobile/tablet */}
         <div
-          className={`absolute top-2 ${isRTL ? 'left-2' : 'right-2'} flex flex-col gap-2 transition-all duration-300 ${
+          className={`absolute top-2 ${isRTL ? 'left-2' : 'right-2'} flex flex-col gap-2 transition-all duration-300 md:hidden ${
             isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'
           }`}
         >
