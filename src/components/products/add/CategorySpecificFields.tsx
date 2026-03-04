@@ -114,7 +114,7 @@ export const CategorySpecificFields = ({
             {isRTL ? "رنگ" : "Color"}
           </Label>
           <div className="overflow-x-auto pb-2 -mx-1 px-1 scrollbar-thin">
-            <div className="flex gap-2 flex-nowrap">
+            <div className="flex gap-2 flex-wrap sm:flex-nowrap">
               {PRODUCT_COLORS.map((colorOption) => {
                 const selectedColors = (attributes.colors as string[]) || [];
                 const isSelected = selectedColors.includes(colorOption.value);
