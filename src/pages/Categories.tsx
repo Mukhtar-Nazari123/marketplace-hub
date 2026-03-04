@@ -39,7 +39,7 @@ interface DbProduct {
 
 const Categories = () => {
   const { t, language, isRTL } = useLanguage();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const selectedCategorySlug = searchParams.get("category");
   const selectedSubcategorySlug = searchParams.get("subcategory");
 
@@ -55,6 +55,8 @@ const Categories = () => {
   const [sortBy, setSortBy] = useState("latest");
   const [displayCount, setDisplayCount] = useState(24);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [filters, setFilters] = useState<FilterState>({
     priceRange: [0, 150000],
     rating: 0,
