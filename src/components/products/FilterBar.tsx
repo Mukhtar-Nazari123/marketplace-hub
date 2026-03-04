@@ -139,11 +139,9 @@ const FilterBar = ({
     if (!el) return;
     
     const scrollAmount = 200;
-    const actualDirection = isRTL 
-      ? (direction === 'left' ? 1 : -1)
-      : (direction === 'left' ? -1 : 1);
+    const multiplier = direction === 'left' ? -1 : 1;
     
-    el.scrollBy({ left: scrollAmount * actualDirection, behavior: 'smooth' });
+    el.scrollBy({ left: scrollAmount * multiplier, behavior: 'smooth' });
   };
 
   return (
