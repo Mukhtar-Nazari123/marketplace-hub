@@ -443,7 +443,7 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
                   {isRTL ? 'مشخصات اختصاصی' : 'Specific Attributes'}
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-3 sm:px-6">
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {Object.entries(formData.attributes).map(([key, value]) => {
                     if (!value) return null;
