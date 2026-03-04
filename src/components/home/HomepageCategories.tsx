@@ -29,9 +29,9 @@ const HomepageCategories = () => {
   const showSubcategories = selectedCategory && subcategories.length > 0;
   const items = showSubcategories ? subcategories : categories;
 
-  // Split items into rows - 3 rows on mobile, 2 rows on desktop
+  // Split items into rows - 2 rows on mobile, 2 rows on desktop
   const rows = useMemo(() => {
-    const rowCount = isMobile ? 3 : 2;
+    const rowCount = isMobile ? 2 : 2;
     const itemsPerRow = Math.ceil(items.length / rowCount);
     const result: typeof items[] = [];
     for (let i = 0; i < rowCount; i++) {
