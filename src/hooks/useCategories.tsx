@@ -64,7 +64,7 @@ interface CategoriesContextType {
   error: string | null;
   refetch: () => Promise<void>;
   getCategoryBySlug: (slug: string) => Category | undefined;
-  getSubcategoryBySlug: (slug: string) => Subcategory | undefined;
+  getSubcategoryBySlug: (slug: string, categoryId?: string) => Subcategory | undefined;
   getSubcategories: (categoryId: string) => Subcategory[];
   getRootCategories: () => Category[];
 }
