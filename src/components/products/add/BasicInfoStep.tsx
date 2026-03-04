@@ -22,19 +22,19 @@ export const BasicInfoStep = ({ formData, updateFormData }: BasicInfoStepProps) 
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div>
-        <h3 className="text-lg font-semibold mb-2">
+        <h3 className="text-base sm:text-lg font-semibold mb-1 sm:mb-2">
           {isRTL ? 'اطلاعات پایه محصول' : 'Basic Product Information'}
         </h3>
-        <p className="text-sm text-muted-foreground mb-6">
+        <p className="text-xs sm:text-sm text-muted-foreground mb-4 sm:mb-6">
           {isRTL 
             ? 'اطلاعات اصلی محصول را وارد کنید'
             : 'Enter the main details of your product'}
         </p>
       </div>
 
-      <div className="grid gap-6">
+      <div className="grid gap-4 sm:gap-6">
         {/* Product Name */}
         <div className="space-y-2">
           <Label htmlFor="name" className="text-sm font-medium flex items-center gap-2">
@@ -108,7 +108,7 @@ export const BasicInfoStep = ({ formData, updateFormData }: BasicInfoStepProps) 
             placeholder={isRTL 
               ? 'توضیحات کامل محصول را بنویسید. ویژگی‌ها، مزایا و اطلاعات مهم را ذکر کنید...'
               : 'Write a detailed description of your product. Include features, benefits, and important information...'}
-            minRows={6}
+            minRows={4}
             maxLength={5000}
           />
           <p className="text-xs text-muted-foreground">
