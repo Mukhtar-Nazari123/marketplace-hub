@@ -157,7 +157,8 @@ const ProductCard = ({
           to={`/products/${id}`}
           className={cn(
             "w-8 h-8 rounded-full backdrop-blur-sm flex items-center justify-center transition-all duration-300 bg-background/80 text-muted-foreground hover:bg-primary hover:text-white",
-            isHovered ? "opacity-100" : "opacity-0"
+            isHovered ? "opacity-100" : "opacity-0 md:opacity-0",
+            "max-md:opacity-100"
           )}
         >
           <Eye className="h-4 w-4" />
