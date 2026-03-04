@@ -263,7 +263,7 @@ export const ReviewStep = ({ formData }: ReviewStepProps) => {
                   {isRTL ? 'اطلاعات پایه' : 'Basic Info'}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="px-3 sm:px-6 space-y-3">
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">
                     {isRTL ? 'نام محصول' : 'Product Name'}
