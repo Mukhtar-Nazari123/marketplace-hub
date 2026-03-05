@@ -707,6 +707,50 @@ const AdminSellers = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <AlertDialogContent dir={isRTL ? 'rtl' : 'ltr'}>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+                <Trash2 className="h-5 w-5" />
+                {getLabel(lang, 'Delete Seller', 'حذف فروشنده', 'پلورونکی حذف کړئ')}
+              </AlertDialogTitle>
+              <AlertDialogDescription className="space-y-2">
+                <p>
+                  {getLabel(lang, 
+                    `Are you sure you want to delete seller "${sellerToDelete?.full_name}"? This will permanently remove:`,
+                    `آیا مطمئن هستید که می‌خواهید فروشنده «${sellerToDelete?.full_name}» را حذف کنید؟ این عملیات موارد زیر را حذف خواهد کرد:`,
+                    `ایا تاسو ډاډه یاست چې پلورونکی «${sellerToDelete?.full_name}» حذف کړئ؟ دا به لاندې شیان حذف کړي:`
+                  )}
+                </p>
+                <ul className={`text-sm space-y-1 ${isRTL ? 'pr-4' : 'pl-4'} list-disc`}>
+                  <li>{getLabel(lang, 'All products and media', 'تمام محصولات و رسانه‌ها', 'ټول محصولات او رسنۍ')}</li>
+                  <li>{getLabel(lang, 'Store verification data', 'اطلاعات تأیید فروشگاه', 'د پلورنځي تایید معلومات')}</li>
+                  <li>{getLabel(lang, 'Seller profile and role', 'پروفایل و نقش فروشنده', 'د پلورونکي پروفایل او رول')}</li>
+                </ul>
+                <p className="font-semibold text-destructive">
+                  {getLabel(lang, 'This action cannot be undone.', 'این عملیات قابل بازگشت نیست.', 'دا عملیات بیرته نشي اخیستل.')}
+                </p>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={isSubmitting}>
+                {getLabel(lang, 'Cancel', 'لغو', 'لغوه')}
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDeleteSeller}
+                disabled={isSubmitting}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {isSubmitting 
+                  ? getLabel(lang, 'Deleting...', 'در حال حذف...', 'حذفیږي...') 
+                  : getLabel(lang, 'Delete', 'حذف', 'حذف')
+                }
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </AdminLayout>
   );
