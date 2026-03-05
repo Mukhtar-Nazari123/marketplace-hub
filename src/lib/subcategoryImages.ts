@@ -102,6 +102,13 @@ export const subcategoryImageMap: Record<string, string> = {
   'beauty': beautySubcat,
   'bags': bagsSubcat,
   'womens-shoes-main': womensShoesMain,
+  // Appliances
+  'kitchen-appliances': kitchenAppliances,
+  'laundry-appliances': laundryAppliances,
+  'heating-cooling': heatingCooling,
+  'vacuum-cleaning': vacuumCleaning,
+  'irons-garment-care': ironsGarmentCare,
+  'small-appliances': smallAppliances,
 };
 
 export const getSubcategoryImage = (slug: string): string | undefined => {
