@@ -763,19 +763,19 @@ const Checkout = () => {
                   {currencyBreakdowns.map((currencyData) => (
                     <div key={currencyData.currency} className="space-y-4">
                       {/* Currency Header */}
-                      <div className="flex items-center gap-2 bg-muted/50 p-3 rounded-lg">
-                        <Badge variant="outline" className="text-base font-semibold">
-                          {currencyData.currency}
-                        </Badge>
-                        <span className="text-muted-foreground text-sm">
-                          {getLabel('Products', 'محصولات', 'محصولات')}
-                        </span>
-                      </div>
+                       <div className="flex items-center gap-2 bg-muted/50 p-2 sm:p-3 rounded-lg">
+                         <Badge variant="outline" className="text-base font-semibold">
+                           {currencyData.currency}
+                         </Badge>
+                         <span className="text-muted-foreground text-sm">
+                           {getLabel('Products', 'محصولات', 'محصولات')}
+                         </span>
+                       </div>
 
-                      {/* Sellers within this currency */}
-                      <div className="space-y-4 pl-2">
-                        {currencyData.sellers.map((seller) => (
-                          <div key={seller.sellerId} className="border rounded-lg p-4 space-y-4">
+                       {/* Sellers within this currency */}
+                       <div className="space-y-4 pl-1 sm:pl-2">
+                         {currencyData.sellers.map((seller) => (
+                           <div key={seller.sellerId} className="border rounded-lg p-2 sm:p-4 space-y-4">
                             <div className="flex items-center justify-between">
                               <Badge variant="secondary" className="text-sm">
                                 {seller.sellerName}
