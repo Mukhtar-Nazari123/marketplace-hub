@@ -835,7 +835,7 @@ const Checkout = () => {
                       </div>
 
                       {/* Currency Total */}
-                      <div className="space-y-2 bg-muted/30 p-4 rounded-lg">
+                      <div className="space-y-2 bg-muted/30 p-2 sm:p-4 rounded-lg">
                         <div className="flex justify-between font-bold text-lg">
                           <span>{getLabel('Products Total', 'جمع محصولات', 'د محصولاتو مجموعه')} ({currencyData.currency})</span>
                           <div className="text-right">
