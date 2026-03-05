@@ -382,10 +382,6 @@ const AdminProducts = () => {
                     <XCircle className="h-4 w-4 mr-1" />
                     {isRTL ? 'رد' : 'Reject'}
                   </Button>
-                  <Button size="sm" variant="destructive" onClick={() => setIsBulkDeleteDialogOpen(true)} disabled={isSubmitting}>
-                    <Trash2 className="h-4 w-4 mr-1" />
-                    {isRTL ? 'حذف' : 'Delete'}
-                  </Button>
                 </div>
               </div>
             )}
