@@ -461,12 +461,38 @@ const ProductDetail = () => {
               </div>
             )}
             
-            {/* Color Swatches */}
-            <ProductColorSwatches 
-              colorMedia={colorMedia}
-              selectedColor={selectedColor}
-              onColorSelect={handleColorSelect}
-            />
+            {/* Color Swatches - from media or attributes */}
+            {(() => {
+              // Merge colors from product_media and product_attributes
+              const colorsFromMedia = colorMedia;
+              const colorsAttr = productAttributes.find(a => a.attribute_key === 'colors');
+              let allColorMedia = [...colorsFromMedia];
+              
+              if (colorsAttr?.attribute_value) {
+                let attrColors: string[] = [];
+                try {
+                  const parsed = JSON.parse(colorsAttr.attribute_value);
+                  attrColors = Array.isArray(parsed) ? parsed.map(String) : [colorsAttr.attribute_value];
+                } catch {
+                  attrColors = colorsAttr.attribute_value.split(',').map(s => s.trim()).filter(Boolean);
+                }
+                // Add attribute colors that don't already have media entries
+                const existingColorValues = new Set(colorsFromMedia.map(m => m.color_value));
+                attrColors.forEach(cv => {
+                  if (!existingColorValues.has(cv)) {
+                    allColorMedia.push({ color_value: cv, url: '' });
+                  }
+                });
+              }
+              
+              return (
+                <ProductColorSwatches 
+                  colorMedia={allColorMedia}
+                  selectedColor={selectedColor}
+                  onColorSelect={handleColorSelect}
+                />
+              );
+            })()}
 
             {/* Available Sizes from attributes */}
             {(() => {
