@@ -461,6 +461,96 @@ const ProductDetail = () => {
               </div>
             )}
             
+            {/* Color Swatches */}
+            <ProductColorSwatches 
+              colorMedia={colorMedia}
+              selectedColor={selectedColor}
+              onColorSelect={handleColorSelect}
+            />
+
+            {/* Available Sizes from attributes */}
+            {(() => {
+              const sizesAttr = productAttributes.find(a => a.attribute_key === 'sizes');
+              const numericSizesAttr = productAttributes.find(a => a.attribute_key === 'numericSizes');
+              
+              let letterSizes: string[] = [];
+              let numericSizes: string[] = [];
+              
+              const parseArrayOrCSV = (val: string): string[] => {
+                try {
+                  const parsed = JSON.parse(val);
+                  if (Array.isArray(parsed)) return parsed.map(String);
+                } catch { /* not JSON */ }
+                // Fallback: comma-separated string
+                return val.split(',').map(s => s.trim()).filter(Boolean);
+              };
+
+              if (sizesAttr?.attribute_value) {
+                letterSizes = parseArrayOrCSV(sizesAttr.attribute_value);
+              }
+              if (numericSizesAttr?.attribute_value) {
+                numericSizes = parseArrayOrCSV(numericSizesAttr.attribute_value)
+                  .sort((a, b) => Number(a) - Number(b));
+              }
+              
+              const allSizes = [...letterSizes, ...numericSizes];
+              if (allSizes.length === 0 && Object.keys(stockPerSize).length === 0) return null;
+
+              return (
+                <div className="space-y-2">
+                  <h4 className="font-medium text-sm">
+                    {language === 'ps' ? 'موجودې اندازې' : language === 'fa' ? 'سایزهای موجود' : 'Available Sizes'}
+                  </h4>
+                  <div className="flex flex-wrap gap-1.5">
+                    {letterSizes.map((size) => (
+                      <button
+                        key={`l-${size}`}
+                        type="button"
+                        onClick={() => setSelectedSize(selectedSize === size ? null : size)}
+                        className={`min-w-[40px] h-9 px-2.5 rounded-lg border text-sm font-medium transition-colors ${
+                          selectedSize === size
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-background text-foreground border-border hover:border-primary/50'
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                    {numericSizes.map((size) => (
+                      <button
+                        key={`n-${size}`}
+                        type="button"
+                        onClick={() => setSelectedSize(selectedSize === size ? null : size)}
+                        className={`min-w-[40px] h-9 px-2.5 rounded-lg border text-sm font-medium transition-colors ${
+                          selectedSize === size
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-background text-foreground border-border hover:border-primary/50'
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                    {allSizes.length === 0 && Object.entries(stockPerSize).map(([size, stock]) => (
+                      <button
+                        key={`s-${size}`}
+                        type="button"
+                        disabled={Number(stock) <= 0}
+                        onClick={() => setSelectedSize(selectedSize === size ? null : size)}
+                        className={`min-w-[40px] h-9 px-2.5 rounded-lg border text-sm font-medium transition-colors ${
+                          Number(stock) <= 0
+                            ? 'opacity-40 cursor-not-allowed bg-muted text-muted-foreground line-through'
+                            : selectedSize === size
+                              ? 'bg-primary text-primary-foreground border-primary'
+                              : 'bg-background text-foreground border-border hover:border-primary/50'
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
             
           </div>
 
@@ -623,96 +713,6 @@ const ProductDetail = () => {
                 </div>
               )}
             </div>
-
-            {/* Color Swatches */}
-            <ProductColorSwatches 
-              colorMedia={colorMedia}
-              selectedColor={selectedColor}
-              onColorSelect={handleColorSelect}
-            />
-
-            {/* Available Sizes from attributes */}
-            {(() => {
-              const sizesAttr = productAttributes.find(a => a.attribute_key === 'sizes');
-              const numericSizesAttr = productAttributes.find(a => a.attribute_key === 'numericSizes');
-              
-              let letterSizes: string[] = [];
-              let numericSizes: string[] = [];
-              
-              const parseArrayOrCSV = (val: string): string[] => {
-                try {
-                  const parsed = JSON.parse(val);
-                  if (Array.isArray(parsed)) return parsed.map(String);
-                } catch { /* not JSON */ }
-                return val.split(',').map(s => s.trim()).filter(Boolean);
-              };
-
-              if (sizesAttr?.attribute_value) {
-                letterSizes = parseArrayOrCSV(sizesAttr.attribute_value);
-              }
-              if (numericSizesAttr?.attribute_value) {
-                numericSizes = parseArrayOrCSV(numericSizesAttr.attribute_value)
-                  .sort((a, b) => Number(a) - Number(b));
-              }
-              
-              const allSizes = [...letterSizes, ...numericSizes];
-              if (allSizes.length === 0 && Object.keys(stockPerSize).length === 0) return null;
-
-              return (
-                <div className="space-y-2">
-                  <h4 className="font-medium text-sm">
-                    {language === 'ps' ? 'موجودې اندازې' : language === 'fa' ? 'سایزهای موجود' : 'Available Sizes'}
-                  </h4>
-                  <div className="flex flex-wrap gap-1.5">
-                    {letterSizes.map((size) => (
-                      <button
-                        key={`l-${size}`}
-                        type="button"
-                        onClick={() => setSelectedSize(selectedSize === size ? null : size)}
-                        className={`min-w-[40px] h-9 px-2.5 rounded-lg border text-sm font-medium transition-colors ${
-                          selectedSize === size
-                            ? 'bg-primary text-primary-foreground border-primary'
-                            : 'bg-background text-foreground border-border hover:border-primary/50'
-                        }`}
-                      >
-                        {size}
-                      </button>
-                    ))}
-                    {numericSizes.map((size) => (
-                      <button
-                        key={`n-${size}`}
-                        type="button"
-                        onClick={() => setSelectedSize(selectedSize === size ? null : size)}
-                        className={`min-w-[40px] h-9 px-2.5 rounded-lg border text-sm font-medium transition-colors ${
-                          selectedSize === size
-                            ? 'bg-primary text-primary-foreground border-primary'
-                            : 'bg-background text-foreground border-border hover:border-primary/50'
-                        }`}
-                      >
-                        {size}
-                      </button>
-                    ))}
-                    {allSizes.length === 0 && Object.entries(stockPerSize).map(([size, stock]) => (
-                      <button
-                        key={`s-${size}`}
-                        type="button"
-                        disabled={Number(stock) <= 0}
-                        onClick={() => setSelectedSize(selectedSize === size ? null : size)}
-                        className={`min-w-[40px] h-9 px-2.5 rounded-lg border text-sm font-medium transition-colors ${
-                          Number(stock) <= 0
-                            ? 'opacity-40 cursor-not-allowed bg-muted text-muted-foreground line-through'
-                            : selectedSize === size
-                              ? 'bg-primary text-primary-foreground border-primary'
-                              : 'bg-background text-foreground border-border hover:border-primary/50'
-                        }`}
-                      >
-                        {size}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              );
-            })()}
 
             {/* Quantity & Add to Cart */}
             {(product.quantity > 0 || Object.values(stockPerSize).some(v => Number(v) > 0)) && (
