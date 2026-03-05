@@ -15,6 +15,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { addHours, format } from 'date-fns';
 import CartRecommendations from '@/components/cart/CartRecommendations';
 import CartItemVariantSelector from '@/components/cart/CartItemVariantSelector';
+import { toast } from '@/hooks/use-toast';
 
 interface CartItemProduct {
   id: string;
