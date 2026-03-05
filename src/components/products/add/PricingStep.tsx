@@ -83,7 +83,9 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
   const priceValid = formData.price > 0;
   const discountValid = !formData.discountPrice || formData.discountPrice < formData.price;
   const stockValid = isClothing 
-    ? Object.values(formData.stockPerSize || {}).some(v => (Number(v) || 0) > 0)
+    ? (selectedSizes.length > 0 || hasCustomSize
+        ? Object.values(formData.stockPerSize || {}).some(v => (Number(v) || 0) > 0)
+        : formData.quantity > 0)
     : formData.quantity > 0;
 
   // Get selected sizes from attributes (from CategorySpecificFields)
