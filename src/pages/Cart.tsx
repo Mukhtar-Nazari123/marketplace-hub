@@ -51,6 +51,7 @@ const Cart = () => {
   const navigate = useNavigate();
   const [deliveryOptionsMap, setDeliveryOptionsMap] = useState<Record<string, DeliveryOptionData>>({});
   const [colorImagesMap, setColorImagesMap] = useState<Record<string, string | null>>({});
+  const [variantInfoMap, setVariantInfoMap] = useState<Record<string, { hasColors: boolean; hasSizes: boolean }>>({});
 
   const handleColorImageChange = useCallback((productId: string, imageUrl: string | null) => {
     setColorImagesMap(prev => ({ ...prev, [productId]: imageUrl }));
