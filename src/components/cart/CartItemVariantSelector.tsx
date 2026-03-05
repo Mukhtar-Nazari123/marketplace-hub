@@ -26,6 +26,7 @@ interface CartItemVariantSelectorProps {
   onSizeChange: (size: string | null) => void;
   onDeliveryOptionChange: (optionId: string | null) => void;
   onColorImageChange?: (imageUrl: string | null) => void;
+  onVariantInfoChange?: (info: { hasColors: boolean; hasSizes: boolean }) => void;
 }
 
 interface ProductVariants {
