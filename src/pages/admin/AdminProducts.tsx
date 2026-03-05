@@ -590,6 +590,28 @@ const AdminProducts = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Bulk Delete Confirmation Dialog */}
+        <Dialog open={isBulkDeleteDialogOpen} onOpenChange={setIsBulkDeleteDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{isRTL ? 'حذف محصولات' : 'Delete Products'}</DialogTitle>
+              <DialogDescription>
+                {isRTL
+                  ? `آیا مطمئن هستید که می‌خواهید ${selectedIds.size} محصول را حذف کنید؟ این عمل قابل بازگشت نیست.`
+                  : `Are you sure you want to delete ${selectedIds.size} products? This action cannot be undone.`}
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsBulkDeleteDialogOpen(false)}>
+                {isRTL ? 'انصراف' : 'Cancel'}
+              </Button>
+              <Button variant="destructive" onClick={handleBulkDelete} disabled={isSubmitting}>
+                {isSubmitting ? (isRTL ? 'در حال حذف...' : 'Deleting...') : (isRTL ? 'حذف' : 'Delete')}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </AdminLayout>
   );
