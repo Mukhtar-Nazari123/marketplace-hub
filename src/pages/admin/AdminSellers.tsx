@@ -298,19 +298,24 @@ const AdminSellers = () => {
       const sellerId = sellerToDelete.user_id;
 
       // Delete seller's products (cascades to product_media, product_attributes, product_translations, delivery_options)
-      await supabase.from('products').delete().eq('seller_id', sellerId);
+      const { error: prodErr } = await supabase.from('products').delete().eq('seller_id', sellerId);
+      if (prodErr) throw prodErr;
 
       // Delete seller verification
-      await supabase.from('seller_verifications').delete().eq('seller_id', sellerId);
+      const { error: verErr } = await supabase.from('seller_verifications').delete().eq('seller_id', sellerId);
+      if (verErr) throw verErr;
 
       // Delete notifications for this seller
-      await supabase.from('notifications').delete().eq('user_id', sellerId);
+      const { error: notifErr } = await supabase.from('notifications').delete().eq('user_id', sellerId);
+      if (notifErr) throw notifErr;
 
       // Delete user role
-      await supabase.from('user_roles').delete().eq('user_id', sellerId);
+      const { error: roleErr } = await supabase.from('user_roles').delete().eq('user_id', sellerId);
+      if (roleErr) throw roleErr;
 
       // Delete profile
-      await supabase.from('profiles').delete().eq('user_id', sellerId);
+      const { error: profErr } = await supabase.from('profiles').delete().eq('user_id', sellerId);
+      if (profErr) throw profErr;
 
       toast.success(getLabel(lang, 'Seller deleted successfully', 'فروشنده با موفقیت حذف شد', 'پلورونکی په بریالیتوب سره حذف شو'));
       setIsDeleteDialogOpen(false);
