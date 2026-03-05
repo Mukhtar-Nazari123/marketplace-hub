@@ -395,7 +395,7 @@ const AdminProducts = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-10 pr-3">
+                    <TableHead className="w-12 px-4">
                       <Checkbox
                         checked={allSelected}
                         ref={(el) => {
