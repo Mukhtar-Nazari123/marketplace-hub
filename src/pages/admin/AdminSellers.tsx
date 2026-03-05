@@ -743,8 +743,11 @@ const AdminSellers = () => {
               <AlertDialogCancel disabled={isSubmitting}>
                 {getLabel(lang, 'Cancel', 'لغو', 'لغوه')}
               </AlertDialogCancel>
-              <AlertDialogAction
-                onClick={handleDeleteSeller}
+              <Button
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleDeleteSeller();
+                }}
                 disabled={isSubmitting}
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               >
@@ -752,7 +755,7 @@ const AdminSellers = () => {
                   ? getLabel(lang, 'Deleting...', 'در حال حذف...', 'حذفیږي...') 
                   : getLabel(lang, 'Delete', 'حذف', 'حذف')
                 }
-              </AlertDialogAction>
+              </Button>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
