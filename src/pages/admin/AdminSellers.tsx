@@ -291,6 +291,39 @@ const AdminSellers = () => {
     setIsViewDialogOpen(true);
   };
 
+  const handleDeleteSeller = async () => {
+    if (!sellerToDelete) return;
+    setIsSubmitting(true);
+    try {
+      const sellerId = sellerToDelete.user_id;
+
+      // Delete seller's products (cascades to product_media, product_attributes, product_translations, delivery_options)
+      await supabase.from('products').delete().eq('seller_id', sellerId);
+
+      // Delete seller verification
+      await supabase.from('seller_verifications').delete().eq('seller_id', sellerId);
+
+      // Delete notifications for this seller
+      await supabase.from('notifications').delete().eq('user_id', sellerId);
+
+      // Delete user role
+      await supabase.from('user_roles').delete().eq('user_id', sellerId);
+
+      // Delete profile
+      await supabase.from('profiles').delete().eq('user_id', sellerId);
+
+      toast.success(getLabel(lang, 'Seller deleted successfully', 'فروشنده با موفقیت حذف شد', 'پلورونکی په بریالیتوب سره حذف شو'));
+      setIsDeleteDialogOpen(false);
+      setSellerToDelete(null);
+      fetchSellers();
+    } catch (error) {
+      console.error('Error deleting seller:', error);
+      toast.error(getLabel(lang, 'Failed to delete seller', 'خطا در حذف فروشنده', 'د پلورونکي په حذفولو کې تېروتنه'));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const searchIconClass = isRTL ? 'right-3' : 'left-3';
   const inputPaddingClass = isRTL ? 'pr-9' : 'pl-9';
   const iconMargin = isRTL ? 'ml-2' : 'mr-2';
