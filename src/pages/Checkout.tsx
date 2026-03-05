@@ -642,7 +642,7 @@ const Checkout = () => {
 
           {/* Stepper */}
           <Card className="mb-8 overflow-hidden">
-            <CardContent className="pt-6 px-3 sm:px-6">
+            <CardContent className="pt-6 px-2 sm:px-6">
               <div className={cn('flex items-center', isRTL && 'flex-row-reverse')}>
                 {STEPS.map((step, index) => {
                   const Icon = step.icon;
@@ -696,7 +696,7 @@ const Checkout = () => {
 
           {/* Step Content */}
           <Card>
-            <CardContent className="pt-6">
+            <CardContent className="pt-3 sm:pt-6 px-2 sm:px-6">
               {/* Step 1: Address */}
               {currentStep === 1 && (
                 <div className="space-y-6">
@@ -763,19 +763,19 @@ const Checkout = () => {
                   {currencyBreakdowns.map((currencyData) => (
                     <div key={currencyData.currency} className="space-y-4">
                       {/* Currency Header */}
-                      <div className="flex items-center gap-2 bg-muted/50 p-3 rounded-lg">
-                        <Badge variant="outline" className="text-base font-semibold">
-                          {currencyData.currency}
-                        </Badge>
-                        <span className="text-muted-foreground text-sm">
-                          {getLabel('Products', 'محصولات', 'محصولات')}
-                        </span>
-                      </div>
+                       <div className="flex items-center gap-2 bg-muted/50 p-2 sm:p-3 rounded-lg">
+                         <Badge variant="outline" className="text-base font-semibold">
+                           {currencyData.currency}
+                         </Badge>
+                         <span className="text-muted-foreground text-sm">
+                           {getLabel('Products', 'محصولات', 'محصولات')}
+                         </span>
+                       </div>
 
-                      {/* Sellers within this currency */}
-                      <div className="space-y-4 pl-2">
-                        {currencyData.sellers.map((seller) => (
-                          <div key={seller.sellerId} className="border rounded-lg p-4 space-y-4">
+                       {/* Sellers within this currency */}
+                       <div className="space-y-4 pl-1 sm:pl-2">
+                         {currencyData.sellers.map((seller) => (
+                           <div key={seller.sellerId} className="border rounded-lg p-2 sm:p-4 space-y-4">
                             <div className="flex items-center justify-between">
                               <Badge variant="secondary" className="text-sm">
                                 {seller.sellerName}
@@ -835,7 +835,7 @@ const Checkout = () => {
                       </div>
 
                       {/* Currency Total */}
-                      <div className="space-y-2 bg-muted/30 p-4 rounded-lg">
+                      <div className="space-y-2 bg-muted/30 p-2 sm:p-4 rounded-lg">
                         <div className="flex justify-between font-bold text-lg">
                           <span>{getLabel('Products Total', 'جمع محصولات', 'د محصولاتو مجموعه')} ({currencyData.currency})</span>
                           <div className="text-right">
