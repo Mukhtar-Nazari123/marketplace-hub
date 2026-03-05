@@ -1,0 +1,1 @@
+UPDATE subcategories SET name_fa = 'پلاس سایز' WHERE id = 'beee1f6b-163e-44e9-b6fe-a84ebfa46594';
