@@ -352,6 +352,7 @@ const Cart = () => {
                             onSizeChange={(size) => updateVariants(item.product_id, item.selected_color, size)}
                             onDeliveryOptionChange={(optionId) => updateDeliveryOption(item.product_id, optionId)}
                             onColorImageChange={(imageUrl) => handleColorImageChange(item.product_id, imageUrl)}
+                            onVariantInfoChange={(info) => setVariantInfoMap(prev => ({ ...prev, [item.product_id]: info }))}
                           />
 
                           {/* Price, Quantity & Total - right-aligned block */}
