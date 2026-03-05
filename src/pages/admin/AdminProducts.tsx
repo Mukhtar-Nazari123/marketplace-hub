@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Table,
   TableBody,
@@ -99,6 +100,88 @@ const AdminProducts = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
+
+  const allSelected = filteredProducts.length > 0 && selectedIds.size === filteredProducts.length;
+  const someSelected = selectedIds.size > 0 && selectedIds.size < filteredProducts.length;
+
+  const toggleSelectAll = () => {
+    if (allSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredProducts.map(p => p.id)));
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const handleBulkApprove = async () => {
+    if (selectedIds.size === 0) return;
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase
+        .from('products')
+        .update({ status: 'active' })
+        .in('id', Array.from(selectedIds));
+      if (error) throw error;
+      toast.success(isRTL ? `${selectedIds.size} محصول تأیید شد` : `${selectedIds.size} products approved`);
+      setSelectedIds(new Set());
+      fetchProducts();
+    } catch (error) {
+      console.error('Error bulk approving:', error);
+      toast.error(isRTL ? 'خطا در تأیید محصولات' : 'Error approving products');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleBulkReject = async () => {
+    if (selectedIds.size === 0) return;
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase
+        .from('products')
+        .update({ status: 'rejected', rejection_reason: 'Bulk rejected by admin' })
+        .in('id', Array.from(selectedIds));
+      if (error) throw error;
+      toast.success(isRTL ? `${selectedIds.size} محصول رد شد` : `${selectedIds.size} products rejected`);
+      setSelectedIds(new Set());
+      fetchProducts();
+    } catch (error) {
+      console.error('Error bulk rejecting:', error);
+      toast.error(isRTL ? 'خطا در رد محصولات' : 'Error rejecting products');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase
+        .from('products')
+        .delete()
+        .in('id', Array.from(selectedIds));
+      if (error) throw error;
+      toast.success(isRTL ? `${selectedIds.size} محصول حذف شد` : `${selectedIds.size} products deleted`);
+      setSelectedIds(new Set());
+      setIsBulkDeleteDialogOpen(false);
+      fetchProducts();
+    } catch (error) {
+      console.error('Error bulk deleting:', error);
+      toast.error(isRTL ? 'خطا در حذف محصولات' : 'Error deleting products');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const fetchProducts = async () => {
     setIsLoading(true);
@@ -284,11 +367,45 @@ const AdminProducts = () => {
               </Select>
             </div>
 
+            {/* Bulk Actions Bar */}
+            {selectedIds.size > 0 && (
+              <div className="mb-4 flex flex-wrap items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 p-3">
+                <span className="text-sm font-medium">
+                  {isRTL ? `${selectedIds.size} محصول انتخاب شده` : `${selectedIds.size} selected`}
+                </span>
+                <div className={`flex gap-2 ${isRTL ? 'mr-auto' : 'ml-auto'}`}>
+                  <Button size="sm" variant="outline" onClick={handleBulkApprove} disabled={isSubmitting} className="text-success border-success/30">
+                    <CheckCircle className="h-4 w-4 mr-1" />
+                    {isRTL ? 'تأیید' : 'Approve'}
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={handleBulkReject} disabled={isSubmitting} className="text-warning border-warning/30">
+                    <XCircle className="h-4 w-4 mr-1" />
+                    {isRTL ? 'رد' : 'Reject'}
+                  </Button>
+                  <Button size="sm" variant="destructive" onClick={() => setIsBulkDeleteDialogOpen(true)} disabled={isSubmitting}>
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    {isRTL ? 'حذف' : 'Delete'}
+                  </Button>
+                </div>
+              </div>
+            )}
+
             {/* Table */}
             <div className="rounded-md border">
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="w-10">
+                      <Checkbox
+                        checked={allSelected}
+                        ref={(el) => {
+                          if (el) {
+                            (el as any).indeterminate = someSelected;
+                          }
+                        }}
+                        onCheckedChange={toggleSelectAll}
+                      />
+                    </TableHead>
                     <TableHead>{t.admin.products.product}</TableHead>
                     <TableHead>{t.admin.products.price}</TableHead>
                     <TableHead>{t.admin.products.status}</TableHead>
@@ -298,34 +415,31 @@ const AdminProducts = () => {
                 </TableHeader>
                 <TableBody>
                   {isLoading ? (
-                    [...Array(5)].map((_, i) => (
+                     [...Array(5)].map((_, i) => (
                       <TableRow key={i}>
-                        <TableCell>
-                          <div className="h-4 w-40 animate-pulse rounded bg-muted" />
-                        </TableCell>
-                        <TableCell>
-                          <div className="h-4 w-20 animate-pulse rounded bg-muted" />
-                        </TableCell>
-                        <TableCell>
-                          <div className="h-6 w-16 animate-pulse rounded bg-muted" />
-                        </TableCell>
-                        <TableCell>
-                          <div className="h-4 w-24 animate-pulse rounded bg-muted" />
-                        </TableCell>
-                        <TableCell>
-                          <div className="h-8 w-8 animate-pulse rounded bg-muted" />
-                        </TableCell>
+                        <TableCell><div className="h-4 w-4 animate-pulse rounded bg-muted" /></TableCell>
+                        <TableCell><div className="h-4 w-40 animate-pulse rounded bg-muted" /></TableCell>
+                        <TableCell><div className="h-4 w-20 animate-pulse rounded bg-muted" /></TableCell>
+                        <TableCell><div className="h-6 w-16 animate-pulse rounded bg-muted" /></TableCell>
+                        <TableCell><div className="h-4 w-24 animate-pulse rounded bg-muted" /></TableCell>
+                        <TableCell><div className="h-8 w-8 animate-pulse rounded bg-muted" /></TableCell>
                       </TableRow>
                     ))
                   ) : filteredProducts.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={5} className="h-24 text-center">
+                      <TableCell colSpan={6} className="h-24 text-center">
                         {t.admin.products.noProducts}
                       </TableCell>
                     </TableRow>
                   ) : (
                     filteredProducts.map((product) => (
-                      <TableRow key={product.id} className="hover:bg-muted/50 transition-colors">
+                      <TableRow key={product.id} className={`hover:bg-muted/50 transition-colors ${selectedIds.has(product.id) ? 'bg-primary/5' : ''}`}>
+                        <TableCell>
+                          <Checkbox
+                            checked={selectedIds.has(product.id)}
+                            onCheckedChange={() => toggleSelect(product.id)}
+                          />
+                        </TableCell>
                         <TableCell>
                           <div className="font-medium">{getProductDisplayName(product)}</div>
                         </TableCell>
@@ -471,6 +585,28 @@ const AdminProducts = () => {
                 onClick={handleDelete}
                 disabled={isSubmitting}
               >
+                {isSubmitting ? (isRTL ? 'در حال حذف...' : 'Deleting...') : (isRTL ? 'حذف' : 'Delete')}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Bulk Delete Confirmation Dialog */}
+        <Dialog open={isBulkDeleteDialogOpen} onOpenChange={setIsBulkDeleteDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{isRTL ? 'حذف محصولات' : 'Delete Products'}</DialogTitle>
+              <DialogDescription>
+                {isRTL
+                  ? `آیا مطمئن هستید که می‌خواهید ${selectedIds.size} محصول را حذف کنید؟ این عمل قابل بازگشت نیست.`
+                  : `Are you sure you want to delete ${selectedIds.size} products? This action cannot be undone.`}
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsBulkDeleteDialogOpen(false)}>
+                {isRTL ? 'انصراف' : 'Cancel'}
+              </Button>
+              <Button variant="destructive" onClick={handleBulkDelete} disabled={isSubmitting}>
                 {isSubmitting ? (isRTL ? 'در حال حذف...' : 'Deleting...') : (isRTL ? 'حذف' : 'Delete')}
               </Button>
             </DialogFooter>
