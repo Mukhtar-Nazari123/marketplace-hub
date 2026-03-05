@@ -41,7 +41,18 @@ import {
   Truck,
   RotateCcw,
   Image,
+  Trash2,
 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import { useLanguage, formatDate } from '@/lib/i18n';
 
@@ -95,7 +106,8 @@ const AdminSellers = () => {
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [sellerToDelete, setSellerToDelete] = useState<SellerData | null>(null);
   const fetchSellers = async () => {
     setIsLoading(true);
     try {
@@ -279,6 +291,39 @@ const AdminSellers = () => {
     setIsViewDialogOpen(true);
   };
 
+  const handleDeleteSeller = async () => {
+    if (!sellerToDelete) return;
+    setIsSubmitting(true);
+    try {
+      const sellerId = sellerToDelete.user_id;
+
+      // Delete seller's products (cascades to product_media, product_attributes, product_translations, delivery_options)
+      await supabase.from('products').delete().eq('seller_id', sellerId);
+
+      // Delete seller verification
+      await supabase.from('seller_verifications').delete().eq('seller_id', sellerId);
+
+      // Delete notifications for this seller
+      await supabase.from('notifications').delete().eq('user_id', sellerId);
+
+      // Delete user role
+      await supabase.from('user_roles').delete().eq('user_id', sellerId);
+
+      // Delete profile
+      await supabase.from('profiles').delete().eq('user_id', sellerId);
+
+      toast.success(getLabel(lang, 'Seller deleted successfully', 'فروشنده با موفقیت حذف شد', 'پلورونکی په بریالیتوب سره حذف شو'));
+      setIsDeleteDialogOpen(false);
+      setSellerToDelete(null);
+      fetchSellers();
+    } catch (error) {
+      console.error('Error deleting seller:', error);
+      toast.error(getLabel(lang, 'Failed to delete seller', 'خطا در حذف فروشنده', 'د پلورونکي په حذفولو کې تېروتنه'));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const searchIconClass = isRTL ? 'right-3' : 'left-3';
   const inputPaddingClass = isRTL ? 'pr-9' : 'pl-9';
   const iconMargin = isRTL ? 'ml-2' : 'mr-2';
@@ -406,6 +451,17 @@ const AdminSellers = () => {
                               onClick={() => handleViewSeller(seller)}
                             >
                               <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                              onClick={() => {
+                                setSellerToDelete(seller);
+                                setIsDeleteDialogOpen(true);
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
                         </TableCell>
@@ -651,6 +707,50 @@ const AdminSellers = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <AlertDialogContent dir={isRTL ? 'rtl' : 'ltr'}>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+                <Trash2 className="h-5 w-5" />
+                {getLabel(lang, 'Delete Seller', 'حذف فروشنده', 'پلورونکی حذف کړئ')}
+              </AlertDialogTitle>
+              <AlertDialogDescription className="space-y-2">
+                <p>
+                  {getLabel(lang, 
+                    `Are you sure you want to delete seller "${sellerToDelete?.full_name}"? This will permanently remove:`,
+                    `آیا مطمئن هستید که می‌خواهید فروشنده «${sellerToDelete?.full_name}» را حذف کنید؟ این عملیات موارد زیر را حذف خواهد کرد:`,
+                    `ایا تاسو ډاډه یاست چې پلورونکی «${sellerToDelete?.full_name}» حذف کړئ؟ دا به لاندې شیان حذف کړي:`
+                  )}
+                </p>
+                <ul className={`text-sm space-y-1 ${isRTL ? 'pr-4' : 'pl-4'} list-disc`}>
+                  <li>{getLabel(lang, 'All products and media', 'تمام محصولات و رسانه‌ها', 'ټول محصولات او رسنۍ')}</li>
+                  <li>{getLabel(lang, 'Store verification data', 'اطلاعات تأیید فروشگاه', 'د پلورنځي تایید معلومات')}</li>
+                  <li>{getLabel(lang, 'Seller profile and role', 'پروفایل و نقش فروشنده', 'د پلورونکي پروفایل او رول')}</li>
+                </ul>
+                <p className="font-semibold text-destructive">
+                  {getLabel(lang, 'This action cannot be undone.', 'این عملیات قابل بازگشت نیست.', 'دا عملیات بیرته نشي اخیستل.')}
+                </p>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={isSubmitting}>
+                {getLabel(lang, 'Cancel', 'لغو', 'لغوه')}
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDeleteSeller}
+                disabled={isSubmitting}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {isSubmitting 
+                  ? getLabel(lang, 'Deleting...', 'در حال حذف...', 'حذفیږي...') 
+                  : getLabel(lang, 'Delete', 'حذف', 'حذف')
+                }
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </AdminLayout>
   );
