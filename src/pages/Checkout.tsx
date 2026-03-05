@@ -635,7 +635,7 @@ const Checkout = () => {
     <PublicLayout showFooter={true}>
       <div className={cn(isRTL && 'rtl')}>
 
-      <main className="flex-1 container mx-auto px-4 py-8">
+      <main className="flex-1 container mx-auto px-2 sm:px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Page Title */}
           <h1 className="text-2xl font-bold mb-8">{t.checkout.title}</h1>
