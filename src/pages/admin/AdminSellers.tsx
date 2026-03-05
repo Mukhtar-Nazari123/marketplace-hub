@@ -106,7 +106,8 @@ const AdminSellers = () => {
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [sellerToDelete, setSellerToDelete] = useState<SellerData | null>(null);
   const fetchSellers = async () => {
     setIsLoading(true);
     try {
