@@ -15,6 +15,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { addHours, format } from 'date-fns';
 import CartRecommendations from '@/components/cart/CartRecommendations';
 import CartItemVariantSelector from '@/components/cart/CartItemVariantSelector';
+import { toast } from '@/hooks/use-toast';
 
 interface CartItemProduct {
   id: string;
@@ -50,6 +51,7 @@ const Cart = () => {
   const navigate = useNavigate();
   const [deliveryOptionsMap, setDeliveryOptionsMap] = useState<Record<string, DeliveryOptionData>>({});
   const [colorImagesMap, setColorImagesMap] = useState<Record<string, string | null>>({});
+  const [variantInfoMap, setVariantInfoMap] = useState<Record<string, { hasColors: boolean; hasSizes: boolean }>>({});
 
   const handleColorImageChange = useCallback((productId: string, imageUrl: string | null) => {
     setColorImagesMap(prev => ({ ...prev, [productId]: imageUrl }));
@@ -350,6 +352,7 @@ const Cart = () => {
                             onSizeChange={(size) => updateVariants(item.product_id, item.selected_color, size)}
                             onDeliveryOptionChange={(optionId) => updateDeliveryOption(item.product_id, optionId)}
                             onColorImageChange={(imageUrl) => handleColorImageChange(item.product_id, imageUrl)}
+                            onVariantInfoChange={(info) => setVariantInfoMap(prev => ({ ...prev, [item.product_id]: info }))}
                           />
 
                           {/* Price, Quantity & Total - right-aligned block */}
@@ -566,7 +569,33 @@ const Cart = () => {
                   )}
                 </CardContent>
                 <CardFooter>
-                  <Button className="w-full" variant="cyan" size="lg" onClick={() => navigate('/checkout')}>
+                  <Button className="w-full" variant="cyan" size="lg" onClick={() => {
+                    // Validate color and size selections
+                    const missingSelections: string[] = [];
+                    items.forEach(item => {
+                      const info = variantInfoMap[item.product_id];
+                      if (info?.hasColors && !item.selected_color) {
+                        missingSelections.push(item.product?.name || 'Product');
+                      }
+                      if (info?.hasSizes && !item.selected_size) {
+                        missingSelections.push(item.product?.name || 'Product');
+                      }
+                    });
+
+                    if (missingSelections.length > 0) {
+                      toast({
+                        title: getLabel('Selection Required', 'انتخاب الزامی است', 'انتخاب اړین دی'),
+                        description: getLabel(
+                          'Please select color and size for all products before checkout.',
+                          'لطفاً رنگ و سایز را برای همه محصولات قبل از تکمیل خرید انتخاب کنید.',
+                          'مهرباني وکړئ د پېرود دمخه د ټولو محصولاتو لپاره رنګ او اندازه غوره کړئ.'
+                        ),
+                        variant: 'destructive',
+                      });
+                      return;
+                    }
+                    navigate('/checkout');
+                  }}>
                     {texts.checkout}
                   </Button>
                 </CardFooter>

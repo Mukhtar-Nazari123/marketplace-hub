@@ -26,6 +26,7 @@ interface CartItemVariantSelectorProps {
   onSizeChange: (size: string | null) => void;
   onDeliveryOptionChange: (optionId: string | null) => void;
   onColorImageChange?: (imageUrl: string | null) => void;
+  onVariantInfoChange?: (info: { hasColors: boolean; hasSizes: boolean }) => void;
 }
 
 interface ProductVariants {
@@ -258,6 +259,7 @@ const CartItemVariantSelector = ({
   onSizeChange,
   onDeliveryOptionChange,
   onColorImageChange,
+  onVariantInfoChange,
 }: CartItemVariantSelectorProps) => {
   const [variants, setVariants] = useState<ProductVariants>({ colors: [], sizes: [], deliveryOptions: [], colorImageMap: {} });
   const [loading, setLoading] = useState(true);
@@ -296,7 +298,35 @@ const CartItemVariantSelector = ({
           .maybeSingle();
 
         const stockPerSize = (product?.metadata as any)?.stockPerSize || {};
-        const sizes = Object.keys(stockPerSize).filter(size => Number(stockPerSize[size]) > 0);
+        let sizes = Object.keys(stockPerSize).filter(size => Number(stockPerSize[size]) > 0);
+
+        // Also fetch sizes from product_attributes if metadata has none
+        if (sizes.length === 0) {
+          const { data: sizeAttrs } = await supabase
+            .from('product_attributes')
+            .select('attribute_key, attribute_value')
+            .eq('product_id', productId)
+            .in('attribute_key', ['sizes', 'numeric_sizes']);
+
+          const parseArrayOrCSV = (val: string): string[] => {
+            try {
+              const parsed = JSON.parse(val);
+              if (Array.isArray(parsed)) return parsed.map(String);
+            } catch { /* not JSON */ }
+            return val.split(',').map(s => s.trim()).filter(Boolean);
+          };
+
+          sizeAttrs?.forEach(attr => {
+            if (attr.attribute_value) {
+              const parsed = parseArrayOrCSV(attr.attribute_value);
+              if (parsed.length > 0 && sizes.length === 0) {
+                sizes = attr.attribute_key === 'numeric_sizes'
+                  ? parsed.sort((a, b) => Number(a) - Number(b))
+                  : parsed;
+              }
+            }
+          });
+        }
 
         // Fetch delivery options
         const { data: deliveryOptions } = await supabase
@@ -312,6 +342,9 @@ const CartItemVariantSelector = ({
           deliveryOptions: deliveryOptions || [],
           colorImageMap,
         });
+
+        // Notify parent about variant availability
+        onVariantInfoChange?.({ hasColors: colors.length > 0, hasSizes: sizes.length > 0 });
 
         // Auto-select first available variant if not already selected
         if (colors.length > 0 && !selectedColor) {
