@@ -415,34 +415,31 @@ const AdminProducts = () => {
                 </TableHeader>
                 <TableBody>
                   {isLoading ? (
-                    [...Array(5)].map((_, i) => (
+                     [...Array(5)].map((_, i) => (
                       <TableRow key={i}>
-                        <TableCell>
-                          <div className="h-4 w-40 animate-pulse rounded bg-muted" />
-                        </TableCell>
-                        <TableCell>
-                          <div className="h-4 w-20 animate-pulse rounded bg-muted" />
-                        </TableCell>
-                        <TableCell>
-                          <div className="h-6 w-16 animate-pulse rounded bg-muted" />
-                        </TableCell>
-                        <TableCell>
-                          <div className="h-4 w-24 animate-pulse rounded bg-muted" />
-                        </TableCell>
-                        <TableCell>
-                          <div className="h-8 w-8 animate-pulse rounded bg-muted" />
-                        </TableCell>
+                        <TableCell><div className="h-4 w-4 animate-pulse rounded bg-muted" /></TableCell>
+                        <TableCell><div className="h-4 w-40 animate-pulse rounded bg-muted" /></TableCell>
+                        <TableCell><div className="h-4 w-20 animate-pulse rounded bg-muted" /></TableCell>
+                        <TableCell><div className="h-6 w-16 animate-pulse rounded bg-muted" /></TableCell>
+                        <TableCell><div className="h-4 w-24 animate-pulse rounded bg-muted" /></TableCell>
+                        <TableCell><div className="h-8 w-8 animate-pulse rounded bg-muted" /></TableCell>
                       </TableRow>
                     ))
                   ) : filteredProducts.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={5} className="h-24 text-center">
+                      <TableCell colSpan={6} className="h-24 text-center">
                         {t.admin.products.noProducts}
                       </TableCell>
                     </TableRow>
                   ) : (
                     filteredProducts.map((product) => (
-                      <TableRow key={product.id} className="hover:bg-muted/50 transition-colors">
+                      <TableRow key={product.id} className={`hover:bg-muted/50 transition-colors ${selectedIds.has(product.id) ? 'bg-primary/5' : ''}`}>
+                        <TableCell>
+                          <Checkbox
+                            checked={selectedIds.has(product.id)}
+                            onCheckedChange={() => toggleSelect(product.id)}
+                          />
+                        </TableCell>
                         <TableCell>
                           <div className="font-medium">{getProductDisplayName(product)}</div>
                         </TableCell>
