@@ -79,15 +79,6 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
   const currencySymbol = '؋';
   const currencyLabel = 'AFN';
 
-  // Validation states
-  const priceValid = formData.price > 0;
-  const discountValid = !formData.discountPrice || formData.discountPrice < formData.price;
-  const stockValid = isClothing 
-    ? (selectedSizes.length > 0 || hasCustomSize
-        ? Object.values(formData.stockPerSize || {}).some(v => (Number(v) || 0) > 0)
-        : formData.quantity > 0)
-    : formData.quantity > 0;
-
   // Get selected sizes from attributes (from CategorySpecificFields)
   const selectedSizes = useMemo(() => {
     const sizesFromAttributes = formData.attributes?.sizes as string[] || [];
@@ -102,6 +93,15 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
     const hasCustomSizeText = !!(formData.attributes?.customSize as string);
     return hasFreeSizeSelected || hasCustomSizeText;
   }, [formData.attributes?.sizes, formData.attributes?.customSize]);
+
+  // Validation states
+  const priceValid = formData.price > 0;
+  const discountValid = !formData.discountPrice || formData.discountPrice < formData.price;
+  const stockValid = isClothing 
+    ? (selectedSizes.length > 0 || hasCustomSize
+        ? Object.values(formData.stockPerSize || {}).some(v => (Number(v) || 0) > 0)
+        : formData.quantity > 0)
+    : formData.quantity > 0;
 
   // Total stock for clothing (including custom sizes)
   const totalClothingStock = Object.values(formData.stockPerSize || {}).reduce(
