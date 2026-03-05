@@ -696,7 +696,7 @@ const Checkout = () => {
 
           {/* Step Content */}
           <Card>
-            <CardContent className="pt-6">
+            <CardContent className="pt-3 sm:pt-6 px-2 sm:px-6">
               {/* Step 1: Address */}
               {currentStep === 1 && (
                 <div className="space-y-6">
