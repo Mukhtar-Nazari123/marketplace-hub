@@ -569,7 +569,33 @@ const Cart = () => {
                   )}
                 </CardContent>
                 <CardFooter>
-                  <Button className="w-full" variant="cyan" size="lg" onClick={() => navigate('/checkout')}>
+                  <Button className="w-full" variant="cyan" size="lg" onClick={() => {
+                    // Validate color and size selections
+                    const missingSelections: string[] = [];
+                    items.forEach(item => {
+                      const info = variantInfoMap[item.product_id];
+                      if (info?.hasColors && !item.selected_color) {
+                        missingSelections.push(item.product?.name || 'Product');
+                      }
+                      if (info?.hasSizes && !item.selected_size) {
+                        missingSelections.push(item.product?.name || 'Product');
+                      }
+                    });
+
+                    if (missingSelections.length > 0) {
+                      toast({
+                        title: getLabel('Selection Required', 'انتخاب الزامی است', 'انتخاب اړین دی'),
+                        description: getLabel(
+                          'Please select color and size for all products before checkout.',
+                          'لطفاً رنگ و سایز را برای همه محصولات قبل از تکمیل خرید انتخاب کنید.',
+                          'مهرباني وکړئ د پېرود دمخه د ټولو محصولاتو لپاره رنګ او اندازه غوره کړئ.'
+                        ),
+                        variant: 'destructive',
+                      });
+                      return;
+                    }
+                    navigate('/checkout');
+                  }}>
                     {texts.checkout}
                   </Button>
                 </CardFooter>
