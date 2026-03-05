@@ -494,17 +494,6 @@ const AdminProducts = () => {
                                   </DropdownMenuItem>
                                 </>
                               )}
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  setSelectedProduct(product);
-                                  setIsDeleteDialogOpen(true);
-                                }}
-                                className="text-destructive"
-                              >
-                                <Trash2 className={`h-4 w-4 ${iconMarginClass}`} />
-                                {isRTL ? 'حذف' : 'Delete'}
-                              </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
