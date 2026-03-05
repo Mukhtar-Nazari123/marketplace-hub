@@ -79,13 +79,6 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
   const currencySymbol = '؋';
   const currencyLabel = 'AFN';
 
-  // Validation states
-  const priceValid = formData.price > 0;
-  const discountValid = !formData.discountPrice || formData.discountPrice < formData.price;
-  const stockValid = isClothing 
-    ? Object.values(formData.stockPerSize || {}).some(v => (Number(v) || 0) > 0)
-    : formData.quantity > 0;
-
   // Get selected sizes from attributes (from CategorySpecificFields)
   const selectedSizes = useMemo(() => {
     const sizesFromAttributes = formData.attributes?.sizes as string[] || [];
@@ -100,6 +93,15 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
     const hasCustomSizeText = !!(formData.attributes?.customSize as string);
     return hasFreeSizeSelected || hasCustomSizeText;
   }, [formData.attributes?.sizes, formData.attributes?.customSize]);
+
+  // Validation states
+  const priceValid = formData.price > 0;
+  const discountValid = !formData.discountPrice || formData.discountPrice < formData.price;
+  const stockValid = isClothing 
+    ? (selectedSizes.length > 0 || hasCustomSize
+        ? Object.values(formData.stockPerSize || {}).some(v => (Number(v) || 0) > 0)
+        : formData.quantity > 0)
+    : formData.quantity > 0;
 
   // Total stock for clothing (including custom sizes)
   const totalClothingStock = Object.values(formData.stockPerSize || {}).reduce(
@@ -320,9 +322,26 @@ export const PricingStep = ({ formData, updateFormData }: PricingStepProps) => {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground italic">
-              {isRTL ? 'ابتدا سایزهای موجود را در مرحله قبل انتخاب کنید' : 'Please select available sizes in the previous step first'}
-            </p>
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground italic">
+                {isRTL ? 'سایزی انتخاب نشده. موجودی کل را وارد کنید:' : 'No sizes selected. Enter total stock:'}
+              </p>
+              <div className="flex items-center gap-3">
+                <Input
+                  type="number"
+                  min="0"
+                  value={formData.quantity || ''}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value) || 0;
+                    updateFormData({ quantity: val });
+                  }}
+                  onFocus={(e) => e.target.select()}
+                  placeholder="0"
+                  className="w-32 text-center h-10 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+                <span className="text-sm text-muted-foreground">{isRTL ? 'عدد' : 'pcs'}</span>
+              </div>
+            </div>
           )}
 
           {/* Custom/Other Size Stock - only show if freesize or custom size selected */}
