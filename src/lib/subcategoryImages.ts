@@ -54,6 +54,7 @@ import heatingCooling from '@/assets/subcategories/heating-cooling.jpg';
 import vacuumCleaning from '@/assets/subcategories/vacuum-cleaning.jpg';
 import ironsGarmentCare from '@/assets/subcategories/irons-garment-care.jpg';
 import smallAppliances from '@/assets/subcategories/small-appliances.jpg';
+import chadorHijab from '@/assets/subcategories/chador-hijab.jpg';
 
 // Map slug to local image
 export const subcategoryImageMap: Record<string, string> = {
