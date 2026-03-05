@@ -306,7 +306,7 @@ const CartItemVariantSelector = ({
             .from('product_attributes')
             .select('attribute_key, attribute_value')
             .eq('product_id', productId)
-            .in('attribute_key', ['sizes', 'numeric_sizes']);
+            .in('attribute_key', ['sizes', 'numeric_sizes', 'numericSizes']);
 
           const parseArrayOrCSV = (val: string): string[] => {
             try {
