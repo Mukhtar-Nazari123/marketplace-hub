@@ -367,11 +367,45 @@ const AdminProducts = () => {
               </Select>
             </div>
 
+            {/* Bulk Actions Bar */}
+            {selectedIds.size > 0 && (
+              <div className="mb-4 flex flex-wrap items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 p-3">
+                <span className="text-sm font-medium">
+                  {isRTL ? `${selectedIds.size} محصول انتخاب شده` : `${selectedIds.size} selected`}
+                </span>
+                <div className={`flex gap-2 ${isRTL ? 'mr-auto' : 'ml-auto'}`}>
+                  <Button size="sm" variant="outline" onClick={handleBulkApprove} disabled={isSubmitting} className="text-success border-success/30">
+                    <CheckCircle className="h-4 w-4 mr-1" />
+                    {isRTL ? 'تأیید' : 'Approve'}
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={handleBulkReject} disabled={isSubmitting} className="text-warning border-warning/30">
+                    <XCircle className="h-4 w-4 mr-1" />
+                    {isRTL ? 'رد' : 'Reject'}
+                  </Button>
+                  <Button size="sm" variant="destructive" onClick={() => setIsBulkDeleteDialogOpen(true)} disabled={isSubmitting}>
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    {isRTL ? 'حذف' : 'Delete'}
+                  </Button>
+                </div>
+              </div>
+            )}
+
             {/* Table */}
             <div className="rounded-md border">
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="w-10">
+                      <Checkbox
+                        checked={allSelected}
+                        ref={(el) => {
+                          if (el) {
+                            (el as any).indeterminate = someSelected;
+                          }
+                        }}
+                        onCheckedChange={toggleSelectAll}
+                      />
+                    </TableHead>
                     <TableHead>{t.admin.products.product}</TableHead>
                     <TableHead>{t.admin.products.price}</TableHead>
                     <TableHead>{t.admin.products.status}</TableHead>
