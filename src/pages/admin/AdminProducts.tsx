@@ -395,7 +395,7 @@ const AdminProducts = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-10 pr-3">
+                    <TableHead className="w-12 px-4">
                       <Checkbox
                         checked={allSelected}
                         ref={(el) => {
@@ -434,7 +434,7 @@ const AdminProducts = () => {
                   ) : (
                     filteredProducts.map((product) => (
                       <TableRow key={product.id} className={`hover:bg-muted/50 transition-colors ${selectedIds.has(product.id) ? 'bg-primary/5' : ''}`}>
-                        <TableCell className="pr-3">
+                        <TableCell className="w-12 px-4">
                           <Checkbox
                             checked={selectedIds.has(product.id)}
                             onCheckedChange={() => toggleSelect(product.id)}
