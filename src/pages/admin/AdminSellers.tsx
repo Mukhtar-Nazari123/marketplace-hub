@@ -297,7 +297,26 @@ const AdminSellers = () => {
     try {
       const sellerId = sellerToDelete.user_id;
 
-      // Delete seller's products (cascades to product_media, product_attributes, product_translations, delivery_options)
+      // Get all product IDs for this seller
+      const { data: sellerProducts } = await supabase
+        .from('products')
+        .select('id')
+        .eq('seller_id', sellerId);
+
+      const productIds = sellerProducts?.map(p => p.id) || [];
+
+      if (productIds.length > 0) {
+        // Nullify order_items references (FK is SET NULL, but we do it explicitly via admin)
+        await supabase.from('order_items').update({ product_id: null }).in('product_id', productIds);
+        
+        // Delete cart items referencing these products (cascade should handle, but be explicit)
+        await supabase.from('cart').delete().in('product_id', productIds);
+        
+        // Delete wishlist items
+        await supabase.from('wishlist').delete().in('product_id', productIds);
+      }
+
+      // Delete seller's products (cascades to product_media, product_attributes, product_translations, delivery_options, reviews)
       const { error: prodErr } = await supabase.from('products').delete().eq('seller_id', sellerId);
       if (prodErr) throw prodErr;
 
