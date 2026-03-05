@@ -110,6 +110,8 @@ export const subcategoryImageMap: Record<string, string> = {
   'vacuum-cleaning': vacuumCleaning,
   'irons-garment-care': ironsGarmentCare,
   'small-appliances': smallAppliances,
+  // Chador & Hijab
+  'chador-hijab': chadorHijab,
 };
 
 export const getSubcategoryImage = (slug: string): string | undefined => {
