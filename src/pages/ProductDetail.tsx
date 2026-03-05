@@ -476,19 +476,22 @@ const ProductDetail = () => {
               let letterSizes: string[] = [];
               let numericSizes: string[] = [];
               
-              try {
-                if (sizesAttr?.attribute_value) {
-                  const parsed = JSON.parse(sizesAttr.attribute_value);
-                  if (Array.isArray(parsed)) letterSizes = parsed;
-                }
-              } catch { /* ignore */ }
-              
-              try {
-                if (numericSizesAttr?.attribute_value) {
-                  const parsed = JSON.parse(numericSizesAttr.attribute_value);
-                  if (Array.isArray(parsed)) numericSizes = parsed.sort((a: string, b: string) => Number(a) - Number(b));
-                }
-              } catch { /* ignore */ }
+              const parseArrayOrCSV = (val: string): string[] => {
+                try {
+                  const parsed = JSON.parse(val);
+                  if (Array.isArray(parsed)) return parsed.map(String);
+                } catch { /* not JSON */ }
+                // Fallback: comma-separated string
+                return val.split(',').map(s => s.trim()).filter(Boolean);
+              };
+
+              if (sizesAttr?.attribute_value) {
+                letterSizes = parseArrayOrCSV(sizesAttr.attribute_value);
+              }
+              if (numericSizesAttr?.attribute_value) {
+                numericSizes = parseArrayOrCSV(numericSizesAttr.attribute_value)
+                  .sort((a, b) => Number(a) - Number(b));
+              }
               
               const allSizes = [...letterSizes, ...numericSizes];
               if (allSizes.length === 0 && Object.keys(stockPerSize).length === 0) return null;
