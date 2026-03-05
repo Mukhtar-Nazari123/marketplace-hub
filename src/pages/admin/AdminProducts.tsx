@@ -434,7 +434,7 @@ const AdminProducts = () => {
                   ) : (
                     filteredProducts.map((product) => (
                       <TableRow key={product.id} className={`hover:bg-muted/50 transition-colors ${selectedIds.has(product.id) ? 'bg-primary/5' : ''}`}>
-                        <TableCell>
+                        <TableCell className="pr-3">
                           <Checkbox
                             checked={selectedIds.has(product.id)}
                             onCheckedChange={() => toggleSelect(product.id)}
