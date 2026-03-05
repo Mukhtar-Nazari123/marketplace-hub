@@ -47,6 +47,14 @@ import dairy from '@/assets/subcategories/dairy.jpg';
 import legumes from '@/assets/subcategories/legumes.jpg';
 import proteins from '@/assets/subcategories/proteins.jpg';
 
+// Appliances subcategories
+import kitchenAppliances from '@/assets/subcategories/kitchen-appliances.jpg';
+import laundryAppliances from '@/assets/subcategories/laundry-appliances.jpg';
+import heatingCooling from '@/assets/subcategories/heating-cooling.jpg';
+import vacuumCleaning from '@/assets/subcategories/vacuum-cleaning.jpg';
+import ironsGarmentCare from '@/assets/subcategories/irons-garment-care.jpg';
+import smallAppliances from '@/assets/subcategories/small-appliances.jpg';
+
 // Map slug to local image
 export const subcategoryImageMap: Record<string, string> = {
   'audio': audio,
@@ -94,6 +102,13 @@ export const subcategoryImageMap: Record<string, string> = {
   'beauty': beautySubcat,
   'bags': bagsSubcat,
   'womens-shoes-main': womensShoesMain,
+  // Appliances
+  'kitchen-appliances': kitchenAppliances,
+  'laundry-appliances': laundryAppliances,
+  'heating-cooling': heatingCooling,
+  'vacuum-cleaning': vacuumCleaning,
+  'irons-garment-care': ironsGarmentCare,
+  'small-appliances': smallAppliances,
 };
 
 export const getSubcategoryImage = (slug: string): string | undefined => {
