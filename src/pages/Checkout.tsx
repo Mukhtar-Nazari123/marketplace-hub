@@ -642,7 +642,7 @@ const Checkout = () => {
 
           {/* Stepper */}
           <Card className="mb-8 overflow-hidden">
-            <CardContent className="pt-6 px-3 sm:px-6">
+            <CardContent className="pt-6 px-2 sm:px-6">
               <div className={cn('flex items-center', isRTL && 'flex-row-reverse')}>
                 {STEPS.map((step, index) => {
                   const Icon = step.icon;
