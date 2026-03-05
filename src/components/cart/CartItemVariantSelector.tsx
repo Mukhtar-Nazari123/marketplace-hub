@@ -290,6 +290,30 @@ const CartItemVariantSelector = ({
           }
         });
 
+        // Also fetch colors from product_attributes for products without color media
+        const { data: colorAttrs } = await supabase
+          .from('product_attributes')
+          .select('attribute_value')
+          .eq('product_id', productId)
+          .eq('attribute_key', 'colors');
+
+        colorAttrs?.forEach(attr => {
+          if (attr.attribute_value) {
+            let parsed: string[] = [];
+            try {
+              const json = JSON.parse(attr.attribute_value);
+              if (Array.isArray(json)) parsed = json.map(String);
+            } catch {
+              parsed = attr.attribute_value.split(',').map((s: string) => s.trim()).filter(Boolean);
+            }
+            parsed.forEach(cv => {
+              if (!colors.includes(cv)) {
+                colors.push(cv);
+              }
+            });
+          }
+        });
+
         // Fetch product metadata for sizes
         const { data: product } = await supabase
           .from('products')
