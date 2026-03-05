@@ -382,10 +382,6 @@ const AdminProducts = () => {
                     <XCircle className="h-4 w-4 mr-1" />
                     {isRTL ? 'رد' : 'Reject'}
                   </Button>
-                  <Button size="sm" variant="destructive" onClick={() => setIsBulkDeleteDialogOpen(true)} disabled={isSubmitting}>
-                    <Trash2 className="h-4 w-4 mr-1" />
-                    {isRTL ? 'حذف' : 'Delete'}
-                  </Button>
                 </div>
               </div>
             )}
@@ -498,17 +494,6 @@ const AdminProducts = () => {
                                   </DropdownMenuItem>
                                 </>
                               )}
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem
-                                onClick={() => {
-                                  setSelectedProduct(product);
-                                  setIsDeleteDialogOpen(true);
-                                }}
-                                className="text-destructive"
-                              >
-                                <Trash2 className={`h-4 w-4 ${iconMarginClass}`} />
-                                {isRTL ? 'حذف' : 'Delete'}
-                              </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
