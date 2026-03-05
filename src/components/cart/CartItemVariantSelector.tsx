@@ -259,6 +259,7 @@ const CartItemVariantSelector = ({
   onSizeChange,
   onDeliveryOptionChange,
   onColorImageChange,
+  onVariantInfoChange,
 }: CartItemVariantSelectorProps) => {
   const [variants, setVariants] = useState<ProductVariants>({ colors: [], sizes: [], deliveryOptions: [], colorImageMap: {} });
   const [loading, setLoading] = useState(true);
