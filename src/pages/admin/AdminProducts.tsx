@@ -100,6 +100,88 @@ const AdminProducts = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
+
+  const allSelected = filteredProducts.length > 0 && selectedIds.size === filteredProducts.length;
+  const someSelected = selectedIds.size > 0 && selectedIds.size < filteredProducts.length;
+
+  const toggleSelectAll = () => {
+    if (allSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredProducts.map(p => p.id)));
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const handleBulkApprove = async () => {
+    if (selectedIds.size === 0) return;
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase
+        .from('products')
+        .update({ status: 'active' })
+        .in('id', Array.from(selectedIds));
+      if (error) throw error;
+      toast.success(isRTL ? `${selectedIds.size} محصول تأیید شد` : `${selectedIds.size} products approved`);
+      setSelectedIds(new Set());
+      fetchProducts();
+    } catch (error) {
+      console.error('Error bulk approving:', error);
+      toast.error(isRTL ? 'خطا در تأیید محصولات' : 'Error approving products');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleBulkReject = async () => {
+    if (selectedIds.size === 0) return;
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase
+        .from('products')
+        .update({ status: 'rejected', rejection_reason: 'Bulk rejected by admin' })
+        .in('id', Array.from(selectedIds));
+      if (error) throw error;
+      toast.success(isRTL ? `${selectedIds.size} محصول رد شد` : `${selectedIds.size} products rejected`);
+      setSelectedIds(new Set());
+      fetchProducts();
+    } catch (error) {
+      console.error('Error bulk rejecting:', error);
+      toast.error(isRTL ? 'خطا در رد محصولات' : 'Error rejecting products');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase
+        .from('products')
+        .delete()
+        .in('id', Array.from(selectedIds));
+      if (error) throw error;
+      toast.success(isRTL ? `${selectedIds.size} محصول حذف شد` : `${selectedIds.size} products deleted`);
+      setSelectedIds(new Set());
+      setIsBulkDeleteDialogOpen(false);
+      fetchProducts();
+    } catch (error) {
+      console.error('Error bulk deleting:', error);
+      toast.error(isRTL ? 'خطا در حذف محصولات' : 'Error deleting products');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const fetchProducts = async () => {
     setIsLoading(true);
