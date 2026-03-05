@@ -430,8 +430,8 @@ const AdminSellers = () => {
                         <TableCell className="font-medium">
                           <div className="flex items-center gap-2">
                             <Avatar className="h-8 w-8">
-                              <AvatarImage src={seller.avatar_url || ''} />
-                              <AvatarFallback>{seller.full_name.charAt(0).toUpperCase()}</AvatarFallback>
+                              <AvatarImage src={seller.verification?.store_logo || seller.avatar_url || ''} />
+                              <AvatarFallback>{(seller.verification?.business_name || seller.full_name).charAt(0).toUpperCase()}</AvatarFallback>
                             </Avatar>
                             {seller.full_name}
                           </div>
