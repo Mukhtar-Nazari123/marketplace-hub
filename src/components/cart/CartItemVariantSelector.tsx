@@ -343,6 +343,9 @@ const CartItemVariantSelector = ({
           colorImageMap,
         });
 
+        // Notify parent about variant availability
+        onVariantInfoChange?.({ hasColors: colors.length > 0, hasSizes: sizes.length > 0 });
+
         // Auto-select first available variant if not already selected
         if (colors.length > 0 && !selectedColor) {
           onColorChange(colors[0]);
