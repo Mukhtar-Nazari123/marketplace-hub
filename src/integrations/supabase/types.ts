@@ -862,6 +862,39 @@ export type Database = {
         }
         Relationships: []
       }
+      email_verification_codes: {
+        Row: {
+          attempt_count: number
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          is_used: boolean
+          user_id: string
+          verification_code: string
+        }
+        Insert: {
+          attempt_count?: number
+          created_at?: string
+          email: string
+          expires_at: string
+          id?: string
+          is_used?: boolean
+          user_id: string
+          verification_code: string
+        }
+        Update: {
+          attempt_count?: number
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          is_used?: boolean
+          user_id?: string
+          verification_code?: string
+        }
+        Relationships: []
+      }
       hero_banner_settings: {
         Row: {
           banner_type: string
@@ -2211,6 +2244,7 @@ export type Database = {
       }
     }
     Functions: {
+      cleanup_expired_verification_codes: { Args: never; Returns: undefined }
       get_product_description: {
         Args: { p_language?: string; p_product_id: string }
         Returns: string
