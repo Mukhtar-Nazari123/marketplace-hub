@@ -98,19 +98,19 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
       >
         {/* Badge */}
         {badgeText && (
-          <span className="inline-block mb-1.5 sm:mb-3 px-3 sm:px-5 py-1.5 sm:py-2 text-xs sm:text-base font-semibold rounded-full bg-white text-black">
+          <span className="inline-block mb-3 sm:mb-4 px-3 sm:px-5 py-1.5 sm:py-2 text-xs sm:text-base font-semibold rounded-full bg-white text-black">
             {badgeText}
           </span>
         )}
 
         {/* Title */}
-        <h2 className="hero-title text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-extrabold text-white leading-tight mb-2 sm:mb-3">
+        <h2 className="hero-title text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-extrabold text-white leading-tight mb-3 sm:mb-4">
           {title}
         </h2>
 
         {/* Description */}
         {description && (
-          <p className="hero-text text-white/85 text-xs sm:text-sm lg:text-base mb-3 sm:mb-4 line-clamp-2">
+          <p className="hero-text text-white/85 text-xs sm:text-sm lg:text-base mb-4 sm:mb-5 line-clamp-2">
             {description}
           </p>
         )}
