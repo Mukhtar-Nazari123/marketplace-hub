@@ -114,6 +114,7 @@ export const subcategoryImageMap: Record<string, string> = {
   // Women's Clothing subcategories
   'clothing': womensClothingMain,
   'jewellery-accessories': jewelleryAccessories,
+  'jewelry-accessories': jewelleryAccessories,
   'curve-plus': curvePlus,
   'beauty': beautySubcat,
   'bags': bagsSubcat,
