@@ -169,6 +169,22 @@ async function saveProductTranslation(
  * Save product media (images and videos) to product_media table
  * Now supports color-specific images with color_value column
  */
+/**
+ * Extract the storage path from a Supabase public URL.
+ * e.g., "https://xxx.supabase.co/storage/v1/object/public/seller-assets/user-id/products/img.jpg"
+ * → "user-id/products/img.jpg"
+ */
+function extractStoragePath(url: string): string | null {
+  try {
+    const marker = '/storage/v1/object/public/seller-assets/';
+    const idx = url.indexOf(marker);
+    if (idx === -1) return null;
+    return decodeURIComponent(url.substring(idx + marker.length));
+  } catch {
+    return null;
+  }
+}
+
 async function saveProductMedia(
   productId: string, 
   imageUrls: string[], 
@@ -218,16 +234,36 @@ async function saveProductMedia(
   });
 
   // Find media to remove (in existing but not in new URLs)
-  const toRemove = existingMedia?.filter(m => !allNewUrls.has(m.url)).map(m => m.id) || [];
+  const mediaToRemove = existingMedia?.filter(m => !allNewUrls.has(m.url)) || [];
+  const toRemove = mediaToRemove.map(m => m.id);
 
-  // Delete removed media
+  // Delete removed media from database and storage bucket
   if (toRemove.length > 0) {
+    // Extract storage paths from URLs to delete from bucket
+    const storagePaths = mediaToRemove
+      .map(m => extractStoragePath(m.url))
+      .filter(Boolean) as string[];
+
+    // Delete files from storage bucket
+    if (storagePaths.length > 0) {
+      const { error: storageError } = await supabase.storage
+        .from('seller-assets')
+        .remove(storagePaths);
+
+      if (storageError) {
+        console.error('Error deleting files from storage:', storageError);
+      } else {
+        console.log(`Deleted ${storagePaths.length} orphaned file(s) from storage`);
+      }
+    }
+
+    // Delete records from product_media table
     const { error } = await supabase
       .from('product_media')
       .delete()
       .in('id', toRemove);
 
-    if (error) console.error('Error deleting media:', error);
+    if (error) console.error('Error deleting media records:', error);
   }
 
   // Insert new media
