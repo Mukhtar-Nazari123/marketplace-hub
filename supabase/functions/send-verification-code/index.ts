@@ -139,7 +139,7 @@ serve(async (req) => {
     // Send email via Supabase Auth admin (uses built-in email provider)
     const { subject, html } = getEmailHtml(code, language);
 
-    // Use Resend if API key available, otherwise use Supabase's built-in
+    // Use Resend if API key available, otherwise log for dev
     const resendKey = Deno.env.get("RESEND_API_KEY");
     if (resendKey) {
       const emailRes = await fetch("https://api.resend.com/emails", {
@@ -149,7 +149,7 @@ serve(async (req) => {
           Authorization: `Bearer ${resendKey}`,
         },
         body: JSON.stringify({
-          from: "BrightFlow Store <noreply@brightflow-store.lovable.app>",
+          from: "BrightFlow Store <onboarding@resend.dev>",
           to: [email],
           subject,
           html,
@@ -159,15 +159,17 @@ serve(async (req) => {
       if (!emailRes.ok) {
         const errText = await emailRes.text();
         console.error("Resend email error:", errText);
-        // Don't fail the request — code is saved, user can verify even if email fails
       }
     } else {
-      // Fallback: log the code (for development/testing)
       console.log(`[DEV] Verification code for ${email}: ${code}`);
     }
 
     // Cleanup expired codes opportunistically
-    await supabaseAdmin.rpc("cleanup_expired_verification_codes").catch(() => {});
+    try {
+      await supabaseAdmin.rpc("cleanup_expired_verification_codes");
+    } catch (_e) {
+      // ignore cleanup errors
+    }
 
     return new Response(JSON.stringify({ success: true, expiresAt }), {
       status: 200,
