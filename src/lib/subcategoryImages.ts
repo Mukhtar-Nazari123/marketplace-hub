@@ -56,6 +56,19 @@ import ironsGarmentCare from '@/assets/subcategories/irons-garment-care.webp';
 import smallAppliances from '@/assets/subcategories/small-appliances.webp';
 import chadorHijab from '@/assets/subcategories/chador-hijab.webp';
 
+// Top-level category images
+import sportsOutdoors from '@/assets/subcategories/sports-outdoors.webp';
+import underwearSleepwear from '@/assets/subcategories/underwear-sleepwear.webp';
+import babyKids from '@/assets/subcategories/baby-kids.webp';
+import homeLiving from '@/assets/subcategories/home-living.webp';
+import bagsLuggage from '@/assets/subcategories/bags-luggage.webp';
+import toysGames from '@/assets/subcategories/toys-games.webp';
+import officeSchool from '@/assets/subcategories/office-school.webp';
+import petSupplies from '@/assets/subcategories/pet-supplies.webp';
+import appliances from '@/assets/subcategories/appliances.webp';
+import electronics from '@/assets/subcategories/electronics.webp';
+import toolsHomeImprovement from '@/assets/subcategories/tools-home-improvement.webp';
+
 // Map slug to local image
 export const subcategoryImageMap: Record<string, string> = {
   'audio': audio,
@@ -112,6 +125,18 @@ export const subcategoryImageMap: Record<string, string> = {
   'small-appliances': smallAppliances,
   // Chador & Hijab
   'chador-hijab': chadorHijab,
+  // Top-level categories
+  'sports-outdoors': sportsOutdoors,
+  'underwear-sleepwear': underwearSleepwear,
+  'baby-kids': babyKids,
+  'home-living': homeLiving,
+  'bags-luggage': bagsLuggage,
+  'toys-games': toysGames,
+  'office-school': officeSchool,
+  'pet-supplies': petSupplies,
+  'appliances': appliances,
+  'electronics': electronics,
+  'tools-home-improvement': toolsHomeImprovement,
 };
 
 export const getSubcategoryImage = (slug: string): string | undefined => {
