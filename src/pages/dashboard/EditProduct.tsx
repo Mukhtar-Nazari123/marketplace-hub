@@ -160,7 +160,7 @@ const EditProduct = () => {
         video: null,
         videoUrl: videoUrl,
         colorImages: {},
-        colorImageUrls: (metadata.colorImageUrls as Record<string, string>) || {},
+        colorImageUrls: loadedColorImageUrls || (metadata.colorImageUrls as Record<string, string>) || {},
         price: product.price_afn,
         priceUSD: 0,
         discountPrice: product.compare_price_afn,
