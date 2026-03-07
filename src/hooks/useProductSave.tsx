@@ -218,16 +218,36 @@ async function saveProductMedia(
   });
 
   // Find media to remove (in existing but not in new URLs)
-  const toRemove = existingMedia?.filter(m => !allNewUrls.has(m.url)).map(m => m.id) || [];
+  const mediaToRemove = existingMedia?.filter(m => !allNewUrls.has(m.url)) || [];
+  const toRemove = mediaToRemove.map(m => m.id);
 
-  // Delete removed media
+  // Delete removed media from database and storage bucket
   if (toRemove.length > 0) {
+    // Extract storage paths from URLs to delete from bucket
+    const storagePaths = mediaToRemove
+      .map(m => extractStoragePath(m.url))
+      .filter(Boolean) as string[];
+
+    // Delete files from storage bucket
+    if (storagePaths.length > 0) {
+      const { error: storageError } = await supabase.storage
+        .from('seller-assets')
+        .remove(storagePaths);
+
+      if (storageError) {
+        console.error('Error deleting files from storage:', storageError);
+      } else {
+        console.log(`Deleted ${storagePaths.length} orphaned file(s) from storage`);
+      }
+    }
+
+    // Delete records from product_media table
     const { error } = await supabase
       .from('product_media')
       .delete()
       .in('id', toRemove);
 
-    if (error) console.error('Error deleting media:', error);
+    if (error) console.error('Error deleting media records:', error);
   }
 
   // Insert new media
