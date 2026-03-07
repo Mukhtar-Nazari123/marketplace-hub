@@ -110,7 +110,7 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
 
         {/* Description */}
         {description && (
-          <p className="hero-text text-white/85 text-xs sm:text-sm lg:text-base mb-3 sm:mb-4 line-clamp-2">
+          <p className="hero-text text-white/85 text-xs sm:text-sm lg:text-base mb-4 sm:mb-5 line-clamp-2">
             {description}
           </p>
         )}
