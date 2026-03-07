@@ -64,7 +64,7 @@ const HeroSection = () => {
                <CarouselItem key={banner.id} className="pl-0">
                   {banner.cta_link ? (
                     <Link to={banner.cta_link}>
-                       <div className="relative overflow-hidden min-h-[540px] sm:min-h-[580px] lg:min-h-[600px]">
+                       <div className="relative overflow-hidden min-h-[600px]">
                         <img
                           src={banner.image_url}
                           alt="Hero banner"
@@ -73,7 +73,7 @@ const HeroSection = () => {
                       </div>
                     </Link>
                   ) : (
-                    <div className="relative overflow-hidden min-h-[540px] sm:min-h-[580px] lg:min-h-[600px]">
+                    <div className="relative overflow-hidden min-h-[600px]">
                       <img
                         src={banner.image_url}
                         alt="Hero banner"
