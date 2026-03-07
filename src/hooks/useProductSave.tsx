@@ -478,7 +478,21 @@ export async function loadProductWithTranslations(
     .eq('product_id', productId)
     .order('sort_order');
 
-  const imageUrls = media?.filter(m => m.media_type === 'image').map(m => m.url) || product.images || [];
+  // Separate general images from color-specific images
+  const generalImages = media?.filter(m => m.media_type === 'image' && !m.color_value) || [];
+  const colorImages = media?.filter(m => m.media_type === 'image' && m.color_value) || [];
+  
+  const imageUrls = generalImages.map(m => m.url).length > 0 
+    ? generalImages.map(m => m.url) 
+    : (product.images || []);
+  
+  const colorImageUrls: Record<string, string> = {};
+  colorImages.forEach(m => {
+    if (m.color_value) {
+      colorImageUrls[m.color_value] = m.url;
+    }
+  });
+
   const videoMedia = media?.find(m => m.media_type === 'video');
   const videoUrl = videoMedia?.url || (product.metadata as any)?.videoUrl || '';
 
@@ -489,6 +503,7 @@ export async function loadProductWithTranslations(
     brand,
     imageUrls,
     videoUrl,
+    colorImageUrls,
   };
 }
 
