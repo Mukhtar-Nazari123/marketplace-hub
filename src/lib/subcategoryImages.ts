@@ -134,7 +134,11 @@ export const subcategoryImageMap: Record<string, string> = {
   'small-appliances': smallAppliances,
   // Chador & Hijab
   'chador-hijab': chadorHijab,
-  // Top-level categories
+  // Electronics subcategories
+  'phones': phones,
+  'computers': computers,
+  'accessories': accessoriesSubcat,
+  'cameras': cameras,
   'sports-outdoors': sportsOutdoors,
   'sports': sportsOutdoors,
   'underwear-sleepwear': underwearSleepwear,
