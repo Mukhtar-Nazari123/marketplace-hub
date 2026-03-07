@@ -434,7 +434,20 @@ const AdminCategories = () => {
           </Button>
         </div>
 
-
+        {/* Migration Tool */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm font-medium">
+              {getLabel(lang, 'Image Migration', 'انتقال تصاویر', 'د انځورونو لېږدول')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-3">
+              {getLabel(lang, 'Upload local bundled images to Supabase storage and save URLs in the database.', 'بارگذاری تصاویر محلی به فضای ذخیره‌سازی Supabase و ذخیره آدرس‌ها در پایگاه داده.', 'محلي انځورونه Supabase ته پورته کړئ او URLs یې په ډیټابیس کې خوندي کړئ.')}
+            </p>
+            <MigrateSubcategoryImages onComplete={fetchData} />
+          </CardContent>
+        </Card>
 
 
         {/* Categories Table */}
