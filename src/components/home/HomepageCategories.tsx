@@ -152,12 +152,12 @@ const HomepageCategories = () => {
   const CategoryItem = ({ item, isSubcategory }: { item: typeof items[0]; isSubcategory: boolean }) => {
     // Get appropriate image based on item type
     const getDisplayImage = () => {
-      // First try database image_url (editable from admin)
-      if (item.image_url) return item.image_url;
-      
-      // Then try local bundled image as fallback
+      // First try local bundled image (works for both categories and subcategories)
       const localImage = getSubcategoryImage(item.slug);
       if (localImage) return localImage;
+      
+      // Then try database image_url
+      if (item.image_url) return item.image_url;
       
       // Fallback to fetched product images
       if (isSubcategory) {
