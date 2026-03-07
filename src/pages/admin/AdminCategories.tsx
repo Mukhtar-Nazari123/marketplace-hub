@@ -418,6 +418,17 @@ const AdminCategories = () => {
       description={getLabel(lang, 'Manage categories and subcategories', 'مدیریت دسته‌بندی‌ها و زیردسته‌بندی‌ها', 'کټګوریانې او فرعي کټګوریانې اداره کړئ')}
     >
       <div className="space-y-6">
+        {/* Image Migration Tool */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">
+              {getLabel(lang, 'Migrate Local Images to Storage', 'انتقال تصاویر محلی به فضای ذخیره‌سازی', 'ځایي انځورونه ذخیره‌سازي ته انتقال کړئ')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <MigrateSubcategoryImages onComplete={fetchData} />
+          </CardContent>
+        </Card>
         {/* Header Actions */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
