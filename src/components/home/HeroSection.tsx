@@ -110,7 +110,7 @@ const HeroSection = () => {
    const renderDynamicBanners = () => {
       if (heroBanners.length === 0) {
         return (
-           <div className="relative overflow-hidden bg-muted min-h-[700px] sm:min-h-[600px] flex items-center justify-center">
+           <div className="relative overflow-hidden bg-muted min-h-[800px] sm:min-h-[600px] flex items-center justify-center">
              <p className="text-muted-foreground text-sm sm:text-base">
                {isRTL ? "بنر تبلیغاتی موجود نیست" : "No hero banner available"}
              </p>
