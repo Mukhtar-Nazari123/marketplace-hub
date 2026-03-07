@@ -104,7 +104,7 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
         )}
 
         {/* Title */}
-        <h2 className="hero-title text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-extrabold text-white leading-tight mb-2 sm:mb-3">
+        <h2 className="hero-title text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-extrabold text-white leading-tight mb-3 sm:mb-4">
           {title}
         </h2>
 
