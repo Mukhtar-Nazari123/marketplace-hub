@@ -64,7 +64,7 @@ const HeroSection = () => {
                <CarouselItem key={banner.id} className="pl-0">
                   {banner.cta_link ? (
                     <Link to={banner.cta_link}>
-                       <div className="relative overflow-hidden min-h-[600px]">
+                       <div className="relative overflow-hidden min-h-[480px] sm:min-h-[520px] lg:min-h-[550px]">
                         <img
                           src={banner.image_url}
                           alt="Hero banner"
