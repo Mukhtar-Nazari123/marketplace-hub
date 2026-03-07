@@ -85,7 +85,7 @@ const EditProduct = () => {
   const fetchProduct = async () => {
     try {
       // Use the new function that loads from normalized tables
-      const { product, translation, attributes, brand, imageUrls, videoUrl } = 
+      const { product, translation, attributes, brand, imageUrls, videoUrl, colorImageUrls: loadedColorImageUrls } = 
         await loadProductWithTranslations(id!, currentLanguage);
 
       if (!product) {
