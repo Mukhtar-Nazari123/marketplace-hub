@@ -125,6 +125,18 @@ export const subcategoryImageMap: Record<string, string> = {
   'small-appliances': smallAppliances,
   // Chador & Hijab
   'chador-hijab': chadorHijab,
+  // Top-level categories
+  'sports-outdoors': sportsOutdoors,
+  'underwear-sleepwear': underwearSleepwear,
+  'baby-kids': babyKids,
+  'home-living': homeLiving,
+  'bags-luggage': bagsLuggage,
+  'toys-games': toysGames,
+  'office-school': officeSchool,
+  'pet-supplies': petSupplies,
+  'appliances': appliances,
+  'electronics': electronics,
+  'tools-home-improvement': toolsHomeImprovement,
 };
 
 export const getSubcategoryImage = (slug: string): string | undefined => {
