@@ -73,7 +73,7 @@ const HeroSection = () => {
                       </div>
                     </Link>
                   ) : (
-                    <div className="relative overflow-hidden min-h-[800px] sm:min-h-[600px]">
+                    <div className="relative overflow-hidden min-h-[600px]">
                       <img
                         src={banner.image_url}
                         alt="Hero banner"
