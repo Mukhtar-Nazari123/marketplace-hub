@@ -27,7 +27,7 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
   };
 
   return (
-    <div className="hero-container relative overflow-hidden min-h-[600px] sm:min-h-[600px] lg:min-h-[600px] flex items-center animate-fade-in">
+    <div className="hero-container relative overflow-hidden min-h-[480px] sm:min-h-[520px] lg:min-h-[550px] flex items-center animate-fade-in">
       {/* Layer 1: Solid Background Color */}
       <div className="hero-bg absolute inset-0 z-[1]">
         {banner.background_color ? (
