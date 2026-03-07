@@ -7,7 +7,7 @@ const HeroBannerSkeleton = () => {
       <div className="relative z-10 h-full flex flex-col sm:flex-row items-center justify-center sm:justify-between px-4 sm:px-8 lg:px-16 py-6 sm:py-0 gap-4 sm:gap-6">
         {/* Icon skeleton */}
         <div className="flex-shrink-0 order-1 sm:order-none">
-          <Skeleton className="w-24 h-24 sm:w-36 sm:h-36 lg:w-56 lg:h-56 xl:w-72 xl:h-72 rounded-full" />
+          <Skeleton className="w-28 h-28 sm:w-40 sm:h-40 lg:w-56 lg:h-56 xl:w-72 xl:h-72 rounded-full" />
         </div>
         
         {/* Content skeleton */}

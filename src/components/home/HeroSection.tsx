@@ -108,15 +108,15 @@ const HeroSection = () => {
  
    // Render dynamic banners
    const renderDynamicBanners = () => {
-     if (heroBanners.length === 0) {
-       return (
-          <div className="relative overflow-hidden bg-muted min-h-[400px] sm:min-h-[480px] lg:min-h-[550px] flex items-center justify-center">
-            <p className="text-muted-foreground text-sm sm:text-base">
-              {isRTL ? "بنر تبلیغاتی موجود نیست" : "No hero banner available"}
-            </p>
-          </div>
-       );
-     }
+      if (heroBanners.length === 0) {
+        return (
+           <div className="relative overflow-hidden bg-muted min-h-[480px] sm:min-h-[520px] lg:min-h-[550px] flex items-center justify-center">
+             <p className="text-muted-foreground text-sm sm:text-base">
+               {isRTL ? "بنر تبلیغاتی موجود نیست" : "No hero banner available"}
+             </p>
+           </div>
+        );
+      }
  
      return (
         <div className="relative overflow-hidden">
