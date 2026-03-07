@@ -56,6 +56,12 @@ import ironsGarmentCare from '@/assets/subcategories/irons-garment-care.webp';
 import smallAppliances from '@/assets/subcategories/small-appliances.webp';
 import chadorHijab from '@/assets/subcategories/chador-hijab.webp';
 
+// Electronics subcategories
+import phones from '@/assets/subcategories/phones.webp';
+import computers from '@/assets/subcategories/computers.webp';
+import accessoriesSubcat from '@/assets/subcategories/accessories.webp';
+import cameras from '@/assets/subcategories/cameras.webp';
+
 // Top-level category images
 import sportsOutdoors from '@/assets/subcategories/sports-outdoors.webp';
 import underwearSleepwear from '@/assets/subcategories/underwear-sleepwear.webp';
