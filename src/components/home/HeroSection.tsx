@@ -62,25 +62,25 @@ const HeroSection = () => {
            <CarouselContent className="-ml-0">
              {designedBanners.map((banner) => (
                <CarouselItem key={banner.id} className="pl-0">
-                 {banner.cta_link ? (
-                   <Link to={banner.cta_link}>
-                      <div className="relative overflow-hidden min-h-[400px] sm:min-h-[480px] lg:min-h-[550px]">
-                       <img
-                         src={banner.image_url}
-                         alt="Hero banner"
-                         className="w-full h-full object-cover absolute inset-0"
-                       />
-                     </div>
-                   </Link>
-                 ) : (
-                   <div className="relative overflow-hidden min-h-[400px] sm:min-h-[480px] lg:min-h-[550px]">
-                     <img
-                       src={banner.image_url}
-                       alt="Hero banner"
-                       className="w-full h-full object-cover absolute inset-0"
-                     />
-                   </div>
-                 )}
+                  {banner.cta_link ? (
+                    <Link to={banner.cta_link}>
+                       <div className="relative overflow-hidden min-h-[480px] sm:min-h-[520px] lg:min-h-[550px]">
+                        <img
+                          src={banner.image_url}
+                          alt="Hero banner"
+                          className="w-full h-full object-cover absolute inset-0"
+                        />
+                      </div>
+                    </Link>
+                  ) : (
+                    <div className="relative overflow-hidden min-h-[480px] sm:min-h-[520px] lg:min-h-[550px]">
+                      <img
+                        src={banner.image_url}
+                        alt="Hero banner"
+                        className="w-full h-full object-cover absolute inset-0"
+                      />
+                    </div>
+                  )}
                </CarouselItem>
              ))}
            </CarouselContent>
