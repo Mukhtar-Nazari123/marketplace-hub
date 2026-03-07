@@ -169,6 +169,22 @@ async function saveProductTranslation(
  * Save product media (images and videos) to product_media table
  * Now supports color-specific images with color_value column
  */
+/**
+ * Extract the storage path from a Supabase public URL.
+ * e.g., "https://xxx.supabase.co/storage/v1/object/public/seller-assets/user-id/products/img.jpg"
+ * → "user-id/products/img.jpg"
+ */
+function extractStoragePath(url: string): string | null {
+  try {
+    const marker = '/storage/v1/object/public/seller-assets/';
+    const idx = url.indexOf(marker);
+    if (idx === -1) return null;
+    return decodeURIComponent(url.substring(idx + marker.length));
+  } catch {
+    return null;
+  }
+}
+
 async function saveProductMedia(
   productId: string, 
   imageUrls: string[], 
