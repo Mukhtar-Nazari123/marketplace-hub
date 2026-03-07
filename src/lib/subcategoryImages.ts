@@ -103,6 +103,7 @@ export const subcategoryImageMap: Record<string, string> = {
   'sportswear': sportswear,
   'toys': toys,
   'women': womensClothing,
+  'womens-clothing': womensClothing,
   // Food & Groceries
   'food-groceries': foodGroceries,
   'rice-grains': riceGrains,
