@@ -88,6 +88,7 @@ export const subcategoryImageMap: Record<string, string> = {
   'led-lighting': ledLighting,
   'makeup': makeup,
   'men': mensClothing,
+  'mens-clothing': mensClothing,
   'mens-shoes': mensShoes,
   'womens-shoes': womensShoes,
   'kids-shoes': kidsShoes,
