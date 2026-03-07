@@ -235,10 +235,11 @@ const EditProduct = () => {
     }
   };
 
-  const uploadMedia = async (): Promise<{ imageUrls: string[]; videoUrl: string }> => {
+  const uploadMedia = async (): Promise<{ imageUrls: string[]; videoUrl: string; colorImageUrls: Record<string, string> }> => {
     setIsUploading(true);
     const uploadedImageUrls: string[] = [...formData.imageUrls];
     let uploadedVideoUrl = formData.videoUrl;
+    const uploadedColorImageUrls: Record<string, string> = { ...formData.colorImageUrls };
 
     try {
       for (const image of formData.images) {
@@ -256,6 +257,22 @@ const EditProduct = () => {
         uploadedImageUrls.push(urlData.publicUrl);
       }
 
+      // Upload new color-specific images
+      for (const [colorValue, file] of Object.entries(formData.colorImages)) {
+        const fileName = `${user?.id}/products/colors/${Date.now()}-${file.name}`;
+        const { error } = await supabase.storage
+          .from('seller-assets')
+          .upload(fileName, file);
+
+        if (error) throw error;
+
+        const { data: urlData } = supabase.storage
+          .from('seller-assets')
+          .getPublicUrl(fileName);
+
+        uploadedColorImageUrls[colorValue] = urlData.publicUrl;
+      }
+
       if (formData.video) {
         const fileName = `${user?.id}/videos/${Date.now()}-${formData.video.name}`;
         const { error } = await supabase.storage
@@ -271,7 +288,7 @@ const EditProduct = () => {
         uploadedVideoUrl = urlData.publicUrl;
       }
 
-      return { imageUrls: uploadedImageUrls, videoUrl: uploadedVideoUrl };
+      return { imageUrls: uploadedImageUrls, videoUrl: uploadedVideoUrl, colorImageUrls: uploadedColorImageUrls };
     } finally {
       setIsUploading(false);
     }
@@ -283,13 +300,13 @@ const EditProduct = () => {
     setIsSubmitting(true);
 
     try {
-      const { imageUrls, videoUrl } = formData.images.length > 0 || formData.video
+      const hasNewFiles = formData.images.length > 0 || formData.video || Object.keys(formData.colorImages).length > 0;
+      const { imageUrls, videoUrl, colorImageUrls } = hasNewFiles
         ? await uploadMedia()
-        : { imageUrls: formData.imageUrls, videoUrl: formData.videoUrl };
+        : { imageUrls: formData.imageUrls, videoUrl: formData.videoUrl, colorImageUrls: formData.colorImageUrls };
 
       if (imageUrls.length === 0) {
-        // Check if color images exist as fallback
-        const hasColorImages = Object.keys(formData.colorImageUrls).length > 0 || Object.keys(formData.colorImages).length > 0;
+        const hasColorImages = Object.keys(colorImageUrls).length > 0;
         if (!hasColorImages) {
           toast.error(isRTL ? 'حداقل یک تصویر لازم است' : 'At least one image is required');
           setIsSubmitting(false);
@@ -305,6 +322,7 @@ const EditProduct = () => {
         formData,
         imageUrls,
         videoUrl,
+        colorImageUrls,
         status,
         currentLanguage,
       });
