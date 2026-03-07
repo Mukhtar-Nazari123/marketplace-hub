@@ -98,7 +98,7 @@ const HeroBannerSlide = ({ banner }: HeroBannerSlideProps) => {
       >
         {/* Badge */}
         {badgeText && (
-          <span className="inline-block mb-1.5 sm:mb-3 px-3 sm:px-5 py-1.5 sm:py-2 text-xs sm:text-base font-semibold rounded-full bg-white text-black">
+          <span className="inline-block mb-3 sm:mb-4 px-3 sm:px-5 py-1.5 sm:py-2 text-xs sm:text-base font-semibold rounded-full bg-white text-black">
             {badgeText}
           </span>
         )}
