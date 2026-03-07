@@ -99,22 +99,59 @@ const Register = () => {
     }
 
     const { error } = await signUp(email, password, fullName, selectedRole);
-    setLoading(false);
 
     if (error) {
+      setLoading(false);
       toast({
         title: t('register', 'registerError'),
         description: error.message,
         variant: "destructive"
       });
-    } else {
-      setSuccess(true);
+      return;
+    }
+
+    // Get the newly created user ID from supabase auth
+    const { data: { session } } = await supabase.auth.getSession();
+    const newUserId = session?.user?.id;
+
+    if (!newUserId) {
+      // If auto-confirm is off, user won't have a session yet.
+      // Try to get user from sign-up response metadata
+      setLoading(false);
       toast({
-        title: t('register', 'registerSuccess'),
-        description: t('register', 'confirmEmailSent')
+        title: t('register', 'registerError'),
+        description: 'Unable to retrieve user. Please try logging in.',
+        variant: "destructive"
       });
-      const redirectPath = selectedRole === 'seller' ? '/seller/profile-choice' : '/login';
-      setTimeout(() => navigate(redirectPath), 2000);
+      return;
+    }
+
+    // Send verification code
+    try {
+      const { data: codeData } = await supabase.functions.invoke('send-verification-code', {
+        body: { userId: newUserId, email, language }
+      });
+
+      // Store verification data in sessionStorage
+      sessionStorage.setItem('verification_data', JSON.stringify({
+        userId: newUserId,
+        email,
+        role: selectedRole,
+        expiresAt: codeData?.expiresAt
+      }));
+
+      setLoading(false);
+      navigate('/verify-email');
+    } catch {
+      setLoading(false);
+      // Still redirect even if email fails — code is saved in DB
+      sessionStorage.setItem('verification_data', JSON.stringify({
+        userId: newUserId,
+        email,
+        role: selectedRole,
+        expiresAt: new Date(Date.now() + 10 * 60 * 1000).toISOString()
+      }));
+      navigate('/verify-email');
     }
   };
 
