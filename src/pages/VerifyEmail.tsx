@@ -137,11 +137,14 @@ const VerifyEmail = () => {
         setResendCooldown(RESEND_COOLDOWN);
         setCode("");
         setRemainingAttempts(null);
-        // Update expiry
+        // Update expiry and devCode
         if (data?.expiresAt) {
-          const updatedData = { ...verificationData, expiresAt: data.expiresAt };
+          const updatedData = { ...verificationData, expiresAt: data.expiresAt, ...(data.devCode ? { devCode: data.devCode } : {}) };
           sessionStorage.setItem("verification_data", JSON.stringify(updatedData));
           setExpiryCountdown(CODE_EXPIRY_MINUTES * 60);
+        }
+        if (data?.devCode) {
+          setDevCode(data.devCode);
         }
       }
     } catch {
