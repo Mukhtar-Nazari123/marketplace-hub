@@ -665,7 +665,7 @@ const BuyerProfile = () => {
                   {getLabel('Enter your new email address', 'ایمیل جدید وارد کنید', 'خپل نوی بریښنالیک پته دننه کړئ')}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4" dir={isRTL ? 'rtl' : 'ltr'}>
                 <div className="space-y-2">
                   <Label>{getLabel('Current Email', 'ایمیل فعلی', 'اوسنی بریښنالیک')}</Label>
                   <Input value={email} disabled className="bg-muted/50" />
