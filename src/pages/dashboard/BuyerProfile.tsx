@@ -441,7 +441,7 @@ const BuyerProfile = () => {
 
           {/* Personal Information Tab */}
           <TabsContent value="personal" className="animate-fade-in">
-            <Card className="border-border/50 shadow-lg">
+            <Card className="border-border/50 shadow-lg" dir={isRTL ? 'rtl' : 'ltr'}>
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -580,7 +580,7 @@ const BuyerProfile = () => {
           {/* Security Tab */}
           <TabsContent value="security" className="space-y-6 animate-fade-in">
             {/* Change Password */}
-            <Card className="border-border/50 shadow-lg">
+            <Card className="border-border/50 shadow-lg" dir={isRTL ? 'rtl' : 'ltr'}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Lock className="h-5 w-5 text-primary" />
@@ -655,7 +655,7 @@ const BuyerProfile = () => {
             </Card>
 
             {/* Change Email */}
-            <Card className="border-border/50 shadow-lg">
+            <Card className="border-border/50 shadow-lg" dir={isRTL ? 'rtl' : 'ltr'}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Mail className="h-5 w-5 text-primary" />
@@ -665,7 +665,7 @@ const BuyerProfile = () => {
                   {getLabel('Enter your new email address', 'ایمیل جدید وارد کنید', 'خپل نوی بریښنالیک پته دننه کړئ')}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4" dir={isRTL ? 'rtl' : 'ltr'}>
                 <div className="space-y-2">
                   <Label>{getLabel('Current Email', 'ایمیل فعلی', 'اوسنی بریښنالیک')}</Label>
                   <Input value={email} disabled className="bg-muted/50" />
@@ -692,7 +692,7 @@ const BuyerProfile = () => {
 
           {/* Addresses Tab */}
           <TabsContent value="addresses" className="animate-fade-in">
-            <Card className="border-border/50 shadow-lg">
+            <Card className="border-border/50 shadow-lg" dir={isRTL ? 'rtl' : 'ltr'}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
@@ -711,7 +711,7 @@ const BuyerProfile = () => {
                         {getLabel('Add Address', 'افزودن آدرس', 'پته اضافه کړئ')}
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="animate-scale-in">
+                    <DialogContent className="animate-scale-in" dir={isRTL ? 'rtl' : 'ltr'}>
                       <DialogHeader>
                         <DialogTitle>{getLabel('Add New Address', 'افزودن آدرس جدید', 'نوې پته اضافه کړئ')}</DialogTitle>
                         <DialogDescription>
@@ -819,7 +819,7 @@ const BuyerProfile = () => {
 
           {/* Preferences Tab */}
           <TabsContent value="preferences" className="animate-fade-in">
-            <Card className="border-border/50 shadow-lg">
+            <Card className="border-border/50 shadow-lg" dir={isRTL ? 'rtl' : 'ltr'}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Palette className="h-5 w-5 text-primary" />
