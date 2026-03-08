@@ -150,15 +150,15 @@ const VerifyEmail = () => {
           </p>
         </div>
 
-        {/* OTP Input */}
-        <div className="flex justify-center">
-          <InputOTP
-            maxLength={6}
-            value={code}
-            onChange={setCode}
-            disabled={loading}
-          >
-            <InputOTPGroup>
+         {/* OTP Input */}
+         <div className="flex justify-center">
+           <InputOTP
+             maxLength={6}
+             value={code}
+             onChange={setCode}
+             disabled={loading}
+           >
+             <InputOTPGroup dir="ltr">
               <InputOTPSlot index={0} />
               <InputOTPSlot index={1} />
               <InputOTPSlot index={2} />
