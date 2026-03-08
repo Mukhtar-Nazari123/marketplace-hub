@@ -28,7 +28,8 @@ const VerifyEmail = () => {
 
   // Get stored verification data from sessionStorage
   const verificationData = JSON.parse(sessionStorage.getItem("verification_data") || "{}");
-  const { userId, email, role, expiresAt } = verificationData;
+  const { userId, email, role, expiresAt, devCode: initialDevCode } = verificationData;
+  const [devCode, setDevCode] = useState<string | null>(initialDevCode || null);
 
   // Redirect if no verification data
   useEffect(() => {
@@ -136,11 +137,14 @@ const VerifyEmail = () => {
         setResendCooldown(RESEND_COOLDOWN);
         setCode("");
         setRemainingAttempts(null);
-        // Update expiry
+        // Update expiry and devCode
         if (data?.expiresAt) {
-          const updatedData = { ...verificationData, expiresAt: data.expiresAt };
+          const updatedData = { ...verificationData, expiresAt: data.expiresAt, ...(data.devCode ? { devCode: data.devCode } : {}) };
           sessionStorage.setItem("verification_data", JSON.stringify(updatedData));
           setExpiryCountdown(CODE_EXPIRY_MINUTES * 60);
+        }
+        if (data?.devCode) {
+          setDevCode(data.devCode);
         }
       }
     } catch {
@@ -190,6 +194,14 @@ const VerifyEmail = () => {
             <span className="font-medium text-foreground">{email}</span>
           </p>
         </div>
+
+        {/* Dev mode: show code when email delivery fails */}
+        {devCode && (
+          <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-4 text-center space-y-1">
+            <p className="text-xs font-medium text-amber-700 dark:text-amber-400">⚠️ Email not delivered (sandbox mode)</p>
+            <p className="text-2xl font-mono font-bold tracking-[0.3em] text-amber-900 dark:text-amber-200">{devCode}</p>
+          </div>
+        )}
 
         {/* OTP Input */}
         <div className="flex justify-center">

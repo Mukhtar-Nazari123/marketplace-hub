@@ -141,6 +141,7 @@ serve(async (req) => {
 
     // Use Resend if API key available, otherwise log for dev
     const resendKey = Deno.env.get("RESEND_API_KEY");
+    let emailSent = false;
     if (resendKey) {
       const emailRes = await fetch("https://api.resend.com/emails", {
         method: "POST",
@@ -159,6 +160,8 @@ serve(async (req) => {
       if (!emailRes.ok) {
         const errText = await emailRes.text();
         console.error("Resend email error:", errText);
+      } else {
+        emailSent = true;
       }
     } else {
       console.log(`[DEV] Verification code for ${email}: ${code}`);
@@ -171,7 +174,11 @@ serve(async (req) => {
       // ignore cleanup errors
     }
 
-    return new Response(JSON.stringify({ success: true, expiresAt }), {
+    return new Response(JSON.stringify({ 
+      success: true, 
+      expiresAt,
+      ...(emailSent ? {} : { devCode: code, devNotice: "Email not delivered (Resend sandbox). Use this code to verify." })
+    }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

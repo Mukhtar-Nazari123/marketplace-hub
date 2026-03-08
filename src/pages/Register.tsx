@@ -140,7 +140,8 @@ const Register = () => {
         userId: newUserId,
         email,
         role: selectedRole,
-        expiresAt: codeData?.expiresAt
+        expiresAt: codeData?.expiresAt,
+        ...(codeData?.devCode ? { devCode: codeData.devCode } : {})
       }));
 
       setLoading(false);
