@@ -229,6 +229,24 @@ const BuyerProfile = () => {
   };
 
   const handleChangePassword = async () => {
+    if (!currentPassword) {
+      toast({
+        title: getLabel('Error', 'خطا', 'تېروتنه'),
+        description: getLabel('Please enter your current password', 'لطفاً رمز عبور فعلی را وارد کنید', 'مهرباني وکړئ خپل اوسنی پاسورډ دننه کړئ'),
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      toast({
+        title: getLabel('Error', 'خطا', 'تېروتنه'),
+        description: getLabel('New password must be at least 8 characters', 'رمز عبور جدید باید حداقل ۸ کاراکتر باشد', 'نوی پاسورډ باید لږ تر لږه ۸ توري ولري'),
+        variant: 'destructive',
+      });
+      return;
+    }
+
     if (newPassword !== confirmPassword) {
       toast({
         title: getLabel('Error', 'خطا', 'تېروتنه'),
@@ -240,6 +258,22 @@ const BuyerProfile = () => {
 
     setIsChangingPassword(true);
     try {
+      // Verify current password by re-authenticating
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: currentPassword,
+      });
+
+      if (signInError) {
+        toast({
+          title: getLabel('Error', 'خطا', 'تېروتنه'),
+          description: getLabel('Current password is incorrect', 'رمز عبور فعلی اشتباه است', 'اوسنی پاسورډ غلط دی'),
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // Update to new password
       const { error } = await supabase.auth.updateUser({ password: newPassword });
       if (error) throw error;
 
