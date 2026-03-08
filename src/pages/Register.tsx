@@ -45,12 +45,15 @@ const Register = () => {
     path: ["confirmPassword"]
   });
 
-  // Redirect if already logged in
+  // Redirect if already logged in (skip during registration/verification flow)
   useEffect(() => {
-    if (user && !authLoading) {
-      navigate('/');
+    if (user && !authLoading && !loading) {
+      const hasVerificationData = sessionStorage.getItem('verification_data');
+      if (!hasVerificationData) {
+        navigate('/');
+      }
     }
-  }, [user, authLoading, navigate]);
+  }, [user, authLoading, loading, navigate]);
 
   const validateForm = (): boolean => {
     try {
