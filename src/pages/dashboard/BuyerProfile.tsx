@@ -711,7 +711,7 @@ const BuyerProfile = () => {
                         {getLabel('Add Address', 'افزودن آدرس', 'پته اضافه کړئ')}
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="animate-scale-in">
+                    <DialogContent className="animate-scale-in" dir={isRTL ? 'rtl' : 'ltr'}>
                       <DialogHeader>
                         <DialogTitle>{getLabel('Add New Address', 'افزودن آدرس جدید', 'نوې پته اضافه کړئ')}</DialogTitle>
                         <DialogDescription>
