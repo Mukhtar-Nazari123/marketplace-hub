@@ -692,7 +692,7 @@ const BuyerProfile = () => {
 
           {/* Addresses Tab */}
           <TabsContent value="addresses" className="animate-fade-in">
-            <Card className="border-border/50 shadow-lg">
+            <Card className="border-border/50 shadow-lg" dir={isRTL ? 'rtl' : 'ltr'}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
