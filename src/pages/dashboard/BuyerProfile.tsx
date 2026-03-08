@@ -655,7 +655,7 @@ const BuyerProfile = () => {
             </Card>
 
             {/* Change Email */}
-            <Card className="border-border/50 shadow-lg">
+            <Card className="border-border/50 shadow-lg" dir={isRTL ? 'rtl' : 'ltr'}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Mail className="h-5 w-5 text-primary" />
