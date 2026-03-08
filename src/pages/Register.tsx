@@ -105,9 +105,13 @@ const Register = () => {
 
     if (error) {
       setLoading(false);
+      const isRateLimit = error.message?.toLowerCase().includes('rate limit') || 
+                          error.message?.includes('429');
       toast({
-        title: t('register', 'registerError'),
-        description: error.message,
+        title: isRateLimit ? (language === 'fa' ? 'محدودیت ارسال ایمیل' : language === 'ps' ? 'د بریښنالیک لیږلو محدودیت' : 'Email Rate Limit') : t('register', 'registerError'),
+        description: isRateLimit 
+          ? (language === 'fa' ? 'لطفاً چند دقیقه صبر کنید و دوباره تلاش کنید.' : language === 'ps' ? 'مهرباني وکړئ یو څو دقیقې انتظار وکړئ او بیا هڅه وکړئ.' : 'Too many attempts. Please wait a few minutes and try again.')
+          : error.message,
         variant: "destructive"
       });
       return;
