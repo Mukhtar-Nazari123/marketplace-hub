@@ -28,7 +28,8 @@ const VerifyEmail = () => {
 
   // Get stored verification data from sessionStorage
   const verificationData = JSON.parse(sessionStorage.getItem("verification_data") || "{}");
-  const { userId, email, role, expiresAt } = verificationData;
+  const { userId, email, role, expiresAt, devCode: initialDevCode } = verificationData;
+  const [devCode, setDevCode] = useState<string | null>(initialDevCode || null);
 
   // Redirect if no verification data
   useEffect(() => {
