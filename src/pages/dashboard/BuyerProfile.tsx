@@ -590,38 +590,40 @@ const BuyerProfile = () => {
                   {getLabel('Choose a new password', 'رمز عبور جدید انتخاب کنید', 'نوی پاسورډ وټاکئ')}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4" dir={isRTL ? 'rtl' : 'ltr'}>
                 <div className="space-y-2">
-                  <Label>{getLabel('Current Password', 'رمز عبور فعلی', 'اوسنی پاسورډ')}</Label>
+                  <Label className={isRTL ? 'text-right' : 'text-left'}>{getLabel('Current Password', 'رمز عبور فعلی', 'اوسنی پاسورډ')}</Label>
                   <div className="relative">
                     <Input
                       type={showCurrentPassword ? 'text' : 'password'}
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
-                      className="pr-10"
+                      className={isRTL ? 'pl-10 pr-3' : 'pr-10'}
+                      dir={isRTL ? 'rtl' : 'ltr'}
                     />
                     <button
                       type="button"
                       onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      className={`absolute top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors ${isRTL ? 'left-3' : 'right-3'}`}
                     >
                       {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label>{getLabel('New Password', 'رمز عبور جدید', 'نوی پاسورډ')}</Label>
+                  <Label className={isRTL ? 'text-right' : 'text-left'}>{getLabel('New Password', 'رمز عبور جدید', 'نوی پاسورډ')}</Label>
                   <div className="relative">
                     <Input
                       type={showNewPassword ? 'text' : 'password'}
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      className="pr-10"
+                      className={isRTL ? 'pl-10 pr-3' : 'pr-10'}
+                      dir={isRTL ? 'rtl' : 'ltr'}
                     />
                     <button
                       type="button"
                       onClick={() => setShowNewPassword(!showNewPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      className={`absolute top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors ${isRTL ? 'left-3' : 'right-3'}`}
                     >
                       {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
@@ -629,14 +631,15 @@ const BuyerProfile = () => {
                   {newPassword && <PasswordStrengthIndicator password={newPassword} language={language} />}
                 </div>
                 <div className="space-y-2">
-                  <Label>{getLabel('Confirm New Password', 'تکرار رمز عبور جدید', 'نوی پاسورډ تایید کړئ')}</Label>
+                  <Label className={isRTL ? 'text-right' : 'text-left'}>{getLabel('Confirm New Password', 'تکرار رمز عبور جدید', 'نوی پاسورډ تایید کړئ')}</Label>
                   <Input
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
+                    dir={isRTL ? 'rtl' : 'ltr'}
                   />
                   {confirmPassword && newPassword !== confirmPassword && (
-                    <p className="text-sm text-destructive">
+                    <p className={`text-sm text-destructive ${isRTL ? 'text-right' : 'text-left'}`}>
                       {getLabel('Passwords do not match', 'رمزها مطابقت ندارند', 'پاسورډونه سره سمون نه خوري')}
                     </p>
                   )}
