@@ -262,20 +262,32 @@ const BuyerProfile = () => {
   };
 
   const handleChangeEmail = async () => {
+    if (!newEmail || newEmail === email) return;
+    
     setIsChangingEmail(true);
     try {
-      const { error } = await supabase.auth.updateUser({ email: newEmail });
+      const { error } = await supabase.auth.updateUser(
+        { email: newEmail },
+        { emailRedirectTo: `${window.location.origin}/dashboard/profile` }
+      );
       if (error) throw error;
 
       toast({
         title: getLabel('Success', 'موفقیت', 'بریالیتوب'),
-        description: getLabel('Confirmation email sent to new address', 'ایمیل تأیید به آدرس جدید ارسال شد', 'تایید بریښنالیک نوې پتې ته واستول شو'),
+        description: getLabel(
+          'Confirmation emails sent. Please check both your old and new email addresses to confirm the change.',
+          'ایمیل‌های تأیید ارسال شد. لطفاً هر دو ایمیل قدیم و جدید را بررسی کنید.',
+          'تایید بریښنالیکونه واستول شول. مهرباني وکړئ دواړه زاړه او نوې بریښنالیک پتې وګورئ.'
+        ),
       });
       setNewEmail('');
-    } catch {
+    } catch (err: any) {
+      const isRateLimit = err?.message?.includes('rate') || err?.message?.includes('429');
       toast({
         title: getLabel('Error', 'خطا', 'تېروتنه'),
-        description: getLabel('Failed to change email', 'خطا در تغییر ایمیل', 'د بریښنالیک بدلولو کې تېروتنه'),
+        description: isRateLimit
+          ? getLabel('Too many attempts. Please wait and try again.', 'تلاش‌های زیاد. لطفاً صبر کنید و دوباره امتحان کنید.', 'ډیرې هڅې. مهرباني وکړئ انتظار وکړئ او بیا هڅه وکړئ.')
+          : getLabel('Failed to change email', 'خطا در تغییر ایمیل', 'د بریښنالیک بدلولو کې تېروتنه'),
         variant: 'destructive',
       });
     } finally {
