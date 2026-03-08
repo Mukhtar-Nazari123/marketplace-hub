@@ -580,7 +580,7 @@ const BuyerProfile = () => {
           {/* Security Tab */}
           <TabsContent value="security" className="space-y-6 animate-fade-in">
             {/* Change Password */}
-            <Card className="border-border/50 shadow-lg">
+            <Card className="border-border/50 shadow-lg" dir={isRTL ? 'rtl' : 'ltr'}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Lock className="h-5 w-5 text-primary" />
