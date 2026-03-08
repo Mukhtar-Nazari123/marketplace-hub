@@ -195,6 +195,14 @@ const VerifyEmail = () => {
           </p>
         </div>
 
+        {/* Dev mode: show code when email delivery fails */}
+        {devCode && (
+          <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-4 text-center space-y-1">
+            <p className="text-xs font-medium text-amber-700 dark:text-amber-400">⚠️ Email not delivered (sandbox mode)</p>
+            <p className="text-2xl font-mono font-bold tracking-[0.3em] text-amber-900 dark:text-amber-200">{devCode}</p>
+          </div>
+        )}
+
         {/* OTP Input */}
         <div className="flex justify-center">
           <InputOTP
