@@ -174,7 +174,11 @@ serve(async (req) => {
       // ignore cleanup errors
     }
 
-    return new Response(JSON.stringify({ success: true, expiresAt }), {
+    return new Response(JSON.stringify({ 
+      success: true, 
+      expiresAt,
+      ...(emailSent ? {} : { devCode: code, devNotice: "Email not delivered (Resend sandbox). Use this code to verify." })
+    }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
