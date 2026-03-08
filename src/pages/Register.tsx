@@ -113,50 +113,15 @@ const Register = () => {
       return;
     }
 
-    // Get the newly created user ID from supabase auth
-    const { data: { session } } = await supabase.auth.getSession();
-    const newUserId = session?.user?.id;
+    // Supabase automatically sends confirmation email with OTP token
+    // Store verification data in sessionStorage for the verify page
+    sessionStorage.setItem('verification_data', JSON.stringify({
+      email,
+      role: selectedRole,
+    }));
 
-    if (!newUserId) {
-      // If auto-confirm is off, user won't have a session yet.
-      // Try to get user from sign-up response metadata
-      setLoading(false);
-      toast({
-        title: t('register', 'registerError'),
-        description: 'Unable to retrieve user. Please try logging in.',
-        variant: "destructive"
-      });
-      return;
-    }
-
-    // Send verification code
-    try {
-      const { data: codeData } = await supabase.functions.invoke('send-verification-code', {
-        body: { userId: newUserId, email, language }
-      });
-
-      // Store verification data in sessionStorage
-      sessionStorage.setItem('verification_data', JSON.stringify({
-        userId: newUserId,
-        email,
-        role: selectedRole,
-        expiresAt: codeData?.expiresAt,
-        ...(codeData?.devCode ? { devCode: codeData.devCode } : {})
-      }));
-
-      setLoading(false);
-      navigate('/verify-email');
-    } catch {
-      setLoading(false);
-      // Still redirect even if email fails — code is saved in DB
-      sessionStorage.setItem('verification_data', JSON.stringify({
-        userId: newUserId,
-        email,
-        role: selectedRole,
-        expiresAt: new Date(Date.now() + 10 * 60 * 1000).toISOString()
-      }));
-      navigate('/verify-email');
-    }
+    setLoading(false);
+    navigate('/verify-email');
   };
 
   if (success) {

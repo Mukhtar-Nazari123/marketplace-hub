@@ -9,7 +9,6 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp
 import { CheckCircle, ArrowLeft, Loader2, ShieldCheck, RefreshCw } from "lucide-react";
 
 const RESEND_COOLDOWN = 60;
-const CODE_EXPIRY_MINUTES = 10;
 
 const VerifyEmail = () => {
   const { isRTL, language } = useLanguage();
@@ -22,21 +21,18 @@ const VerifyEmail = () => {
   const [resending, setResending] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
-  const [remainingAttempts, setRemainingAttempts] = useState<number | null>(null);
   const [resendCooldown, setResendCooldown] = useState(RESEND_COOLDOWN);
-  const [expiryCountdown, setExpiryCountdown] = useState(CODE_EXPIRY_MINUTES * 60);
 
   // Get stored verification data from sessionStorage
   const verificationData = JSON.parse(sessionStorage.getItem("verification_data") || "{}");
-  const { userId, email, role, expiresAt, devCode: initialDevCode } = verificationData;
-  const [devCode, setDevCode] = useState<string | null>(initialDevCode || null);
+  const { email, role } = verificationData;
 
   // Redirect if no verification data
   useEffect(() => {
-    if (!userId || !email) {
+    if (!email) {
       navigate("/register");
     }
-  }, [userId, email, navigate]);
+  }, [email, navigate]);
 
   // Resend cooldown timer
   useEffect(() => {
@@ -47,42 +43,20 @@ const VerifyEmail = () => {
     return () => clearInterval(timer);
   }, [resendCooldown]);
 
-  // Expiry countdown
-  useEffect(() => {
-    if (!expiresAt) return;
-    const updateCountdown = () => {
-      const remaining = Math.max(0, Math.floor((new Date(expiresAt).getTime() - Date.now()) / 1000));
-      setExpiryCountdown(remaining);
-    };
-    updateCountdown();
-    const timer = setInterval(updateCountdown, 1000);
-    return () => clearInterval(timer);
-  }, [expiresAt]);
-
   const handleVerify = useCallback(async (otpCode: string) => {
     if (otpCode.length !== 6 || loading) return;
     setLoading(true);
     setError("");
 
     try {
-      const { data, error: fnError } = await supabase.functions.invoke("verify-email-code", {
-        body: { userId, code: otpCode },
+      const { error: verifyError } = await supabase.auth.verifyOtp({
+        email,
+        token: otpCode,
+        type: 'signup',
       });
 
-      if (fnError || data?.error) {
-        const errType = data?.error || "unknown";
-        if (errType === "invalid_code") {
-          setError(t("invalidCode"));
-          setRemainingAttempts(data.remainingAttempts);
-        } else if (errType === "code_expired") {
-          setError(t("expiredCode"));
-        } else if (errType === "too_many_attempts") {
-          setError(t("tooManyAttempts"));
-        } else if (errType === "no_code") {
-          setError(t("noCode"));
-        } else {
-          setError(data?.message || "Verification failed");
-        }
+      if (verifyError) {
+        setError(verifyError.message || t("invalidCode"));
         setCode("");
         setLoading(false);
         return;
@@ -91,9 +65,6 @@ const VerifyEmail = () => {
       // Success
       setSuccess(true);
       sessionStorage.removeItem("verification_data");
-
-      // Refresh session to pick up verified status
-      await supabase.auth.refreshSession();
 
       toast({ title: t("success") });
 
@@ -107,7 +78,7 @@ const VerifyEmail = () => {
     } finally {
       setLoading(false);
     }
-  }, [userId, loading, navigate, role, t, toast]);
+  }, [email, loading, navigate, role, t, toast]);
 
   // Auto-submit when 6 digits entered
   useEffect(() => {
@@ -122,30 +93,17 @@ const VerifyEmail = () => {
     setError("");
 
     try {
-      const { data, error: fnError } = await supabase.functions.invoke("resend-verification-code", {
-        body: { userId, email, language },
+      const { error: resendError } = await supabase.auth.resend({
+        type: 'signup',
+        email,
       });
 
-      if (fnError || data?.error) {
-        if (data?.error === "too_many_requests") {
-          setError(t("tooManyRequests"));
-        } else {
-          setError(data?.message || "Failed to resend");
-        }
+      if (resendError) {
+        setError(resendError.message || "Failed to resend");
       } else {
         toast({ title: t("codeSent"), description: t("checkEmail") });
         setResendCooldown(RESEND_COOLDOWN);
         setCode("");
-        setRemainingAttempts(null);
-        // Update expiry and devCode
-        if (data?.expiresAt) {
-          const updatedData = { ...verificationData, expiresAt: data.expiresAt, ...(data.devCode ? { devCode: data.devCode } : {}) };
-          sessionStorage.setItem("verification_data", JSON.stringify(updatedData));
-          setExpiryCountdown(CODE_EXPIRY_MINUTES * 60);
-        }
-        if (data?.devCode) {
-          setDevCode(data.devCode);
-        }
       }
     } catch {
       setError("Failed to resend code");
@@ -167,9 +125,6 @@ const VerifyEmail = () => {
       </div>
     );
   }
-
-  const expiryMinutes = Math.floor(expiryCountdown / 60);
-  const expirySeconds = expiryCountdown % 60;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4" dir={isRTL ? "rtl" : "ltr"}>
@@ -195,14 +150,6 @@ const VerifyEmail = () => {
           </p>
         </div>
 
-        {/* Dev mode: show code when email delivery fails */}
-        {devCode && (
-          <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-4 text-center space-y-1">
-            <p className="text-xs font-medium text-amber-700 dark:text-amber-400">⚠️ Email not delivered (sandbox mode)</p>
-            <p className="text-2xl font-mono font-bold tracking-[0.3em] text-amber-900 dark:text-amber-200">{devCode}</p>
-          </div>
-        )}
-
         {/* OTP Input */}
         <div className="flex justify-center">
           <InputOTP
@@ -226,19 +173,7 @@ const VerifyEmail = () => {
         {error && (
           <div className="text-center">
             <p className="text-sm text-destructive font-medium">{error}</p>
-            {remainingAttempts !== null && remainingAttempts > 0 && (
-              <p className="text-xs text-muted-foreground mt-1">
-                {remainingAttempts} {t("remainingAttempts")}
-              </p>
-            )}
           </div>
-        )}
-
-        {/* Expiry Timer */}
-        {expiryCountdown > 0 && (
-          <p className="text-center text-xs text-muted-foreground">
-            {t("codeExpires")} {expiryMinutes}:{String(expirySeconds).padStart(2, "0")} {t("minutes")}
-          </p>
         )}
 
         {/* Verify Button */}
