@@ -56,6 +56,9 @@ const attributeLabels: Record<string, { en: string; fa: string; ps: string }> = 
   // Baby & Kids
   ageRange: { en: 'Age Range', fa: 'محدوده سنی', ps: 'عمري حد' },
   safetyStandards: { en: 'Safety Standards', fa: 'استانداردهای ایمنی', ps: 'د خوندیتوب معیارونه' },
+  // Men's Grooming
+  groomingType: { en: 'Product Type', fa: 'نوع محصول', ps: 'د محصول ډول' },
+  scent: { en: 'Scent/Fragrance', fa: 'عطر/رایحه', ps: 'بوی/عطر' },
   // General
   model: { en: 'Model', fa: 'مدل', ps: 'ماډل' },
   warranty: { en: 'Warranty', fa: 'گارانتی', ps: 'ګارنټي' },
