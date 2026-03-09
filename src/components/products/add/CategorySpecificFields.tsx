@@ -564,7 +564,16 @@ export const CategorySpecificFields = ({
         </div>
 
         <div className="space-y-2">
-          <Label>{getLabel("Skin Type", "نوع پوست", "د پوستکي ډول")}</Label>
+          <Label>{getLabel("Model", "مدل", "ماډل")}</Label>
+          <Input
+            value={(attributes.model as string) || ""}
+            onChange={(e) => updateAttribute("model", e.target.value)}
+            placeholder={getLabel("e.g., Gillette Fusion 5", "مثال: ژیلت فیوژن ۵", "مثال: ژیلت فیوژن ۵")}
+            className={cn(isRTL && "text-right")}
+          />
+        </div>
+
+        <div className="space-y-2">
           <Select
             value={(attributes.skinType as string) || ""}
             onValueChange={(value) => updateAttribute("skinType", value)}
