@@ -1324,6 +1324,22 @@ export const CategorySpecificFields = ({
       }
     }
   }, [categoryType]); // Only run when category changes
+  // Check for subcategory-specific fields first
+  const getSubcategoryType = (subName?: string): string => {
+    if (!subName) return '';
+    const lower = subName.toLowerCase();
+    const groomingMatches = ["mens-grooming", "men's grooming", "اصلاح مردانه", "د نارینه سینګار"];
+    if (groomingMatches.some(m => lower.includes(m) || m.includes(lower))) return 'mens-grooming';
+    return '';
+  };
+
+  const subcategoryType = getSubcategoryType(subCategoryName);
+
+  // Subcategory-specific fields take priority
+  if (subcategoryType === 'mens-grooming') {
+    return renderMensGroomingFields();
+  }
+
   switch (categoryType) {
     case "electronics":
       return renderElectronicsFields();
