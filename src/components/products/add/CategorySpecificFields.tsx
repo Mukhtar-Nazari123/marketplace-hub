@@ -530,6 +530,114 @@ export const CategorySpecificFields = ({
     </div>
   );
 
+  const renderMensGroomingFields = () => (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2 mb-4 text-primary">
+        <Sparkles className="w-5 h-5" />
+        <span className="font-medium">
+          {getLabel("Men's Grooming Specifications", "مشخصات اصلاح مردانه", "د نارینه سینګار مشخصات")}
+        </span>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="space-y-2">
+          <Label>{getLabel("Product Type", "نوع محصول", "د محصول ډول")}</Label>
+          <Select
+            value={(attributes.groomingType as string) || ""}
+            onValueChange={(value) => updateAttribute("groomingType", value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder={getLabel("Select", "انتخاب کنید", "غوره کړئ")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="razor">{getLabel("Razor", "تیغ اصلاح", "استره")}</SelectItem>
+              <SelectItem value="trimmer">{getLabel("Trimmer", "تریمر", "ټریمر")}</SelectItem>
+              <SelectItem value="shaving-cream">{getLabel("Shaving Cream/Gel", "کرم/ژل اصلاح", "د اصلاح کریم/جیل")}</SelectItem>
+              <SelectItem value="aftershave">{getLabel("Aftershave", "افترشیو", "وروسته له اصلاح")}</SelectItem>
+              <SelectItem value="beard-oil">{getLabel("Beard Oil", "روغن ریش", "د ږیرې تیل")}</SelectItem>
+              <SelectItem value="beard-balm">{getLabel("Beard Balm", "بالم ریش", "د ږیرې بالم")}</SelectItem>
+              <SelectItem value="cologne">{getLabel("Cologne/Perfume", "ادکلن/عطر", "عطر")}</SelectItem>
+              <SelectItem value="grooming-kit">{getLabel("Grooming Kit", "ست اصلاح", "د اصلاح سیټ")}</SelectItem>
+              <SelectItem value="other">{getLabel("Other", "سایر", "نور")}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label>{getLabel("Skin Type", "نوع پوست", "د پوستکي ډول")}</Label>
+          <Select
+            value={(attributes.skinType as string) || ""}
+            onValueChange={(value) => updateAttribute("skinType", value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder={getLabel("Select", "انتخاب کنید", "غوره کړئ")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{getLabel("All Types", "همه انواع", "ټول ډولونه")}</SelectItem>
+              <SelectItem value="oily">{getLabel("Oily", "چرب", "غوړ")}</SelectItem>
+              <SelectItem value="dry">{getLabel("Dry", "خشک", "وچ")}</SelectItem>
+              <SelectItem value="sensitive">{getLabel("Sensitive", "حساس", "حساس")}</SelectItem>
+              <SelectItem value="normal">{getLabel("Normal", "نرمال", "نورمال")}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label>{getLabel("Scent/Fragrance", "عطر/رایحه", "بوی/عطر")}</Label>
+          <Input
+            value={(attributes.scent as string) || ""}
+            onChange={(e) => updateAttribute("scent", e.target.value)}
+            placeholder={getLabel("e.g., Sandalwood, Fresh", "مثال: صندل، تازه", "مثال: صندل، تازه")}
+            className={cn(isRTL && "text-right")}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label>{getLabel("Volume / Quantity", "حجم / مقدار", "اندازه / مقدار")}</Label>
+          <Input
+            value={(attributes.volume as string) || ""}
+            onChange={(e) => updateAttribute("volume", e.target.value)}
+            placeholder={getLabel("e.g., 100ml, 200g", "مثال: ۱۰۰ میلی‌لیتر", "مثال: ۱۰۰ ملي لیتر")}
+            className={cn(isRTL && "text-right")}
+          />
+        </div>
+
+        <div className="md:col-span-2 space-y-2">
+          <Label>{getLabel("Ingredients", "مواد تشکیل‌دهنده", "مواد")}</Label>
+          <Textarea
+            value={(attributes.ingredients as string) || ""}
+            onChange={(e) => updateAttribute("ingredients", e.target.value)}
+            placeholder={getLabel("Main ingredients...", "مواد تشکیل‌دهنده اصلی...", "اصلي مواد...")}
+            rows={3}
+            className={cn(isRTL && "text-right")}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label className="flex items-center gap-2">
+            <Calendar className="w-4 h-4" />
+            {getLabel("Expiry Date", "تاریخ انقضا", "د ختمیدو نیټه")}
+          </Label>
+          <Input
+            type="date"
+            value={(attributes.expiryDate as string) || ""}
+            onChange={(e) => updateAttribute("expiryDate", e.target.value)}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label>{getLabel("Country of Origin", "کشور سازنده", "د جوړولو هیواد")}</Label>
+          <Input
+            value={(attributes.countryOfOrigin as string) || ""}
+            onChange={(e) => updateAttribute("countryOfOrigin", e.target.value)}
+            placeholder={getLabel("e.g., USA, Germany", "مثال: آمریکا، آلمان", "مثال: امریکا، آلمان")}
+            className={cn(isRTL && "text-right")}
+          />
+        </div>
+      </div>
+    </div>
+  );
+
   const renderBeautyFields = () => (
     <div className="space-y-4">
       <div className="flex items-center gap-2 mb-4 text-primary">
