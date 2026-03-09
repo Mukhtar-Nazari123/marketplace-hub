@@ -574,6 +574,7 @@ export const CategorySpecificFields = ({
         </div>
 
         <div className="space-y-2">
+          <Label>{getLabel("Skin Type", "نوع پوست", "د پوستکي ډول")}</Label>
           <Select
             value={(attributes.skinType as string) || ""}
             onValueChange={(value) => updateAttribute("skinType", value)}
