@@ -135,6 +135,8 @@ export const subcategoryImageMap: Record<string, string> = {
   'small-appliances': smallAppliances,
   // Chador & Hijab
   'chador-hijab': chadorHijab,
+  // Men's Grooming
+  'mens-grooming': mensGrooming,
   // Electronics subcategories
   'phones': phones,
   'computers': computers,
