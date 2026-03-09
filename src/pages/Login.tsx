@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, EyeOff, Loader2, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
+import { supabase } from "@/integrations/supabase/client";
 
 const Login = () => {
   const { isRTL, language } = useLanguage();
