@@ -21,6 +21,9 @@ export const authTranslations = {
     welcomeBack: { en: 'Welcome back!', fa: 'خوش آمدید!', ps: 'بیرته ښه راغلاست!' },
     invalidCredentials: { en: 'Invalid email or password', fa: 'ایمیل یا رمز عبور اشتباه است', ps: 'ناسم بریښنالیک یا پټنوم' },
     confirmEmail: { en: 'Please confirm your email first', fa: 'لطفا ایمیل خود را تایید کنید', ps: 'مهرباني وکړئ لومړی خپل بریښنالیک تایید کړئ' },
+    continueWithGoogle: { en: 'Continue with Google', fa: 'ورود با گوگل', ps: 'د ګوګل سره ننوتل' },
+    orDivider: { en: 'or', fa: 'یا', ps: 'یا' },
+    googleError: { en: 'Google sign-in failed', fa: 'ورود با گوگل ناموفق بود', ps: 'د ګوګل سره ننوتل ناکام شول' },
   },
   
   // Register Page
