@@ -210,13 +210,33 @@ const Login = () => {
           disabled={googleLoading}
           onClick={async () => {
             setGoogleLoading(true);
-            const { error } = await supabase.auth.signInWithOAuth({
-              provider: 'google',
-              options: {
-                redirectTo: `${window.location.origin}/`,
-              },
-            });
-            if (error) {
+            try {
+              const isCustomDomain =
+                !window.location.hostname.includes("lovable.app") &&
+                !window.location.hostname.includes("lovableproject.com");
+
+              if (isCustomDomain) {
+                const { data, error } = await supabase.auth.signInWithOAuth({
+                  provider: 'google',
+                  options: {
+                    redirectTo: `${window.location.origin}/`,
+                    skipBrowserRedirect: true,
+                  },
+                });
+                if (error) throw error;
+                if (data?.url) {
+                  window.location.href = data.url;
+                }
+              } else {
+                const { error } = await supabase.auth.signInWithOAuth({
+                  provider: 'google',
+                  options: {
+                    redirectTo: `${window.location.origin}/`,
+                  },
+                });
+                if (error) throw error;
+              }
+            } catch (error: any) {
               setGoogleLoading(false);
               toast({
                 title: t('login', 'loginError'),
