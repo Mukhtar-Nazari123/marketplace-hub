@@ -55,6 +55,7 @@ import vacuumCleaning from '@/assets/subcategories/vacuum-cleaning.webp';
 import ironsGarmentCare from '@/assets/subcategories/irons-garment-care.webp';
 import smallAppliances from '@/assets/subcategories/small-appliances.webp';
 import chadorHijab from '@/assets/subcategories/chador-hijab.webp';
+import mensGrooming from '@/assets/subcategories/mens-grooming.webp';
 
 // Electronics subcategories
 import phones from '@/assets/subcategories/phones.webp';
@@ -134,6 +135,8 @@ export const subcategoryImageMap: Record<string, string> = {
   'small-appliances': smallAppliances,
   // Chador & Hijab
   'chador-hijab': chadorHijab,
+  // Men's Grooming
+  'mens-grooming': mensGrooming,
   // Electronics subcategories
   'phones': phones,
   'computers': computers,

@@ -1,0 +1,2 @@
+INSERT INTO subcategories (name, name_fa, name_ps, slug, category_id, is_active, sort_order)
+VALUES ('Men''s Grooming', 'اصلاح مردانه', 'د نارینه سینګار', 'mens-grooming', '52e5300f-eb8b-483d-b7af-4cbf6a91e619', true, 6);
