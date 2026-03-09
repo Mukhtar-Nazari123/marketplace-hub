@@ -885,15 +885,32 @@ export const CategorySpecificFields = ({
           />
         </div>
 
+        <div className="md:col-span-2 space-y-2">
+          <Label>{getLabel("Technical Specifications", "مشخصات فنی", "تخنیکي مشخصات")}</Label>
+          <Textarea
+            value={(attributes.specifications as string) || ""}
+            onChange={(e) => updateAttribute("specifications", e.target.value)}
+            placeholder={
+              getLabel(
+                "Write technical specs here...\nExample:\n- Material: ...\n- Weight: ...\n- Dimensions: ...",
+                "مشخصات فنی را اینجا بنویسید...\nمثال:\n- جنس: ...\n- وزن: ...\n- ابعاد: ...",
+                "تخنیکي مشخصات دلته ولیکئ...\nمثال:\n- ډول: ...\n- وزن: ...\n- اندازې: ..."
+              )
+            }
+            rows={4}
+            className={cn(isRTL && "text-right")}
+          />
+        </div>
+
         <Card className="md:col-span-2 p-4 space-y-3 bg-muted/30">
           <Label className="flex items-center gap-2">
             <Shield className="w-4 h-4 text-primary" />
-            {isRTL ? "اطلاعات ایمنی" : "Safety Information"}
+            {getLabel("Safety Information", "اطلاعات ایمنی", "د خوندیتوب معلومات")}
           </Label>
           <Textarea
             value={(attributes.safetyInfo as string) || ""}
             onChange={(e) => updateAttribute("safetyInfo", e.target.value)}
-            placeholder={isRTL ? "اطلاعات ایمنی و هشدارها را وارد کنید..." : "Enter safety info and warnings..."}
+            placeholder={getLabel("Enter safety info and warnings...", "اطلاعات ایمنی و هشدارها را وارد کنید...", "د خوندیتوب معلومات او خبرداری ولیکئ...")}
             rows={2}
             className={cn(isRTL && "text-right")}
           />
