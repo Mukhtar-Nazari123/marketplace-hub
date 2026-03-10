@@ -54,20 +54,21 @@ const MigrateSubcategoryImages = ({ onComplete }: { onComplete?: () => void }) =
           .from('site-assets')
           .getPublicUrl(fileName);
 
-        // Update subcategories table where slug matches
-        const { error: updateError } = await supabase
-          .from('subcategories')
-          .update({ image_url: publicUrl })
-          .eq('slug', slug);
-
-        if (updateError) {
-          console.warn(`No subcategory found for slug "${slug}", trying categories...`);
-          // Try categories table too
-          await supabase
+        // Update both subcategories and categories tables where slug matches
+        // Supabase update returns no error when 0 rows match, so we update both
+        const [subResult, catResult] = await Promise.all([
+          supabase
+            .from('subcategories')
+            .update({ image_url: publicUrl })
+            .eq('slug', slug),
+          supabase
             .from('categories')
             .update({ image_url: publicUrl })
-            .eq('slug', slug);
-        }
+            .eq('slug', slug)
+        ]);
+
+        if (subResult.error) console.warn(`Subcategory update error for "${slug}":`, subResult.error);
+        if (catResult.error) console.warn(`Category update error for "${slug}":`, catResult.error);
 
         migrationResults.push({ slug, success: true, url: publicUrl });
       } catch (error: any) {
