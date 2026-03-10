@@ -24,6 +24,13 @@ const MigrateSubcategoryImages = ({ onComplete }: { onComplete?: () => void }) =
     const total = slugs.length;
     const migrationResults: MigrationResult[] = [];
 
+    // Pre-fetch all category slugs to determine correct upload folder
+    const { data: categoryRows } = await supabase
+      .from('categories')
+      .select('slug')
+      .is('parent_id', null);
+    const categorySlugs = new Set((categoryRows || []).map(c => c.slug));
+
     for (let i = 0; i < slugs.length; i++) {
       const slug = slugs[i];
       const localImageUrl = subcategoryImageMap[slug];
@@ -37,7 +44,11 @@ const MigrateSubcategoryImages = ({ onComplete }: { onComplete?: () => void }) =
         // Determine extension from content type
         const contentType = blob.type || 'image/jpeg';
         const ext = contentType.includes('webp') ? 'webp' : contentType.includes('png') ? 'png' : 'jpg';
-        const fileName = `subcategories/${slug}.${ext}`;
+        
+        // Use categories/ folder for top-level categories, subcategories/ for the rest
+        const isCategory = categorySlugs.has(slug);
+        const folder = isCategory ? 'categories' : 'subcategories';
+        const fileName = `${folder}/${slug}.${ext}`;
 
         // Upload to site-assets bucket
         const { error: uploadError } = await supabase.storage
@@ -54,21 +65,28 @@ const MigrateSubcategoryImages = ({ onComplete }: { onComplete?: () => void }) =
           .from('site-assets')
           .getPublicUrl(fileName);
 
-        // Update both subcategories and categories tables where slug matches
-        // Supabase update returns no error when 0 rows match, so we update both
-        const [subResult, catResult] = await Promise.all([
-          supabase
-            .from('subcategories')
-            .update({ image_url: publicUrl })
-            .eq('slug', slug),
-          supabase
+        // Update the correct table based on whether it's a category or subcategory
+        if (isCategory) {
+          const { error } = await supabase
             .from('categories')
             .update({ image_url: publicUrl })
-            .eq('slug', slug)
-        ]);
-
-        if (subResult.error) console.warn(`Subcategory update error for "${slug}":`, subResult.error);
-        if (catResult.error) console.warn(`Category update error for "${slug}":`, catResult.error);
+            .eq('slug', slug);
+          if (error) console.warn(`Category update error for "${slug}":`, error);
+        } else {
+          // Update both subcategories and categories (for child categories) where slug matches
+          const [subResult, catResult] = await Promise.all([
+            supabase
+              .from('subcategories')
+              .update({ image_url: publicUrl })
+              .eq('slug', slug),
+            supabase
+              .from('categories')
+              .update({ image_url: publicUrl })
+              .eq('slug', slug)
+          ]);
+          if (subResult.error) console.warn(`Subcategory update error for "${slug}":`, subResult.error);
+          if (catResult.error) console.warn(`Category update error for "${slug}":`, catResult.error);
+        }
 
         migrationResults.push({ slug, success: true, url: publicUrl });
       } catch (error: any) {
