@@ -1622,6 +1622,8 @@ export const CategorySpecificFields = ({
       return renderBabyFields();
     case "food":
       return renderFoodGroceriesFields();
+    case "jewelry":
+      return renderJewelryFields();
     default:
       return (
         <Card className="p-4 bg-muted/30">
