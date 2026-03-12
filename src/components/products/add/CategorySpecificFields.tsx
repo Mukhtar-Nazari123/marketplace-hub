@@ -1302,6 +1302,243 @@ export const CategorySpecificFields = ({
     </div>
   );
 
+  const renderJewelryFields = () => (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2 mb-4 text-primary">
+        <Sparkles className="w-5 h-5" />
+        <span className="font-medium">{getLabel("Jewelry & Accessories Specifications", "مشخصات زیورآلات و اکسسوری", "د زیورآلاتو او اکسسوري مشخصات")}</span>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="space-y-2">
+          <Label>{getLabel("Material", "جنس", "ماده")}</Label>
+          <Select
+            value={(attributes.material as string) || ""}
+            onValueChange={(value) => updateAttribute("material", value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder={getLabel("Select", "انتخاب کنید", "غوره کړئ")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="gold">{getLabel("Gold", "طلا", "سرو")}</SelectItem>
+              <SelectItem value="silver">{getLabel("Silver", "نقره", "سپینزر")}</SelectItem>
+              <SelectItem value="platinum">{getLabel("Platinum", "پلاتین", "پلاتین")}</SelectItem>
+              <SelectItem value="stainless-steel">{getLabel("Stainless Steel", "استیل ضد زنگ", "سټینلیس سټیل")}</SelectItem>
+              <SelectItem value="titanium">{getLabel("Titanium", "تیتانیوم", "تیتانیوم")}</SelectItem>
+              <SelectItem value="copper">{getLabel("Copper", "مس", "مس")}</SelectItem>
+              <SelectItem value="brass">{getLabel("Brass", "برنج", "برنج")}</SelectItem>
+              <SelectItem value="leather">{getLabel("Leather", "چرم", "چرم")}</SelectItem>
+              <SelectItem value="fabric">{getLabel("Fabric", "پارچه", "تکه")}</SelectItem>
+              <SelectItem value="plastic">{getLabel("Plastic/Acrylic", "پلاستیک/اکریلیک", "پلاستیک")}</SelectItem>
+              <SelectItem value="mixed">{getLabel("Mixed", "ترکیبی", "مخلوط")}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label>{getLabel("Gender", "جنسیت", "جنسیت")}</Label>
+          <Select
+            value={(attributes.gender as string) || ""}
+            onValueChange={(value) => updateAttribute("gender", value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder={getLabel("Select", "انتخاب کنید", "غوره کړئ")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="women">{getLabel("Women", "زنانه", "ښځینه")}</SelectItem>
+              <SelectItem value="men">{getLabel("Men", "مردانه", "نارینه")}</SelectItem>
+              <SelectItem value="unisex">{getLabel("Unisex", "یونیسکس", "دواړه")}</SelectItem>
+              <SelectItem value="kids">{getLabel("Kids", "بچگانه", "ماشومانو")}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label>{getLabel("Plating / Coating", "آبکاری / روکش", "آبکاري / پوښ")}</Label>
+          <Select
+            value={(attributes.plating as string) || ""}
+            onValueChange={(value) => updateAttribute("plating", value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder={getLabel("Select", "انتخاب کنید", "غوره کړئ")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="gold-plated">{getLabel("Gold Plated", "آبکاری طلا", "سرو آبکاري")}</SelectItem>
+              <SelectItem value="silver-plated">{getLabel("Silver Plated", "آبکاری نقره", "سپینزر آبکاري")}</SelectItem>
+              <SelectItem value="rose-gold">{getLabel("Rose Gold", "رزگلد", "رزګولډ")}</SelectItem>
+              <SelectItem value="rhodium">{getLabel("Rhodium", "رودیوم", "رودیوم")}</SelectItem>
+              <SelectItem value="none">{getLabel("None / Solid", "ندارد / خالص", "نلري / خالص")}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label>{getLabel("Stone / Gem Type", "نوع نگین / سنگ", "د ګڼي / ډبرې ډول")}</Label>
+          <Select
+            value={(attributes.stoneType as string) || ""}
+            onValueChange={(value) => updateAttribute("stoneType", value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder={getLabel("Select", "انتخاب کنید", "غوره کړئ")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">{getLabel("None", "ندارد", "نلري")}</SelectItem>
+              <SelectItem value="diamond">{getLabel("Diamond", "الماس", "الماس")}</SelectItem>
+              <SelectItem value="zircon">{getLabel("Zircon / CZ", "زیرکون", "زیرکون")}</SelectItem>
+              <SelectItem value="pearl">{getLabel("Pearl", "مروارید", "مرغلره")}</SelectItem>
+              <SelectItem value="ruby">{getLabel("Ruby", "یاقوت", "یاقوت")}</SelectItem>
+              <SelectItem value="emerald">{getLabel("Emerald", "زمرد", "زمرد")}</SelectItem>
+              <SelectItem value="sapphire">{getLabel("Sapphire", "یاقوت کبود", "نیلم")}</SelectItem>
+              <SelectItem value="crystal">{getLabel("Crystal", "کریستال", "کریستال")}</SelectItem>
+              <SelectItem value="turquoise">{getLabel("Turquoise", "فیروزه", "فیروزه")}</SelectItem>
+              <SelectItem value="other">{getLabel("Other", "سایر", "نور")}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Color Selection */}
+        <div className="md:col-span-2 space-y-2">
+          <Label className="flex items-center gap-2">
+            <Palette className="w-4 h-4" />
+            {getLabel("Color", "رنگ", "رنګ")}
+          </Label>
+          <div className="max-h-32 overflow-y-auto sm:max-h-none sm:overflow-y-visible pb-2">
+            <div className={cn("flex gap-2 flex-wrap", isRTL ? "flex-row-reverse justify-start" : "justify-start")}>
+              {PRODUCT_COLORS.map((colorOption) => {
+                const selectedColors = (attributes.colors as string[]) || [];
+                const isSelected = selectedColors.includes(colorOption.value);
+                const colorLabel = language === 'ps' ? (colorOption.namePs || colorOption.nameFa) : language === 'fa' ? colorOption.nameFa : colorOption.name;
+                return (
+                  <button
+                    key={colorOption.value}
+                    type="button"
+                    onClick={() => {
+                      const newColors = isSelected 
+                        ? selectedColors.filter((c) => c !== colorOption.value) 
+                        : [...selectedColors, colorOption.value];
+                      updateAttribute("colors", newColors);
+                    }}
+                    className={cn(
+                      "flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-full border transition-all duration-200 whitespace-nowrap",
+                      isSelected
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-background text-foreground border-border hover:border-primary/50"
+                    )}
+                    title={colorOption.name}
+                  >
+                    <span
+                      className="w-3.5 h-3.5 rounded-full border border-border/50 flex-shrink-0"
+                      style={{ backgroundColor: colorOption.hex }}
+                    />
+                    <span>{colorLabel}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <div className="space-y-2 pt-1">
+            <Label className="text-sm text-muted-foreground">
+              {getLabel("Custom Color (optional)", "رنگ دیگر (اختیاری)", "بل رنګ (اختیاري)")}
+            </Label>
+            <Input
+              value={(attributes.customColor as string) || ""}
+              onChange={(e) => updateAttribute("customColor", e.target.value)}
+              placeholder={getLabel("e.g., Rose Gold, Champagne", "مثال: رزگلد، شامپاینی", "مثال: رزګولډ")}
+              className={cn(isRTL && "text-right")}
+            />
+          </div>
+        </div>
+
+        {/* Size for rings/bracelets */}
+        <div className="space-y-2">
+          <Label className="flex items-center gap-2">
+            <Ruler className="w-4 h-4" />
+            {getLabel("Size (if applicable)", "سایز (در صورت نیاز)", "اندازه (که اړتیا وي)")}
+          </Label>
+          <Input
+            value={(attributes.jewelrySize as string) || ""}
+            onChange={(e) => updateAttribute("jewelrySize", e.target.value)}
+            placeholder={getLabel("e.g., Ring: 7, Bracelet: 18cm", "مثال: انگشتر: ۷، دستبند: ۱۸ سانتی‌متر", "مثال: ګوته‌وان: ۷، لاسبند: ۱۸ سم")}
+            className={cn(isRTL && "text-right")}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label className="flex items-center gap-2">
+            <Weight className="w-4 h-4" />
+            {getLabel("Weight (grams)", "وزن (گرم)", "وزن (ګرامه)")}
+          </Label>
+          <Input
+            type="number"
+            value={(attributes.jewelryWeight as string) || ""}
+            onChange={(e) => updateAttribute("jewelryWeight", e.target.value)}
+            placeholder={getLabel("e.g., 5.2", "مثال: ۵.۲", "مثال: ۵.۲")}
+            className={cn(isRTL && "text-right")}
+          />
+        </div>
+
+        <Card className="md:col-span-2 p-4 space-y-3 bg-muted/30">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Switch
+                checked={(attributes.isHandmade as boolean) || false}
+                onCheckedChange={(checked) => updateAttribute("isHandmade", checked)}
+              />
+              <Label>{getLabel("Handmade", "دست‌ساز", "لاسي جوړ شوی")}</Label>
+            </div>
+            <div className="flex items-center gap-2">
+              <Switch
+                checked={(attributes.isAdjustable as boolean) || false}
+                onCheckedChange={(checked) => updateAttribute("isAdjustable", checked)}
+              />
+              <Label>{getLabel("Adjustable", "قابل تنظیم", "د تنظیم وړ")}</Label>
+            </div>
+            <div className="flex items-center gap-2">
+              <Switch
+                checked={(attributes.isWaterproof as boolean) || false}
+                onCheckedChange={(checked) => updateAttribute("isWaterproof", checked)}
+              />
+              <Label>{getLabel("Waterproof", "ضد آب", "د اوبو ضد")}</Label>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="md:col-span-2 p-4 space-y-3 bg-muted/30">
+          <Label className="flex items-center gap-2">
+            <Shield className="w-4 h-4 text-primary" />
+            {getLabel("Warranty", "گارانتی", "تضمین")}
+          </Label>
+          <div className="flex items-center gap-4">
+            <Switch
+              checked={(attributes.hasWarranty as boolean) || false}
+              onCheckedChange={(checked) => updateAttribute("hasWarranty", checked)}
+            />
+            <span className="text-sm text-muted-foreground">
+              {attributes.hasWarranty ? (isRTL ? "دارد" : "Yes") : isRTL ? "ندارد" : "No"}
+            </span>
+          </div>
+          {attributes.hasWarranty && (
+            <Select
+              value={(attributes.warrantyDuration as string) || ""}
+              onValueChange={(value) => updateAttribute("warrantyDuration", value)}
+            >
+              <SelectTrigger className="max-w-xs">
+                <SelectValue placeholder={getLabel("Warranty Duration", "مدت گارانتی", "د تضمین موده")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="3months">{isRTL ? "۳ ماه" : "3 Months"}</SelectItem>
+                <SelectItem value="6months">{isRTL ? "۶ ماه" : "6 Months"}</SelectItem>
+                <SelectItem value="1year">{isRTL ? "۱ سال" : "1 Year"}</SelectItem>
+                <SelectItem value="2years">{isRTL ? "۲ سال" : "2 Years"}</SelectItem>
+                <SelectItem value="lifetime">{isRTL ? "مادام‌العمر" : "Lifetime"}</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+        </Card>
+      </div>
+    </div>
+  );
+
   // Match category by name - works with both English names and Persian/Pashto names
   const getCategoryType = (name: string, subName?: string): string => {
     const categoryMap: Record<string, string[]> = {
@@ -1321,6 +1558,7 @@ export const CategorySpecificFields = ({
       sports: ["sports", "sports-outdoor", "ورزش", "sports & outdoor", "outdoor", "ورزشی", "لوبې"],
       baby: ["baby", "baby-kids", "کودک", "baby & kids", "kids", "نوزاد", "بچه", "ماشومان"],
       food: ["food", "food-groceries", "groceries", "غذا", "خواربار", "مواد غذایی", "food & groceries", "خواړه"],
+      jewelry: ["jewelry", "jewellery", "jewelry-accessories", "jewellery-accessories", "زیورآلات", "اکسسوری", "jewelry & accessories", "زیورآلات و اکسسوری", "د زیورآلاتو"],
     };
 
     // Check both category and subcategory names
@@ -1384,6 +1622,8 @@ export const CategorySpecificFields = ({
       return renderBabyFields();
     case "food":
       return renderFoodGroceriesFields();
+    case "jewelry":
+      return renderJewelryFields();
     default:
       return (
         <Card className="p-4 bg-muted/30">
