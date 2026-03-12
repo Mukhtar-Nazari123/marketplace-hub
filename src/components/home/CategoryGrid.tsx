@@ -3,6 +3,7 @@ import { useLanguage } from '@/lib/i18n';
 import { useCategories } from '@/hooks/useCategories';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Package, ChevronLeft, ChevronRight } from 'lucide-react';
+import { getSubcategoryImage } from '@/lib/subcategoryImages';
 
 const CategoryGrid = () => {
   const { t, isRTL } = useLanguage();
