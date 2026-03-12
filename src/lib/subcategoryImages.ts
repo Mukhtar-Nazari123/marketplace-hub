@@ -57,6 +57,16 @@ import smallAppliances from '@/assets/subcategories/small-appliances.webp';
 import chadorHijab from '@/assets/subcategories/chador-hijab.webp';
 import mensGrooming from '@/assets/subcategories/mens-grooming.webp';
 
+// Jewelry & Accessories subcategories
+import necklaces from '@/assets/subcategories/necklaces.webp';
+import earrings from '@/assets/subcategories/earrings.webp';
+import bracelets from '@/assets/subcategories/bracelets.webp';
+import rings from '@/assets/subcategories/rings.webp';
+import watches from '@/assets/subcategories/watches.webp';
+import sunglasses from '@/assets/subcategories/sunglasses.webp';
+import hairAccessories from '@/assets/subcategories/hair-accessories.webp';
+import jewelrySets from '@/assets/subcategories/jewelry-sets.webp';
+
 // Electronics subcategories
 import phones from '@/assets/subcategories/phones.webp';
 import computers from '@/assets/subcategories/computers.webp';
