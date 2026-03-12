@@ -3,6 +3,7 @@ import { useLanguage } from '@/lib/i18n';
 import { useCategories } from '@/hooks/useCategories';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Package, ChevronLeft, ChevronRight } from 'lucide-react';
+import { getSubcategoryImage } from '@/lib/subcategoryImages';
 
 const CategoryGrid = () => {
   const { t, isRTL } = useLanguage();
@@ -80,18 +81,21 @@ const CategoryGrid = () => {
                 >
                   {/* Circular Image */}
                   <div className="relative w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-2xl sm:rounded-[2rem] overflow-hidden bg-gradient-to-br from-primary/10 to-primary/5 border-2 border-transparent group-hover:border-primary/50 transition-all duration-300 group-hover:shadow-lg group-hover:scale-105">
-                    {sub.image_url ? (
-                      <img
-                        src={sub.image_url}
-                        alt={sub.name}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <Package className="h-6 w-6 md:h-8 md:w-8 text-muted-foreground" />
-                      </div>
-                    )}
+                    {(() => {
+                      const imgUrl = sub.image_url || getSubcategoryImage(sub.slug);
+                      return imgUrl ? (
+                        <img
+                          src={imgUrl}
+                          alt={sub.name}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Package className="h-6 w-6 md:h-8 md:w-8 text-muted-foreground" />
+                        </div>
+                      );
+                    })()}
                   </div>
                   
                   {/* Subcategory Name */}
