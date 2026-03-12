@@ -167,6 +167,15 @@ export const subcategoryImageMap: Record<string, string> = {
   'appliances': appliances,
   'electronics': electronics,
   'tools-home-improvement': toolsHomeImprovement,
+  // Jewelry & Accessories
+  'necklaces': necklaces,
+  'earrings': earrings,
+  'bracelets': bracelets,
+  'rings': rings,
+  'watches': watches,
+  'sunglasses': sunglasses,
+  'hair-accessories': hairAccessories,
+  'jewelry-sets': jewelrySets,
 };
 
 export const getSubcategoryImage = (slug: string): string | undefined => {
