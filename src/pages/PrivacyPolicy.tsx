@@ -41,7 +41,7 @@ const PrivacyPolicy = () => {
         {/* Hero Section */}
         <section className="bg-primary/5 border-b">
           <div className="container mx-auto px-4 py-12 md:py-16">
-            <div className={`flex items-center gap-3 mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className={`flex items-center gap-3 mb-4 ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
               <div className="p-3 rounded-xl bg-primary/10">
                 <Shield className="h-8 w-8 text-primary" />
               </div>
