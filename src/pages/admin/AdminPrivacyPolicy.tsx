@@ -48,6 +48,7 @@ const AdminPrivacyPolicy = () => {
   const [selectedPolicyId, setSelectedPolicyId] = useState<string | null>(null);
   const [changeSummary, setChangeSummary] = useState('');
   const [contentTab, setContentTab] = useState('en');
+  const [previewLang, setPreviewLang] = useState<string>(language);
 
   // Form state
   const [form, setForm] = useState({
