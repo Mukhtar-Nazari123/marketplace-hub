@@ -41,14 +41,14 @@ const PrivacyPolicy = () => {
         {/* Hero Section */}
         <section className="bg-primary/5 border-b">
           <div className="container mx-auto px-4 py-12 md:py-16">
-            <div className={`flex items-center gap-3 mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className={`flex items-center gap-3 mb-4 ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
               <div className="p-3 rounded-xl bg-primary/10">
                 <Shield className="h-8 w-8 text-primary" />
               </div>
               <h1 className="text-3xl md:text-4xl font-bold text-foreground">{title || labelTitle}</h1>
             </div>
             {policy && (
-              <div className={`flex items-center gap-4 text-sm text-muted-foreground ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <div className={`flex items-center gap-4 text-sm text-muted-foreground ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
                 {policy.published_at && (
                   <span>{labelLastUpdated}: {format(new Date(policy.published_at), 'PPP')}</span>
                 )}
