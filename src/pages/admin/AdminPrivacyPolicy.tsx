@@ -48,6 +48,7 @@ const AdminPrivacyPolicy = () => {
   const [selectedPolicyId, setSelectedPolicyId] = useState<string | null>(null);
   const [changeSummary, setChangeSummary] = useState('');
   const [contentTab, setContentTab] = useState('en');
+  const [previewLang, setPreviewLang] = useState<string>(language);
 
   // Form state
   const [form, setForm] = useState({
@@ -343,24 +344,41 @@ const AdminPrivacyPolicy = () => {
           <DialogHeader>
             <DialogTitle>{getLabel(lang, 'Preview', 'پیش‌نمایش', 'مخکتنه')}</DialogTitle>
           </DialogHeader>
-          <ScrollArea className="max-h-[65vh]">
-            {(() => {
-              const p = policies.find((p) => p.id === selectedPolicyId);
-              if (!p) return null;
-              const content = lang === 'fa' ? (p.content_fa || p.content_en) : lang === 'ps' ? (p.content_ps || p.content_en) : p.content_en;
-              const title = lang === 'fa' ? (p.title_fa || p.title_en) : lang === 'ps' ? (p.title_ps || p.title_en) : p.title_en;
-              return (
-                <div className={`prose max-w-none dark:prose-invert ${isRTL ? 'text-right' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
-                  <h1>{title}</h1>
-                  <p className="text-muted-foreground text-sm">
-                    {getLabel(lang, 'Version', 'نسخه', 'نسخه')} {p.version} •{' '}
-                    {p.published_at && format(new Date(p.published_at), 'PPP')}
-                  </p>
-                  <div className="whitespace-pre-wrap">{content}</div>
-                </div>
-              );
-            })()}
-          </ScrollArea>
+          <Tabs value={previewLang} onValueChange={setPreviewLang}>
+            <TabsList>
+              <TabsTrigger value="en">English</TabsTrigger>
+              <TabsTrigger value="fa">فارسی</TabsTrigger>
+              <TabsTrigger value="ps">پښتو</TabsTrigger>
+            </TabsList>
+            {['en', 'fa', 'ps'].map((pLang) => (
+              <TabsContent key={pLang} value={pLang}>
+                <ScrollArea className="max-h-[60vh]">
+                  {(() => {
+                    const p = policies.find((p) => p.id === selectedPolicyId);
+                    if (!p) return null;
+                    const title = (p as any)[`title_${pLang}`] || p.title_en;
+                    const content = (p as any)[`content_${pLang}`] || p.content_en;
+                    const isPreviewRTL = pLang !== 'en';
+                    return (
+                      <div className={`prose max-w-none dark:prose-invert ${isPreviewRTL ? 'text-right' : ''}`} dir={isPreviewRTL ? 'rtl' : 'ltr'}>
+                        <h1>{title}</h1>
+                        <p className="text-muted-foreground text-sm">
+                          {getLabel(lang, 'Version', 'نسخه', 'نسخه')} {p.version} •{' '}
+                          {p.published_at && format(new Date(p.published_at), 'PPP')}
+                        </p>
+                        {!((p as any)[`content_${pLang}`]) && pLang !== 'en' && (
+                          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md p-3 text-sm text-yellow-800 dark:text-yellow-200">
+                            {getLabel(lang, `No ${pLang === 'fa' ? 'Persian' : 'Pashto'} content available. Showing English content.`, `محتوای ${pLang === 'fa' ? 'فارسی' : 'پشتو'} موجود نیست. محتوای انگلیسی نمایش داده می‌شود.`, `د ${pLang === 'fa' ? 'فارسي' : 'پښتو'} منځپانګه شتون نلري. انګلیسي منځپانګه ښودل کیږي.`)}
+                          </div>
+                        )}
+                        <div className="whitespace-pre-wrap">{content}</div>
+                      </div>
+                    );
+                  })()}
+                </ScrollArea>
+              </TabsContent>
+            ))}
+          </Tabs>
         </DialogContent>
       </Dialog>
 
