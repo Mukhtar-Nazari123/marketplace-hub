@@ -48,7 +48,7 @@ const PrivacyPolicy = () => {
               <h1 className="text-3xl md:text-4xl font-bold text-foreground">{title || labelTitle}</h1>
             </div>
             {policy && (
-              <div className={`flex items-center gap-4 text-sm text-muted-foreground ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
+              <div dir={isRTL ? 'rtl' : 'ltr'} className="flex items-center gap-4 text-sm text-muted-foreground">
                 {policy.published_at && (
                   <span>{labelLastUpdated}: {format(new Date(policy.published_at), 'PPP')}</span>
                 )}
