@@ -75,6 +75,39 @@ export const authTranslations = {
     agreeTermsRequired: { en: 'You must agree to the terms', fa: 'باید با شرایط موافقت کنید', ps: 'تاسو باید شرایطو ته ومنئ' },
     passwordRequired: { en: 'Password is required', fa: 'رمز عبور الزامی است', ps: 'پټنوم اړین دی' },
   },
+
+  // Forgot Password Page
+  forgotPassword: {
+    title: { en: 'Reset Your Password', fa: 'بازیابی رمز عبور', ps: 'خپل پټنوم بیا تنظیم کړئ' },
+    subtitle: { en: 'Enter your email address and we\'ll send you a link to reset your password', fa: 'ایمیل خود را وارد کنید تا لینک بازیابی رمز عبور برای شما ارسال شود', ps: 'خپل بریښنالیک دننه کړئ او موږ به تاسو ته د پټنوم بیا تنظیمولو لینک واستوو' },
+    email: { en: 'Email Address', fa: 'آدرس ایمیل', ps: 'بریښنالیک پته' },
+    emailPlaceholder: { en: 'Enter your email', fa: 'ایمیل خود را وارد کنید', ps: 'خپل بریښنالیک دننه کړئ' },
+    sendLink: { en: 'Send Reset Link', fa: 'ارسال لینک بازیابی', ps: 'د بیا تنظیم لینک واستوئ' },
+    sending: { en: 'Sending...', fa: 'در حال ارسال...', ps: 'لیږل کېږي...' },
+    backToLogin: { en: 'Back to Login', fa: 'بازگشت به صفحه ورود', ps: 'ننوتلو ته بیرته' },
+    successTitle: { en: 'Check Your Email', fa: 'ایمیل خود را بررسی کنید', ps: 'خپل بریښنالیک وګورئ' },
+    successMessage: { en: 'We\'ve sent a password reset link to your email. Please check your inbox and follow the instructions.', fa: 'لینک بازیابی رمز عبور به ایمیل شما ارسال شد. لطفا صندوق ورودی خود را بررسی کنید.', ps: 'موږ ستاسو بریښنالیک ته د پټنوم بیا تنظیم لینک واستاوه. مهرباني وکړئ خپل انباکس وګورئ.' },
+    error: { en: 'Error', fa: 'خطا', ps: 'تېروتنه' },
+    rememberPassword: { en: 'Remember your password?', fa: 'رمز عبور خود را به یاد دارید؟', ps: 'خپل پټنوم مو په یاد دی؟' },
+    signIn: { en: 'Sign In', fa: 'ورود', ps: 'ننوتل' },
+  },
+
+  // Reset Password Page
+  resetPassword: {
+    title: { en: 'Create New Password', fa: 'ایجاد رمز عبور جدید', ps: 'نوی پټنوم جوړ کړئ' },
+    subtitle: { en: 'Enter your new password below', fa: 'رمز عبور جدید خود را وارد کنید', ps: 'خپل نوی پټنوم لاندې دننه کړئ' },
+    newPassword: { en: 'New Password', fa: 'رمز عبور جدید', ps: 'نوی پټنوم' },
+    confirmPassword: { en: 'Confirm Password', fa: 'تکرار رمز عبور', ps: 'پټنوم تایید کړئ' },
+    updatePassword: { en: 'Update Password', fa: 'تغییر رمز عبور', ps: 'پټنوم تازه کړئ' },
+    updating: { en: 'Updating...', fa: 'در حال تغییر...', ps: 'تازه کول...' },
+    successTitle: { en: 'Password Updated!', fa: 'رمز عبور تغییر کرد!', ps: 'پټنوم تازه شو!' },
+    successMessage: { en: 'Your password has been successfully updated. You can now sign in with your new password.', fa: 'رمز عبور شما با موفقیت تغییر کرد. اکنون می‌توانید با رمز عبور جدید وارد شوید.', ps: 'ستاسو پټنوم په بریالیتوب سره تازه شو. تاسو اوس د خپل نوي پټنوم سره ننوتلی شئ.' },
+    goToLogin: { en: 'Go to Login', fa: 'ورود به حساب', ps: 'حساب ته ننوتل' },
+    invalidLink: { en: 'Invalid or Expired Link', fa: 'لینک نامعتبر یا منقضی شده', ps: 'ناسم یا ختم شوی لینک' },
+    invalidLinkDesc: { en: 'This password reset link is invalid or has expired. Please request a new one.', fa: 'این لینک بازیابی نامعتبر یا منقضی شده است. لطفا درخواست جدید ارسال کنید.', ps: 'دا د پټنوم بیا تنظیم لینک ناسم یا ختم شوی دی. مهرباني وکړئ نوی غوښتنه وکړئ.' },
+    requestAgain: { en: 'Request New Link', fa: 'درخواست مجدد', ps: 'نوی لینک غوښتنه' },
+    error: { en: 'Error', fa: 'خطا', ps: 'تېروتنه' },
+  },
 };
 
 export const useAuthTranslations = (language: Language) => {
