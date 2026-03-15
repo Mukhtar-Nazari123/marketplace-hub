@@ -1,16 +1,19 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/lib/i18n";
+import { useAuthTranslations } from "@/lib/auth-translations";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, ArrowRight, CheckCircle, Eye, EyeOff } from "lucide-react";
+import { Loader2, ArrowLeft, ArrowRight, CheckCircle, Eye, EyeOff, ShieldCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { z } from "zod";
+import PasswordStrengthIndicator from "@/components/auth/PasswordStrengthIndicator";
 
 const ResetPassword = () => {
-  const { isRTL, language } = useLanguage();
+  const { language, isRTL } = useLanguage();
+  const { t } = useAuthTranslations(language as 'en' | 'fa' | 'ps');
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -24,35 +27,18 @@ const ResetPassword = () => {
   const [isValidSession, setIsValidSession] = useState(false);
   const [checking, setChecking] = useState(true);
 
-  const texts = {
-    title: language === 'fa' ? 'تنظیم رمز عبور جدید' : language === 'ps' ? 'نوی پټنوم ټاکل' : 'Set New Password',
-    subtitle: language === 'fa' ? 'رمز عبور جدید خود را وارد کنید' : language === 'ps' ? 'خپل نوی پټنوم دننه کړئ' : 'Enter your new password',
-    password: language === 'fa' ? 'رمز عبور جدید' : language === 'ps' ? 'نوی پټنوم' : 'New Password',
-    confirmPassword: language === 'fa' ? 'تکرار رمز عبور' : language === 'ps' ? 'پټنوم تایید کړئ' : 'Confirm Password',
-    submit: language === 'fa' ? 'تغییر رمز عبور' : language === 'ps' ? 'پټنوم بدل کړئ' : 'Update Password',
-    submitting: language === 'fa' ? 'در حال تغییر...' : language === 'ps' ? 'بدلول روان دي...' : 'Updating...',
-    successTitle: language === 'fa' ? 'رمز عبور تغییر کرد' : language === 'ps' ? 'پټنوم بدل شو' : 'Password Updated',
-    successMessage: language === 'fa' ? 'رمز عبور شما با موفقیت تغییر کرد. اکنون می‌توانید وارد شوید.' : language === 'ps' ? 'ستاسو پټنوم په بریالیتوب سره بدل شو.' : 'Your password has been updated successfully.',
-    goToLogin: language === 'fa' ? 'ورود به حساب' : language === 'ps' ? 'حساب ته ننوتل' : 'Go to Login',
-    invalidLink: language === 'fa' ? 'لینک نامعتبر است' : language === 'ps' ? 'ناسم لینک' : 'Invalid Link',
-    invalidLinkDesc: language === 'fa' ? 'این لینک بازیابی نامعتبر یا منقضی شده است.' : language === 'ps' ? 'دا د بیا رغولو لینک ناسم یا ختم شوی دی.' : 'This reset link is invalid or has expired.',
-    backToForgot: language === 'fa' ? 'درخواست مجدد' : language === 'ps' ? 'بیا غوښتنه' : 'Request Again',
-    passwordMin: language === 'fa' ? 'رمز عبور باید حداقل ۸ کاراکتر باشد' : language === 'ps' ? 'پټنوم باید لږ تر لږه ۸ توري ولري' : 'Password must be at least 8 characters',
-    passwordsNoMatch: language === 'fa' ? 'رمزهای عبور مطابقت ندارند' : language === 'ps' ? 'پټنومونه سره سمون نه لري' : 'Passwords do not match',
-  };
+  const BackArrow = isRTL ? ArrowRight : ArrowLeft;
 
   useEffect(() => {
-    // Check for recovery session from URL hash
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
     const type = hashParams.get('type');
-    
+
     if (type === 'recovery') {
       setIsValidSession(true);
       setChecking(false);
       return;
     }
 
-    // Also check if user already has an active session from recovery
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         setIsValidSession(true);
@@ -66,23 +52,23 @@ const ResetPassword = () => {
     setError("");
 
     if (password.length < 8) {
-      setError(texts.passwordMin);
+      setError(t('validation', 'passwordMin'));
       return;
     }
 
     if (password !== confirmPassword) {
-      setError(texts.passwordsNoMatch);
+      setError(t('validation', 'passwordsNoMatch'));
       return;
     }
 
     setLoading(true);
-    const { error } = await supabase.auth.updateUser({ password });
+    const { error: updateError } = await supabase.auth.updateUser({ password });
     setLoading(false);
 
-    if (error) {
+    if (updateError) {
       toast({
-        title: language === 'fa' ? 'خطا' : language === 'ps' ? 'تېروتنه' : 'Error',
-        description: error.message,
+        title: t('resetPassword', 'error'),
+        description: updateError.message,
         variant: "destructive"
       });
     } else {
@@ -92,7 +78,7 @@ const ResetPassword = () => {
 
   if (checking) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-screen flex items-center justify-center bg-muted/30">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
@@ -100,108 +86,141 @@ const ResetPassword = () => {
 
   if (!isValidSession) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <div className="w-full max-w-md text-center animate-fade-in">
-          <h1 className="text-2xl font-bold text-foreground mb-2">{texts.invalidLink}</h1>
-          <p className="text-muted-foreground mb-6">{texts.invalidLinkDesc}</p>
-          <Link to="/forgot-password">
-            <Button variant="outline" className="gap-2">
-              <ArrowRight className={`w-4 h-4 ${isRTL ? '' : 'rotate-180'}`} />
-              {texts.backToForgot}
-            </Button>
-          </Link>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4" dir={isRTL ? 'rtl' : 'ltr'}>
+        <Card className="w-full max-w-md shadow-lg border-0 animate-fade-in">
+          <CardContent className="pt-10 pb-8 px-8 text-center">
+            <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-5">
+              <ShieldCheck className="w-8 h-8 text-destructive" />
+            </div>
+            <h1 className="text-2xl font-bold text-foreground mb-2">
+              {t('resetPassword', 'invalidLink')}
+            </h1>
+            <p className="text-muted-foreground mb-6">
+              {t('resetPassword', 'invalidLinkDesc')}
+            </p>
+            <Link to="/forgot-password">
+              <Button variant="outline" className="gap-2">
+                <BackArrow className="w-4 h-4" />
+                {t('resetPassword', 'requestAgain')}
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <div className="w-full max-w-md text-center animate-fade-in">
-          <div className="w-20 h-20 rounded-full bg-success/20 flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-10 h-10 text-success" />
-          </div>
-          <h1 className="text-2xl font-bold text-foreground mb-2">{texts.successTitle}</h1>
-          <p className="text-muted-foreground mb-6">{texts.successMessage}</p>
-          <Link to="/login">
-            <Button className="gap-2">
-              {texts.goToLogin}
-            </Button>
-          </Link>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4" dir={isRTL ? 'rtl' : 'ltr'}>
+        <Card className="w-full max-w-md shadow-lg border-0 animate-fade-in">
+          <CardContent className="pt-10 pb-8 px-8 text-center">
+            <div className="w-16 h-16 rounded-full bg-success/15 flex items-center justify-center mx-auto mb-5">
+              <CheckCircle className="w-8 h-8 text-success" />
+            </div>
+            <h1 className="text-2xl font-bold text-foreground mb-2">
+              {t('resetPassword', 'successTitle')}
+            </h1>
+            <p className="text-muted-foreground mb-8 leading-relaxed">
+              {t('resetPassword', 'successMessage')}
+            </p>
+            <Link to="/login">
+              <Button className="gap-2">
+                {t('resetPassword', 'goToLogin')}
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md space-y-8 animate-fade-in">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-foreground mb-2">{texts.title}</h1>
-          <p className="text-muted-foreground">{texts.subtitle}</p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="password">{texts.password}</Label>
-            <div className="relative">
-              <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className={error ? "border-destructive" : ""}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className={`absolute top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground ${isRTL ? 'left-3' : 'right-3'}`}
-              >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
+    <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4" dir={isRTL ? 'rtl' : 'ltr'}>
+      <Card className="w-full max-w-md shadow-lg border-0 animate-fade-in">
+        <CardContent className="pt-10 pb-8 px-8">
+          {/* Icon */}
+          <div className="flex justify-center mb-6">
+            <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
+              <ShieldCheck className="w-7 h-7 text-primary" />
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="confirmPassword">{texts.confirmPassword}</Label>
-            <div className="relative">
-              <Input
-                id="confirmPassword"
-                type={showConfirm ? "text" : "password"}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className={error ? "border-destructive" : ""}
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirm(!showConfirm)}
-                className={`absolute top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground ${isRTL ? 'left-3' : 'right-3'}`}
-              >
-                {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
-            </div>
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-bold text-foreground mb-2">
+              {t('resetPassword', 'title')}
+            </h1>
+            <p className="text-muted-foreground text-sm">
+              {t('resetPassword', 'subtitle')}
+            </p>
           </div>
 
-          {error && <p className="text-sm text-destructive">{error}</p>}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* New Password */}
+            <div className="space-y-2">
+              <Label htmlFor="password">{t('resetPassword', 'newPassword')}</Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => { setPassword(e.target.value); setError(""); }}
+                  className={error ? "border-destructive" : ""}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className={`absolute top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors ${isRTL ? 'left-3' : 'right-3'}`}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              <PasswordStrengthIndicator password={password} language={language as 'en' | 'fa' | 'ps'} />
+            </div>
 
-          <Button
-            type="submit"
-            className="w-full"
-            size="lg"
-            disabled={!password || !confirmPassword || loading}
-          >
-            {loading ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                {texts.submitting}
-              </>
-            ) : (
-              texts.submit
-            )}
-          </Button>
-        </form>
-      </div>
+            {/* Confirm Password */}
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">{t('resetPassword', 'confirmPassword')}</Label>
+              <div className="relative">
+                <Input
+                  id="confirmPassword"
+                  type={showConfirm ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => { setConfirmPassword(e.target.value); setError(""); }}
+                  className={error ? "border-destructive" : ""}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirm(!showConfirm)}
+                  className={`absolute top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors ${isRTL ? 'left-3' : 'right-3'}`}
+                >
+                  {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            {error && <p className="text-sm text-destructive">{error}</p>}
+
+            {/* Submit */}
+            <Button
+              type="submit"
+              className="w-full"
+              size="lg"
+              disabled={!password || !confirmPassword || loading}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  {t('resetPassword', 'updating')}
+                </>
+              ) : (
+                t('resetPassword', 'updatePassword')
+              )}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 };
